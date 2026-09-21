@@ -1,0 +1,17 @@
+[project]
+name = "museumbot"
+version = "0.1.0"
+description = "Falk visitor-category latent shift in LLM-generated museum audio guides"
+requires-python = ">=3.11"
+dependencies = [
+    "requests>=2.31",
+    "python-dotenv>=1.0",
+    "numpy>=1.26",
+    "pandas>=2.1",
+    "scikit-learn>=1.4",
+    "scipy>=1.11",
+    "matplotlib>=3.8",
+    "sentence-transformers>=3.0",
+    "torch>=2.2",
+    "umap-learn>=0.5",
+]

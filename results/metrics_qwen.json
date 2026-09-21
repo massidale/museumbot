@@ -1,0 +1,223 @@
+{
+  "model": "qwen",
+  "n_artworks": 100,
+  "n_conditions": 6,
+  "dim": 1024,
+  "variance": {
+    "artwork_share": 0.6987006664276123,
+    "condition_share": 0.07393199950456619
+  },
+  "probe": {
+    "accuracy": 0.945,
+    "chance": 0.16666666666666666,
+    "per_class_recall": {
+      "Explorer": 0.96,
+      "Facilitator": 0.92,
+      "Experience Seeker": 0.97,
+      "Professional/Hobbyist": 0.98,
+      "Recharger": 1.0,
+      "Flat (baseline)": 0.84
+    }
+  },
+  "split_half_cosine": {
+    "Explorer": {
+      "mean": 0.8811482077836991,
+      "std": 0.017896331166610373
+    },
+    "Facilitator": {
+      "mean": 0.9080700880289078,
+      "std": 0.014141123545948472
+    },
+    "Experience Seeker": {
+      "mean": 0.9625150802731514,
+      "std": 0.005191593274480609
+    },
+    "Professional/Hobbyist": {
+      "mean": 0.9573796275258064,
+      "std": 0.005424587797985581
+    },
+    "Recharger": {
+      "mean": 0.9634328746795654,
+      "std": 0.0055897267605682956
+    },
+    "Flat (baseline)": {
+      "mean": 0.7774236491322517,
+      "std": 0.02744835386676166
+    }
+  },
+  "cosine_matrix": {
+    "Explorer": {
+      "Explorer": 1.0,
+      "Facilitator": 0.3280559182167053,
+      "Experience Seeker": -0.5049695372581482,
+      "Professional/Hobbyist": -0.1994423121213913,
+      "Recharger": -0.023486757650971413,
+      "Flat (baseline)": -0.20930014550685883
+    },
+    "Facilitator": {
+      "Explorer": 0.3280559182167053,
+      "Facilitator": 0.9999999403953552,
+      "Experience Seeker": -0.3786608576774597,
+      "Professional/Hobbyist": -0.3780280351638794,
+      "Recharger": 0.049214016646146774,
+      "Flat (baseline)": -0.2942524552345276
+    },
+    "Experience Seeker": {
+      "Explorer": -0.5049695372581482,
+      "Facilitator": -0.3786608576774597,
+      "Experience Seeker": 1.0,
+      "Professional/Hobbyist": -0.08724284917116165,
+      "Recharger": -0.4411628544330597,
+      "Flat (baseline)": 0.41026580333709717
+    },
+    "Professional/Hobbyist": {
+      "Explorer": -0.1994423121213913,
+      "Facilitator": -0.3780280351638794,
+      "Experience Seeker": -0.08724284917116165,
+      "Professional/Hobbyist": 1.0000001192092896,
+      "Recharger": -0.5317580103874207,
+      "Flat (baseline)": -0.11914949864149094
+    },
+    "Recharger": {
+      "Explorer": -0.023486757650971413,
+      "Facilitator": 0.049214016646146774,
+      "Experience Seeker": -0.4411628544330597,
+      "Professional/Hobbyist": -0.5317580103874207,
+      "Recharger": 1.0,
+      "Flat (baseline)": -0.3119925260543823
+    },
+    "Flat (baseline)": {
+      "Explorer": -0.20930014550685883,
+      "Facilitator": -0.2942524552345276,
+      "Experience Seeker": 0.41026580333709717,
+      "Professional/Hobbyist": -0.11914949864149094,
+      "Recharger": -0.3119925260543823,
+      "Flat (baseline)": 0.9999999403953552
+    }
+  },
+  "steering_norms": {
+    "Explorer": 0.15091785788536072,
+    "Facilitator": 0.15966179966926575,
+    "Experience Seeker": 0.24233148992061615,
+    "Professional/Hobbyist": 0.2705233097076416,
+    "Recharger": 0.2769569754600525,
+    "Flat (baseline)": 0.09778891503810883
+  },
+  "permutation": {
+    "observed_mean_norm": 0.19969671964645386,
+    "null_mean": 0.04229185618646443,
+    "p_value": 0.0004997501249375312
+  },
+  "words": {
+    "Explorer": 238.74,
+    "Facilitator": 236.23,
+    "Experience Seeker": 234.7,
+    "Professional/Hobbyist": 258.51,
+    "Recharger": 226.18,
+    "Flat (baseline)": 224.22
+  },
+  "top_words": {
+    "Explorer": [
+      "choose",
+      "closer",
+      "twist",
+      "curious",
+      "spot",
+      "clue",
+      "trying",
+      "doing",
+      "yourself",
+      "flowers",
+      "wasn't",
+      "puzzle",
+      "again",
+      "felt",
+      "waiting"
+    ],
+    "Facilitator": [
+      "talk",
+      "discuss",
+      "companions",
+      "conversation",
+      "group",
+      "sharing",
+      "especially",
+      "share",
+      "think",
+      "someone",
+      "chance",
+      "maybe",
+      "might",
+      "discussion",
+      "clever"
+    ],
+    "Experience Seeker": [
+      "must",
+      "treasure",
+      "legendary",
+      "genius",
+      "defining",
+      "iconic",
+      "reputation",
+      "unforgettable",
+      "depict",
+      "cornerstone",
+      "icon",
+      "remember",
+      "widely",
+      "landmark",
+      "revolutionary"
+    ],
+    "Professional/Hobbyist": [
+      "scholarly",
+      "critical",
+      "tonal",
+      "note",
+      "particularly",
+      "handling",
+      "comparison",
+      "compositional",
+      "technically",
+      "further",
+      "evolving",
+      "similarly",
+      "executed",
+      "compare",
+      "understanding"
+    ],
+    "Recharger": [
+      "breath",
+      "rush",
+      "breathe",
+      "allow",
+      "settle",
+      "steady",
+      "noise",
+      "slowly",
+      "refuge",
+      "carry",
+      "wish",
+      "slow",
+      "drift",
+      "pause",
+      "rest"
+    ],
+    "Flat (baseline)": [
+      "slightly",
+      "hair",
+      "seized",
+      "places",
+      "madness",
+      "measures",
+      "artist's",
+      "grace",
+      "critic",
+      "guide",
+      "testament",
+      "permanent",
+      "casual",
+      "mountains",
+      "soon"
+    ]
+  }
+}

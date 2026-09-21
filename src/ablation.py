@@ -148,7 +148,7 @@ def fig_bars(res: dict, path: Path) -> None:
     a.set_ylabel("accuracy")
     a.set_ylim(0, 1.05)
     a2 = a.twinx()
-    a2.bar(x + 0.2, [R[v]["norm_mean"] for v in vs], 0.4, color="#E8743B", label="||v|| media")
+    a2.bar(x + 0.2, [R[v]["norm_mean"] for v in vs], 0.4, color="#9E9E9E", label="||v|| media")
     a2.set_ylabel("norma media steering")
     h1, l1 = a.get_legend_handles_labels()
     h2, l2 = a2.get_legend_handles_labels()
@@ -177,16 +177,17 @@ def fig_bars(res: dict, path: Path) -> None:
 
 
 def fig_cosine_heatmap(res: dict, path: Path) -> None:
+    """Heatmap variante x categoria del coseno con full, su scala sequenziale ristretta al range osservato."""
     vs = [v for v in VARIANTS if v in res["variants"]]
     M = np.array([[res["variants"][v]["cos_with_full"][LABELS[c]] for c in FALK_CATEGORIES] for v in vs])
     fig, ax = plt.subplots(figsize=(7.5, 6))
-    im = ax.imshow(M, cmap="RdBu_r", vmin=-1, vmax=1)
+    im = ax.imshow(M, cmap="YlOrRd", vmin=0.4, vmax=1.0)
     ax.set_xticks(range(N_FALK), [LABELS[c] for c in FALK_CATEGORIES], rotation=40, ha="right", fontsize=9)
     ax.set_yticks(range(len(vs)), vs, fontsize=9)
     for i in range(len(vs)):
         for j in range(N_FALK):
             ax.text(j, i, f"{M[i, j]:.2f}", ha="center", va="center", fontsize=8,
-                    color="white" if abs(M[i, j]) > 0.55 else "black")
+                    color="white" if M[i, j] > 0.85 else "black")
     ax.set_title("Coseno fra v_variante[c] e v_full[c]", fontsize=11)
     fig.colorbar(im, shrink=0.8)
     fig.tight_layout()

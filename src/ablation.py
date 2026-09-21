@@ -29,6 +29,7 @@ RESULTS = ROOT / "results"
 FIGS = ROOT / "figures"
 
 N_FALK = len(FALK_CATEGORIES)  # le prime 5 di CONDITIONS; flat e' l'ultima
+assert CONDITIONS[N_FALK:] == ["flat"], "l'analisi assume flat come ultima condizione"
 
 
 def steering(X: np.ndarray) -> np.ndarray:
@@ -67,12 +68,12 @@ def factorial_effects(table: dict[str, float]) -> dict:
     return {"main": main, "interaction": inter}
 
 
-def analyse_variant(model: str, variant: str, V_full: np.ndarray | None) -> dict:
-    X, arts, meta = load(model, variant)
+def analyse_variant(model: str, variant: str, V_full: np.ndarray | None) -> tuple[dict, np.ndarray]:
+    X, _, meta = load(model, variant)
     Xc = X - X.mean(axis=1, keepdims=True)
     V = steering(X)
     acc, cm, _, _ = probe(Xc[:, :N_FALK, :])          # 5 classi: flat escluso
-    sh_mu, sh_sd = split_half(X)
+    sh_mu, _ = split_half(X)
     norms = np.linalg.norm(V, axis=1)
     words = meta.groupby("condition")["words"].mean()
     out = {

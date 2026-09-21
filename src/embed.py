@@ -7,8 +7,9 @@ Nessuna instruction prefix: Qwen3-Embedding la supporta, ma un prefisso diverso 
 condizione introdurrebbe esattamente lo shift che l'esperimento vuole misurare. Il prefisso
 resta assente per tutti, in modo uniforme.
 
-Output: data/emb_{alias}.npy (float32, L2-normalizzato) + data/meta.csv, allineati riga
-per riga.
+Output: data/emb_{alias}.npy + data/meta.csv per la variante `full`; per le altre varianti
+data/emb_{alias}_{variante}.npy + data/meta_{variante}.csv. Le righe flat vengono sempre
+dalla variante `full`.
 """
 
 import argparse
@@ -98,6 +99,9 @@ def main() -> None:
     ap.add_argument("--batch-size", type=int, default=8)
     ap.add_argument("--device", default="mps")
     args = ap.parse_args()
+
+    if args.all_variants and args.variant != "full":
+        print("--variant ignorato perche' e' impostato --all-variants")
 
     all_rows = [json.loads(l) for l in GEN.open()]
     if args.all_variants:

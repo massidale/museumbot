@@ -9,7 +9,7 @@ ogni categoria, uno **shift direzionale** misurabile e riproducibile rispetto a 
 descrizione neutra?
 
 **Risposta breve.** Sì. Con 100 opere e 6 condizioni, un probe lineare distingue la
-condizione di generazione con accuracy del 94.5% (chance 16.7%), le direzioni di shift sono
+condizione di generazione con accuracy del 94.7% (chance 16.7%), le direzioni di shift sono
 stabili su metà disgiunte del corpus (coseno 0.88–0.96) e il test di permutazione entro
 opera dà p = 0.0005. L'effetto è piccolo in termini di varianza (7% contro il 70% spiegato
 dall'opera) ma è nitido, e le cinque categorie non collassano fra loro.
@@ -93,7 +93,8 @@ il centering.
 
 ![Matrice di confusione del probe lineare, embedding Qwen3](../figures/confusion_qwen.png)
 
-Accuracy **94.5%** (90.3%). Recall per classe:
+Accuracy **94.7%** (90.3%) (gli embedding Qwen3 sono stati ricalcolati dopo un cambio di
+ambiente; il valore originale era 94.5%). Recall per classe:
 
 | condizione | Qwen3 | BGE-M3 |
 |---|---|---|
@@ -233,9 +234,9 @@ interazioni a due vie, sul coseno medio con il full e sulla norma media.
 
 **Lo stile è la discriminante.** È sufficiente: da solo riproduce la direzione del blocco
 completo (coseno 0.96 / 0.91) con la stessa ampiezza e la stessa separabilità. Ed è
-necessaria: toglierlo è l'unica rimozione singola che costa qualcosa (0.87 / 0.87, e
+necessaria: toglierlo è l'unica rimozione singola con un costo netto (0.87 / 0.87, e
 la norma cala di un quarto). L'effetto principale dello stile sul coseno è 2.5 volte
-quello della definizione e 8 volte quello del bisogno.
+quello della definizione e 8 volte quello del bisogno (Qwen3; 1.6 e 3.6 volte su BGE-M3).
 
 **La definizione conta solo in assenza dello stile.** L'interazione def×style è negativa e
 grande (−0.09 / −0.10): la definizione porta il coseno da 0.74 a 0.87 quando lo stile
@@ -245,7 +246,8 @@ stile la dice in modo più operativo.
 **Il bisogno da solo non basta, e in un caso devia.** `need_only` è la più debole delle
 varianti a una parte, e per Experience Seeker il coseno crolla a 0.50 / 0.53: la frase
 "Their need is memorable, high-impact takeaways", senza definizione né stile, spinge il
-testo in una direzione diversa da quella del blocco completo. È l'unico caso in cui una
+testo in una direzione diversa da quella del blocco completo, e più debole (norma
+dimezzata). È l'unico caso in cui una
 parte del prompt non è un sottoinsieme dell'effetto totale ma un effetto diverso.
 
 **Il nome da solo conserva circa tre quarti dello shift.** Con "Your listener is a
@@ -269,8 +271,9 @@ misurabile. Una seconda generazione del full su 100 opere (≈ 0.05 $) darebbe i
 ### 5.4 Implicazione per il prompt
 
 Per un sistema di produzione il blocco può ridursi all'istruzione di stile: stessa
-efficacia, un terzo dei token. Per lo studio scientifico l'ablazione dice che quello che
-il paper chiama "adattamento alla categoria di Falk" è, nel modello, quasi interamente
+efficacia, circa metà delle parole del blocco di categoria (il resto del system prompt non
+cambia). Per lo studio scientifico l'ablazione dice che quello che
+il paper chiama "adattamento alla categoria di Falk" è, nel modello, in larga parte
 l'esecuzione di un'istruzione stilistica esplicita, e in misura minore l'evocazione di uno
 stereotipo associato al nome. La definizione sociologica della categoria non aggiunge
 nulla quando lo stile è presente.

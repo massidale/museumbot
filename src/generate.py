@@ -102,6 +102,9 @@ def read_done(path: Path) -> set[tuple[str, str, str, str]]:
     return done
 
 
+# Nota: "flat forced to full" dello spec e' implementato come "flat saltato per le
+# varianti non-full" (equivalente se esistono le righe flat di full; su un dataset nuovo
+# lanciare prima --variant full).
 def plan_jobs(artworks, variants, done, model) -> list[tuple[dict, str, str]]:
     """Terne (opera, condizione, variante) da generare. `flat` esiste solo in `full`."""
     return [

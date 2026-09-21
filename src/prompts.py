@@ -27,6 +27,10 @@ stessa fonte, stessi vincoli di stile, stesso limite di parole, stessi parametri
 decoding. I 5 blocchi Falk hanno inoltre forma parallela — definizione, poi bisogno, poi
 stile — cosi' che a variare sia il contenuto della categoria e non il modo in cui e'
 formulata.
+
+ABLAZIONE: ogni blocco e' spezzato in tre parti (def, need, style) e ricomposto secondo una
+variante (vedi VARIANTS). La variante `full` riproduce il prompt originale byte per byte;
+`name_only` lascia soltanto il nome della categoria.
 """
 
 SYSTEM_TEMPLATE = """\
@@ -51,42 +55,93 @@ Source description:
 {source_text}"""
 
 
-CATEGORY_BLOCKS = {
-    "explorer": """\
-Your listener is an Explorer: a curiosity-driven visitor with a generic interest in the \
-contents of the museum, who expects to find something that will grab their attention and fuel \
-their curiosity and learning. Their need is variety, discovery and stimulation. Use engaging, \
-curiosity-piquing language that invites further exploration — intriguing details, or \
-thought-provoking questions related to the artwork. Encourage them to look closer, to consider \
-the artist's techniques, or to explore themes that resonate widely.""",
-    "facilitator": """\
-Your listener is a Facilitator: a socially motivated visitor whose visit is primarily focused \
-on enabling the learning and experience of others in their accompanying social group. Their \
-need is accommodating the needs and interests of companions. Offer a balanced overview of the \
-artwork that can engage both the primary visitor and their companions. Provide information \
-that is accessible and relevant to a diverse audience, and encourage discussion and dialogue \
-among group members.""",
-    "experience_seeker": """\
-Your listener is an Experience Seeker: a visitor motivated to come because they perceive the \
-museum as a must-see destination, whose satisfaction primarily derives from having been there \
-and done that. Their need is memorable, high-impact takeaways. Emphasise the artwork's \
-significance — its historical importance, its cultural impact, the artist's reputation. \
-Highlight the must-know details or unique aspects that give this piece its iconic status, in a \
-way that makes its importance immediately apparent and shareable.""",
-    "professional_hobbyist": """\
-Your listener is a Professional or Hobbyist: a visitor who feels a close tie between the \
-museum contents and their professional or hobbyist passions, and whose visit is motivated by \
-a desire to satisfy a specific content-related objective. Their need is deepening \
-understanding and engaging with specialised knowledge. Provide detailed insight into artistic \
-technique, historical significance and the scholarly debates surrounding the artwork, and \
-point towards related works by the same artist or within the same genre.""",
-    "recharger": """\
-Your listener is a Recharger: a visitor who primarily seeks a contemplative, spiritual or \
-restorative experience, and who sees the museum as a refuge from the work-a-day world or as a \
-confirmation of their beliefs. Their need is space for reflection and rejuvenation. Create a \
-tranquil and contemplative atmosphere around the artwork. Make room for quiet observation and \
-introspection, and offer reflective prompts that encourage a slower, deeper engagement.""",
+# Ogni blocco e' spezzato nelle tre parti che l'ablazione manipola. Le stringhe sono
+# esattamente quelle del blocco originale: `build_block(c, "full")` le ricompone byte per byte.
+CATEGORY_PARTS = {
+    "explorer": {
+        "name": "an Explorer",
+        "def": "a curiosity-driven visitor with a generic interest in the contents of the "
+               "museum, who expects to find something that will grab their attention and fuel "
+               "their curiosity and learning.",
+        "need": "Their need is variety, discovery and stimulation.",
+        "style": "Use engaging, curiosity-piquing language that invites further exploration — "
+                 "intriguing details, or thought-provoking questions related to the artwork. "
+                 "Encourage them to look closer, to consider the artist's techniques, or to "
+                 "explore themes that resonate widely.",
+    },
+    "facilitator": {
+        "name": "a Facilitator",
+        "def": "a socially motivated visitor whose visit is primarily focused on enabling the "
+               "learning and experience of others in their accompanying social group.",
+        "need": "Their need is accommodating the needs and interests of companions.",
+        "style": "Offer a balanced overview of the artwork that can engage both the primary "
+                 "visitor and their companions. Provide information that is accessible and "
+                 "relevant to a diverse audience, and encourage discussion and dialogue among "
+                 "group members.",
+    },
+    "experience_seeker": {
+        "name": "an Experience Seeker",
+        "def": "a visitor motivated to come because they perceive the museum as a must-see "
+               "destination, whose satisfaction primarily derives from having been there and "
+               "done that.",
+        "need": "Their need is memorable, high-impact takeaways.",
+        "style": "Emphasise the artwork's significance — its historical importance, its "
+                 "cultural impact, the artist's reputation. Highlight the must-know details or "
+                 "unique aspects that give this piece its iconic status, in a way that makes "
+                 "its importance immediately apparent and shareable.",
+    },
+    "professional_hobbyist": {
+        "name": "a Professional or Hobbyist",
+        "def": "a visitor who feels a close tie between the museum contents and their "
+               "professional or hobbyist passions, and whose visit is motivated by a desire to "
+               "satisfy a specific content-related objective.",
+        "need": "Their need is deepening understanding and engaging with specialised knowledge.",
+        "style": "Provide detailed insight into artistic technique, historical significance and "
+                 "the scholarly debates surrounding the artwork, and point towards related "
+                 "works by the same artist or within the same genre.",
+    },
+    "recharger": {
+        "name": "a Recharger",
+        "def": "a visitor who primarily seeks a contemplative, spiritual or restorative "
+               "experience, and who sees the museum as a refuge from the work-a-day world or as "
+               "a confirmation of their beliefs.",
+        "need": "Their need is space for reflection and rejuvenation.",
+        "style": "Create a tranquil and contemplative atmosphere around the artwork. Make room "
+                 "for quiet observation and introspection, and offer reflective prompts that "
+                 "encourage a slower, deeper engagement.",
+    },
 }
+
+# Varianti dell'ablazione: flag (def, need, style). Disegno fattoriale 2x2x2.
+# `full` e' il prompt originale; `name_only` lascia solo "Your listener is <name>."
+VARIANTS = {
+    "full":       (True,  True,  True),
+    "no_def":     (False, True,  True),
+    "no_need":    (True,  False, True),
+    "no_style":   (True,  True,  False),
+    "def_only":   (True,  False, False),
+    "need_only":  (False, True,  False),
+    "style_only": (False, False, True),
+    "name_only":  (False, False, False),
+}
+PARTS = ("def", "need", "style")
+
+
+def build_block(category: str, variant: str = "full") -> str:
+    """Blocco di categoria per una variante: nome sempre presente, parti solo se attive."""
+    if variant not in VARIANTS:
+        raise ValueError(f"unknown variant {variant!r}; expected one of {list(VARIANTS)}")
+    if category not in CATEGORY_PARTS:
+        raise ValueError(f"unknown category {category!r}")
+    p = CATEGORY_PARTS[category]
+    active = [p[part] for part, on in zip(PARTS, VARIANTS[variant]) if on]
+    if not active:
+        return f"Your listener is {p['name']}."
+    return f"Your listener is {p['name']}: " + " ".join(active)
+
+
+# Alias di compatibilita': i blocchi completi, come prima del refactor.
+CATEGORY_BLOCKS = {c: build_block(c, "full") for c in CATEGORY_PARTS}
 
 # Le 5 categorie di Falk, piu' la condizione flat (baseline del paper: nessun blocco).
 FALK_CATEGORIES = list(CATEGORY_BLOCKS)
@@ -103,21 +158,23 @@ LABELS = {
 }
 
 
-def build_system(condition: str) -> str:
-    """System prompt per una condizione. `flat` rimuove del tutto il blocco di categoria."""
+def build_system(condition: str, variant: str = "full") -> str:
+    """System prompt per una (condizione, variante). `flat` non ha blocco e ignora la variante."""
     if condition == "flat":
         block = ""
-    elif condition in CATEGORY_BLOCKS:
-        block = "\n" + CATEGORY_BLOCKS[condition] + "\n"
+    elif condition in CATEGORY_PARTS:
+        block = "\n" + build_block(condition, variant) + "\n"
     else:
         raise ValueError(f"unknown condition {condition!r}; expected one of {CONDITIONS}")
     return SYSTEM_TEMPLATE.format(category_block=block)
 
 
-def build_messages(condition: str, title: str, artist: str, source_text: str) -> list[dict]:
-    """Messaggi in formato chat completions per una (condizione, opera)."""
+def build_messages(
+    condition: str, title: str, artist: str, source_text: str, variant: str = "full"
+) -> list[dict]:
+    """Messaggi in formato chat completions per una (condizione, opera, variante)."""
     return [
-        {"role": "system", "content": build_system(condition)},
+        {"role": "system", "content": build_system(condition, variant)},
         {
             "role": "user",
             "content": USER_TEMPLATE.format(
@@ -135,3 +192,8 @@ if __name__ == "__main__":
         print("=" * 78)
         print(build_system(cond))
         print()
+
+    print("\n" + "=" * 78)
+    print("### Varianti dell'ablazione (Explorer)")
+    for v in VARIANTS:
+        print(f"--- {v}\n{build_block('explorer', v)}\n")

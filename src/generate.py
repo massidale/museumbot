@@ -18,7 +18,7 @@ from pathlib import Path
 import requests
 
 from config import openrouter_key
-from prompts import CONDITIONS, build_messages
+from prompts import CONDITIONS, VARIANTS, build_messages
 
 ROOT = Path(__file__).resolve().parent.parent
 ARTWORKS = ROOT / "data" / "artworks.jsonl"
@@ -92,33 +92,50 @@ def generate_one(
     raise RuntimeError("nessun testo valido dopo 4 tentativi")
 
 
+def read_done(path: Path) -> set[tuple[str, str, str, str]]:
+    """Chiavi gia' generate. Le righe storiche senza `variant` valgono come `full`."""
+    done = set()
+    if path.exists():
+        for line in path.open():
+            r = json.loads(line)
+            done.add((r["artwork_id"], r["condition"], r["model"], r.get("variant", "full")))
+    return done
+
+
+def plan_jobs(artworks, variants, done, model) -> list[tuple[dict, str, str]]:
+    """Terne (opera, condizione, variante) da generare. `flat` esiste solo in `full`."""
+    return [
+        (a, c, v)
+        for v in variants
+        for a in artworks
+        for c in CONDITIONS
+        if not (c == "flat" and v != "full")
+        and (a["id"], c, model, v) not in done
+    ]
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="deepseek/deepseek-v4-flash")
     ap.add_argument("--temperature", type=float, default=0.7)
     ap.add_argument("--limit", type=int, help="usa solo le prime N opere (smoke test)")
-    ap.add_argument("--cap", type=float, default=0.60, help="tetto di spesa in dollari")
+    ap.add_argument("--cap", type=float, default=1.00, help="tetto di spesa in dollari")
     ap.add_argument("--workers", type=int, default=6)
+    ap.add_argument("--variant", default="full", choices=list(VARIANTS),
+                    help="variante del blocco di categoria (ablazione)")
+    ap.add_argument("--all-variants", action="store_true",
+                    help="genera tutte le varianti diverse da full in un solo run")
     args = ap.parse_args()
 
     artworks = [json.loads(l) for l in ARTWORKS.open()]
     if args.limit:
         artworks = artworks[: args.limit]
 
-    done = set()
-    if OUT.exists():
-        for line in OUT.open():
-            r = json.loads(line)
-            done.add((r["artwork_id"], r["condition"], r["model"]))
-
-    todo = [
-        (a, c)
-        for a in artworks
-        for c in CONDITIONS
-        if (a["id"], c, args.model) not in done
-    ]
-    print(f"[{args.model}] {len(artworks)} opere x {len(CONDITIONS)} condizioni")
-    print(f"  gia' fatte {len(artworks) * len(CONDITIONS) - len(todo)}, da generare {len(todo)}")
+    variants = [v for v in VARIANTS if v != "full"] if args.all_variants else [args.variant]
+    done = read_done(OUT)
+    todo = plan_jobs(artworks, variants, done, args.model)
+    print(f"[{args.model}] {len(artworks)} opere, varianti {variants}")
+    print(f"  da generare {len(todo)}")
     if not todo:
         return
 
@@ -131,14 +148,15 @@ def main() -> None:
     fh = OUT.open("a")
 
     def work(job):
-        art, cond = job
-        msgs = build_messages(cond, art["title"], art["artist"], art["source_text"])
+        art, cond, variant = job
+        msgs = build_messages(cond, art["title"], art["artist"], art["source_text"], variant)
         text, usage = generate_one(session, args.model, msgs, budget, args.temperature)
         row = {
             "artwork_id": art["id"],
             "title": art["title"],
             "artist": art["artist"],
             "condition": cond,
+            "variant": variant,
             "model": args.model,
             "temperature": args.temperature,
             "text": text,

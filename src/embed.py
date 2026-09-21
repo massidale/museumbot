@@ -13,18 +13,71 @@ per riga.
 
 import argparse
 import json
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parent.parent
+from config import ROOT, emb_path, meta_path
+from prompts import VARIANTS
+
 GEN = ROOT / "data" / "generations.jsonl"
 
 MODELS = {
     "qwen": "Qwen/Qwen3-Embedding-0.6B",
     "bge-m3": "BAAI/bge-m3",
 }
+
+
+def select_rows(all_rows: list[dict], generator_model: str, variant: str) -> list[dict]:
+    """Righe di una variante. Le righe flat vengono sempre dalla variante `full`,
+    perche' il flat non ha blocco e quindi non ha varianti. Righe storiche senza campo
+    `variant` valgono come `full`. Ordine deterministico (opera, condizione)."""
+    rows = []
+    for r in all_rows:
+        if r.get("model") != generator_model:
+            continue
+        v = r.get("variant", "full")
+        if r["condition"] == "flat":
+            if v == "full":
+                rows.append(r)
+        elif v == variant:
+            rows.append(r)
+    keys = [(r["artwork_id"], r["condition"]) for r in rows]
+    if len(keys) != len(set(keys)):
+        raise SystemExit(f"righe duplicate per (opera, condizione) in variante {variant!r}")
+    rows.sort(key=lambda r: (r["artwork_id"], r["condition"]))
+    return rows
+
+
+def embed_rows(model, rows: list[dict], alias: str, variant: str, batch_size: int) -> None:
+    emb = model.encode(
+        [r["text"] for r in rows],
+        batch_size=batch_size,
+        normalize_embeddings=True,
+        show_progress_bar=True,
+        convert_to_numpy=True,
+    ).astype(np.float32)
+
+    out = emb_path(alias, variant)
+    np.save(out, emb)
+    pd.DataFrame(
+        [
+            {
+                "artwork_id": r["artwork_id"],
+                "title": r["title"],
+                "artist": r["artist"],
+                "condition": r["condition"],
+                "variant": r.get("variant", "full"),
+                "words": r["words"],
+                "generator_model": r["model"],
+            }
+            for r in rows
+        ]
+    ).to_csv(meta_path(variant), index=False)
+
+    norms = np.linalg.norm(emb, axis=1)
+    print(f"\n{out.relative_to(ROOT)}  shape {emb.shape}")
+    print(f"  norme L2: min {norms.min():.4f} max {norms.max():.4f}   NaN: {int(np.isnan(emb).sum())}")
 
 
 def main() -> None:
@@ -39,29 +92,19 @@ def main() -> None:
         default="deepseek/deepseek-v4-flash",
         help="usa soltanto i testi prodotti da questo modello generativo",
     )
+    ap.add_argument("--variant", default="full", choices=list(VARIANTS))
+    ap.add_argument("--all-variants", action="store_true",
+                    help="embedda ogni variante presente in generations.jsonl")
     ap.add_argument("--batch-size", type=int, default=8)
     ap.add_argument("--device", default="mps")
     args = ap.parse_args()
 
     all_rows = [json.loads(l) for l in GEN.open()]
-    rows = [r for r in all_rows if r.get("model") == args.generator_model]
-    if not rows:
-        available = sorted({r.get("model", "<mancante>") for r in all_rows})
-        raise SystemExit(
-            f"nessun testo per {args.generator_model!r}; modelli disponibili: {available}"
-        )
-
-    keys = [(r["artwork_id"], r["condition"]) for r in rows]
-    if len(keys) != len(set(keys)):
-        raise SystemExit(
-            f"righe duplicate per (opera, condizione) nel modello {args.generator_model!r}"
-        )
-    # ordine deterministico: l'analisi assume un reshape (opera, condizione)
-    rows.sort(key=lambda r: (r["artwork_id"], r["condition"]))
-    print(
-        f"{len(rows)} testi da {len({r['artwork_id'] for r in rows})} opere "
-        f"[generatore: {args.generator_model}]"
-    )
+    if args.all_variants:
+        present = {r.get("variant", "full") for r in all_rows if r.get("model") == args.generator_model}
+        variants = [v for v in VARIANTS if v in present]
+    else:
+        variants = [args.variant]
 
     from sentence_transformers import SentenceTransformer
 
@@ -69,34 +112,14 @@ def main() -> None:
     print(f"carico {name} su {args.device} ...")
     m = SentenceTransformer(name, device=args.device)
 
-    emb = m.encode(
-        [r["text"] for r in rows],
-        batch_size=args.batch_size,
-        normalize_embeddings=True,
-        show_progress_bar=True,
-        convert_to_numpy=True,
-    ).astype(np.float32)
-
-    out = ROOT / "data" / f"emb_{args.embedding_model}.npy"
-    np.save(out, emb)
-    pd.DataFrame(
-        [
-            {
-                "artwork_id": r["artwork_id"],
-                "title": r["title"],
-                "artist": r["artist"],
-                "condition": r["condition"],
-                "words": r["words"],
-                "generator_model": r["model"],
-            }
-            for r in rows
-        ]
-    ).to_csv(ROOT / "data" / "meta.csv", index=False)
-
-    norms = np.linalg.norm(emb, axis=1)
-    print(f"\n{out.relative_to(ROOT)}  shape {emb.shape}")
-    print(f"  norme L2: min {norms.min():.4f} max {norms.max():.4f}")
-    print(f"  NaN: {int(np.isnan(emb).sum())}")
+    for v in variants:
+        rows = select_rows(all_rows, args.generator_model, v)
+        if not rows:
+            print(f"[{v}] nessun testo, salto")
+            continue
+        n_art = len({r["artwork_id"] for r in rows})
+        print(f"\n[{v}] {len(rows)} testi da {n_art} opere [generatore: {args.generator_model}]")
+        embed_rows(m, rows, args.embedding_model, v, args.batch_size)
 
 
 if __name__ == "__main__":

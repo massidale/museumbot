@@ -1,601 +1,601 @@
-artwork_id,title,artist,condition,words,generator_model
-Q1091086,The Third of May 1808,Francisco Goya,experience_seeker,237,deepseek/deepseek-v4-flash
-Q1091086,The Third of May 1808,Francisco Goya,explorer,215,deepseek/deepseek-v4-flash
-Q1091086,The Third of May 1808,Francisco Goya,facilitator,259,deepseek/deepseek-v4-flash
-Q1091086,The Third of May 1808,Francisco Goya,flat,260,deepseek/deepseek-v4-flash
-Q1091086,The Third of May 1808,Francisco Goya,professional_hobbyist,265,deepseek/deepseek-v4-flash
-Q1091086,The Third of May 1808,Francisco Goya,recharger,241,deepseek/deepseek-v4-flash
-Q1118456,La Balançoire,Pierre-Auguste Renoir,experience_seeker,240,deepseek/deepseek-v4-flash
-Q1118456,La Balançoire,Pierre-Auguste Renoir,explorer,242,deepseek/deepseek-v4-flash
-Q1118456,La Balançoire,Pierre-Auguste Renoir,facilitator,271,deepseek/deepseek-v4-flash
-Q1118456,La Balançoire,Pierre-Auguste Renoir,flat,245,deepseek/deepseek-v4-flash
-Q1118456,La Balançoire,Pierre-Auguste Renoir,professional_hobbyist,281,deepseek/deepseek-v4-flash
-Q1118456,La Balançoire,Pierre-Auguste Renoir,recharger,259,deepseek/deepseek-v4-flash
-Q1123378,Equestrian Portrait of Charles V,Titian,experience_seeker,232,deepseek/deepseek-v4-flash
-Q1123378,Equestrian Portrait of Charles V,Titian,explorer,255,deepseek/deepseek-v4-flash
-Q1123378,Equestrian Portrait of Charles V,Titian,facilitator,235,deepseek/deepseek-v4-flash
-Q1123378,Equestrian Portrait of Charles V,Titian,flat,239,deepseek/deepseek-v4-flash
-Q1123378,Equestrian Portrait of Charles V,Titian,professional_hobbyist,264,deepseek/deepseek-v4-flash
-Q1123378,Equestrian Portrait of Charles V,Titian,recharger,238,deepseek/deepseek-v4-flash
-Q1133420,The Surrender of Brea,Diego Velázquez,experience_seeker,249,deepseek/deepseek-v4-flash
-Q1133420,The Surrender of Brea,Diego Velázquez,explorer,232,deepseek/deepseek-v4-flash
-Q1133420,The Surrender of Brea,Diego Velázquez,facilitator,239,deepseek/deepseek-v4-flash
-Q1133420,The Surrender of Brea,Diego Velázquez,flat,213,deepseek/deepseek-v4-flash
-Q1133420,The Surrender of Brea,Diego Velázquez,professional_hobbyist,268,deepseek/deepseek-v4-flash
-Q1133420,The Surrender of Brea,Diego Velázquez,recharger,215,deepseek/deepseek-v4-flash
-Q1150997,Saturn Devouring His Son,Francisco Goya,experience_seeker,243,deepseek/deepseek-v4-flash
-Q1150997,Saturn Devouring His Son,Francisco Goya,explorer,216,deepseek/deepseek-v4-flash
-Q1150997,Saturn Devouring His Son,Francisco Goya,facilitator,235,deepseek/deepseek-v4-flash
-Q1150997,Saturn Devouring His Son,Francisco Goya,flat,220,deepseek/deepseek-v4-flash
-Q1150997,Saturn Devouring His Son,Francisco Goya,professional_hobbyist,251,deepseek/deepseek-v4-flash
-Q1150997,Saturn Devouring His Son,Francisco Goya,recharger,242,deepseek/deepseek-v4-flash
-Q1167178,The Painter's Studio,Gustave Courbet,experience_seeker,205,deepseek/deepseek-v4-flash
-Q1167178,The Painter's Studio,Gustave Courbet,explorer,254,deepseek/deepseek-v4-flash
-Q1167178,The Painter's Studio,Gustave Courbet,facilitator,244,deepseek/deepseek-v4-flash
-Q1167178,The Painter's Studio,Gustave Courbet,flat,192,deepseek/deepseek-v4-flash
-Q1167178,The Painter's Studio,Gustave Courbet,professional_hobbyist,292,deepseek/deepseek-v4-flash
-Q1167178,The Painter's Studio,Gustave Courbet,recharger,230,deepseek/deepseek-v4-flash
-Q1167912,Le Déjeuner sur l'herbe,Claude Monet,experience_seeker,229,deepseek/deepseek-v4-flash
-Q1167912,Le Déjeuner sur l'herbe,Claude Monet,explorer,250,deepseek/deepseek-v4-flash
-Q1167912,Le Déjeuner sur l'herbe,Claude Monet,facilitator,238,deepseek/deepseek-v4-flash
-Q1167912,Le Déjeuner sur l'herbe,Claude Monet,flat,214,deepseek/deepseek-v4-flash
-Q1167912,Le Déjeuner sur l'herbe,Claude Monet,professional_hobbyist,243,deepseek/deepseek-v4-flash
-Q1167912,Le Déjeuner sur l'herbe,Claude Monet,recharger,194,deepseek/deepseek-v4-flash
-Q1212098,The Railway,Édouard Manet,experience_seeker,230,deepseek/deepseek-v4-flash
-Q1212098,The Railway,Édouard Manet,explorer,244,deepseek/deepseek-v4-flash
-Q1212098,The Railway,Édouard Manet,facilitator,271,deepseek/deepseek-v4-flash
-Q1212098,The Railway,Édouard Manet,flat,215,deepseek/deepseek-v4-flash
-Q1212098,The Railway,Édouard Manet,professional_hobbyist,261,deepseek/deepseek-v4-flash
-Q1212098,The Railway,Édouard Manet,recharger,214,deepseek/deepseek-v4-flash
-Q1212861,The Birth of Venus,Alexandre Cabanel,experience_seeker,256,deepseek/deepseek-v4-flash
-Q1212861,The Birth of Venus,Alexandre Cabanel,explorer,205,deepseek/deepseek-v4-flash
-Q1212861,The Birth of Venus,Alexandre Cabanel,facilitator,241,deepseek/deepseek-v4-flash
-Q1212861,The Birth of Venus,Alexandre Cabanel,flat,230,deepseek/deepseek-v4-flash
-Q1212861,The Birth of Venus,Alexandre Cabanel,professional_hobbyist,239,deepseek/deepseek-v4-flash
-Q1212861,The Birth of Venus,Alexandre Cabanel,recharger,239,deepseek/deepseek-v4-flash
-Q1215604,The Source,Jean-Auguste-Dominique Ingres,experience_seeker,212,deepseek/deepseek-v4-flash
-Q1215604,The Source,Jean-Auguste-Dominique Ingres,explorer,228,deepseek/deepseek-v4-flash
-Q1215604,The Source,Jean-Auguste-Dominique Ingres,facilitator,242,deepseek/deepseek-v4-flash
-Q1215604,The Source,Jean-Auguste-Dominique Ingres,flat,230,deepseek/deepseek-v4-flash
-Q1215604,The Source,Jean-Auguste-Dominique Ingres,professional_hobbyist,235,deepseek/deepseek-v4-flash
-Q1215604,The Source,Jean-Auguste-Dominique Ingres,recharger,224,deepseek/deepseek-v4-flash
-Q1219263,The Sleeping Gypsy,Henri Rousseau,experience_seeker,223,deepseek/deepseek-v4-flash
-Q1219263,The Sleeping Gypsy,Henri Rousseau,explorer,224,deepseek/deepseek-v4-flash
-Q1219263,The Sleeping Gypsy,Henri Rousseau,facilitator,230,deepseek/deepseek-v4-flash
-Q1219263,The Sleeping Gypsy,Henri Rousseau,flat,242,deepseek/deepseek-v4-flash
-Q1219263,The Sleeping Gypsy,Henri Rousseau,professional_hobbyist,241,deepseek/deepseek-v4-flash
-Q1219263,The Sleeping Gypsy,Henri Rousseau,recharger,210,deepseek/deepseek-v4-flash
-Q1220013,Opening of the Fifth Seal,El Greco,experience_seeker,203,deepseek/deepseek-v4-flash
-Q1220013,Opening of the Fifth Seal,El Greco,explorer,245,deepseek/deepseek-v4-flash
-Q1220013,Opening of the Fifth Seal,El Greco,facilitator,213,deepseek/deepseek-v4-flash
-Q1220013,Opening of the Fifth Seal,El Greco,flat,216,deepseek/deepseek-v4-flash
-Q1220013,Opening of the Fifth Seal,El Greco,professional_hobbyist,298,deepseek/deepseek-v4-flash
-Q1220013,Opening of the Fifth Seal,El Greco,recharger,210,deepseek/deepseek-v4-flash
-Q123935,The Triumph of Bacchus,Diego Velázquez,experience_seeker,222,deepseek/deepseek-v4-flash
-Q123935,The Triumph of Bacchus,Diego Velázquez,explorer,256,deepseek/deepseek-v4-flash
-Q123935,The Triumph of Bacchus,Diego Velázquez,facilitator,223,deepseek/deepseek-v4-flash
-Q123935,The Triumph of Bacchus,Diego Velázquez,flat,216,deepseek/deepseek-v4-flash
-Q123935,The Triumph of Bacchus,Diego Velázquez,professional_hobbyist,272,deepseek/deepseek-v4-flash
-Q123935,The Triumph of Bacchus,Diego Velázquez,recharger,222,deepseek/deepseek-v4-flash
-Q1239950,L'Absinthe,Edgar Degas,experience_seeker,223,deepseek/deepseek-v4-flash
-Q1239950,L'Absinthe,Edgar Degas,explorer,218,deepseek/deepseek-v4-flash
-Q1239950,L'Absinthe,Edgar Degas,facilitator,243,deepseek/deepseek-v4-flash
-Q1239950,L'Absinthe,Edgar Degas,flat,250,deepseek/deepseek-v4-flash
-Q1239950,L'Absinthe,Edgar Degas,professional_hobbyist,225,deepseek/deepseek-v4-flash
-Q1239950,L'Absinthe,Edgar Degas,recharger,229,deepseek/deepseek-v4-flash
-Q1267893,Ginevra de' Benci,Leonardo da Vinci,experience_seeker,237,deepseek/deepseek-v4-flash
-Q1267893,Ginevra de' Benci,Leonardo da Vinci,explorer,223,deepseek/deepseek-v4-flash
-Q1267893,Ginevra de' Benci,Leonardo da Vinci,facilitator,255,deepseek/deepseek-v4-flash
-Q1267893,Ginevra de' Benci,Leonardo da Vinci,flat,239,deepseek/deepseek-v4-flash
-Q1267893,Ginevra de' Benci,Leonardo da Vinci,professional_hobbyist,295,deepseek/deepseek-v4-flash
-Q1267893,Ginevra de' Benci,Leonardo da Vinci,recharger,207,deepseek/deepseek-v4-flash
-Q1283024,The Birth of Venus,William-Adolphe Bouguereau,experience_seeker,199,deepseek/deepseek-v4-flash
-Q1283024,The Birth of Venus,William-Adolphe Bouguereau,explorer,241,deepseek/deepseek-v4-flash
-Q1283024,The Birth of Venus,William-Adolphe Bouguereau,facilitator,225,deepseek/deepseek-v4-flash
-Q1283024,The Birth of Venus,William-Adolphe Bouguereau,flat,281,deepseek/deepseek-v4-flash
-Q1283024,The Birth of Venus,William-Adolphe Bouguereau,professional_hobbyist,263,deepseek/deepseek-v4-flash
-Q1283024,The Birth of Venus,William-Adolphe Bouguereau,recharger,230,deepseek/deepseek-v4-flash
-Q1313605,The Emperor Napoleon in His Study at the Tuileries,Jacques-Louis David,experience_seeker,234,deepseek/deepseek-v4-flash
-Q1313605,The Emperor Napoleon in His Study at the Tuileries,Jacques-Louis David,explorer,245,deepseek/deepseek-v4-flash
-Q1313605,The Emperor Napoleon in His Study at the Tuileries,Jacques-Louis David,facilitator,225,deepseek/deepseek-v4-flash
-Q1313605,The Emperor Napoleon in His Study at the Tuileries,Jacques-Louis David,flat,223,deepseek/deepseek-v4-flash
-Q1313605,The Emperor Napoleon in His Study at the Tuileries,Jacques-Louis David,professional_hobbyist,282,deepseek/deepseek-v4-flash
-Q1313605,The Emperor Napoleon in His Study at the Tuileries,Jacques-Louis David,recharger,239,deepseek/deepseek-v4-flash
-Q1464531,Starry Night Over the Rhone,Vincent van Gogh,experience_seeker,232,deepseek/deepseek-v4-flash
-Q1464531,Starry Night Over the Rhone,Vincent van Gogh,explorer,242,deepseek/deepseek-v4-flash
-Q1464531,Starry Night Over the Rhone,Vincent van Gogh,facilitator,263,deepseek/deepseek-v4-flash
-Q1464531,Starry Night Over the Rhone,Vincent van Gogh,flat,201,deepseek/deepseek-v4-flash
-Q1464531,Starry Night Over the Rhone,Vincent van Gogh,professional_hobbyist,247,deepseek/deepseek-v4-flash
-Q1464531,Starry Night Over the Rhone,Vincent van Gogh,recharger,245,deepseek/deepseek-v4-flash
-Q15008032,The Feast of the Gods,Giovanni Bellini,experience_seeker,240,deepseek/deepseek-v4-flash
-Q15008032,The Feast of the Gods,Giovanni Bellini,explorer,247,deepseek/deepseek-v4-flash
-Q15008032,The Feast of the Gods,Giovanni Bellini,facilitator,233,deepseek/deepseek-v4-flash
-Q15008032,The Feast of the Gods,Giovanni Bellini,flat,229,deepseek/deepseek-v4-flash
-Q15008032,The Feast of the Gods,Giovanni Bellini,professional_hobbyist,250,deepseek/deepseek-v4-flash
-Q15008032,The Feast of the Gods,Giovanni Bellini,recharger,239,deepseek/deepseek-v4-flash
-Q152509,Luncheon on the Grass,Édouard Manet,experience_seeker,232,deepseek/deepseek-v4-flash
-Q152509,Luncheon on the Grass,Édouard Manet,explorer,246,deepseek/deepseek-v4-flash
-Q152509,Luncheon on the Grass,Édouard Manet,facilitator,216,deepseek/deepseek-v4-flash
-Q152509,Luncheon on the Grass,Édouard Manet,flat,212,deepseek/deepseek-v4-flash
-Q152509,Luncheon on the Grass,Édouard Manet,professional_hobbyist,246,deepseek/deepseek-v4-flash
-Q152509,Luncheon on the Grass,Édouard Manet,recharger,233,deepseek/deepseek-v4-flash
-Q152867,La maja desnuda,Francisco Goya,experience_seeker,230,deepseek/deepseek-v4-flash
-Q152867,La maja desnuda,Francisco Goya,explorer,206,deepseek/deepseek-v4-flash
-Q152867,La maja desnuda,Francisco Goya,facilitator,272,deepseek/deepseek-v4-flash
-Q152867,La maja desnuda,Francisco Goya,flat,209,deepseek/deepseek-v4-flash
-Q152867,La maja desnuda,Francisco Goya,professional_hobbyist,232,deepseek/deepseek-v4-flash
-Q152867,La maja desnuda,Francisco Goya,recharger,212,deepseek/deepseek-v4-flash
-Q16950902,Beauty Revealed,Sarah Goodridge,experience_seeker,236,deepseek/deepseek-v4-flash
-Q16950902,Beauty Revealed,Sarah Goodridge,explorer,232,deepseek/deepseek-v4-flash
-Q16950902,Beauty Revealed,Sarah Goodridge,facilitator,251,deepseek/deepseek-v4-flash
-Q16950902,Beauty Revealed,Sarah Goodridge,flat,194,deepseek/deepseek-v4-flash
-Q16950902,Beauty Revealed,Sarah Goodridge,professional_hobbyist,259,deepseek/deepseek-v4-flash
-Q16950902,Beauty Revealed,Sarah Goodridge,recharger,233,deepseek/deepseek-v4-flash
-Q1752990,The Death of Socrates,Jacques-Louis David,experience_seeker,240,deepseek/deepseek-v4-flash
-Q1752990,The Death of Socrates,Jacques-Louis David,explorer,242,deepseek/deepseek-v4-flash
-Q1752990,The Death of Socrates,Jacques-Louis David,facilitator,236,deepseek/deepseek-v4-flash
-Q1752990,The Death of Socrates,Jacques-Louis David,flat,214,deepseek/deepseek-v4-flash
-Q1752990,The Death of Socrates,Jacques-Louis David,professional_hobbyist,251,deepseek/deepseek-v4-flash
-Q1752990,The Death of Socrates,Jacques-Louis David,recharger,226,deepseek/deepseek-v4-flash
-Q1766454,Les raboteurs de parquet,Gustave Caillebotte,experience_seeker,252,deepseek/deepseek-v4-flash
-Q1766454,Les raboteurs de parquet,Gustave Caillebotte,explorer,231,deepseek/deepseek-v4-flash
-Q1766454,Les raboteurs de parquet,Gustave Caillebotte,facilitator,241,deepseek/deepseek-v4-flash
-Q1766454,Les raboteurs de parquet,Gustave Caillebotte,flat,209,deepseek/deepseek-v4-flash
-Q1766454,Les raboteurs de parquet,Gustave Caillebotte,professional_hobbyist,244,deepseek/deepseek-v4-flash
-Q1766454,Les raboteurs de parquet,Gustave Caillebotte,recharger,233,deepseek/deepseek-v4-flash
-Q208758,Las Meninas,Diego Velázquez,experience_seeker,266,deepseek/deepseek-v4-flash
-Q208758,Las Meninas,Diego Velázquez,explorer,212,deepseek/deepseek-v4-flash
-Q208758,Las Meninas,Diego Velázquez,facilitator,243,deepseek/deepseek-v4-flash
-Q208758,Las Meninas,Diego Velázquez,flat,235,deepseek/deepseek-v4-flash
-Q208758,Las Meninas,Diego Velázquez,professional_hobbyist,252,deepseek/deepseek-v4-flash
-Q208758,Las Meninas,Diego Velázquez,recharger,220,deepseek/deepseek-v4-flash
-Q2203011,Death and the Miser,Hieronymus Bosch,experience_seeker,260,deepseek/deepseek-v4-flash
-Q2203011,Death and the Miser,Hieronymus Bosch,explorer,233,deepseek/deepseek-v4-flash
-Q2203011,Death and the Miser,Hieronymus Bosch,facilitator,278,deepseek/deepseek-v4-flash
-Q2203011,Death and the Miser,Hieronymus Bosch,flat,236,deepseek/deepseek-v4-flash
-Q2203011,Death and the Miser,Hieronymus Bosch,professional_hobbyist,276,deepseek/deepseek-v4-flash
-Q2203011,Death and the Miser,Hieronymus Bosch,recharger,233,deepseek/deepseek-v4-flash
-Q2213811,The Haywain Triptych,Hieronymus Bosch,experience_seeker,253,deepseek/deepseek-v4-flash
-Q2213811,The Haywain Triptych,Hieronymus Bosch,explorer,240,deepseek/deepseek-v4-flash
-Q2213811,The Haywain Triptych,Hieronymus Bosch,facilitator,258,deepseek/deepseek-v4-flash
-Q2213811,The Haywain Triptych,Hieronymus Bosch,flat,248,deepseek/deepseek-v4-flash
-Q2213811,The Haywain Triptych,Hieronymus Bosch,professional_hobbyist,331,deepseek/deepseek-v4-flash
-Q2213811,The Haywain Triptych,Hieronymus Bosch,recharger,214,deepseek/deepseek-v4-flash
-Q2268524,The Three Graces,Peter Paul Rubens,experience_seeker,228,deepseek/deepseek-v4-flash
-Q2268524,The Three Graces,Peter Paul Rubens,explorer,245,deepseek/deepseek-v4-flash
-Q2268524,The Three Graces,Peter Paul Rubens,facilitator,211,deepseek/deepseek-v4-flash
-Q2268524,The Three Graces,Peter Paul Rubens,flat,223,deepseek/deepseek-v4-flash
-Q2268524,The Three Graces,Peter Paul Rubens,professional_hobbyist,236,deepseek/deepseek-v4-flash
-Q2268524,The Three Graces,Peter Paul Rubens,recharger,220,deepseek/deepseek-v4-flash
-Q2270768,Cutting the Stone,Hieronymus Bosch,experience_seeker,240,deepseek/deepseek-v4-flash
-Q2270768,Cutting the Stone,Hieronymus Bosch,explorer,211,deepseek/deepseek-v4-flash
-Q2270768,Cutting the Stone,Hieronymus Bosch,facilitator,267,deepseek/deepseek-v4-flash
-Q2270768,Cutting the Stone,Hieronymus Bosch,flat,206,deepseek/deepseek-v4-flash
-Q2270768,Cutting the Stone,Hieronymus Bosch,professional_hobbyist,243,deepseek/deepseek-v4-flash
-Q2270768,Cutting the Stone,Hieronymus Bosch,recharger,189,deepseek/deepseek-v4-flash
-Q2270938,Les Grandes Baigneuses,Paul Cézanne,experience_seeker,220,deepseek/deepseek-v4-flash
-Q2270938,Les Grandes Baigneuses,Paul Cézanne,explorer,255,deepseek/deepseek-v4-flash
-Q2270938,Les Grandes Baigneuses,Paul Cézanne,facilitator,261,deepseek/deepseek-v4-flash
-Q2270938,Les Grandes Baigneuses,Paul Cézanne,flat,226,deepseek/deepseek-v4-flash
-Q2270938,Les Grandes Baigneuses,Paul Cézanne,professional_hobbyist,264,deepseek/deepseek-v4-flash
-Q2270938,Les Grandes Baigneuses,Paul Cézanne,recharger,249,deepseek/deepseek-v4-flash
-Q2270955,David and Goliath,Caravaggio,experience_seeker,224,deepseek/deepseek-v4-flash
-Q2270955,David and Goliath,Caravaggio,explorer,216,deepseek/deepseek-v4-flash
-Q2270955,David and Goliath,Caravaggio,facilitator,238,deepseek/deepseek-v4-flash
-Q2270955,David and Goliath,Caravaggio,flat,235,deepseek/deepseek-v4-flash
-Q2270955,David and Goliath,Caravaggio,professional_hobbyist,222,deepseek/deepseek-v4-flash
-Q2270955,David and Goliath,Caravaggio,recharger,198,deepseek/deepseek-v4-flash
-Q2273943,Adoration of the Magi,Diego Velázquez,experience_seeker,231,deepseek/deepseek-v4-flash
-Q2273943,Adoration of the Magi,Diego Velázquez,explorer,268,deepseek/deepseek-v4-flash
-Q2273943,Adoration of the Magi,Diego Velázquez,facilitator,223,deepseek/deepseek-v4-flash
-Q2273943,Adoration of the Magi,Diego Velázquez,flat,189,deepseek/deepseek-v4-flash
-Q2273943,Adoration of the Magi,Diego Velázquez,professional_hobbyist,236,deepseek/deepseek-v4-flash
-Q2273943,Adoration of the Magi,Diego Velázquez,recharger,189,deepseek/deepseek-v4-flash
-Q2304870,The Seven Deadly Sins and the Four Last Things,Hieronymus Bosch,experience_seeker,207,deepseek/deepseek-v4-flash
-Q2304870,The Seven Deadly Sins and the Four Last Things,Hieronymus Bosch,explorer,235,deepseek/deepseek-v4-flash
-Q2304870,The Seven Deadly Sins and the Four Last Things,Hieronymus Bosch,facilitator,213,deepseek/deepseek-v4-flash
-Q2304870,The Seven Deadly Sins and the Four Last Things,Hieronymus Bosch,flat,196,deepseek/deepseek-v4-flash
-Q2304870,The Seven Deadly Sins and the Four Last Things,Hieronymus Bosch,professional_hobbyist,220,deepseek/deepseek-v4-flash
-Q2304870,The Seven Deadly Sins and the Four Last Things,Hieronymus Bosch,recharger,221,deepseek/deepseek-v4-flash
-Q2395218,Woman with a Parasol – Madame Monet and Her Son,Claude Monet,experience_seeker,299,deepseek/deepseek-v4-flash
-Q2395218,Woman with a Parasol – Madame Monet and Her Son,Claude Monet,explorer,251,deepseek/deepseek-v4-flash
-Q2395218,Woman with a Parasol – Madame Monet and Her Son,Claude Monet,facilitator,232,deepseek/deepseek-v4-flash
-Q2395218,Woman with a Parasol – Madame Monet and Her Son,Claude Monet,flat,229,deepseek/deepseek-v4-flash
-Q2395218,Woman with a Parasol – Madame Monet and Her Son,Claude Monet,professional_hobbyist,263,deepseek/deepseek-v4-flash
-Q2395218,Woman with a Parasol – Madame Monet and Her Son,Claude Monet,recharger,232,deepseek/deepseek-v4-flash
-Q2404992,Aristotle with a Bust of Homer,Rembrandt,experience_seeker,231,deepseek/deepseek-v4-flash
-Q2404992,Aristotle with a Bust of Homer,Rembrandt,explorer,199,deepseek/deepseek-v4-flash
-Q2404992,Aristotle with a Bust of Homer,Rembrandt,facilitator,221,deepseek/deepseek-v4-flash
-Q2404992,Aristotle with a Bust of Homer,Rembrandt,flat,228,deepseek/deepseek-v4-flash
-Q2404992,Aristotle with a Bust of Homer,Rembrandt,professional_hobbyist,283,deepseek/deepseek-v4-flash
-Q2404992,Aristotle with a Bust of Homer,Rembrandt,recharger,203,deepseek/deepseek-v4-flash
-Q2413468,The Colossus,Francisco Goya,experience_seeker,236,deepseek/deepseek-v4-flash
-Q2413468,The Colossus,Francisco Goya,explorer,230,deepseek/deepseek-v4-flash
-Q2413468,The Colossus,Francisco Goya,facilitator,232,deepseek/deepseek-v4-flash
-Q2413468,The Colossus,Francisco Goya,flat,198,deepseek/deepseek-v4-flash
-Q2413468,The Colossus,Francisco Goya,professional_hobbyist,277,deepseek/deepseek-v4-flash
-Q2413468,The Colossus,Francisco Goya,recharger,234,deepseek/deepseek-v4-flash
-Q2420918,Madonna of the Rose,Raphael,experience_seeker,277,deepseek/deepseek-v4-flash
-Q2420918,Madonna of the Rose,Raphael,explorer,239,deepseek/deepseek-v4-flash
-Q2420918,Madonna of the Rose,Raphael,facilitator,222,deepseek/deepseek-v4-flash
-Q2420918,Madonna of the Rose,Raphael,flat,199,deepseek/deepseek-v4-flash
-Q2420918,Madonna of the Rose,Raphael,professional_hobbyist,277,deepseek/deepseek-v4-flash
-Q2420918,Madonna of the Rose,Raphael,recharger,220,deepseek/deepseek-v4-flash
-Q2439462,Portrait of a Lady,Rogier van der Weyden,experience_seeker,236,deepseek/deepseek-v4-flash
-Q2439462,Portrait of a Lady,Rogier van der Weyden,explorer,247,deepseek/deepseek-v4-flash
-Q2439462,Portrait of a Lady,Rogier van der Weyden,facilitator,219,deepseek/deepseek-v4-flash
-Q2439462,Portrait of a Lady,Rogier van der Weyden,flat,191,deepseek/deepseek-v4-flash
-Q2439462,Portrait of a Lady,Rogier van der Weyden,professional_hobbyist,253,deepseek/deepseek-v4-flash
-Q2439462,Portrait of a Lady,Rogier van der Weyden,recharger,222,deepseek/deepseek-v4-flash
-Q2465911,Christina's World,Andrew Wyeth,experience_seeker,204,deepseek/deepseek-v4-flash
-Q2465911,Christina's World,Andrew Wyeth,explorer,240,deepseek/deepseek-v4-flash
-Q2465911,Christina's World,Andrew Wyeth,facilitator,237,deepseek/deepseek-v4-flash
-Q2465911,Christina's World,Andrew Wyeth,flat,238,deepseek/deepseek-v4-flash
-Q2465911,Christina's World,Andrew Wyeth,professional_hobbyist,257,deepseek/deepseek-v4-flash
-Q2465911,Christina's World,Andrew Wyeth,recharger,205,deepseek/deepseek-v4-flash
-Q247282,Apollo in the Forge of Vulcan,Diego Velázquez,experience_seeker,256,deepseek/deepseek-v4-flash
-Q247282,Apollo in the Forge of Vulcan,Diego Velázquez,explorer,232,deepseek/deepseek-v4-flash
-Q247282,Apollo in the Forge of Vulcan,Diego Velázquez,facilitator,226,deepseek/deepseek-v4-flash
-Q247282,Apollo in the Forge of Vulcan,Diego Velázquez,flat,202,deepseek/deepseek-v4-flash
-Q247282,Apollo in the Forge of Vulcan,Diego Velázquez,professional_hobbyist,283,deepseek/deepseek-v4-flash
-Q247282,Apollo in the Forge of Vulcan,Diego Velázquez,recharger,218,deepseek/deepseek-v4-flash
-Q2501284,The Great Bathers,Pierre-Auguste Renoir,experience_seeker,231,deepseek/deepseek-v4-flash
-Q2501284,The Great Bathers,Pierre-Auguste Renoir,explorer,259,deepseek/deepseek-v4-flash
-Q2501284,The Great Bathers,Pierre-Auguste Renoir,facilitator,277,deepseek/deepseek-v4-flash
-Q2501284,The Great Bathers,Pierre-Auguste Renoir,flat,215,deepseek/deepseek-v4-flash
-Q2501284,The Great Bathers,Pierre-Auguste Renoir,professional_hobbyist,263,deepseek/deepseek-v4-flash
-Q2501284,The Great Bathers,Pierre-Auguste Renoir,recharger,217,deepseek/deepseek-v4-flash
-Q2528106,Portrait of Bindo Altoviti,Raphael,experience_seeker,219,deepseek/deepseek-v4-flash
-Q2528106,Portrait of Bindo Altoviti,Raphael,explorer,228,deepseek/deepseek-v4-flash
-Q2528106,Portrait of Bindo Altoviti,Raphael,facilitator,213,deepseek/deepseek-v4-flash
-Q2528106,Portrait of Bindo Altoviti,Raphael,flat,254,deepseek/deepseek-v4-flash
-Q2528106,Portrait of Bindo Altoviti,Raphael,professional_hobbyist,212,deepseek/deepseek-v4-flash
-Q2528106,Portrait of Bindo Altoviti,Raphael,recharger,206,deepseek/deepseek-v4-flash
-Q2528477,Witches' Sabbath,Francisco Goya,experience_seeker,249,deepseek/deepseek-v4-flash
-Q2528477,Witches' Sabbath,Francisco Goya,explorer,223,deepseek/deepseek-v4-flash
-Q2528477,Witches' Sabbath,Francisco Goya,facilitator,221,deepseek/deepseek-v4-flash
-Q2528477,Witches' Sabbath,Francisco Goya,flat,228,deepseek/deepseek-v4-flash
-Q2528477,Witches' Sabbath,Francisco Goya,professional_hobbyist,252,deepseek/deepseek-v4-flash
-Q2528477,Witches' Sabbath,Francisco Goya,recharger,205,deepseek/deepseek-v4-flash
-Q2528741,Christ Crucified,Diego Velázquez,experience_seeker,286,deepseek/deepseek-v4-flash
-Q2528741,Christ Crucified,Diego Velázquez,explorer,213,deepseek/deepseek-v4-flash
-Q2528741,Christ Crucified,Diego Velázquez,facilitator,252,deepseek/deepseek-v4-flash
-Q2528741,Christ Crucified,Diego Velázquez,flat,238,deepseek/deepseek-v4-flash
-Q2528741,Christ Crucified,Diego Velázquez,professional_hobbyist,288,deepseek/deepseek-v4-flash
-Q2528741,Christ Crucified,Diego Velázquez,recharger,224,deepseek/deepseek-v4-flash
-Q2529703,Portrait of Emile Zola,Édouard Manet,experience_seeker,228,deepseek/deepseek-v4-flash
-Q2529703,Portrait of Emile Zola,Édouard Manet,explorer,248,deepseek/deepseek-v4-flash
-Q2529703,Portrait of Emile Zola,Édouard Manet,facilitator,239,deepseek/deepseek-v4-flash
-Q2529703,Portrait of Emile Zola,Édouard Manet,flat,199,deepseek/deepseek-v4-flash
-Q2529703,Portrait of Emile Zola,Édouard Manet,professional_hobbyist,251,deepseek/deepseek-v4-flash
-Q2529703,Portrait of Emile Zola,Édouard Manet,recharger,233,deepseek/deepseek-v4-flash
-Q254923,Alba Madonna,Raphael,experience_seeker,249,deepseek/deepseek-v4-flash
-Q254923,Alba Madonna,Raphael,explorer,267,deepseek/deepseek-v4-flash
-Q254923,Alba Madonna,Raphael,facilitator,234,deepseek/deepseek-v4-flash
-Q254923,Alba Madonna,Raphael,flat,237,deepseek/deepseek-v4-flash
-Q254923,Alba Madonna,Raphael,professional_hobbyist,255,deepseek/deepseek-v4-flash
-Q254923,Alba Madonna,Raphael,recharger,181,deepseek/deepseek-v4-flash
-Q2571560,The Angelus,Jean-François Millet,experience_seeker,251,deepseek/deepseek-v4-flash
-Q2571560,The Angelus,Jean-François Millet,explorer,238,deepseek/deepseek-v4-flash
-Q2571560,The Angelus,Jean-François Millet,facilitator,245,deepseek/deepseek-v4-flash
-Q2571560,The Angelus,Jean-François Millet,flat,218,deepseek/deepseek-v4-flash
-Q2571560,The Angelus,Jean-François Millet,professional_hobbyist,274,deepseek/deepseek-v4-flash
-Q2571560,The Angelus,Jean-François Millet,recharger,251,deepseek/deepseek-v4-flash
-Q25729,The Persistence of Memory,Salvador Dalí,experience_seeker,238,deepseek/deepseek-v4-flash
-Q25729,The Persistence of Memory,Salvador Dalí,explorer,238,deepseek/deepseek-v4-flash
-Q25729,The Persistence of Memory,Salvador Dalí,facilitator,234,deepseek/deepseek-v4-flash
-Q25729,The Persistence of Memory,Salvador Dalí,flat,253,deepseek/deepseek-v4-flash
-Q25729,The Persistence of Memory,Salvador Dalí,professional_hobbyist,248,deepseek/deepseek-v4-flash
-Q25729,The Persistence of Memory,Salvador Dalí,recharger,233,deepseek/deepseek-v4-flash
-Q2622172,The Bellelli Family,Edgar Degas,experience_seeker,243,deepseek/deepseek-v4-flash
-Q2622172,The Bellelli Family,Edgar Degas,explorer,225,deepseek/deepseek-v4-flash
-Q2622172,The Bellelli Family,Edgar Degas,facilitator,251,deepseek/deepseek-v4-flash
-Q2622172,The Bellelli Family,Edgar Degas,flat,231,deepseek/deepseek-v4-flash
-Q2622172,The Bellelli Family,Edgar Degas,professional_hobbyist,247,deepseek/deepseek-v4-flash
-Q2622172,The Bellelli Family,Edgar Degas,recharger,230,deepseek/deepseek-v4-flash
-Q2653851,The Elevation of the Cross,Peter Paul Rubens,experience_seeker,234,deepseek/deepseek-v4-flash
-Q2653851,The Elevation of the Cross,Peter Paul Rubens,explorer,275,deepseek/deepseek-v4-flash
-Q2653851,The Elevation of the Cross,Peter Paul Rubens,facilitator,238,deepseek/deepseek-v4-flash
-Q2653851,The Elevation of the Cross,Peter Paul Rubens,flat,265,deepseek/deepseek-v4-flash
-Q2653851,The Elevation of the Cross,Peter Paul Rubens,professional_hobbyist,241,deepseek/deepseek-v4-flash
-Q2653851,The Elevation of the Cross,Peter Paul Rubens,recharger,253,deepseek/deepseek-v4-flash
-Q2664039,Madame X (Virginie Amélie Avegno Gautreau),Q155626,experience_seeker,178,deepseek/deepseek-v4-flash
-Q2664039,Madame X (Virginie Amélie Avegno Gautreau),Q155626,explorer,245,deepseek/deepseek-v4-flash
-Q2664039,Madame X (Virginie Amélie Avegno Gautreau),Q155626,facilitator,214,deepseek/deepseek-v4-flash
-Q2664039,Madame X (Virginie Amélie Avegno Gautreau),Q155626,flat,163,deepseek/deepseek-v4-flash
-Q2664039,Madame X (Virginie Amélie Avegno Gautreau),Q155626,professional_hobbyist,255,deepseek/deepseek-v4-flash
-Q2664039,Madame X (Virginie Amélie Avegno Gautreau),Q155626,recharger,221,deepseek/deepseek-v4-flash
-Q2665048,Dante and Virgil in Hell,William-Adolphe Bouguereau,experience_seeker,223,deepseek/deepseek-v4-flash
-Q2665048,Dante and Virgil in Hell,William-Adolphe Bouguereau,explorer,233,deepseek/deepseek-v4-flash
-Q2665048,Dante and Virgil in Hell,William-Adolphe Bouguereau,facilitator,249,deepseek/deepseek-v4-flash
-Q2665048,Dante and Virgil in Hell,William-Adolphe Bouguereau,flat,225,deepseek/deepseek-v4-flash
-Q2665048,Dante and Virgil in Hell,William-Adolphe Bouguereau,professional_hobbyist,265,deepseek/deepseek-v4-flash
-Q2665048,Dante and Virgil in Hell,William-Adolphe Bouguereau,recharger,230,deepseek/deepseek-v4-flash
-Q2697937,Campbell's Soup Cans,Andy Warhol,experience_seeker,243,deepseek/deepseek-v4-flash
-Q2697937,Campbell's Soup Cans,Andy Warhol,explorer,251,deepseek/deepseek-v4-flash
-Q2697937,Campbell's Soup Cans,Andy Warhol,facilitator,219,deepseek/deepseek-v4-flash
-Q2697937,Campbell's Soup Cans,Andy Warhol,flat,239,deepseek/deepseek-v4-flash
-Q2697937,Campbell's Soup Cans,Andy Warhol,professional_hobbyist,242,deepseek/deepseek-v4-flash
-Q2697937,Campbell's Soup Cans,Andy Warhol,recharger,219,deepseek/deepseek-v4-flash
-Q2734881,Annunciation,Jan van Eyck,experience_seeker,257,deepseek/deepseek-v4-flash
-Q2734881,Annunciation,Jan van Eyck,explorer,236,deepseek/deepseek-v4-flash
-Q2734881,Annunciation,Jan van Eyck,facilitator,235,deepseek/deepseek-v4-flash
-Q2734881,Annunciation,Jan van Eyck,flat,242,deepseek/deepseek-v4-flash
-Q2734881,Annunciation,Jan van Eyck,professional_hobbyist,207,deepseek/deepseek-v4-flash
-Q2734881,Annunciation,Jan van Eyck,recharger,238,deepseek/deepseek-v4-flash
-Q2734892,Women in the Garden,Claude Monet,experience_seeker,233,deepseek/deepseek-v4-flash
-Q2734892,Women in the Garden,Claude Monet,explorer,244,deepseek/deepseek-v4-flash
-Q2734892,Women in the Garden,Claude Monet,facilitator,263,deepseek/deepseek-v4-flash
-Q2734892,Women in the Garden,Claude Monet,flat,213,deepseek/deepseek-v4-flash
-Q2734892,Women in the Garden,Claude Monet,professional_hobbyist,257,deepseek/deepseek-v4-flash
-Q2734892,Women in the Garden,Claude Monet,recharger,210,deepseek/deepseek-v4-flash
-Q2735507,The Clothed Maja,Francisco Goya,experience_seeker,264,deepseek/deepseek-v4-flash
-Q2735507,The Clothed Maja,Francisco Goya,explorer,199,deepseek/deepseek-v4-flash
-Q2735507,The Clothed Maja,Francisco Goya,facilitator,214,deepseek/deepseek-v4-flash
-Q2735507,The Clothed Maja,Francisco Goya,flat,244,deepseek/deepseek-v4-flash
-Q2735507,The Clothed Maja,Francisco Goya,professional_hobbyist,246,deepseek/deepseek-v4-flash
-Q2735507,The Clothed Maja,Francisco Goya,recharger,230,deepseek/deepseek-v4-flash
-Q2899286,Berthe Morisot with a Bouquet of Violets,Édouard Manet,experience_seeker,212,deepseek/deepseek-v4-flash
-Q2899286,Berthe Morisot with a Bouquet of Violets,Édouard Manet,explorer,254,deepseek/deepseek-v4-flash
-Q2899286,Berthe Morisot with a Bouquet of Violets,Édouard Manet,facilitator,237,deepseek/deepseek-v4-flash
-Q2899286,Berthe Morisot with a Bouquet of Violets,Édouard Manet,flat,233,deepseek/deepseek-v4-flash
-Q2899286,Berthe Morisot with a Bouquet of Violets,Édouard Manet,professional_hobbyist,226,deepseek/deepseek-v4-flash
-Q2899286,Berthe Morisot with a Bouquet of Violets,Édouard Manet,recharger,207,deepseek/deepseek-v4-flash
-Q2983399,The Second of May 1808,Francisco Goya,experience_seeker,241,deepseek/deepseek-v4-flash
-Q2983399,The Second of May 1808,Francisco Goya,explorer,223,deepseek/deepseek-v4-flash
-Q2983399,The Second of May 1808,Francisco Goya,facilitator,242,deepseek/deepseek-v4-flash
-Q2983399,The Second of May 1808,Francisco Goya,flat,235,deepseek/deepseek-v4-flash
-Q2983399,The Second of May 1808,Francisco Goya,professional_hobbyist,269,deepseek/deepseek-v4-flash
-Q2983399,The Second of May 1808,Francisco Goya,recharger,207,deepseek/deepseek-v4-flash
-Q321303,The Garden of Earthly Delights,Hieronymus Bosch,experience_seeker,255,deepseek/deepseek-v4-flash
-Q321303,The Garden of Earthly Delights,Hieronymus Bosch,explorer,291,deepseek/deepseek-v4-flash
-Q321303,The Garden of Earthly Delights,Hieronymus Bosch,facilitator,220,deepseek/deepseek-v4-flash
-Q321303,The Garden of Earthly Delights,Hieronymus Bosch,flat,226,deepseek/deepseek-v4-flash
-Q321303,The Garden of Earthly Delights,Hieronymus Bosch,professional_hobbyist,222,deepseek/deepseek-v4-flash
-Q321303,The Garden of Earthly Delights,Hieronymus Bosch,recharger,202,deepseek/deepseek-v4-flash
-Q334604,Heart of the Andes,Frederic Edwin Church,experience_seeker,224,deepseek/deepseek-v4-flash
-Q334604,Heart of the Andes,Frederic Edwin Church,explorer,230,deepseek/deepseek-v4-flash
-Q334604,Heart of the Andes,Frederic Edwin Church,facilitator,209,deepseek/deepseek-v4-flash
-Q334604,Heart of the Andes,Frederic Edwin Church,flat,234,deepseek/deepseek-v4-flash
-Q334604,Heart of the Andes,Frederic Edwin Church,professional_hobbyist,256,deepseek/deepseek-v4-flash
-Q334604,Heart of the Andes,Frederic Edwin Church,recharger,238,deepseek/deepseek-v4-flash
-Q3630735,Self-portrait,Vincent van Gogh,experience_seeker,231,deepseek/deepseek-v4-flash
-Q3630735,Self-portrait,Vincent van Gogh,explorer,215,deepseek/deepseek-v4-flash
-Q3630735,Self-portrait,Vincent van Gogh,facilitator,216,deepseek/deepseek-v4-flash
-Q3630735,Self-portrait,Vincent van Gogh,flat,221,deepseek/deepseek-v4-flash
-Q3630735,Self-portrait,Vincent van Gogh,professional_hobbyist,260,deepseek/deepseek-v4-flash
-Q3630735,Self-portrait,Vincent van Gogh,recharger,271,deepseek/deepseek-v4-flash
-Q3633456,Dance in the City,Pierre-Auguste Renoir,experience_seeker,214,deepseek/deepseek-v4-flash
-Q3633456,Dance in the City,Pierre-Auguste Renoir,explorer,233,deepseek/deepseek-v4-flash
-Q3633456,Dance in the City,Pierre-Auguste Renoir,facilitator,228,deepseek/deepseek-v4-flash
-Q3633456,Dance in the City,Pierre-Auguste Renoir,flat,194,deepseek/deepseek-v4-flash
-Q3633456,Dance in the City,Pierre-Auguste Renoir,professional_hobbyist,274,deepseek/deepseek-v4-flash
-Q3633456,Dance in the City,Pierre-Auguste Renoir,recharger,248,deepseek/deepseek-v4-flash
-Q3751961,The Wounded Man,Gustave Courbet,experience_seeker,246,deepseek/deepseek-v4-flash
-Q3751961,The Wounded Man,Gustave Courbet,explorer,210,deepseek/deepseek-v4-flash
-Q3751961,The Wounded Man,Gustave Courbet,facilitator,228,deepseek/deepseek-v4-flash
-Q3751961,The Wounded Man,Gustave Courbet,flat,190,deepseek/deepseek-v4-flash
-Q3751961,The Wounded Man,Gustave Courbet,professional_hobbyist,235,deepseek/deepseek-v4-flash
-Q3751961,The Wounded Man,Gustave Courbet,recharger,247,deepseek/deepseek-v4-flash
-Q3808227,Girls at the Piano,Pierre-Auguste Renoir,experience_seeker,226,deepseek/deepseek-v4-flash
-Q3808227,Girls at the Piano,Pierre-Auguste Renoir,explorer,234,deepseek/deepseek-v4-flash
-Q3808227,Girls at the Piano,Pierre-Auguste Renoir,facilitator,270,deepseek/deepseek-v4-flash
-Q3808227,Girls at the Piano,Pierre-Auguste Renoir,flat,212,deepseek/deepseek-v4-flash
-Q3808227,Girls at the Piano,Pierre-Auguste Renoir,professional_hobbyist,248,deepseek/deepseek-v4-flash
-Q3808227,Girls at the Piano,Pierre-Auguste Renoir,recharger,259,deepseek/deepseek-v4-flash
-Q421716,"Nude Descending a Staircase, No. 2",Marcel Duchamp,experience_seeker,231,deepseek/deepseek-v4-flash
-Q421716,"Nude Descending a Staircase, No. 2",Marcel Duchamp,explorer,241,deepseek/deepseek-v4-flash
-Q421716,"Nude Descending a Staircase, No. 2",Marcel Duchamp,facilitator,257,deepseek/deepseek-v4-flash
-Q421716,"Nude Descending a Staircase, No. 2",Marcel Duchamp,flat,252,deepseek/deepseek-v4-flash
-Q421716,"Nude Descending a Staircase, No. 2",Marcel Duchamp,professional_hobbyist,270,deepseek/deepseek-v4-flash
-Q421716,"Nude Descending a Staircase, No. 2",Marcel Duchamp,recharger,268,deepseek/deepseek-v4-flash
-Q432253,Garden at Sainte-Adresse,Claude Monet,experience_seeker,225,deepseek/deepseek-v4-flash
-Q432253,Garden at Sainte-Adresse,Claude Monet,explorer,284,deepseek/deepseek-v4-flash
-Q432253,Garden at Sainte-Adresse,Claude Monet,facilitator,229,deepseek/deepseek-v4-flash
-Q432253,Garden at Sainte-Adresse,Claude Monet,flat,268,deepseek/deepseek-v4-flash
-Q432253,Garden at Sainte-Adresse,Claude Monet,professional_hobbyist,247,deepseek/deepseek-v4-flash
-Q432253,Garden at Sainte-Adresse,Claude Monet,recharger,224,deepseek/deepseek-v4-flash
-Q4429116,The Magpie,Claude Monet,experience_seeker,240,deepseek/deepseek-v4-flash
-Q4429116,The Magpie,Claude Monet,explorer,246,deepseek/deepseek-v4-flash
-Q4429116,The Magpie,Claude Monet,facilitator,222,deepseek/deepseek-v4-flash
-Q4429116,The Magpie,Claude Monet,flat,230,deepseek/deepseek-v4-flash
-Q4429116,The Magpie,Claude Monet,professional_hobbyist,265,deepseek/deepseek-v4-flash
-Q4429116,The Magpie,Claude Monet,recharger,231,deepseek/deepseek-v4-flash
-Q45585,The Starry Night,Vincent van Gogh,experience_seeker,233,deepseek/deepseek-v4-flash
-Q45585,The Starry Night,Vincent van Gogh,explorer,255,deepseek/deepseek-v4-flash
-Q45585,The Starry Night,Vincent van Gogh,facilitator,225,deepseek/deepseek-v4-flash
-Q45585,The Starry Night,Vincent van Gogh,flat,225,deepseek/deepseek-v4-flash
-Q45585,The Starry Night,Vincent van Gogh,professional_hobbyist,301,deepseek/deepseek-v4-flash
-Q45585,The Starry Night,Vincent van Gogh,recharger,213,deepseek/deepseek-v4-flash
-Q467359,Allegory of the Catholic Faith,Johannes Vermeer,experience_seeker,242,deepseek/deepseek-v4-flash
-Q467359,Allegory of the Catholic Faith,Johannes Vermeer,explorer,285,deepseek/deepseek-v4-flash
-Q467359,Allegory of the Catholic Faith,Johannes Vermeer,facilitator,231,deepseek/deepseek-v4-flash
-Q467359,Allegory of the Catholic Faith,Johannes Vermeer,flat,251,deepseek/deepseek-v4-flash
-Q467359,Allegory of the Catholic Faith,Johannes Vermeer,professional_hobbyist,289,deepseek/deepseek-v4-flash
-Q467359,Allegory of the Catholic Faith,Johannes Vermeer,recharger,253,deepseek/deepseek-v4-flash
-Q4717953,Portrait of Juan de Pareja,Diego Velázquez,experience_seeker,206,deepseek/deepseek-v4-flash
-Q4717953,Portrait of Juan de Pareja,Diego Velázquez,explorer,253,deepseek/deepseek-v4-flash
-Q4717953,Portrait of Juan de Pareja,Diego Velázquez,facilitator,238,deepseek/deepseek-v4-flash
-Q4717953,Portrait of Juan de Pareja,Diego Velázquez,flat,248,deepseek/deepseek-v4-flash
-Q4717953,Portrait of Juan de Pareja,Diego Velázquez,professional_hobbyist,257,deepseek/deepseek-v4-flash
-Q4717953,Portrait of Juan de Pareja,Diego Velázquez,recharger,209,deepseek/deepseek-v4-flash
-Q500936,The Dog,Francisco Goya,experience_seeker,248,deepseek/deepseek-v4-flash
-Q500936,The Dog,Francisco Goya,explorer,266,deepseek/deepseek-v4-flash
-Q500936,The Dog,Francisco Goya,facilitator,228,deepseek/deepseek-v4-flash
-Q500936,The Dog,Francisco Goya,flat,230,deepseek/deepseek-v4-flash
-Q500936,The Dog,Francisco Goya,professional_hobbyist,272,deepseek/deepseek-v4-flash
-Q500936,The Dog,Francisco Goya,recharger,193,deepseek/deepseek-v4-flash
-Q500985,The Hunters in the Snow,Pieter Brueghel the Elder,experience_seeker,251,deepseek/deepseek-v4-flash
-Q500985,The Hunters in the Snow,Pieter Brueghel the Elder,explorer,259,deepseek/deepseek-v4-flash
-Q500985,The Hunters in the Snow,Pieter Brueghel the Elder,facilitator,224,deepseek/deepseek-v4-flash
-Q500985,The Hunters in the Snow,Pieter Brueghel the Elder,flat,237,deepseek/deepseek-v4-flash
-Q500985,The Hunters in the Snow,Pieter Brueghel the Elder,professional_hobbyist,263,deepseek/deepseek-v4-flash
-Q500985,The Hunters in the Snow,Pieter Brueghel the Elder,recharger,258,deepseek/deepseek-v4-flash
-Q509806,Washington Crossing the Delaware,Emanuel Leutze,experience_seeker,240,deepseek/deepseek-v4-flash
-Q509806,Washington Crossing the Delaware,Emanuel Leutze,explorer,219,deepseek/deepseek-v4-flash
-Q509806,Washington Crossing the Delaware,Emanuel Leutze,facilitator,244,deepseek/deepseek-v4-flash
-Q509806,Washington Crossing the Delaware,Emanuel Leutze,flat,219,deepseek/deepseek-v4-flash
-Q509806,Washington Crossing the Delaware,Emanuel Leutze,professional_hobbyist,269,deepseek/deepseek-v4-flash
-Q509806,Washington Crossing the Delaware,Emanuel Leutze,recharger,228,deepseek/deepseek-v4-flash
-Q540488,A Burial at Ornans,Gustave Courbet,experience_seeker,204,deepseek/deepseek-v4-flash
-Q540488,A Burial at Ornans,Gustave Courbet,explorer,230,deepseek/deepseek-v4-flash
-Q540488,A Burial at Ornans,Gustave Courbet,facilitator,227,deepseek/deepseek-v4-flash
-Q540488,A Burial at Ornans,Gustave Courbet,flat,218,deepseek/deepseek-v4-flash
-Q540488,A Burial at Ornans,Gustave Courbet,professional_hobbyist,263,deepseek/deepseek-v4-flash
-Q540488,A Burial at Ornans,Gustave Courbet,recharger,243,deepseek/deepseek-v4-flash
-Q568847,The Descent from the Cross,Rogier van der Weyden,experience_seeker,238,deepseek/deepseek-v4-flash
-Q568847,The Descent from the Cross,Rogier van der Weyden,explorer,275,deepseek/deepseek-v4-flash
-Q568847,The Descent from the Cross,Rogier van der Weyden,facilitator,235,deepseek/deepseek-v4-flash
-Q568847,The Descent from the Cross,Rogier van der Weyden,flat,219,deepseek/deepseek-v4-flash
-Q568847,The Descent from the Cross,Rogier van der Weyden,professional_hobbyist,253,deepseek/deepseek-v4-flash
-Q568847,The Descent from the Cross,Rogier van der Weyden,recharger,236,deepseek/deepseek-v4-flash
-Q588695,The Art of Painting,Johannes Vermeer,experience_seeker,248,deepseek/deepseek-v4-flash
-Q588695,The Art of Painting,Johannes Vermeer,explorer,227,deepseek/deepseek-v4-flash
-Q588695,The Art of Painting,Johannes Vermeer,facilitator,242,deepseek/deepseek-v4-flash
-Q588695,The Art of Painting,Johannes Vermeer,flat,212,deepseek/deepseek-v4-flash
-Q588695,The Art of Painting,Johannes Vermeer,professional_hobbyist,273,deepseek/deepseek-v4-flash
-Q588695,The Art of Painting,Johannes Vermeer,recharger,234,deepseek/deepseek-v4-flash
-Q603751,The Peasant Wedding,Pieter Brueghel the Elder,experience_seeker,210,deepseek/deepseek-v4-flash
-Q603751,The Peasant Wedding,Pieter Brueghel the Elder,explorer,228,deepseek/deepseek-v4-flash
-Q603751,The Peasant Wedding,Pieter Brueghel the Elder,facilitator,242,deepseek/deepseek-v4-flash
-Q603751,The Peasant Wedding,Pieter Brueghel the Elder,flat,166,deepseek/deepseek-v4-flash
-Q603751,The Peasant Wedding,Pieter Brueghel the Elder,professional_hobbyist,245,deepseek/deepseek-v4-flash
-Q603751,The Peasant Wedding,Pieter Brueghel the Elder,recharger,195,deepseek/deepseek-v4-flash
-Q614047,Girl with a Red Hat,Johannes Vermeer,experience_seeker,224,deepseek/deepseek-v4-flash
-Q614047,Girl with a Red Hat,Johannes Vermeer,explorer,174,deepseek/deepseek-v4-flash
-Q614047,Girl with a Red Hat,Johannes Vermeer,facilitator,230,deepseek/deepseek-v4-flash
-Q614047,Girl with a Red Hat,Johannes Vermeer,flat,203,deepseek/deepseek-v4-flash
-Q614047,Girl with a Red Hat,Johannes Vermeer,professional_hobbyist,250,deepseek/deepseek-v4-flash
-Q614047,Girl with a Red Hat,Johannes Vermeer,recharger,246,deepseek/deepseek-v4-flash
-Q6402081,The Nobleman with his Hand on his Chest,El Greco,experience_seeker,248,deepseek/deepseek-v4-flash
-Q6402081,The Nobleman with his Hand on his Chest,El Greco,explorer,224,deepseek/deepseek-v4-flash
-Q6402081,The Nobleman with his Hand on his Chest,El Greco,facilitator,260,deepseek/deepseek-v4-flash
-Q6402081,The Nobleman with his Hand on his Chest,El Greco,flat,184,deepseek/deepseek-v4-flash
-Q6402081,The Nobleman with his Hand on his Chest,El Greco,professional_hobbyist,262,deepseek/deepseek-v4-flash
-Q6402081,The Nobleman with his Hand on his Chest,El Greco,recharger,214,deepseek/deepseek-v4-flash
-Q650635,"A Militiaman Holding a Berkemeyer, Known as the ‘Merry Drinker’",Frans Hals,experience_seeker,249,deepseek/deepseek-v4-flash
-Q650635,"A Militiaman Holding a Berkemeyer, Known as the ‘Merry Drinker’",Frans Hals,explorer,225,deepseek/deepseek-v4-flash
-Q650635,"A Militiaman Holding a Berkemeyer, Known as the ‘Merry Drinker’",Frans Hals,facilitator,244,deepseek/deepseek-v4-flash
-Q650635,"A Militiaman Holding a Berkemeyer, Known as the ‘Merry Drinker’",Frans Hals,flat,199,deepseek/deepseek-v4-flash
-Q650635,"A Militiaman Holding a Berkemeyer, Known as the ‘Merry Drinker’",Frans Hals,professional_hobbyist,224,deepseek/deepseek-v4-flash
-Q650635,"A Militiaman Holding a Berkemeyer, Known as the ‘Merry Drinker’",Frans Hals,recharger,281,deepseek/deepseek-v4-flash
-Q683274,Bal du moulin de la Galette,Pierre-Auguste Renoir,experience_seeker,268,deepseek/deepseek-v4-flash
-Q683274,Bal du moulin de la Galette,Pierre-Auguste Renoir,explorer,241,deepseek/deepseek-v4-flash
-Q683274,Bal du moulin de la Galette,Pierre-Auguste Renoir,facilitator,263,deepseek/deepseek-v4-flash
-Q683274,Bal du moulin de la Galette,Pierre-Auguste Renoir,flat,222,deepseek/deepseek-v4-flash
-Q683274,Bal du moulin de la Galette,Pierre-Auguste Renoir,professional_hobbyist,312,deepseek/deepseek-v4-flash
-Q683274,Bal du moulin de la Galette,Pierre-Auguste Renoir,recharger,249,deepseek/deepseek-v4-flash
-Q687182,Whistler's Mother,James McNeill Whistler,experience_seeker,240,deepseek/deepseek-v4-flash
-Q687182,Whistler's Mother,James McNeill Whistler,explorer,254,deepseek/deepseek-v4-flash
-Q687182,Whistler's Mother,James McNeill Whistler,facilitator,249,deepseek/deepseek-v4-flash
-Q687182,Whistler's Mother,James McNeill Whistler,flat,238,deepseek/deepseek-v4-flash
-Q687182,Whistler's Mother,James McNeill Whistler,professional_hobbyist,278,deepseek/deepseek-v4-flash
-Q687182,Whistler's Mother,James McNeill Whistler,recharger,244,deepseek/deepseek-v4-flash
-Q689236,The Fight Between Carnival and Lent,Pieter Brueghel the Elder,experience_seeker,240,deepseek/deepseek-v4-flash
-Q689236,The Fight Between Carnival and Lent,Pieter Brueghel the Elder,explorer,272,deepseek/deepseek-v4-flash
-Q689236,The Fight Between Carnival and Lent,Pieter Brueghel the Elder,facilitator,190,deepseek/deepseek-v4-flash
-Q689236,The Fight Between Carnival and Lent,Pieter Brueghel the Elder,flat,245,deepseek/deepseek-v4-flash
-Q689236,The Fight Between Carnival and Lent,Pieter Brueghel the Elder,professional_hobbyist,240,deepseek/deepseek-v4-flash
-Q689236,The Fight Between Carnival and Lent,Pieter Brueghel the Elder,recharger,238,deepseek/deepseek-v4-flash
-Q698228,Madonna of the Rosary,Caravaggio,experience_seeker,227,deepseek/deepseek-v4-flash
-Q698228,Madonna of the Rosary,Caravaggio,explorer,248,deepseek/deepseek-v4-flash
-Q698228,Madonna of the Rosary,Caravaggio,facilitator,243,deepseek/deepseek-v4-flash
-Q698228,Madonna of the Rosary,Caravaggio,flat,195,deepseek/deepseek-v4-flash
-Q698228,Madonna of the Rosary,Caravaggio,professional_hobbyist,253,deepseek/deepseek-v4-flash
-Q698228,Madonna of the Rosary,Caravaggio,recharger,215,deepseek/deepseek-v4-flash
-Q698254,The Return of the Herd,Pieter Brueghel the Elder,experience_seeker,241,deepseek/deepseek-v4-flash
-Q698254,The Return of the Herd,Pieter Brueghel the Elder,explorer,300,deepseek/deepseek-v4-flash
-Q698254,The Return of the Herd,Pieter Brueghel the Elder,facilitator,205,deepseek/deepseek-v4-flash
-Q698254,The Return of the Herd,Pieter Brueghel the Elder,flat,238,deepseek/deepseek-v4-flash
-Q698254,The Return of the Herd,Pieter Brueghel the Elder,professional_hobbyist,284,deepseek/deepseek-v4-flash
-Q698254,The Return of the Herd,Pieter Brueghel the Elder,recharger,217,deepseek/deepseek-v4-flash
-Q731639,The Plum,Édouard Manet,experience_seeker,199,deepseek/deepseek-v4-flash
-Q731639,The Plum,Édouard Manet,explorer,256,deepseek/deepseek-v4-flash
-Q731639,The Plum,Édouard Manet,facilitator,234,deepseek/deepseek-v4-flash
-Q731639,The Plum,Édouard Manet,flat,203,deepseek/deepseek-v4-flash
-Q731639,The Plum,Édouard Manet,professional_hobbyist,210,deepseek/deepseek-v4-flash
-Q731639,The Plum,Édouard Manet,recharger,217,deepseek/deepseek-v4-flash
-Q737062,Olympia,Édouard Manet,experience_seeker,236,deepseek/deepseek-v4-flash
-Q737062,Olympia,Édouard Manet,explorer,255,deepseek/deepseek-v4-flash
-Q737062,Olympia,Édouard Manet,facilitator,263,deepseek/deepseek-v4-flash
-Q737062,Olympia,Édouard Manet,flat,193,deepseek/deepseek-v4-flash
-Q737062,Olympia,Édouard Manet,professional_hobbyist,250,deepseek/deepseek-v4-flash
-Q737062,Olympia,Édouard Manet,recharger,189,deepseek/deepseek-v4-flash
-Q766782,The Jewish Bride,Rembrandt,experience_seeker,226,deepseek/deepseek-v4-flash
-Q766782,The Jewish Bride,Rembrandt,explorer,243,deepseek/deepseek-v4-flash
-Q766782,The Jewish Bride,Rembrandt,facilitator,249,deepseek/deepseek-v4-flash
-Q766782,The Jewish Bride,Rembrandt,flat,239,deepseek/deepseek-v4-flash
-Q766782,The Jewish Bride,Rembrandt,professional_hobbyist,266,deepseek/deepseek-v4-flash
-Q766782,The Jewish Bride,Rembrandt,recharger,267,deepseek/deepseek-v4-flash
-Q775407,The Balcony,Édouard Manet,experience_seeker,212,deepseek/deepseek-v4-flash
-Q775407,The Balcony,Édouard Manet,explorer,213,deepseek/deepseek-v4-flash
-Q775407,The Balcony,Édouard Manet,facilitator,226,deepseek/deepseek-v4-flash
-Q775407,The Balcony,Édouard Manet,flat,238,deepseek/deepseek-v4-flash
-Q775407,The Balcony,Édouard Manet,professional_hobbyist,304,deepseek/deepseek-v4-flash
-Q775407,The Balcony,Édouard Manet,recharger,212,deepseek/deepseek-v4-flash
-Q776175,The Harvesters,Pieter Brueghel the Elder,experience_seeker,236,deepseek/deepseek-v4-flash
-Q776175,The Harvesters,Pieter Brueghel the Elder,explorer,255,deepseek/deepseek-v4-flash
-Q776175,The Harvesters,Pieter Brueghel the Elder,facilitator,238,deepseek/deepseek-v4-flash
-Q776175,The Harvesters,Pieter Brueghel the Elder,flat,258,deepseek/deepseek-v4-flash
-Q776175,The Harvesters,Pieter Brueghel the Elder,professional_hobbyist,308,deepseek/deepseek-v4-flash
-Q776175,The Harvesters,Pieter Brueghel the Elder,recharger,235,deepseek/deepseek-v4-flash
-Q783215,Saint John the Baptist,Leonardo da Vinci,experience_seeker,232,deepseek/deepseek-v4-flash
-Q783215,Saint John the Baptist,Leonardo da Vinci,explorer,243,deepseek/deepseek-v4-flash
-Q783215,Saint John the Baptist,Leonardo da Vinci,facilitator,242,deepseek/deepseek-v4-flash
-Q783215,Saint John the Baptist,Leonardo da Vinci,flat,174,deepseek/deepseek-v4-flash
-Q783215,Saint John the Baptist,Leonardo da Vinci,professional_hobbyist,255,deepseek/deepseek-v4-flash
-Q783215,Saint John the Baptist,Leonardo da Vinci,recharger,225,deepseek/deepseek-v4-flash
-Q877191,The Three Philosophers,Giorgione,experience_seeker,236,deepseek/deepseek-v4-flash
-Q877191,The Three Philosophers,Giorgione,explorer,224,deepseek/deepseek-v4-flash
-Q877191,The Three Philosophers,Giorgione,facilitator,213,deepseek/deepseek-v4-flash
-Q877191,The Three Philosophers,Giorgione,flat,226,deepseek/deepseek-v4-flash
-Q877191,The Three Philosophers,Giorgione,professional_hobbyist,216,deepseek/deepseek-v4-flash
-Q877191,The Three Philosophers,Giorgione,recharger,218,deepseek/deepseek-v4-flash
-Q883994,View of Toledo,El Greco,experience_seeker,233,deepseek/deepseek-v4-flash
-Q883994,View of Toledo,El Greco,explorer,250,deepseek/deepseek-v4-flash
-Q883994,View of Toledo,El Greco,facilitator,205,deepseek/deepseek-v4-flash
-Q883994,View of Toledo,El Greco,flat,250,deepseek/deepseek-v4-flash
-Q883994,View of Toledo,El Greco,professional_hobbyist,252,deepseek/deepseek-v4-flash
-Q883994,View of Toledo,El Greco,recharger,250,deepseek/deepseek-v4-flash
-Q910199,Les Demoiselles d'Avignon,Pablo Picasso,experience_seeker,207,deepseek/deepseek-v4-flash
-Q910199,Les Demoiselles d'Avignon,Pablo Picasso,explorer,209,deepseek/deepseek-v4-flash
-Q910199,Les Demoiselles d'Avignon,Pablo Picasso,facilitator,219,deepseek/deepseek-v4-flash
-Q910199,Les Demoiselles d'Avignon,Pablo Picasso,flat,248,deepseek/deepseek-v4-flash
-Q910199,Les Demoiselles d'Avignon,Pablo Picasso,professional_hobbyist,246,deepseek/deepseek-v4-flash
-Q910199,Les Demoiselles d'Avignon,Pablo Picasso,recharger,222,deepseek/deepseek-v4-flash
-Q920030,Charles IV of Spain and His Family,Francisco Goya,experience_seeker,252,deepseek/deepseek-v4-flash
-Q920030,Charles IV of Spain and His Family,Francisco Goya,explorer,240,deepseek/deepseek-v4-flash
-Q920030,Charles IV of Spain and His Family,Francisco Goya,facilitator,212,deepseek/deepseek-v4-flash
-Q920030,Charles IV of Spain and His Family,Francisco Goya,flat,221,deepseek/deepseek-v4-flash
-Q920030,Charles IV of Spain and His Family,Francisco Goya,professional_hobbyist,271,deepseek/deepseek-v4-flash
-Q920030,Charles IV of Spain and His Family,Francisco Goya,recharger,245,deepseek/deepseek-v4-flash
-Q930535,Tahitian Women on the Beach,Paul Gauguin,experience_seeker,221,deepseek/deepseek-v4-flash
-Q930535,Tahitian Women on the Beach,Paul Gauguin,explorer,224,deepseek/deepseek-v4-flash
-Q930535,Tahitian Women on the Beach,Paul Gauguin,facilitator,218,deepseek/deepseek-v4-flash
-Q930535,Tahitian Women on the Beach,Paul Gauguin,flat,268,deepseek/deepseek-v4-flash
-Q930535,Tahitian Women on the Beach,Paul Gauguin,professional_hobbyist,232,deepseek/deepseek-v4-flash
-Q930535,Tahitian Women on the Beach,Paul Gauguin,recharger,211,deepseek/deepseek-v4-flash
-Q958088,Portrait of a Young Woman,Johannes Vermeer,experience_seeker,218,deepseek/deepseek-v4-flash
-Q958088,Portrait of a Young Woman,Johannes Vermeer,explorer,238,deepseek/deepseek-v4-flash
-Q958088,Portrait of a Young Woman,Johannes Vermeer,facilitator,233,deepseek/deepseek-v4-flash
-Q958088,Portrait of a Young Woman,Johannes Vermeer,flat,222,deepseek/deepseek-v4-flash
-Q958088,Portrait of a Young Woman,Johannes Vermeer,professional_hobbyist,238,deepseek/deepseek-v4-flash
-Q958088,Portrait of a Young Woman,Johannes Vermeer,recharger,207,deepseek/deepseek-v4-flash
-Q969367,Woman Holding a Balance,Johannes Vermeer,experience_seeker,250,deepseek/deepseek-v4-flash
-Q969367,Woman Holding a Balance,Johannes Vermeer,explorer,222,deepseek/deepseek-v4-flash
-Q969367,Woman Holding a Balance,Johannes Vermeer,facilitator,218,deepseek/deepseek-v4-flash
-Q969367,Woman Holding a Balance,Johannes Vermeer,flat,222,deepseek/deepseek-v4-flash
-Q969367,Woman Holding a Balance,Johannes Vermeer,professional_hobbyist,304,deepseek/deepseek-v4-flash
-Q969367,Woman Holding a Balance,Johannes Vermeer,recharger,201,deepseek/deepseek-v4-flash
-Q970968,"Symphony in White, No. 1: The White Girl",James McNeill Whistler,experience_seeker,248,deepseek/deepseek-v4-flash
-Q970968,"Symphony in White, No. 1: The White Girl",James McNeill Whistler,explorer,250,deepseek/deepseek-v4-flash
-Q970968,"Symphony in White, No. 1: The White Girl",James McNeill Whistler,facilitator,265,deepseek/deepseek-v4-flash
-Q970968,"Symphony in White, No. 1: The White Girl",James McNeill Whistler,flat,258,deepseek/deepseek-v4-flash
-Q970968,"Symphony in White, No. 1: The White Girl",James McNeill Whistler,professional_hobbyist,299,deepseek/deepseek-v4-flash
-Q970968,"Symphony in White, No. 1: The White Girl",James McNeill Whistler,recharger,218,deepseek/deepseek-v4-flash
-Q984058,Las Hilanderas,Diego Velázquez,experience_seeker,232,deepseek/deepseek-v4-flash
-Q984058,Las Hilanderas,Diego Velázquez,explorer,242,deepseek/deepseek-v4-flash
-Q984058,Las Hilanderas,Diego Velázquez,facilitator,230,deepseek/deepseek-v4-flash
-Q984058,Las Hilanderas,Diego Velázquez,flat,222,deepseek/deepseek-v4-flash
-Q984058,Las Hilanderas,Diego Velázquez,professional_hobbyist,260,deepseek/deepseek-v4-flash
-Q984058,Las Hilanderas,Diego Velázquez,recharger,221,deepseek/deepseek-v4-flash
+artwork_id,title,artist,condition,variant,words,generator_model
+Q1091086,The Third of May 1808,Francisco Goya,experience_seeker,full,237,deepseek/deepseek-v4-flash
+Q1091086,The Third of May 1808,Francisco Goya,explorer,full,215,deepseek/deepseek-v4-flash
+Q1091086,The Third of May 1808,Francisco Goya,facilitator,full,259,deepseek/deepseek-v4-flash
+Q1091086,The Third of May 1808,Francisco Goya,flat,full,260,deepseek/deepseek-v4-flash
+Q1091086,The Third of May 1808,Francisco Goya,professional_hobbyist,full,265,deepseek/deepseek-v4-flash
+Q1091086,The Third of May 1808,Francisco Goya,recharger,full,241,deepseek/deepseek-v4-flash
+Q1118456,La Balançoire,Pierre-Auguste Renoir,experience_seeker,full,240,deepseek/deepseek-v4-flash
+Q1118456,La Balançoire,Pierre-Auguste Renoir,explorer,full,242,deepseek/deepseek-v4-flash
+Q1118456,La Balançoire,Pierre-Auguste Renoir,facilitator,full,271,deepseek/deepseek-v4-flash
+Q1118456,La Balançoire,Pierre-Auguste Renoir,flat,full,245,deepseek/deepseek-v4-flash
+Q1118456,La Balançoire,Pierre-Auguste Renoir,professional_hobbyist,full,281,deepseek/deepseek-v4-flash
+Q1118456,La Balançoire,Pierre-Auguste Renoir,recharger,full,259,deepseek/deepseek-v4-flash
+Q1123378,Equestrian Portrait of Charles V,Titian,experience_seeker,full,232,deepseek/deepseek-v4-flash
+Q1123378,Equestrian Portrait of Charles V,Titian,explorer,full,255,deepseek/deepseek-v4-flash
+Q1123378,Equestrian Portrait of Charles V,Titian,facilitator,full,235,deepseek/deepseek-v4-flash
+Q1123378,Equestrian Portrait of Charles V,Titian,flat,full,239,deepseek/deepseek-v4-flash
+Q1123378,Equestrian Portrait of Charles V,Titian,professional_hobbyist,full,264,deepseek/deepseek-v4-flash
+Q1123378,Equestrian Portrait of Charles V,Titian,recharger,full,238,deepseek/deepseek-v4-flash
+Q1133420,The Surrender of Brea,Diego Velázquez,experience_seeker,full,249,deepseek/deepseek-v4-flash
+Q1133420,The Surrender of Brea,Diego Velázquez,explorer,full,232,deepseek/deepseek-v4-flash
+Q1133420,The Surrender of Brea,Diego Velázquez,facilitator,full,239,deepseek/deepseek-v4-flash
+Q1133420,The Surrender of Brea,Diego Velázquez,flat,full,213,deepseek/deepseek-v4-flash
+Q1133420,The Surrender of Brea,Diego Velázquez,professional_hobbyist,full,268,deepseek/deepseek-v4-flash
+Q1133420,The Surrender of Brea,Diego Velázquez,recharger,full,215,deepseek/deepseek-v4-flash
+Q1150997,Saturn Devouring His Son,Francisco Goya,experience_seeker,full,243,deepseek/deepseek-v4-flash
+Q1150997,Saturn Devouring His Son,Francisco Goya,explorer,full,216,deepseek/deepseek-v4-flash
+Q1150997,Saturn Devouring His Son,Francisco Goya,facilitator,full,235,deepseek/deepseek-v4-flash
+Q1150997,Saturn Devouring His Son,Francisco Goya,flat,full,220,deepseek/deepseek-v4-flash
+Q1150997,Saturn Devouring His Son,Francisco Goya,professional_hobbyist,full,251,deepseek/deepseek-v4-flash
+Q1150997,Saturn Devouring His Son,Francisco Goya,recharger,full,242,deepseek/deepseek-v4-flash
+Q1167178,The Painter's Studio,Gustave Courbet,experience_seeker,full,205,deepseek/deepseek-v4-flash
+Q1167178,The Painter's Studio,Gustave Courbet,explorer,full,254,deepseek/deepseek-v4-flash
+Q1167178,The Painter's Studio,Gustave Courbet,facilitator,full,244,deepseek/deepseek-v4-flash
+Q1167178,The Painter's Studio,Gustave Courbet,flat,full,192,deepseek/deepseek-v4-flash
+Q1167178,The Painter's Studio,Gustave Courbet,professional_hobbyist,full,292,deepseek/deepseek-v4-flash
+Q1167178,The Painter's Studio,Gustave Courbet,recharger,full,230,deepseek/deepseek-v4-flash
+Q1167912,Le Déjeuner sur l'herbe,Claude Monet,experience_seeker,full,229,deepseek/deepseek-v4-flash
+Q1167912,Le Déjeuner sur l'herbe,Claude Monet,explorer,full,250,deepseek/deepseek-v4-flash
+Q1167912,Le Déjeuner sur l'herbe,Claude Monet,facilitator,full,238,deepseek/deepseek-v4-flash
+Q1167912,Le Déjeuner sur l'herbe,Claude Monet,flat,full,214,deepseek/deepseek-v4-flash
+Q1167912,Le Déjeuner sur l'herbe,Claude Monet,professional_hobbyist,full,243,deepseek/deepseek-v4-flash
+Q1167912,Le Déjeuner sur l'herbe,Claude Monet,recharger,full,194,deepseek/deepseek-v4-flash
+Q1212098,The Railway,Édouard Manet,experience_seeker,full,230,deepseek/deepseek-v4-flash
+Q1212098,The Railway,Édouard Manet,explorer,full,244,deepseek/deepseek-v4-flash
+Q1212098,The Railway,Édouard Manet,facilitator,full,271,deepseek/deepseek-v4-flash
+Q1212098,The Railway,Édouard Manet,flat,full,215,deepseek/deepseek-v4-flash
+Q1212098,The Railway,Édouard Manet,professional_hobbyist,full,261,deepseek/deepseek-v4-flash
+Q1212098,The Railway,Édouard Manet,recharger,full,214,deepseek/deepseek-v4-flash
+Q1212861,The Birth of Venus,Alexandre Cabanel,experience_seeker,full,256,deepseek/deepseek-v4-flash
+Q1212861,The Birth of Venus,Alexandre Cabanel,explorer,full,205,deepseek/deepseek-v4-flash
+Q1212861,The Birth of Venus,Alexandre Cabanel,facilitator,full,241,deepseek/deepseek-v4-flash
+Q1212861,The Birth of Venus,Alexandre Cabanel,flat,full,230,deepseek/deepseek-v4-flash
+Q1212861,The Birth of Venus,Alexandre Cabanel,professional_hobbyist,full,239,deepseek/deepseek-v4-flash
+Q1212861,The Birth of Venus,Alexandre Cabanel,recharger,full,239,deepseek/deepseek-v4-flash
+Q1215604,The Source,Jean-Auguste-Dominique Ingres,experience_seeker,full,212,deepseek/deepseek-v4-flash
+Q1215604,The Source,Jean-Auguste-Dominique Ingres,explorer,full,228,deepseek/deepseek-v4-flash
+Q1215604,The Source,Jean-Auguste-Dominique Ingres,facilitator,full,242,deepseek/deepseek-v4-flash
+Q1215604,The Source,Jean-Auguste-Dominique Ingres,flat,full,230,deepseek/deepseek-v4-flash
+Q1215604,The Source,Jean-Auguste-Dominique Ingres,professional_hobbyist,full,235,deepseek/deepseek-v4-flash
+Q1215604,The Source,Jean-Auguste-Dominique Ingres,recharger,full,224,deepseek/deepseek-v4-flash
+Q1219263,The Sleeping Gypsy,Henri Rousseau,experience_seeker,full,223,deepseek/deepseek-v4-flash
+Q1219263,The Sleeping Gypsy,Henri Rousseau,explorer,full,224,deepseek/deepseek-v4-flash
+Q1219263,The Sleeping Gypsy,Henri Rousseau,facilitator,full,230,deepseek/deepseek-v4-flash
+Q1219263,The Sleeping Gypsy,Henri Rousseau,flat,full,242,deepseek/deepseek-v4-flash
+Q1219263,The Sleeping Gypsy,Henri Rousseau,professional_hobbyist,full,241,deepseek/deepseek-v4-flash
+Q1219263,The Sleeping Gypsy,Henri Rousseau,recharger,full,210,deepseek/deepseek-v4-flash
+Q1220013,Opening of the Fifth Seal,El Greco,experience_seeker,full,203,deepseek/deepseek-v4-flash
+Q1220013,Opening of the Fifth Seal,El Greco,explorer,full,245,deepseek/deepseek-v4-flash
+Q1220013,Opening of the Fifth Seal,El Greco,facilitator,full,213,deepseek/deepseek-v4-flash
+Q1220013,Opening of the Fifth Seal,El Greco,flat,full,216,deepseek/deepseek-v4-flash
+Q1220013,Opening of the Fifth Seal,El Greco,professional_hobbyist,full,298,deepseek/deepseek-v4-flash
+Q1220013,Opening of the Fifth Seal,El Greco,recharger,full,210,deepseek/deepseek-v4-flash
+Q123935,The Triumph of Bacchus,Diego Velázquez,experience_seeker,full,222,deepseek/deepseek-v4-flash
+Q123935,The Triumph of Bacchus,Diego Velázquez,explorer,full,256,deepseek/deepseek-v4-flash
+Q123935,The Triumph of Bacchus,Diego Velázquez,facilitator,full,223,deepseek/deepseek-v4-flash
+Q123935,The Triumph of Bacchus,Diego Velázquez,flat,full,216,deepseek/deepseek-v4-flash
+Q123935,The Triumph of Bacchus,Diego Velázquez,professional_hobbyist,full,272,deepseek/deepseek-v4-flash
+Q123935,The Triumph of Bacchus,Diego Velázquez,recharger,full,222,deepseek/deepseek-v4-flash
+Q1239950,L'Absinthe,Edgar Degas,experience_seeker,full,223,deepseek/deepseek-v4-flash
+Q1239950,L'Absinthe,Edgar Degas,explorer,full,218,deepseek/deepseek-v4-flash
+Q1239950,L'Absinthe,Edgar Degas,facilitator,full,243,deepseek/deepseek-v4-flash
+Q1239950,L'Absinthe,Edgar Degas,flat,full,250,deepseek/deepseek-v4-flash
+Q1239950,L'Absinthe,Edgar Degas,professional_hobbyist,full,225,deepseek/deepseek-v4-flash
+Q1239950,L'Absinthe,Edgar Degas,recharger,full,229,deepseek/deepseek-v4-flash
+Q1267893,Ginevra de' Benci,Leonardo da Vinci,experience_seeker,full,237,deepseek/deepseek-v4-flash
+Q1267893,Ginevra de' Benci,Leonardo da Vinci,explorer,full,223,deepseek/deepseek-v4-flash
+Q1267893,Ginevra de' Benci,Leonardo da Vinci,facilitator,full,255,deepseek/deepseek-v4-flash
+Q1267893,Ginevra de' Benci,Leonardo da Vinci,flat,full,239,deepseek/deepseek-v4-flash
+Q1267893,Ginevra de' Benci,Leonardo da Vinci,professional_hobbyist,full,295,deepseek/deepseek-v4-flash
+Q1267893,Ginevra de' Benci,Leonardo da Vinci,recharger,full,207,deepseek/deepseek-v4-flash
+Q1283024,The Birth of Venus,William-Adolphe Bouguereau,experience_seeker,full,199,deepseek/deepseek-v4-flash
+Q1283024,The Birth of Venus,William-Adolphe Bouguereau,explorer,full,241,deepseek/deepseek-v4-flash
+Q1283024,The Birth of Venus,William-Adolphe Bouguereau,facilitator,full,225,deepseek/deepseek-v4-flash
+Q1283024,The Birth of Venus,William-Adolphe Bouguereau,flat,full,281,deepseek/deepseek-v4-flash
+Q1283024,The Birth of Venus,William-Adolphe Bouguereau,professional_hobbyist,full,263,deepseek/deepseek-v4-flash
+Q1283024,The Birth of Venus,William-Adolphe Bouguereau,recharger,full,230,deepseek/deepseek-v4-flash
+Q1313605,The Emperor Napoleon in His Study at the Tuileries,Jacques-Louis David,experience_seeker,full,234,deepseek/deepseek-v4-flash
+Q1313605,The Emperor Napoleon in His Study at the Tuileries,Jacques-Louis David,explorer,full,245,deepseek/deepseek-v4-flash
+Q1313605,The Emperor Napoleon in His Study at the Tuileries,Jacques-Louis David,facilitator,full,225,deepseek/deepseek-v4-flash
+Q1313605,The Emperor Napoleon in His Study at the Tuileries,Jacques-Louis David,flat,full,223,deepseek/deepseek-v4-flash
+Q1313605,The Emperor Napoleon in His Study at the Tuileries,Jacques-Louis David,professional_hobbyist,full,282,deepseek/deepseek-v4-flash
+Q1313605,The Emperor Napoleon in His Study at the Tuileries,Jacques-Louis David,recharger,full,239,deepseek/deepseek-v4-flash
+Q1464531,Starry Night Over the Rhone,Vincent van Gogh,experience_seeker,full,232,deepseek/deepseek-v4-flash
+Q1464531,Starry Night Over the Rhone,Vincent van Gogh,explorer,full,242,deepseek/deepseek-v4-flash
+Q1464531,Starry Night Over the Rhone,Vincent van Gogh,facilitator,full,263,deepseek/deepseek-v4-flash
+Q1464531,Starry Night Over the Rhone,Vincent van Gogh,flat,full,201,deepseek/deepseek-v4-flash
+Q1464531,Starry Night Over the Rhone,Vincent van Gogh,professional_hobbyist,full,247,deepseek/deepseek-v4-flash
+Q1464531,Starry Night Over the Rhone,Vincent van Gogh,recharger,full,245,deepseek/deepseek-v4-flash
+Q15008032,The Feast of the Gods,Giovanni Bellini,experience_seeker,full,240,deepseek/deepseek-v4-flash
+Q15008032,The Feast of the Gods,Giovanni Bellini,explorer,full,247,deepseek/deepseek-v4-flash
+Q15008032,The Feast of the Gods,Giovanni Bellini,facilitator,full,233,deepseek/deepseek-v4-flash
+Q15008032,The Feast of the Gods,Giovanni Bellini,flat,full,229,deepseek/deepseek-v4-flash
+Q15008032,The Feast of the Gods,Giovanni Bellini,professional_hobbyist,full,250,deepseek/deepseek-v4-flash
+Q15008032,The Feast of the Gods,Giovanni Bellini,recharger,full,239,deepseek/deepseek-v4-flash
+Q152509,Luncheon on the Grass,Édouard Manet,experience_seeker,full,232,deepseek/deepseek-v4-flash
+Q152509,Luncheon on the Grass,Édouard Manet,explorer,full,246,deepseek/deepseek-v4-flash
+Q152509,Luncheon on the Grass,Édouard Manet,facilitator,full,216,deepseek/deepseek-v4-flash
+Q152509,Luncheon on the Grass,Édouard Manet,flat,full,212,deepseek/deepseek-v4-flash
+Q152509,Luncheon on the Grass,Édouard Manet,professional_hobbyist,full,246,deepseek/deepseek-v4-flash
+Q152509,Luncheon on the Grass,Édouard Manet,recharger,full,233,deepseek/deepseek-v4-flash
+Q152867,La maja desnuda,Francisco Goya,experience_seeker,full,230,deepseek/deepseek-v4-flash
+Q152867,La maja desnuda,Francisco Goya,explorer,full,206,deepseek/deepseek-v4-flash
+Q152867,La maja desnuda,Francisco Goya,facilitator,full,272,deepseek/deepseek-v4-flash
+Q152867,La maja desnuda,Francisco Goya,flat,full,209,deepseek/deepseek-v4-flash
+Q152867,La maja desnuda,Francisco Goya,professional_hobbyist,full,232,deepseek/deepseek-v4-flash
+Q152867,La maja desnuda,Francisco Goya,recharger,full,212,deepseek/deepseek-v4-flash
+Q16950902,Beauty Revealed,Sarah Goodridge,experience_seeker,full,236,deepseek/deepseek-v4-flash
+Q16950902,Beauty Revealed,Sarah Goodridge,explorer,full,232,deepseek/deepseek-v4-flash
+Q16950902,Beauty Revealed,Sarah Goodridge,facilitator,full,251,deepseek/deepseek-v4-flash
+Q16950902,Beauty Revealed,Sarah Goodridge,flat,full,194,deepseek/deepseek-v4-flash
+Q16950902,Beauty Revealed,Sarah Goodridge,professional_hobbyist,full,259,deepseek/deepseek-v4-flash
+Q16950902,Beauty Revealed,Sarah Goodridge,recharger,full,233,deepseek/deepseek-v4-flash
+Q1752990,The Death of Socrates,Jacques-Louis David,experience_seeker,full,240,deepseek/deepseek-v4-flash
+Q1752990,The Death of Socrates,Jacques-Louis David,explorer,full,242,deepseek/deepseek-v4-flash
+Q1752990,The Death of Socrates,Jacques-Louis David,facilitator,full,236,deepseek/deepseek-v4-flash
+Q1752990,The Death of Socrates,Jacques-Louis David,flat,full,214,deepseek/deepseek-v4-flash
+Q1752990,The Death of Socrates,Jacques-Louis David,professional_hobbyist,full,251,deepseek/deepseek-v4-flash
+Q1752990,The Death of Socrates,Jacques-Louis David,recharger,full,226,deepseek/deepseek-v4-flash
+Q1766454,Les raboteurs de parquet,Gustave Caillebotte,experience_seeker,full,252,deepseek/deepseek-v4-flash
+Q1766454,Les raboteurs de parquet,Gustave Caillebotte,explorer,full,231,deepseek/deepseek-v4-flash
+Q1766454,Les raboteurs de parquet,Gustave Caillebotte,facilitator,full,241,deepseek/deepseek-v4-flash
+Q1766454,Les raboteurs de parquet,Gustave Caillebotte,flat,full,209,deepseek/deepseek-v4-flash
+Q1766454,Les raboteurs de parquet,Gustave Caillebotte,professional_hobbyist,full,244,deepseek/deepseek-v4-flash
+Q1766454,Les raboteurs de parquet,Gustave Caillebotte,recharger,full,233,deepseek/deepseek-v4-flash
+Q208758,Las Meninas,Diego Velázquez,experience_seeker,full,266,deepseek/deepseek-v4-flash
+Q208758,Las Meninas,Diego Velázquez,explorer,full,212,deepseek/deepseek-v4-flash
+Q208758,Las Meninas,Diego Velázquez,facilitator,full,243,deepseek/deepseek-v4-flash
+Q208758,Las Meninas,Diego Velázquez,flat,full,235,deepseek/deepseek-v4-flash
+Q208758,Las Meninas,Diego Velázquez,professional_hobbyist,full,252,deepseek/deepseek-v4-flash
+Q208758,Las Meninas,Diego Velázquez,recharger,full,220,deepseek/deepseek-v4-flash
+Q2203011,Death and the Miser,Hieronymus Bosch,experience_seeker,full,260,deepseek/deepseek-v4-flash
+Q2203011,Death and the Miser,Hieronymus Bosch,explorer,full,233,deepseek/deepseek-v4-flash
+Q2203011,Death and the Miser,Hieronymus Bosch,facilitator,full,278,deepseek/deepseek-v4-flash
+Q2203011,Death and the Miser,Hieronymus Bosch,flat,full,236,deepseek/deepseek-v4-flash
+Q2203011,Death and the Miser,Hieronymus Bosch,professional_hobbyist,full,276,deepseek/deepseek-v4-flash
+Q2203011,Death and the Miser,Hieronymus Bosch,recharger,full,233,deepseek/deepseek-v4-flash
+Q2213811,The Haywain Triptych,Hieronymus Bosch,experience_seeker,full,253,deepseek/deepseek-v4-flash
+Q2213811,The Haywain Triptych,Hieronymus Bosch,explorer,full,240,deepseek/deepseek-v4-flash
+Q2213811,The Haywain Triptych,Hieronymus Bosch,facilitator,full,258,deepseek/deepseek-v4-flash
+Q2213811,The Haywain Triptych,Hieronymus Bosch,flat,full,248,deepseek/deepseek-v4-flash
+Q2213811,The Haywain Triptych,Hieronymus Bosch,professional_hobbyist,full,331,deepseek/deepseek-v4-flash
+Q2213811,The Haywain Triptych,Hieronymus Bosch,recharger,full,214,deepseek/deepseek-v4-flash
+Q2268524,The Three Graces,Peter Paul Rubens,experience_seeker,full,228,deepseek/deepseek-v4-flash
+Q2268524,The Three Graces,Peter Paul Rubens,explorer,full,245,deepseek/deepseek-v4-flash
+Q2268524,The Three Graces,Peter Paul Rubens,facilitator,full,211,deepseek/deepseek-v4-flash
+Q2268524,The Three Graces,Peter Paul Rubens,flat,full,223,deepseek/deepseek-v4-flash
+Q2268524,The Three Graces,Peter Paul Rubens,professional_hobbyist,full,236,deepseek/deepseek-v4-flash
+Q2268524,The Three Graces,Peter Paul Rubens,recharger,full,220,deepseek/deepseek-v4-flash
+Q2270768,Cutting the Stone,Hieronymus Bosch,experience_seeker,full,240,deepseek/deepseek-v4-flash
+Q2270768,Cutting the Stone,Hieronymus Bosch,explorer,full,211,deepseek/deepseek-v4-flash
+Q2270768,Cutting the Stone,Hieronymus Bosch,facilitator,full,267,deepseek/deepseek-v4-flash
+Q2270768,Cutting the Stone,Hieronymus Bosch,flat,full,206,deepseek/deepseek-v4-flash
+Q2270768,Cutting the Stone,Hieronymus Bosch,professional_hobbyist,full,243,deepseek/deepseek-v4-flash
+Q2270768,Cutting the Stone,Hieronymus Bosch,recharger,full,189,deepseek/deepseek-v4-flash
+Q2270938,Les Grandes Baigneuses,Paul Cézanne,experience_seeker,full,220,deepseek/deepseek-v4-flash
+Q2270938,Les Grandes Baigneuses,Paul Cézanne,explorer,full,255,deepseek/deepseek-v4-flash
+Q2270938,Les Grandes Baigneuses,Paul Cézanne,facilitator,full,261,deepseek/deepseek-v4-flash
+Q2270938,Les Grandes Baigneuses,Paul Cézanne,flat,full,226,deepseek/deepseek-v4-flash
+Q2270938,Les Grandes Baigneuses,Paul Cézanne,professional_hobbyist,full,264,deepseek/deepseek-v4-flash
+Q2270938,Les Grandes Baigneuses,Paul Cézanne,recharger,full,249,deepseek/deepseek-v4-flash
+Q2270955,David and Goliath,Caravaggio,experience_seeker,full,224,deepseek/deepseek-v4-flash
+Q2270955,David and Goliath,Caravaggio,explorer,full,216,deepseek/deepseek-v4-flash
+Q2270955,David and Goliath,Caravaggio,facilitator,full,238,deepseek/deepseek-v4-flash
+Q2270955,David and Goliath,Caravaggio,flat,full,235,deepseek/deepseek-v4-flash
+Q2270955,David and Goliath,Caravaggio,professional_hobbyist,full,222,deepseek/deepseek-v4-flash
+Q2270955,David and Goliath,Caravaggio,recharger,full,198,deepseek/deepseek-v4-flash
+Q2273943,Adoration of the Magi,Diego Velázquez,experience_seeker,full,231,deepseek/deepseek-v4-flash
+Q2273943,Adoration of the Magi,Diego Velázquez,explorer,full,268,deepseek/deepseek-v4-flash
+Q2273943,Adoration of the Magi,Diego Velázquez,facilitator,full,223,deepseek/deepseek-v4-flash
+Q2273943,Adoration of the Magi,Diego Velázquez,flat,full,189,deepseek/deepseek-v4-flash
+Q2273943,Adoration of the Magi,Diego Velázquez,professional_hobbyist,full,236,deepseek/deepseek-v4-flash
+Q2273943,Adoration of the Magi,Diego Velázquez,recharger,full,189,deepseek/deepseek-v4-flash
+Q2304870,The Seven Deadly Sins and the Four Last Things,Hieronymus Bosch,experience_seeker,full,207,deepseek/deepseek-v4-flash
+Q2304870,The Seven Deadly Sins and the Four Last Things,Hieronymus Bosch,explorer,full,235,deepseek/deepseek-v4-flash
+Q2304870,The Seven Deadly Sins and the Four Last Things,Hieronymus Bosch,facilitator,full,213,deepseek/deepseek-v4-flash
+Q2304870,The Seven Deadly Sins and the Four Last Things,Hieronymus Bosch,flat,full,196,deepseek/deepseek-v4-flash
+Q2304870,The Seven Deadly Sins and the Four Last Things,Hieronymus Bosch,professional_hobbyist,full,220,deepseek/deepseek-v4-flash
+Q2304870,The Seven Deadly Sins and the Four Last Things,Hieronymus Bosch,recharger,full,221,deepseek/deepseek-v4-flash
+Q2395218,Woman with a Parasol – Madame Monet and Her Son,Claude Monet,experience_seeker,full,299,deepseek/deepseek-v4-flash
+Q2395218,Woman with a Parasol – Madame Monet and Her Son,Claude Monet,explorer,full,251,deepseek/deepseek-v4-flash
+Q2395218,Woman with a Parasol – Madame Monet and Her Son,Claude Monet,facilitator,full,232,deepseek/deepseek-v4-flash
+Q2395218,Woman with a Parasol – Madame Monet and Her Son,Claude Monet,flat,full,229,deepseek/deepseek-v4-flash
+Q2395218,Woman with a Parasol – Madame Monet and Her Son,Claude Monet,professional_hobbyist,full,263,deepseek/deepseek-v4-flash
+Q2395218,Woman with a Parasol – Madame Monet and Her Son,Claude Monet,recharger,full,232,deepseek/deepseek-v4-flash
+Q2404992,Aristotle with a Bust of Homer,Rembrandt,experience_seeker,full,231,deepseek/deepseek-v4-flash
+Q2404992,Aristotle with a Bust of Homer,Rembrandt,explorer,full,199,deepseek/deepseek-v4-flash
+Q2404992,Aristotle with a Bust of Homer,Rembrandt,facilitator,full,221,deepseek/deepseek-v4-flash
+Q2404992,Aristotle with a Bust of Homer,Rembrandt,flat,full,228,deepseek/deepseek-v4-flash
+Q2404992,Aristotle with a Bust of Homer,Rembrandt,professional_hobbyist,full,283,deepseek/deepseek-v4-flash
+Q2404992,Aristotle with a Bust of Homer,Rembrandt,recharger,full,203,deepseek/deepseek-v4-flash
+Q2413468,The Colossus,Francisco Goya,experience_seeker,full,236,deepseek/deepseek-v4-flash
+Q2413468,The Colossus,Francisco Goya,explorer,full,230,deepseek/deepseek-v4-flash
+Q2413468,The Colossus,Francisco Goya,facilitator,full,232,deepseek/deepseek-v4-flash
+Q2413468,The Colossus,Francisco Goya,flat,full,198,deepseek/deepseek-v4-flash
+Q2413468,The Colossus,Francisco Goya,professional_hobbyist,full,277,deepseek/deepseek-v4-flash
+Q2413468,The Colossus,Francisco Goya,recharger,full,234,deepseek/deepseek-v4-flash
+Q2420918,Madonna of the Rose,Raphael,experience_seeker,full,277,deepseek/deepseek-v4-flash
+Q2420918,Madonna of the Rose,Raphael,explorer,full,239,deepseek/deepseek-v4-flash
+Q2420918,Madonna of the Rose,Raphael,facilitator,full,222,deepseek/deepseek-v4-flash
+Q2420918,Madonna of the Rose,Raphael,flat,full,199,deepseek/deepseek-v4-flash
+Q2420918,Madonna of the Rose,Raphael,professional_hobbyist,full,277,deepseek/deepseek-v4-flash
+Q2420918,Madonna of the Rose,Raphael,recharger,full,220,deepseek/deepseek-v4-flash
+Q2439462,Portrait of a Lady,Rogier van der Weyden,experience_seeker,full,236,deepseek/deepseek-v4-flash
+Q2439462,Portrait of a Lady,Rogier van der Weyden,explorer,full,247,deepseek/deepseek-v4-flash
+Q2439462,Portrait of a Lady,Rogier van der Weyden,facilitator,full,219,deepseek/deepseek-v4-flash
+Q2439462,Portrait of a Lady,Rogier van der Weyden,flat,full,191,deepseek/deepseek-v4-flash
+Q2439462,Portrait of a Lady,Rogier van der Weyden,professional_hobbyist,full,253,deepseek/deepseek-v4-flash
+Q2439462,Portrait of a Lady,Rogier van der Weyden,recharger,full,222,deepseek/deepseek-v4-flash
+Q2465911,Christina's World,Andrew Wyeth,experience_seeker,full,204,deepseek/deepseek-v4-flash
+Q2465911,Christina's World,Andrew Wyeth,explorer,full,240,deepseek/deepseek-v4-flash
+Q2465911,Christina's World,Andrew Wyeth,facilitator,full,237,deepseek/deepseek-v4-flash
+Q2465911,Christina's World,Andrew Wyeth,flat,full,238,deepseek/deepseek-v4-flash
+Q2465911,Christina's World,Andrew Wyeth,professional_hobbyist,full,257,deepseek/deepseek-v4-flash
+Q2465911,Christina's World,Andrew Wyeth,recharger,full,205,deepseek/deepseek-v4-flash
+Q247282,Apollo in the Forge of Vulcan,Diego Velázquez,experience_seeker,full,256,deepseek/deepseek-v4-flash
+Q247282,Apollo in the Forge of Vulcan,Diego Velázquez,explorer,full,232,deepseek/deepseek-v4-flash
+Q247282,Apollo in the Forge of Vulcan,Diego Velázquez,facilitator,full,226,deepseek/deepseek-v4-flash
+Q247282,Apollo in the Forge of Vulcan,Diego Velázquez,flat,full,202,deepseek/deepseek-v4-flash
+Q247282,Apollo in the Forge of Vulcan,Diego Velázquez,professional_hobbyist,full,283,deepseek/deepseek-v4-flash
+Q247282,Apollo in the Forge of Vulcan,Diego Velázquez,recharger,full,218,deepseek/deepseek-v4-flash
+Q2501284,The Great Bathers,Pierre-Auguste Renoir,experience_seeker,full,231,deepseek/deepseek-v4-flash
+Q2501284,The Great Bathers,Pierre-Auguste Renoir,explorer,full,259,deepseek/deepseek-v4-flash
+Q2501284,The Great Bathers,Pierre-Auguste Renoir,facilitator,full,277,deepseek/deepseek-v4-flash
+Q2501284,The Great Bathers,Pierre-Auguste Renoir,flat,full,215,deepseek/deepseek-v4-flash
+Q2501284,The Great Bathers,Pierre-Auguste Renoir,professional_hobbyist,full,263,deepseek/deepseek-v4-flash
+Q2501284,The Great Bathers,Pierre-Auguste Renoir,recharger,full,217,deepseek/deepseek-v4-flash
+Q2528106,Portrait of Bindo Altoviti,Raphael,experience_seeker,full,219,deepseek/deepseek-v4-flash
+Q2528106,Portrait of Bindo Altoviti,Raphael,explorer,full,228,deepseek/deepseek-v4-flash
+Q2528106,Portrait of Bindo Altoviti,Raphael,facilitator,full,213,deepseek/deepseek-v4-flash
+Q2528106,Portrait of Bindo Altoviti,Raphael,flat,full,254,deepseek/deepseek-v4-flash
+Q2528106,Portrait of Bindo Altoviti,Raphael,professional_hobbyist,full,212,deepseek/deepseek-v4-flash
+Q2528106,Portrait of Bindo Altoviti,Raphael,recharger,full,206,deepseek/deepseek-v4-flash
+Q2528477,Witches' Sabbath,Francisco Goya,experience_seeker,full,249,deepseek/deepseek-v4-flash
+Q2528477,Witches' Sabbath,Francisco Goya,explorer,full,223,deepseek/deepseek-v4-flash
+Q2528477,Witches' Sabbath,Francisco Goya,facilitator,full,221,deepseek/deepseek-v4-flash
+Q2528477,Witches' Sabbath,Francisco Goya,flat,full,228,deepseek/deepseek-v4-flash
+Q2528477,Witches' Sabbath,Francisco Goya,professional_hobbyist,full,252,deepseek/deepseek-v4-flash
+Q2528477,Witches' Sabbath,Francisco Goya,recharger,full,205,deepseek/deepseek-v4-flash
+Q2528741,Christ Crucified,Diego Velázquez,experience_seeker,full,286,deepseek/deepseek-v4-flash
+Q2528741,Christ Crucified,Diego Velázquez,explorer,full,213,deepseek/deepseek-v4-flash
+Q2528741,Christ Crucified,Diego Velázquez,facilitator,full,252,deepseek/deepseek-v4-flash
+Q2528741,Christ Crucified,Diego Velázquez,flat,full,238,deepseek/deepseek-v4-flash
+Q2528741,Christ Crucified,Diego Velázquez,professional_hobbyist,full,288,deepseek/deepseek-v4-flash
+Q2528741,Christ Crucified,Diego Velázquez,recharger,full,224,deepseek/deepseek-v4-flash
+Q2529703,Portrait of Emile Zola,Édouard Manet,experience_seeker,full,228,deepseek/deepseek-v4-flash
+Q2529703,Portrait of Emile Zola,Édouard Manet,explorer,full,248,deepseek/deepseek-v4-flash
+Q2529703,Portrait of Emile Zola,Édouard Manet,facilitator,full,239,deepseek/deepseek-v4-flash
+Q2529703,Portrait of Emile Zola,Édouard Manet,flat,full,199,deepseek/deepseek-v4-flash
+Q2529703,Portrait of Emile Zola,Édouard Manet,professional_hobbyist,full,251,deepseek/deepseek-v4-flash
+Q2529703,Portrait of Emile Zola,Édouard Manet,recharger,full,233,deepseek/deepseek-v4-flash
+Q254923,Alba Madonna,Raphael,experience_seeker,full,249,deepseek/deepseek-v4-flash
+Q254923,Alba Madonna,Raphael,explorer,full,267,deepseek/deepseek-v4-flash
+Q254923,Alba Madonna,Raphael,facilitator,full,234,deepseek/deepseek-v4-flash
+Q254923,Alba Madonna,Raphael,flat,full,237,deepseek/deepseek-v4-flash
+Q254923,Alba Madonna,Raphael,professional_hobbyist,full,255,deepseek/deepseek-v4-flash
+Q254923,Alba Madonna,Raphael,recharger,full,181,deepseek/deepseek-v4-flash
+Q2571560,The Angelus,Jean-François Millet,experience_seeker,full,251,deepseek/deepseek-v4-flash
+Q2571560,The Angelus,Jean-François Millet,explorer,full,238,deepseek/deepseek-v4-flash
+Q2571560,The Angelus,Jean-François Millet,facilitator,full,245,deepseek/deepseek-v4-flash
+Q2571560,The Angelus,Jean-François Millet,flat,full,218,deepseek/deepseek-v4-flash
+Q2571560,The Angelus,Jean-François Millet,professional_hobbyist,full,274,deepseek/deepseek-v4-flash
+Q2571560,The Angelus,Jean-François Millet,recharger,full,251,deepseek/deepseek-v4-flash
+Q25729,The Persistence of Memory,Salvador Dalí,experience_seeker,full,238,deepseek/deepseek-v4-flash
+Q25729,The Persistence of Memory,Salvador Dalí,explorer,full,238,deepseek/deepseek-v4-flash
+Q25729,The Persistence of Memory,Salvador Dalí,facilitator,full,234,deepseek/deepseek-v4-flash
+Q25729,The Persistence of Memory,Salvador Dalí,flat,full,253,deepseek/deepseek-v4-flash
+Q25729,The Persistence of Memory,Salvador Dalí,professional_hobbyist,full,248,deepseek/deepseek-v4-flash
+Q25729,The Persistence of Memory,Salvador Dalí,recharger,full,233,deepseek/deepseek-v4-flash
+Q2622172,The Bellelli Family,Edgar Degas,experience_seeker,full,243,deepseek/deepseek-v4-flash
+Q2622172,The Bellelli Family,Edgar Degas,explorer,full,225,deepseek/deepseek-v4-flash
+Q2622172,The Bellelli Family,Edgar Degas,facilitator,full,251,deepseek/deepseek-v4-flash
+Q2622172,The Bellelli Family,Edgar Degas,flat,full,231,deepseek/deepseek-v4-flash
+Q2622172,The Bellelli Family,Edgar Degas,professional_hobbyist,full,247,deepseek/deepseek-v4-flash
+Q2622172,The Bellelli Family,Edgar Degas,recharger,full,230,deepseek/deepseek-v4-flash
+Q2653851,The Elevation of the Cross,Peter Paul Rubens,experience_seeker,full,234,deepseek/deepseek-v4-flash
+Q2653851,The Elevation of the Cross,Peter Paul Rubens,explorer,full,275,deepseek/deepseek-v4-flash
+Q2653851,The Elevation of the Cross,Peter Paul Rubens,facilitator,full,238,deepseek/deepseek-v4-flash
+Q2653851,The Elevation of the Cross,Peter Paul Rubens,flat,full,265,deepseek/deepseek-v4-flash
+Q2653851,The Elevation of the Cross,Peter Paul Rubens,professional_hobbyist,full,241,deepseek/deepseek-v4-flash
+Q2653851,The Elevation of the Cross,Peter Paul Rubens,recharger,full,253,deepseek/deepseek-v4-flash
+Q2664039,Madame X (Virginie Amélie Avegno Gautreau),Q155626,experience_seeker,full,178,deepseek/deepseek-v4-flash
+Q2664039,Madame X (Virginie Amélie Avegno Gautreau),Q155626,explorer,full,245,deepseek/deepseek-v4-flash
+Q2664039,Madame X (Virginie Amélie Avegno Gautreau),Q155626,facilitator,full,214,deepseek/deepseek-v4-flash
+Q2664039,Madame X (Virginie Amélie Avegno Gautreau),Q155626,flat,full,163,deepseek/deepseek-v4-flash
+Q2664039,Madame X (Virginie Amélie Avegno Gautreau),Q155626,professional_hobbyist,full,255,deepseek/deepseek-v4-flash
+Q2664039,Madame X (Virginie Amélie Avegno Gautreau),Q155626,recharger,full,221,deepseek/deepseek-v4-flash
+Q2665048,Dante and Virgil in Hell,William-Adolphe Bouguereau,experience_seeker,full,223,deepseek/deepseek-v4-flash
+Q2665048,Dante and Virgil in Hell,William-Adolphe Bouguereau,explorer,full,233,deepseek/deepseek-v4-flash
+Q2665048,Dante and Virgil in Hell,William-Adolphe Bouguereau,facilitator,full,249,deepseek/deepseek-v4-flash
+Q2665048,Dante and Virgil in Hell,William-Adolphe Bouguereau,flat,full,225,deepseek/deepseek-v4-flash
+Q2665048,Dante and Virgil in Hell,William-Adolphe Bouguereau,professional_hobbyist,full,265,deepseek/deepseek-v4-flash
+Q2665048,Dante and Virgil in Hell,William-Adolphe Bouguereau,recharger,full,230,deepseek/deepseek-v4-flash
+Q2697937,Campbell's Soup Cans,Andy Warhol,experience_seeker,full,243,deepseek/deepseek-v4-flash
+Q2697937,Campbell's Soup Cans,Andy Warhol,explorer,full,251,deepseek/deepseek-v4-flash
+Q2697937,Campbell's Soup Cans,Andy Warhol,facilitator,full,219,deepseek/deepseek-v4-flash
+Q2697937,Campbell's Soup Cans,Andy Warhol,flat,full,239,deepseek/deepseek-v4-flash
+Q2697937,Campbell's Soup Cans,Andy Warhol,professional_hobbyist,full,242,deepseek/deepseek-v4-flash
+Q2697937,Campbell's Soup Cans,Andy Warhol,recharger,full,219,deepseek/deepseek-v4-flash
+Q2734881,Annunciation,Jan van Eyck,experience_seeker,full,257,deepseek/deepseek-v4-flash
+Q2734881,Annunciation,Jan van Eyck,explorer,full,236,deepseek/deepseek-v4-flash
+Q2734881,Annunciation,Jan van Eyck,facilitator,full,235,deepseek/deepseek-v4-flash
+Q2734881,Annunciation,Jan van Eyck,flat,full,242,deepseek/deepseek-v4-flash
+Q2734881,Annunciation,Jan van Eyck,professional_hobbyist,full,207,deepseek/deepseek-v4-flash
+Q2734881,Annunciation,Jan van Eyck,recharger,full,238,deepseek/deepseek-v4-flash
+Q2734892,Women in the Garden,Claude Monet,experience_seeker,full,233,deepseek/deepseek-v4-flash
+Q2734892,Women in the Garden,Claude Monet,explorer,full,244,deepseek/deepseek-v4-flash
+Q2734892,Women in the Garden,Claude Monet,facilitator,full,263,deepseek/deepseek-v4-flash
+Q2734892,Women in the Garden,Claude Monet,flat,full,213,deepseek/deepseek-v4-flash
+Q2734892,Women in the Garden,Claude Monet,professional_hobbyist,full,257,deepseek/deepseek-v4-flash
+Q2734892,Women in the Garden,Claude Monet,recharger,full,210,deepseek/deepseek-v4-flash
+Q2735507,The Clothed Maja,Francisco Goya,experience_seeker,full,264,deepseek/deepseek-v4-flash
+Q2735507,The Clothed Maja,Francisco Goya,explorer,full,199,deepseek/deepseek-v4-flash
+Q2735507,The Clothed Maja,Francisco Goya,facilitator,full,214,deepseek/deepseek-v4-flash
+Q2735507,The Clothed Maja,Francisco Goya,flat,full,244,deepseek/deepseek-v4-flash
+Q2735507,The Clothed Maja,Francisco Goya,professional_hobbyist,full,246,deepseek/deepseek-v4-flash
+Q2735507,The Clothed Maja,Francisco Goya,recharger,full,230,deepseek/deepseek-v4-flash
+Q2899286,Berthe Morisot with a Bouquet of Violets,Édouard Manet,experience_seeker,full,212,deepseek/deepseek-v4-flash
+Q2899286,Berthe Morisot with a Bouquet of Violets,Édouard Manet,explorer,full,254,deepseek/deepseek-v4-flash
+Q2899286,Berthe Morisot with a Bouquet of Violets,Édouard Manet,facilitator,full,237,deepseek/deepseek-v4-flash
+Q2899286,Berthe Morisot with a Bouquet of Violets,Édouard Manet,flat,full,233,deepseek/deepseek-v4-flash
+Q2899286,Berthe Morisot with a Bouquet of Violets,Édouard Manet,professional_hobbyist,full,226,deepseek/deepseek-v4-flash
+Q2899286,Berthe Morisot with a Bouquet of Violets,Édouard Manet,recharger,full,207,deepseek/deepseek-v4-flash
+Q2983399,The Second of May 1808,Francisco Goya,experience_seeker,full,241,deepseek/deepseek-v4-flash
+Q2983399,The Second of May 1808,Francisco Goya,explorer,full,223,deepseek/deepseek-v4-flash
+Q2983399,The Second of May 1808,Francisco Goya,facilitator,full,242,deepseek/deepseek-v4-flash
+Q2983399,The Second of May 1808,Francisco Goya,flat,full,235,deepseek/deepseek-v4-flash
+Q2983399,The Second of May 1808,Francisco Goya,professional_hobbyist,full,269,deepseek/deepseek-v4-flash
+Q2983399,The Second of May 1808,Francisco Goya,recharger,full,207,deepseek/deepseek-v4-flash
+Q321303,The Garden of Earthly Delights,Hieronymus Bosch,experience_seeker,full,255,deepseek/deepseek-v4-flash
+Q321303,The Garden of Earthly Delights,Hieronymus Bosch,explorer,full,291,deepseek/deepseek-v4-flash
+Q321303,The Garden of Earthly Delights,Hieronymus Bosch,facilitator,full,220,deepseek/deepseek-v4-flash
+Q321303,The Garden of Earthly Delights,Hieronymus Bosch,flat,full,226,deepseek/deepseek-v4-flash
+Q321303,The Garden of Earthly Delights,Hieronymus Bosch,professional_hobbyist,full,222,deepseek/deepseek-v4-flash
+Q321303,The Garden of Earthly Delights,Hieronymus Bosch,recharger,full,202,deepseek/deepseek-v4-flash
+Q334604,Heart of the Andes,Frederic Edwin Church,experience_seeker,full,224,deepseek/deepseek-v4-flash
+Q334604,Heart of the Andes,Frederic Edwin Church,explorer,full,230,deepseek/deepseek-v4-flash
+Q334604,Heart of the Andes,Frederic Edwin Church,facilitator,full,209,deepseek/deepseek-v4-flash
+Q334604,Heart of the Andes,Frederic Edwin Church,flat,full,234,deepseek/deepseek-v4-flash
+Q334604,Heart of the Andes,Frederic Edwin Church,professional_hobbyist,full,256,deepseek/deepseek-v4-flash
+Q334604,Heart of the Andes,Frederic Edwin Church,recharger,full,238,deepseek/deepseek-v4-flash
+Q3630735,Self-portrait,Vincent van Gogh,experience_seeker,full,231,deepseek/deepseek-v4-flash
+Q3630735,Self-portrait,Vincent van Gogh,explorer,full,215,deepseek/deepseek-v4-flash
+Q3630735,Self-portrait,Vincent van Gogh,facilitator,full,216,deepseek/deepseek-v4-flash
+Q3630735,Self-portrait,Vincent van Gogh,flat,full,221,deepseek/deepseek-v4-flash
+Q3630735,Self-portrait,Vincent van Gogh,professional_hobbyist,full,260,deepseek/deepseek-v4-flash
+Q3630735,Self-portrait,Vincent van Gogh,recharger,full,271,deepseek/deepseek-v4-flash
+Q3633456,Dance in the City,Pierre-Auguste Renoir,experience_seeker,full,214,deepseek/deepseek-v4-flash
+Q3633456,Dance in the City,Pierre-Auguste Renoir,explorer,full,233,deepseek/deepseek-v4-flash
+Q3633456,Dance in the City,Pierre-Auguste Renoir,facilitator,full,228,deepseek/deepseek-v4-flash
+Q3633456,Dance in the City,Pierre-Auguste Renoir,flat,full,194,deepseek/deepseek-v4-flash
+Q3633456,Dance in the City,Pierre-Auguste Renoir,professional_hobbyist,full,274,deepseek/deepseek-v4-flash
+Q3633456,Dance in the City,Pierre-Auguste Renoir,recharger,full,248,deepseek/deepseek-v4-flash
+Q3751961,The Wounded Man,Gustave Courbet,experience_seeker,full,246,deepseek/deepseek-v4-flash
+Q3751961,The Wounded Man,Gustave Courbet,explorer,full,210,deepseek/deepseek-v4-flash
+Q3751961,The Wounded Man,Gustave Courbet,facilitator,full,228,deepseek/deepseek-v4-flash
+Q3751961,The Wounded Man,Gustave Courbet,flat,full,190,deepseek/deepseek-v4-flash
+Q3751961,The Wounded Man,Gustave Courbet,professional_hobbyist,full,235,deepseek/deepseek-v4-flash
+Q3751961,The Wounded Man,Gustave Courbet,recharger,full,247,deepseek/deepseek-v4-flash
+Q3808227,Girls at the Piano,Pierre-Auguste Renoir,experience_seeker,full,226,deepseek/deepseek-v4-flash
+Q3808227,Girls at the Piano,Pierre-Auguste Renoir,explorer,full,234,deepseek/deepseek-v4-flash
+Q3808227,Girls at the Piano,Pierre-Auguste Renoir,facilitator,full,270,deepseek/deepseek-v4-flash
+Q3808227,Girls at the Piano,Pierre-Auguste Renoir,flat,full,212,deepseek/deepseek-v4-flash
+Q3808227,Girls at the Piano,Pierre-Auguste Renoir,professional_hobbyist,full,248,deepseek/deepseek-v4-flash
+Q3808227,Girls at the Piano,Pierre-Auguste Renoir,recharger,full,259,deepseek/deepseek-v4-flash
+Q421716,"Nude Descending a Staircase, No. 2",Marcel Duchamp,experience_seeker,full,231,deepseek/deepseek-v4-flash
+Q421716,"Nude Descending a Staircase, No. 2",Marcel Duchamp,explorer,full,241,deepseek/deepseek-v4-flash
+Q421716,"Nude Descending a Staircase, No. 2",Marcel Duchamp,facilitator,full,257,deepseek/deepseek-v4-flash
+Q421716,"Nude Descending a Staircase, No. 2",Marcel Duchamp,flat,full,252,deepseek/deepseek-v4-flash
+Q421716,"Nude Descending a Staircase, No. 2",Marcel Duchamp,professional_hobbyist,full,270,deepseek/deepseek-v4-flash
+Q421716,"Nude Descending a Staircase, No. 2",Marcel Duchamp,recharger,full,268,deepseek/deepseek-v4-flash
+Q432253,Garden at Sainte-Adresse,Claude Monet,experience_seeker,full,225,deepseek/deepseek-v4-flash
+Q432253,Garden at Sainte-Adresse,Claude Monet,explorer,full,284,deepseek/deepseek-v4-flash
+Q432253,Garden at Sainte-Adresse,Claude Monet,facilitator,full,229,deepseek/deepseek-v4-flash
+Q432253,Garden at Sainte-Adresse,Claude Monet,flat,full,268,deepseek/deepseek-v4-flash
+Q432253,Garden at Sainte-Adresse,Claude Monet,professional_hobbyist,full,247,deepseek/deepseek-v4-flash
+Q432253,Garden at Sainte-Adresse,Claude Monet,recharger,full,224,deepseek/deepseek-v4-flash
+Q4429116,The Magpie,Claude Monet,experience_seeker,full,240,deepseek/deepseek-v4-flash
+Q4429116,The Magpie,Claude Monet,explorer,full,246,deepseek/deepseek-v4-flash
+Q4429116,The Magpie,Claude Monet,facilitator,full,222,deepseek/deepseek-v4-flash
+Q4429116,The Magpie,Claude Monet,flat,full,230,deepseek/deepseek-v4-flash
+Q4429116,The Magpie,Claude Monet,professional_hobbyist,full,265,deepseek/deepseek-v4-flash
+Q4429116,The Magpie,Claude Monet,recharger,full,231,deepseek/deepseek-v4-flash
+Q45585,The Starry Night,Vincent van Gogh,experience_seeker,full,233,deepseek/deepseek-v4-flash
+Q45585,The Starry Night,Vincent van Gogh,explorer,full,255,deepseek/deepseek-v4-flash
+Q45585,The Starry Night,Vincent van Gogh,facilitator,full,225,deepseek/deepseek-v4-flash
+Q45585,The Starry Night,Vincent van Gogh,flat,full,225,deepseek/deepseek-v4-flash
+Q45585,The Starry Night,Vincent van Gogh,professional_hobbyist,full,301,deepseek/deepseek-v4-flash
+Q45585,The Starry Night,Vincent van Gogh,recharger,full,213,deepseek/deepseek-v4-flash
+Q467359,Allegory of the Catholic Faith,Johannes Vermeer,experience_seeker,full,242,deepseek/deepseek-v4-flash
+Q467359,Allegory of the Catholic Faith,Johannes Vermeer,explorer,full,285,deepseek/deepseek-v4-flash
+Q467359,Allegory of the Catholic Faith,Johannes Vermeer,facilitator,full,231,deepseek/deepseek-v4-flash
+Q467359,Allegory of the Catholic Faith,Johannes Vermeer,flat,full,251,deepseek/deepseek-v4-flash
+Q467359,Allegory of the Catholic Faith,Johannes Vermeer,professional_hobbyist,full,289,deepseek/deepseek-v4-flash
+Q467359,Allegory of the Catholic Faith,Johannes Vermeer,recharger,full,253,deepseek/deepseek-v4-flash
+Q4717953,Portrait of Juan de Pareja,Diego Velázquez,experience_seeker,full,206,deepseek/deepseek-v4-flash
+Q4717953,Portrait of Juan de Pareja,Diego Velázquez,explorer,full,253,deepseek/deepseek-v4-flash
+Q4717953,Portrait of Juan de Pareja,Diego Velázquez,facilitator,full,238,deepseek/deepseek-v4-flash
+Q4717953,Portrait of Juan de Pareja,Diego Velázquez,flat,full,248,deepseek/deepseek-v4-flash
+Q4717953,Portrait of Juan de Pareja,Diego Velázquez,professional_hobbyist,full,257,deepseek/deepseek-v4-flash
+Q4717953,Portrait of Juan de Pareja,Diego Velázquez,recharger,full,209,deepseek/deepseek-v4-flash
+Q500936,The Dog,Francisco Goya,experience_seeker,full,248,deepseek/deepseek-v4-flash
+Q500936,The Dog,Francisco Goya,explorer,full,266,deepseek/deepseek-v4-flash
+Q500936,The Dog,Francisco Goya,facilitator,full,228,deepseek/deepseek-v4-flash
+Q500936,The Dog,Francisco Goya,flat,full,230,deepseek/deepseek-v4-flash
+Q500936,The Dog,Francisco Goya,professional_hobbyist,full,272,deepseek/deepseek-v4-flash
+Q500936,The Dog,Francisco Goya,recharger,full,193,deepseek/deepseek-v4-flash
+Q500985,The Hunters in the Snow,Pieter Brueghel the Elder,experience_seeker,full,251,deepseek/deepseek-v4-flash
+Q500985,The Hunters in the Snow,Pieter Brueghel the Elder,explorer,full,259,deepseek/deepseek-v4-flash
+Q500985,The Hunters in the Snow,Pieter Brueghel the Elder,facilitator,full,224,deepseek/deepseek-v4-flash
+Q500985,The Hunters in the Snow,Pieter Brueghel the Elder,flat,full,237,deepseek/deepseek-v4-flash
+Q500985,The Hunters in the Snow,Pieter Brueghel the Elder,professional_hobbyist,full,263,deepseek/deepseek-v4-flash
+Q500985,The Hunters in the Snow,Pieter Brueghel the Elder,recharger,full,258,deepseek/deepseek-v4-flash
+Q509806,Washington Crossing the Delaware,Emanuel Leutze,experience_seeker,full,240,deepseek/deepseek-v4-flash
+Q509806,Washington Crossing the Delaware,Emanuel Leutze,explorer,full,219,deepseek/deepseek-v4-flash
+Q509806,Washington Crossing the Delaware,Emanuel Leutze,facilitator,full,244,deepseek/deepseek-v4-flash
+Q509806,Washington Crossing the Delaware,Emanuel Leutze,flat,full,219,deepseek/deepseek-v4-flash
+Q509806,Washington Crossing the Delaware,Emanuel Leutze,professional_hobbyist,full,269,deepseek/deepseek-v4-flash
+Q509806,Washington Crossing the Delaware,Emanuel Leutze,recharger,full,228,deepseek/deepseek-v4-flash
+Q540488,A Burial at Ornans,Gustave Courbet,experience_seeker,full,204,deepseek/deepseek-v4-flash
+Q540488,A Burial at Ornans,Gustave Courbet,explorer,full,230,deepseek/deepseek-v4-flash
+Q540488,A Burial at Ornans,Gustave Courbet,facilitator,full,227,deepseek/deepseek-v4-flash
+Q540488,A Burial at Ornans,Gustave Courbet,flat,full,218,deepseek/deepseek-v4-flash
+Q540488,A Burial at Ornans,Gustave Courbet,professional_hobbyist,full,263,deepseek/deepseek-v4-flash
+Q540488,A Burial at Ornans,Gustave Courbet,recharger,full,243,deepseek/deepseek-v4-flash
+Q568847,The Descent from the Cross,Rogier van der Weyden,experience_seeker,full,238,deepseek/deepseek-v4-flash
+Q568847,The Descent from the Cross,Rogier van der Weyden,explorer,full,275,deepseek/deepseek-v4-flash
+Q568847,The Descent from the Cross,Rogier van der Weyden,facilitator,full,235,deepseek/deepseek-v4-flash
+Q568847,The Descent from the Cross,Rogier van der Weyden,flat,full,219,deepseek/deepseek-v4-flash
+Q568847,The Descent from the Cross,Rogier van der Weyden,professional_hobbyist,full,253,deepseek/deepseek-v4-flash
+Q568847,The Descent from the Cross,Rogier van der Weyden,recharger,full,236,deepseek/deepseek-v4-flash
+Q588695,The Art of Painting,Johannes Vermeer,experience_seeker,full,248,deepseek/deepseek-v4-flash
+Q588695,The Art of Painting,Johannes Vermeer,explorer,full,227,deepseek/deepseek-v4-flash
+Q588695,The Art of Painting,Johannes Vermeer,facilitator,full,242,deepseek/deepseek-v4-flash
+Q588695,The Art of Painting,Johannes Vermeer,flat,full,212,deepseek/deepseek-v4-flash
+Q588695,The Art of Painting,Johannes Vermeer,professional_hobbyist,full,273,deepseek/deepseek-v4-flash
+Q588695,The Art of Painting,Johannes Vermeer,recharger,full,234,deepseek/deepseek-v4-flash
+Q603751,The Peasant Wedding,Pieter Brueghel the Elder,experience_seeker,full,210,deepseek/deepseek-v4-flash
+Q603751,The Peasant Wedding,Pieter Brueghel the Elder,explorer,full,228,deepseek/deepseek-v4-flash
+Q603751,The Peasant Wedding,Pieter Brueghel the Elder,facilitator,full,242,deepseek/deepseek-v4-flash
+Q603751,The Peasant Wedding,Pieter Brueghel the Elder,flat,full,166,deepseek/deepseek-v4-flash
+Q603751,The Peasant Wedding,Pieter Brueghel the Elder,professional_hobbyist,full,245,deepseek/deepseek-v4-flash
+Q603751,The Peasant Wedding,Pieter Brueghel the Elder,recharger,full,195,deepseek/deepseek-v4-flash
+Q614047,Girl with a Red Hat,Johannes Vermeer,experience_seeker,full,224,deepseek/deepseek-v4-flash
+Q614047,Girl with a Red Hat,Johannes Vermeer,explorer,full,174,deepseek/deepseek-v4-flash
+Q614047,Girl with a Red Hat,Johannes Vermeer,facilitator,full,230,deepseek/deepseek-v4-flash
+Q614047,Girl with a Red Hat,Johannes Vermeer,flat,full,203,deepseek/deepseek-v4-flash
+Q614047,Girl with a Red Hat,Johannes Vermeer,professional_hobbyist,full,250,deepseek/deepseek-v4-flash
+Q614047,Girl with a Red Hat,Johannes Vermeer,recharger,full,246,deepseek/deepseek-v4-flash
+Q6402081,The Nobleman with his Hand on his Chest,El Greco,experience_seeker,full,248,deepseek/deepseek-v4-flash
+Q6402081,The Nobleman with his Hand on his Chest,El Greco,explorer,full,224,deepseek/deepseek-v4-flash
+Q6402081,The Nobleman with his Hand on his Chest,El Greco,facilitator,full,260,deepseek/deepseek-v4-flash
+Q6402081,The Nobleman with his Hand on his Chest,El Greco,flat,full,184,deepseek/deepseek-v4-flash
+Q6402081,The Nobleman with his Hand on his Chest,El Greco,professional_hobbyist,full,262,deepseek/deepseek-v4-flash
+Q6402081,The Nobleman with his Hand on his Chest,El Greco,recharger,full,214,deepseek/deepseek-v4-flash
+Q650635,"A Militiaman Holding a Berkemeyer, Known as the ‘Merry Drinker’",Frans Hals,experience_seeker,full,249,deepseek/deepseek-v4-flash
+Q650635,"A Militiaman Holding a Berkemeyer, Known as the ‘Merry Drinker’",Frans Hals,explorer,full,225,deepseek/deepseek-v4-flash
+Q650635,"A Militiaman Holding a Berkemeyer, Known as the ‘Merry Drinker’",Frans Hals,facilitator,full,244,deepseek/deepseek-v4-flash
+Q650635,"A Militiaman Holding a Berkemeyer, Known as the ‘Merry Drinker’",Frans Hals,flat,full,199,deepseek/deepseek-v4-flash
+Q650635,"A Militiaman Holding a Berkemeyer, Known as the ‘Merry Drinker’",Frans Hals,professional_hobbyist,full,224,deepseek/deepseek-v4-flash
+Q650635,"A Militiaman Holding a Berkemeyer, Known as the ‘Merry Drinker’",Frans Hals,recharger,full,281,deepseek/deepseek-v4-flash
+Q683274,Bal du moulin de la Galette,Pierre-Auguste Renoir,experience_seeker,full,268,deepseek/deepseek-v4-flash
+Q683274,Bal du moulin de la Galette,Pierre-Auguste Renoir,explorer,full,241,deepseek/deepseek-v4-flash
+Q683274,Bal du moulin de la Galette,Pierre-Auguste Renoir,facilitator,full,263,deepseek/deepseek-v4-flash
+Q683274,Bal du moulin de la Galette,Pierre-Auguste Renoir,flat,full,222,deepseek/deepseek-v4-flash
+Q683274,Bal du moulin de la Galette,Pierre-Auguste Renoir,professional_hobbyist,full,312,deepseek/deepseek-v4-flash
+Q683274,Bal du moulin de la Galette,Pierre-Auguste Renoir,recharger,full,249,deepseek/deepseek-v4-flash
+Q687182,Whistler's Mother,James McNeill Whistler,experience_seeker,full,240,deepseek/deepseek-v4-flash
+Q687182,Whistler's Mother,James McNeill Whistler,explorer,full,254,deepseek/deepseek-v4-flash
+Q687182,Whistler's Mother,James McNeill Whistler,facilitator,full,249,deepseek/deepseek-v4-flash
+Q687182,Whistler's Mother,James McNeill Whistler,flat,full,238,deepseek/deepseek-v4-flash
+Q687182,Whistler's Mother,James McNeill Whistler,professional_hobbyist,full,278,deepseek/deepseek-v4-flash
+Q687182,Whistler's Mother,James McNeill Whistler,recharger,full,244,deepseek/deepseek-v4-flash
+Q689236,The Fight Between Carnival and Lent,Pieter Brueghel the Elder,experience_seeker,full,240,deepseek/deepseek-v4-flash
+Q689236,The Fight Between Carnival and Lent,Pieter Brueghel the Elder,explorer,full,272,deepseek/deepseek-v4-flash
+Q689236,The Fight Between Carnival and Lent,Pieter Brueghel the Elder,facilitator,full,190,deepseek/deepseek-v4-flash
+Q689236,The Fight Between Carnival and Lent,Pieter Brueghel the Elder,flat,full,245,deepseek/deepseek-v4-flash
+Q689236,The Fight Between Carnival and Lent,Pieter Brueghel the Elder,professional_hobbyist,full,240,deepseek/deepseek-v4-flash
+Q689236,The Fight Between Carnival and Lent,Pieter Brueghel the Elder,recharger,full,238,deepseek/deepseek-v4-flash
+Q698228,Madonna of the Rosary,Caravaggio,experience_seeker,full,227,deepseek/deepseek-v4-flash
+Q698228,Madonna of the Rosary,Caravaggio,explorer,full,248,deepseek/deepseek-v4-flash
+Q698228,Madonna of the Rosary,Caravaggio,facilitator,full,243,deepseek/deepseek-v4-flash
+Q698228,Madonna of the Rosary,Caravaggio,flat,full,195,deepseek/deepseek-v4-flash
+Q698228,Madonna of the Rosary,Caravaggio,professional_hobbyist,full,253,deepseek/deepseek-v4-flash
+Q698228,Madonna of the Rosary,Caravaggio,recharger,full,215,deepseek/deepseek-v4-flash
+Q698254,The Return of the Herd,Pieter Brueghel the Elder,experience_seeker,full,241,deepseek/deepseek-v4-flash
+Q698254,The Return of the Herd,Pieter Brueghel the Elder,explorer,full,300,deepseek/deepseek-v4-flash
+Q698254,The Return of the Herd,Pieter Brueghel the Elder,facilitator,full,205,deepseek/deepseek-v4-flash
+Q698254,The Return of the Herd,Pieter Brueghel the Elder,flat,full,238,deepseek/deepseek-v4-flash
+Q698254,The Return of the Herd,Pieter Brueghel the Elder,professional_hobbyist,full,284,deepseek/deepseek-v4-flash
+Q698254,The Return of the Herd,Pieter Brueghel the Elder,recharger,full,217,deepseek/deepseek-v4-flash
+Q731639,The Plum,Édouard Manet,experience_seeker,full,199,deepseek/deepseek-v4-flash
+Q731639,The Plum,Édouard Manet,explorer,full,256,deepseek/deepseek-v4-flash
+Q731639,The Plum,Édouard Manet,facilitator,full,234,deepseek/deepseek-v4-flash
+Q731639,The Plum,Édouard Manet,flat,full,203,deepseek/deepseek-v4-flash
+Q731639,The Plum,Édouard Manet,professional_hobbyist,full,210,deepseek/deepseek-v4-flash
+Q731639,The Plum,Édouard Manet,recharger,full,217,deepseek/deepseek-v4-flash
+Q737062,Olympia,Édouard Manet,experience_seeker,full,236,deepseek/deepseek-v4-flash
+Q737062,Olympia,Édouard Manet,explorer,full,255,deepseek/deepseek-v4-flash
+Q737062,Olympia,Édouard Manet,facilitator,full,263,deepseek/deepseek-v4-flash
+Q737062,Olympia,Édouard Manet,flat,full,193,deepseek/deepseek-v4-flash
+Q737062,Olympia,Édouard Manet,professional_hobbyist,full,250,deepseek/deepseek-v4-flash
+Q737062,Olympia,Édouard Manet,recharger,full,189,deepseek/deepseek-v4-flash
+Q766782,The Jewish Bride,Rembrandt,experience_seeker,full,226,deepseek/deepseek-v4-flash
+Q766782,The Jewish Bride,Rembrandt,explorer,full,243,deepseek/deepseek-v4-flash
+Q766782,The Jewish Bride,Rembrandt,facilitator,full,249,deepseek/deepseek-v4-flash
+Q766782,The Jewish Bride,Rembrandt,flat,full,239,deepseek/deepseek-v4-flash
+Q766782,The Jewish Bride,Rembrandt,professional_hobbyist,full,266,deepseek/deepseek-v4-flash
+Q766782,The Jewish Bride,Rembrandt,recharger,full,267,deepseek/deepseek-v4-flash
+Q775407,The Balcony,Édouard Manet,experience_seeker,full,212,deepseek/deepseek-v4-flash
+Q775407,The Balcony,Édouard Manet,explorer,full,213,deepseek/deepseek-v4-flash
+Q775407,The Balcony,Édouard Manet,facilitator,full,226,deepseek/deepseek-v4-flash
+Q775407,The Balcony,Édouard Manet,flat,full,238,deepseek/deepseek-v4-flash
+Q775407,The Balcony,Édouard Manet,professional_hobbyist,full,304,deepseek/deepseek-v4-flash
+Q775407,The Balcony,Édouard Manet,recharger,full,212,deepseek/deepseek-v4-flash
+Q776175,The Harvesters,Pieter Brueghel the Elder,experience_seeker,full,236,deepseek/deepseek-v4-flash
+Q776175,The Harvesters,Pieter Brueghel the Elder,explorer,full,255,deepseek/deepseek-v4-flash
+Q776175,The Harvesters,Pieter Brueghel the Elder,facilitator,full,238,deepseek/deepseek-v4-flash
+Q776175,The Harvesters,Pieter Brueghel the Elder,flat,full,258,deepseek/deepseek-v4-flash
+Q776175,The Harvesters,Pieter Brueghel the Elder,professional_hobbyist,full,308,deepseek/deepseek-v4-flash
+Q776175,The Harvesters,Pieter Brueghel the Elder,recharger,full,235,deepseek/deepseek-v4-flash
+Q783215,Saint John the Baptist,Leonardo da Vinci,experience_seeker,full,232,deepseek/deepseek-v4-flash
+Q783215,Saint John the Baptist,Leonardo da Vinci,explorer,full,243,deepseek/deepseek-v4-flash
+Q783215,Saint John the Baptist,Leonardo da Vinci,facilitator,full,242,deepseek/deepseek-v4-flash
+Q783215,Saint John the Baptist,Leonardo da Vinci,flat,full,174,deepseek/deepseek-v4-flash
+Q783215,Saint John the Baptist,Leonardo da Vinci,professional_hobbyist,full,255,deepseek/deepseek-v4-flash
+Q783215,Saint John the Baptist,Leonardo da Vinci,recharger,full,225,deepseek/deepseek-v4-flash
+Q877191,The Three Philosophers,Giorgione,experience_seeker,full,236,deepseek/deepseek-v4-flash
+Q877191,The Three Philosophers,Giorgione,explorer,full,224,deepseek/deepseek-v4-flash
+Q877191,The Three Philosophers,Giorgione,facilitator,full,213,deepseek/deepseek-v4-flash
+Q877191,The Three Philosophers,Giorgione,flat,full,226,deepseek/deepseek-v4-flash
+Q877191,The Three Philosophers,Giorgione,professional_hobbyist,full,216,deepseek/deepseek-v4-flash
+Q877191,The Three Philosophers,Giorgione,recharger,full,218,deepseek/deepseek-v4-flash
+Q883994,View of Toledo,El Greco,experience_seeker,full,233,deepseek/deepseek-v4-flash
+Q883994,View of Toledo,El Greco,explorer,full,250,deepseek/deepseek-v4-flash
+Q883994,View of Toledo,El Greco,facilitator,full,205,deepseek/deepseek-v4-flash
+Q883994,View of Toledo,El Greco,flat,full,250,deepseek/deepseek-v4-flash
+Q883994,View of Toledo,El Greco,professional_hobbyist,full,252,deepseek/deepseek-v4-flash
+Q883994,View of Toledo,El Greco,recharger,full,250,deepseek/deepseek-v4-flash
+Q910199,Les Demoiselles d'Avignon,Pablo Picasso,experience_seeker,full,207,deepseek/deepseek-v4-flash
+Q910199,Les Demoiselles d'Avignon,Pablo Picasso,explorer,full,209,deepseek/deepseek-v4-flash
+Q910199,Les Demoiselles d'Avignon,Pablo Picasso,facilitator,full,219,deepseek/deepseek-v4-flash
+Q910199,Les Demoiselles d'Avignon,Pablo Picasso,flat,full,248,deepseek/deepseek-v4-flash
+Q910199,Les Demoiselles d'Avignon,Pablo Picasso,professional_hobbyist,full,246,deepseek/deepseek-v4-flash
+Q910199,Les Demoiselles d'Avignon,Pablo Picasso,recharger,full,222,deepseek/deepseek-v4-flash
+Q920030,Charles IV of Spain and His Family,Francisco Goya,experience_seeker,full,252,deepseek/deepseek-v4-flash
+Q920030,Charles IV of Spain and His Family,Francisco Goya,explorer,full,240,deepseek/deepseek-v4-flash
+Q920030,Charles IV of Spain and His Family,Francisco Goya,facilitator,full,212,deepseek/deepseek-v4-flash
+Q920030,Charles IV of Spain and His Family,Francisco Goya,flat,full,221,deepseek/deepseek-v4-flash
+Q920030,Charles IV of Spain and His Family,Francisco Goya,professional_hobbyist,full,271,deepseek/deepseek-v4-flash
+Q920030,Charles IV of Spain and His Family,Francisco Goya,recharger,full,245,deepseek/deepseek-v4-flash
+Q930535,Tahitian Women on the Beach,Paul Gauguin,experience_seeker,full,221,deepseek/deepseek-v4-flash
+Q930535,Tahitian Women on the Beach,Paul Gauguin,explorer,full,224,deepseek/deepseek-v4-flash
+Q930535,Tahitian Women on the Beach,Paul Gauguin,facilitator,full,218,deepseek/deepseek-v4-flash
+Q930535,Tahitian Women on the Beach,Paul Gauguin,flat,full,268,deepseek/deepseek-v4-flash
+Q930535,Tahitian Women on the Beach,Paul Gauguin,professional_hobbyist,full,232,deepseek/deepseek-v4-flash
+Q930535,Tahitian Women on the Beach,Paul Gauguin,recharger,full,211,deepseek/deepseek-v4-flash
+Q958088,Portrait of a Young Woman,Johannes Vermeer,experience_seeker,full,218,deepseek/deepseek-v4-flash
+Q958088,Portrait of a Young Woman,Johannes Vermeer,explorer,full,238,deepseek/deepseek-v4-flash
+Q958088,Portrait of a Young Woman,Johannes Vermeer,facilitator,full,233,deepseek/deepseek-v4-flash
+Q958088,Portrait of a Young Woman,Johannes Vermeer,flat,full,222,deepseek/deepseek-v4-flash
+Q958088,Portrait of a Young Woman,Johannes Vermeer,professional_hobbyist,full,238,deepseek/deepseek-v4-flash
+Q958088,Portrait of a Young Woman,Johannes Vermeer,recharger,full,207,deepseek/deepseek-v4-flash
+Q969367,Woman Holding a Balance,Johannes Vermeer,experience_seeker,full,250,deepseek/deepseek-v4-flash
+Q969367,Woman Holding a Balance,Johannes Vermeer,explorer,full,222,deepseek/deepseek-v4-flash
+Q969367,Woman Holding a Balance,Johannes Vermeer,facilitator,full,218,deepseek/deepseek-v4-flash
+Q969367,Woman Holding a Balance,Johannes Vermeer,flat,full,222,deepseek/deepseek-v4-flash
+Q969367,Woman Holding a Balance,Johannes Vermeer,professional_hobbyist,full,304,deepseek/deepseek-v4-flash
+Q969367,Woman Holding a Balance,Johannes Vermeer,recharger,full,201,deepseek/deepseek-v4-flash
+Q970968,"Symphony in White, No. 1: The White Girl",James McNeill Whistler,experience_seeker,full,248,deepseek/deepseek-v4-flash
+Q970968,"Symphony in White, No. 1: The White Girl",James McNeill Whistler,explorer,full,250,deepseek/deepseek-v4-flash
+Q970968,"Symphony in White, No. 1: The White Girl",James McNeill Whistler,facilitator,full,265,deepseek/deepseek-v4-flash
+Q970968,"Symphony in White, No. 1: The White Girl",James McNeill Whistler,flat,full,258,deepseek/deepseek-v4-flash
+Q970968,"Symphony in White, No. 1: The White Girl",James McNeill Whistler,professional_hobbyist,full,299,deepseek/deepseek-v4-flash
+Q970968,"Symphony in White, No. 1: The White Girl",James McNeill Whistler,recharger,full,218,deepseek/deepseek-v4-flash
+Q984058,Las Hilanderas,Diego Velázquez,experience_seeker,full,232,deepseek/deepseek-v4-flash
+Q984058,Las Hilanderas,Diego Velázquez,explorer,full,242,deepseek/deepseek-v4-flash
+Q984058,Las Hilanderas,Diego Velázquez,facilitator,full,230,deepseek/deepseek-v4-flash
+Q984058,Las Hilanderas,Diego Velázquez,flat,full,222,deepseek/deepseek-v4-flash
+Q984058,Las Hilanderas,Diego Velázquez,professional_hobbyist,full,260,deepseek/deepseek-v4-flash
+Q984058,Las Hilanderas,Diego Velázquez,recharger,full,221,deepseek/deepseek-v4-flash

@@ -20,3 +20,15 @@ def openrouter_key() -> str:
             "OPENROUTER_KEY non configurata: impostala nell'ambiente o nel file .env"
         )
     return key
+
+
+def emb_path(alias: str, variant: str = "full") -> Path:
+    """File degli embedding per (modello, variante). `full` mantiene il nome storico."""
+    suffix = "" if variant == "full" else f"_{variant}"
+    return ROOT / "data" / f"emb_{alias}{suffix}.npy"
+
+
+def meta_path(variant: str = "full") -> Path:
+    """Metadati allineati riga per riga con `emb_path`. `full` mantiene il nome storico."""
+    suffix = "" if variant == "full" else f"_{variant}"
+    return ROOT / "data" / f"meta{suffix}.csv"

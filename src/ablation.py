@@ -14,9 +14,13 @@ import itertools
 import json
 from pathlib import Path
 
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 import numpy as np
 
-from analyze import load, probe, split_half
+from analyze import COLORS, load, probe, split_half
 from config import emb_path
 from prompts import CONDITIONS, FALK_CATEGORIES, LABELS, PARTS, VARIANTS
 
@@ -132,6 +136,64 @@ def print_summary(res: dict) -> None:
             print(f"  {metric:20} {m}")
 
 
+def fig_bars(res: dict, path: Path) -> None:
+    """Due pannelli: (a) probe a 5 classi e norma media; (b) coseno con full per categoria."""
+    vs = [v for v in VARIANTS if v in res["variants"]]
+    R = res["variants"]
+    x = np.arange(len(vs))
+    fig, (a, b) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+
+    a.bar(x - 0.2, [R[v]["probe5_accuracy"] for v in vs], 0.4, color="#444", label="probe (5 classi)")
+    a.axhline(1 / N_FALK, color="#444", ls=":", lw=1)
+    a.set_ylabel("accuracy")
+    a.set_ylim(0, 1.05)
+    a2 = a.twinx()
+    a2.bar(x + 0.2, [R[v]["norm_mean"] for v in vs], 0.4, color="#E8743B", label="||v|| media")
+    a2.set_ylabel("norma media steering")
+    h1, l1 = a.get_legend_handles_labels()
+    h2, l2 = a2.get_legend_handles_labels()
+    a.legend(h1 + h2, l1 + l2, frameon=False, loc="lower left", fontsize=9)
+    # a2 (twinx) viene disegnata sopra a: si alza lo zorder di a per riportare la
+    # legenda in primo piano, rendendo trasparente lo sfondo di a cosi' i colori non cambiano.
+    a.set_zorder(a2.get_zorder() + 1)
+    a.patch.set_visible(False)
+    a.set_title("Ablazione del prompt — separabilita' e ampiezza dello shift", fontsize=11)
+
+    w = 0.8 / N_FALK
+    for i, c in enumerate(FALK_CATEGORIES):
+        b.bar(x + (i - (N_FALK - 1) / 2) * w, [R[v]["cos_with_full"][LABELS[c]] for v in vs],
+              w, color=COLORS[c], label=LABELS[c])
+    b.axhline(0, color="#ccc", lw=0.8)
+    b.set_ylabel("cos(v_variante, v_full)")
+    b.set_ylim(-0.2, 1.05)
+    b.set_xticks(x, vs, rotation=30, ha="right")
+    b.legend(frameon=False, fontsize=8, ncol=5, loc="lower left")
+    b.set_title("Quanto ogni variante conserva la direzione del blocco completo", fontsize=11)
+    for ax in (a, b):
+        ax.spines[["top"]].set_visible(False)
+    fig.tight_layout()
+    fig.savefig(path, dpi=160)
+    plt.close(fig)
+
+
+def fig_cosine_heatmap(res: dict, path: Path) -> None:
+    vs = [v for v in VARIANTS if v in res["variants"]]
+    M = np.array([[res["variants"][v]["cos_with_full"][LABELS[c]] for c in FALK_CATEGORIES] for v in vs])
+    fig, ax = plt.subplots(figsize=(7.5, 6))
+    im = ax.imshow(M, cmap="RdBu_r", vmin=-1, vmax=1)
+    ax.set_xticks(range(N_FALK), [LABELS[c] for c in FALK_CATEGORIES], rotation=40, ha="right", fontsize=9)
+    ax.set_yticks(range(len(vs)), vs, fontsize=9)
+    for i in range(len(vs)):
+        for j in range(N_FALK):
+            ax.text(j, i, f"{M[i, j]:.2f}", ha="center", va="center", fontsize=8,
+                    color="white" if abs(M[i, j]) > 0.55 else "black")
+    ax.set_title("Coseno fra v_variante[c] e v_full[c]", fontsize=11)
+    fig.colorbar(im, shrink=0.8)
+    fig.tight_layout()
+    fig.savefig(path, dpi=160)
+    plt.close(fig)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="qwen")
@@ -144,6 +206,10 @@ def main() -> None:
     out = RESULTS / f"ablation_{args.model}.json"
     out.write_text(json.dumps(res, indent=2, ensure_ascii=False))
     print(f"\nrisultati -> {out.relative_to(ROOT)}")
+
+    fig_bars(res, FIGS / f"ablation_{args.model}.png")
+    fig_cosine_heatmap(res, FIGS / f"ablation_cosine_{args.model}.png")
+    print(f"figure -> figures/ablation_{args.model}.png, figures/ablation_cosine_{args.model}.png")
 
 
 if __name__ == "__main__":

@@ -34,6 +34,7 @@ from sklearn.manifold import TSNE
 from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.model_selection import GroupKFold
 
+from config import emb_path, meta_path
 from prompts import CONDITIONS, LABELS
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -54,9 +55,9 @@ COLORS = {
 # --------------------------------------------------------------------------- dati
 
 
-def load(model: str):
-    emb = np.load(ROOT / "data" / f"emb_{model}.npy")
-    meta = pd.read_csv(ROOT / "data" / "meta.csv")
+def load(model: str, variant: str = "full"):
+    emb = np.load(emb_path(model, variant))
+    meta = pd.read_csv(meta_path(variant))
     assert len(meta) == len(emb), f"meta {len(meta)} != emb {len(emb)}"
 
     arts = sorted(meta["artwork_id"].unique())
@@ -281,14 +282,15 @@ def fig_confusion(cm, acc, path):
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="qwen")
+    ap.add_argument("--variant", default="full")
     ap.add_argument("--no-ablation", action="store_true")
     args = ap.parse_args()
 
     FIGS.mkdir(exist_ok=True)
     RESULTS.mkdir(exist_ok=True)
-    tag = args.model
+    tag = args.model if args.variant == "full" else f"{args.model}_{args.variant}"
 
-    X, arts, meta = load(args.model)
+    X, arts, meta = load(args.model, args.variant)
     A, C, D = X.shape
     print(f"\n{A} opere x {C} condizioni x {D} dim  [{args.model}]")
 
@@ -378,6 +380,8 @@ def main() -> None:
 
     # --- parole discriminative ---
     gens = [json.loads(l) for l in (ROOT / "data" / "generations.jsonl").open()]
+    gens = [g for g in gens if g.get("variant", "full") == args.variant
+            or (g["condition"] == "flat" and g.get("variant", "full") == "full")]
     by_cond = {c: [g["text"] for g in gens if g["condition"] == c] for c in CONDITIONS}
     out["top_words"] = {LABELS[c]: w[:15] for c, w in top_words(by_cond).items()}
     print("\nparole piu' discriminative per categoria:")

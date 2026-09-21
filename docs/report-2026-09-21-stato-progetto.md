@@ -169,13 +169,119 @@ domanda a cui risponde il passo successivo.
 - Due punti aperti: il confondente lunghezza per Professional/Hobbyist e l'equivalenza
   chain/singolo, finora solo qualitativa.
 
-## 5. Passo successivo: ablazione del prompt
+## 5. Ablazione del prompt: quale parte del blocco produce lo shift?
 
-Ogni blocco categoria è composto da tre parti (definizione, bisogno, stile). L'ablazione
-genera le stesse 500 audioguide (5 categorie × 100 opere) con 7 varianti del blocco, in un
-disegno fattoriale 2×2×2 più la variante "solo nome", e misura per ciascuna quanto lo shift
-sopravvive e quanto conserva la *direzione* del blocco completo. La domanda: quale parte del
-prompt è la discriminante? Spec in `docs/superpowers/specs/`.
+Ogni blocco categoria è composto da tre parti in ordine fisso: **definizione** (chi è il
+visitatore), **bisogno** ("Their need is …"), **stile** (come scrivere). L'ablazione genera
+le stesse 500 audioguide (5 categorie × 100 opere) per 8 varianti del blocco, in un disegno
+fattoriale 2×2×2 più la variante "solo nome". Il flat non varia. Stesso modello, stessa
+temperatura, stesso filtro sui riferimenti espliciti. Costo 0.45 $; rigenerazioni per
+violazione del filtro 3.9% (3.8% nel run originale).
+
+| variante | def | need | style |
+|---|---|---|---|
+| `full` | ✓ | ✓ | ✓ |
+| `no_def` | | ✓ | ✓ |
+| `no_need` | ✓ | | ✓ |
+| `no_style` | ✓ | ✓ | |
+| `def_only` | ✓ | | |
+| `need_only` | | ✓ | |
+| `style_only` | | | ✓ |
+| `name_only` | | | |
+
+Per ogni variante: probe a 5 classi (flat escluso, è identico fra varianti), norma media
+degli steering vector, **coseno con il full** per categoria (la metrica chiave: dice se la
+parte conserva la *direzione* dello shift, non solo la separabilità), split-half. Poi
+l'analisi fattoriale: effetto principale di ciascuna parte e interazioni a due vie, sulle
+medie delle 8 celle.
+
+![Ablazione: separabilità, ampiezza e direzione per variante (Qwen3)](../figures/ablation_qwen.png)
+
+![Coseno con il full, varianti × categorie (Qwen3)](../figures/ablation_cosine_qwen.png)
+
+### 5.1 Risultati per variante (Qwen3; BGE-M3 fra parentesi)
+
+Ordinate per coseno medio con il full.
+
+| variante | probe 5 classi | ‖v‖ media | cos·full | split-half |
+|---|---|---|---|---|
+| `full` | 98.4% (97.0%) | 0.220 (0.135) | 1.000 (1.000) | 0.93 (0.87) |
+| `no_need` | 98.6% (95.0%) | 0.223 (0.136) | 0.969 (0.930) | 0.94 (0.87) |
+| `no_def` | 98.2% (95.2%) | 0.220 (0.132) | 0.969 (0.930) | 0.94 (0.87) |
+| `style_only` | 97.0% (95.2%) | 0.217 (0.131) | 0.960 (0.911) | 0.94 (0.86) |
+| `no_style` | 91.8% (90.4%) | 0.166 (0.110) | 0.871 (0.865) | 0.89 (0.81) |
+| `def_only` | 93.0% (90.0%) | 0.173 (0.113) | 0.868 (0.857) | 0.90 (0.82) |
+| `need_only` | 85.2% (87.4%) | 0.148 (0.097) | 0.776 (0.754) | 0.85 (0.76) |
+| `name_only` | 77.4% (74.6%) | 0.131 (0.088) | 0.741 (0.683) | 0.78 (0.69) |
+
+Chance del probe a 5 classi: 20%. La lunghezza media resta fra 229 e 240 parole per tutte
+le varianti: l'ablazione non introduce un confondente di lunghezza.
+
+### 5.2 Analisi fattoriale
+
+Effetti principali (media delle 4 celle con la parte meno media delle 4 senza) e
+interazioni a due vie, sul coseno medio con il full e sulla norma media.
+
+| | def | need | style | def×need | def×style | need×style |
+|---|---|---|---|---|---|---|
+| cos·full (Qwen3) | +0.065 | +0.020 | **+0.160** | −0.005 | **−0.091** | +0.000 |
+| cos·full (BGE-M3) | +0.094 | +0.042 | **+0.153** | −0.006 | **−0.098** | +0.005 |
+| ‖v‖ media (Qwen3) | +0.016 | +0.002 | **+0.065** | −0.015 | −0.027 | −0.005 |
+| ‖v‖ media (BGE-M3) | +0.012 | +0.002 | **+0.031** | −0.007 | −0.014 | −0.003 |
+
+### 5.3 Lettura
+
+**Lo stile è la discriminante.** È sufficiente: da solo riproduce la direzione del blocco
+completo (coseno 0.96 / 0.91) con la stessa ampiezza e la stessa separabilità. Ed è
+necessaria: toglierlo è l'unica rimozione singola che costa qualcosa (0.87 / 0.87, e
+la norma cala di un quarto). L'effetto principale dello stile sul coseno è 2.5 volte
+quello della definizione e 8 volte quello del bisogno.
+
+**La definizione conta solo in assenza dello stile.** L'interazione def×style è negativa e
+grande (−0.09 / −0.10): la definizione porta il coseno da 0.74 a 0.87 quando lo stile
+manca, ma da 0.96 a 0.97 quando c'è. Le due parti dicono al modello la stessa cosa e lo
+stile la dice in modo più operativo.
+
+**Il bisogno da solo non basta, e in un caso devia.** `need_only` è la più debole delle
+varianti a una parte, e per Experience Seeker il coseno crolla a 0.50 / 0.53: la frase
+"Their need is memorable, high-impact takeaways", senza definizione né stile, spinge il
+testo in una direzione diversa da quella del blocco completo. È l'unico caso in cui una
+parte del prompt non è un sottoinsieme dell'effetto totale ma un effetto diverso.
+
+**Il nome da solo conserva circa tre quarti dello shift.** Con "Your listener is a
+Recharger." e nient'altro, il probe resta al 77% / 75% contro il 20% di chance, e il
+coseno medio è 0.74 / 0.68. Questa è la conoscenza parametrica di Falk del modello. Ma è
+distribuita in modo molto diseguale: Recharger (0.94 / 0.95) e Professional/Hobbyist
+(0.84 / 0.91) sono nomi autoesplicativi e il modello li interpreta come il blocco
+completo; Explorer (0.56 / 0.45) e Experience Seeker (0.62 / 0.52) no. Sono anche le due
+categorie con i nomi più ambigui in inglese comune.
+
+**Asimmetria fra categorie.** Recharger è robusto a ogni ablazione (coseno ≥ 0.94 in tutte
+le varianti): la sua direzione, quella contemplativa, è così marcata che qualunque indizio
+basta a evocarla. Explorer è la più fragile, e già nello studio principale era la categoria
+con lo shift più debole.
+
+**Limite: manca la calibrazione del coseno.** I coseni si leggono solo in ordine relativo.
+Non sappiamo quale sia il coseno fra due run del *medesimo* prompt full a temperatura 0.7,
+quindi non possiamo dire se 0.97 (`no_def`) è "identico al full" o già una perdita
+misurabile. Una seconda generazione del full su 100 opere (≈ 0.05 $) darebbe il tetto.
+
+### 5.4 Implicazione per il prompt
+
+Per un sistema di produzione il blocco può ridursi all'istruzione di stile: stessa
+efficacia, un terzo dei token. Per lo studio scientifico l'ablazione dice che quello che
+il paper chiama "adattamento alla categoria di Falk" è, nel modello, quasi interamente
+l'esecuzione di un'istruzione stilistica esplicita, e in misura minore l'evocazione di uno
+stereotipo associato al nome. La definizione sociologica della categoria non aggiunge
+nulla quando lo stile è presente.
+
+## 6. Prossimi passi
+
+1. Calibrazione del coseno: seconda generazione del full, per leggere i coseni in assoluto.
+2. Confondente lunghezza per Professional/Hobbyist nello studio principale (§3.6).
+3. Feature demografiche del visitatore (età, sesso): stessa pipeline, con un profilo nel
+   prompt in aggiunta o in alternativa alla categoria Falk, per misurare se lo shift
+   demografico è indipendente o collineare con quello di categoria.
 
 ## Riferimenti
 

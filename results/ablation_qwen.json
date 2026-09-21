@@ -1,0 +1,379 @@
+{
+  "model": "qwen",
+  "variants": {
+    "full": {
+      "variant": "full",
+      "n_artworks": 100,
+      "probe5_accuracy": 0.984,
+      "probe5_recall": {
+        "Explorer": 0.99,
+        "Facilitator": 0.95,
+        "Experience Seeker": 0.98,
+        "Professional/Hobbyist": 1.0,
+        "Recharger": 1.0
+      },
+      "norm": {
+        "Explorer": 0.15087318420410156,
+        "Facilitator": 0.15910547971725464,
+        "Experience Seeker": 0.24154548346996307,
+        "Professional/Hobbyist": 0.26999470591545105,
+        "Recharger": 0.27658599615097046
+      },
+      "norm_mean": 0.2196209877729416,
+      "split_half": {
+        "Explorer": 0.8812827944755555,
+        "Facilitator": 0.9075922432541847,
+        "Experience Seeker": 0.9624434563517571,
+        "Professional/Hobbyist": 0.957283448278904,
+        "Recharger": 0.9634124875068665
+      },
+      "words": {
+        "Explorer": 238.74,
+        "Facilitator": 236.23,
+        "Experience Seeker": 234.7,
+        "Professional/Hobbyist": 258.51,
+        "Recharger": 226.18
+      },
+      "cos_with_full": {
+        "Explorer": 1.0,
+        "Facilitator": 1.0,
+        "Experience Seeker": 1.0,
+        "Professional/Hobbyist": 1.0,
+        "Recharger": 1.0
+      },
+      "cos_with_full_mean": 1.0
+    },
+    "no_def": {
+      "variant": "no_def",
+      "n_artworks": 100,
+      "probe5_accuracy": 0.982,
+      "probe5_recall": {
+        "Explorer": 0.99,
+        "Facilitator": 0.92,
+        "Experience Seeker": 1.0,
+        "Professional/Hobbyist": 1.0,
+        "Recharger": 1.0
+      },
+      "norm": {
+        "Explorer": 0.1415916383266449,
+        "Facilitator": 0.171089306473732,
+        "Experience Seeker": 0.23775221407413483,
+        "Professional/Hobbyist": 0.2535032629966736,
+        "Recharger": 0.2958233058452606
+      },
+      "norm_mean": 0.21995194256305695,
+      "split_half": {
+        "Explorer": 0.8839516305923462,
+        "Facilitator": 0.9252025035023689,
+        "Experience Seeker": 0.9593047305941582,
+        "Professional/Hobbyist": 0.9533589345216751,
+        "Recharger": 0.9641935116052628
+      },
+      "words": {
+        "Explorer": 236.04,
+        "Facilitator": 237.01,
+        "Experience Seeker": 235.75,
+        "Professional/Hobbyist": 255.76,
+        "Recharger": 224.1
+      },
+      "cos_with_full": {
+        "Explorer": 0.9432480335235596,
+        "Facilitator": 0.9623093605041504,
+        "Experience Seeker": 0.976027250289917,
+        "Professional/Hobbyist": 0.9813031554222107,
+        "Recharger": 0.9808239340782166
+      },
+      "cos_with_full_mean": 0.9687423706054688
+    },
+    "no_need": {
+      "variant": "no_need",
+      "n_artworks": 100,
+      "probe5_accuracy": 0.986,
+      "probe5_recall": {
+        "Explorer": 0.96,
+        "Facilitator": 0.97,
+        "Experience Seeker": 1.0,
+        "Professional/Hobbyist": 1.0,
+        "Recharger": 1.0
+      },
+      "norm": {
+        "Explorer": 0.15072736144065857,
+        "Facilitator": 0.1667223572731018,
+        "Experience Seeker": 0.2646339237689972,
+        "Professional/Hobbyist": 0.24861542880535126,
+        "Recharger": 0.28412696719169617
+      },
+      "norm_mean": 0.22296521067619324,
+      "split_half": {
+        "Explorer": 0.884474376142025,
+        "Facilitator": 0.918447260260582,
+        "Experience Seeker": 0.967566003203392,
+        "Professional/Hobbyist": 0.9503475692868233,
+        "Recharger": 0.9651044547557831
+      },
+      "words": {
+        "Explorer": 244.31,
+        "Facilitator": 233.37,
+        "Experience Seeker": 237.92,
+        "Professional/Hobbyist": 254.84,
+        "Recharger": 231.27
+      },
+      "cos_with_full": {
+        "Explorer": 0.9484279751777649,
+        "Facilitator": 0.950961709022522,
+        "Experience Seeker": 0.9792537689208984,
+        "Professional/Hobbyist": 0.9799888730049133,
+        "Recharger": 0.9852967858314514
+      },
+      "cos_with_full_mean": 0.9687858819961548
+    },
+    "no_style": {
+      "variant": "no_style",
+      "n_artworks": 100,
+      "probe5_accuracy": 0.918,
+      "probe5_recall": {
+        "Explorer": 0.7,
+        "Facilitator": 0.91,
+        "Experience Seeker": 0.98,
+        "Professional/Hobbyist": 1.0,
+        "Recharger": 1.0
+      },
+      "norm": {
+        "Explorer": 0.1018158346414566,
+        "Facilitator": 0.13395559787750244,
+        "Experience Seeker": 0.14405958354473114,
+        "Professional/Hobbyist": 0.19863836467266083,
+        "Recharger": 0.24963343143463135
+      },
+      "norm_mean": 0.1656205654144287,
+      "split_half": {
+        "Explorer": 0.7945647412538528,
+        "Facilitator": 0.8702624541521072,
+        "Experience Seeker": 0.8958609315752983,
+        "Professional/Hobbyist": 0.9298176342248916,
+        "Recharger": 0.9572054395079612
+      },
+      "words": {
+        "Explorer": 231.3,
+        "Facilitator": 230.25,
+        "Experience Seeker": 222.33,
+        "Professional/Hobbyist": 237.65,
+        "Recharger": 224.82
+      },
+      "cos_with_full": {
+        "Explorer": 0.7666454911231995,
+        "Facilitator": 0.8832699656486511,
+        "Experience Seeker": 0.8828593492507935,
+        "Professional/Hobbyist": 0.8668445944786072,
+        "Recharger": 0.9566575288772583
+      },
+      "cos_with_full_mean": 0.8712553977966309
+    },
+    "def_only": {
+      "variant": "def_only",
+      "n_artworks": 100,
+      "probe5_accuracy": 0.93,
+      "probe5_recall": {
+        "Explorer": 0.83,
+        "Facilitator": 0.85,
+        "Experience Seeker": 0.97,
+        "Professional/Hobbyist": 1.0,
+        "Recharger": 1.0
+      },
+      "norm": {
+        "Explorer": 0.10270699113607407,
+        "Facilitator": 0.14399302005767822,
+        "Experience Seeker": 0.17829720675945282,
+        "Professional/Hobbyist": 0.19017191231250763,
+        "Recharger": 0.2507387399673462
+      },
+      "norm_mean": 0.17318156361579895,
+      "split_half": {
+        "Explorer": 0.7894367974996567,
+        "Facilitator": 0.8852291983366013,
+        "Experience Seeker": 0.9345087411999703,
+        "Professional/Hobbyist": 0.9279334062337875,
+        "Recharger": 0.9541313114762306
+      },
+      "words": {
+        "Explorer": 236.09,
+        "Facilitator": 236.86,
+        "Experience Seeker": 223.29,
+        "Professional/Hobbyist": 235.55,
+        "Recharger": 228.06
+      },
+      "cos_with_full": {
+        "Explorer": 0.8021001219749451,
+        "Facilitator": 0.8821188807487488,
+        "Experience Seeker": 0.8651588559150696,
+        "Professional/Hobbyist": 0.8478736877441406,
+        "Recharger": 0.9418455362319946
+      },
+      "cos_with_full_mean": 0.8678194284439087
+    },
+    "need_only": {
+      "variant": "need_only",
+      "n_artworks": 100,
+      "probe5_accuracy": 0.852,
+      "probe5_recall": {
+        "Explorer": 0.63,
+        "Facilitator": 0.82,
+        "Experience Seeker": 0.85,
+        "Professional/Hobbyist": 0.97,
+        "Recharger": 0.99
+      },
+      "norm": {
+        "Explorer": 0.08232787996530533,
+        "Facilitator": 0.13651041686534882,
+        "Experience Seeker": 0.11176269501447678,
+        "Professional/Hobbyist": 0.20172448456287384,
+        "Recharger": 0.207381010055542
+      },
+      "norm_mean": 0.14794130623340607,
+      "split_half": {
+        "Explorer": 0.6940471461415291,
+        "Facilitator": 0.8773760893940925,
+        "Experience Seeker": 0.8245669701695442,
+        "Professional/Hobbyist": 0.931111173927784,
+        "Recharger": 0.942807892858982
+      },
+      "words": {
+        "Explorer": 230.0,
+        "Facilitator": 233.81,
+        "Experience Seeker": 224.04,
+        "Professional/Hobbyist": 247.26,
+        "Recharger": 221.32
+      },
+      "cos_with_full": {
+        "Explorer": 0.7084691524505615,
+        "Facilitator": 0.8420743942260742,
+        "Experience Seeker": 0.5003829002380371,
+        "Professional/Hobbyist": 0.8737348318099976,
+        "Recharger": 0.9574840664863586
+      },
+      "cos_with_full_mean": 0.7764290571212769
+    },
+    "style_only": {
+      "variant": "style_only",
+      "n_artworks": 100,
+      "probe5_accuracy": 0.97,
+      "probe5_recall": {
+        "Explorer": 0.98,
+        "Facilitator": 0.88,
+        "Experience Seeker": 1.0,
+        "Professional/Hobbyist": 0.99,
+        "Recharger": 1.0
+      },
+      "norm": {
+        "Explorer": 0.15636111795902252,
+        "Facilitator": 0.1577794849872589,
+        "Experience Seeker": 0.24258024990558624,
+        "Professional/Hobbyist": 0.2535056471824646,
+        "Recharger": 0.27297863364219666
+      },
+      "norm_mean": 0.21664102375507355,
+      "split_half": {
+        "Explorer": 0.8952986198663712,
+        "Facilitator": 0.9130264565348625,
+        "Experience Seeker": 0.9610125380754471,
+        "Professional/Hobbyist": 0.9541390872001648,
+        "Recharger": 0.9629214030504226
+      },
+      "words": {
+        "Explorer": 240.56,
+        "Facilitator": 239.79,
+        "Experience Seeker": 230.62,
+        "Professional/Hobbyist": 259.72,
+        "Recharger": 229.61
+      },
+      "cos_with_full": {
+        "Explorer": 0.9492314457893372,
+        "Facilitator": 0.9443567991256714,
+        "Experience Seeker": 0.9592991471290588,
+        "Professional/Hobbyist": 0.9727437496185303,
+        "Recharger": 0.9761316776275635
+      },
+      "cos_with_full_mean": 0.9603525400161743
+    },
+    "name_only": {
+      "variant": "name_only",
+      "n_artworks": 100,
+      "probe5_accuracy": 0.774,
+      "probe5_recall": {
+        "Explorer": 0.49,
+        "Facilitator": 0.73,
+        "Experience Seeker": 0.69,
+        "Professional/Hobbyist": 1.0,
+        "Recharger": 0.96
+      },
+      "norm": {
+        "Explorer": 0.06458783894777298,
+        "Facilitator": 0.09677989780902863,
+        "Experience Seeker": 0.07807356119155884,
+        "Professional/Hobbyist": 0.18869692087173462,
+        "Recharger": 0.22888080775737762
+      },
+      "norm_mean": 0.13140380382537842,
+      "split_half": {
+        "Explorer": 0.567681334912777,
+        "Facilitator": 0.7846631452441215,
+        "Experience Seeker": 0.6964448112249374,
+        "Professional/Hobbyist": 0.9220236510038375,
+        "Recharger": 0.9495715066790581
+      },
+      "words": {
+        "Explorer": 238.54,
+        "Facilitator": 229.15,
+        "Experience Seeker": 231.57,
+        "Professional/Hobbyist": 242.61,
+        "Recharger": 229.1
+      },
+      "cos_with_full": {
+        "Explorer": 0.5583361387252808,
+        "Facilitator": 0.745394229888916,
+        "Experience Seeker": 0.618206799030304,
+        "Professional/Hobbyist": 0.8438361287117004,
+        "Recharger": 0.9375601410865784
+      },
+      "cos_with_full_mean": 0.7406666874885559
+    }
+  },
+  "factorial": {
+    "norm_mean": {
+      "main": {
+        "def": 0.016362562775611877,
+        "need": 0.00223580002784729,
+        "style": 0.0652579814195633
+      },
+      "interaction": {
+        "def×need": -0.015376821160316467,
+        "def×style": -0.02673189342021942,
+        "need×style": -0.00450490415096283
+      }
+    },
+    "cos_with_full_mean": {
+      "main": {
+        "def": 0.06541751325130463,
+        "need": 0.01970057189464569,
+        "style": 0.16042755544185638
+      },
+      "interaction": {
+        "def×need": -0.004751056432723999,
+        "def×style": -0.09114405512809753,
+        "need×style": 0.0002028048038482666
+      }
+    },
+    "probe5_accuracy": {
+      "main": {
+        "def": 0.05999999999999994,
+        "need": 0.018999999999999906,
+        "style": 0.11199999999999988
+      },
+      "interaction": {
+        "def×need": -0.051999999999999935,
+        "def×style": -0.10200000000000009,
+        "need×style": -0.027999999999999914
+      }
+    }
+  }
+}

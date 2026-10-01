@@ -68,3 +68,13 @@ def test_flat_ignores_variant(variant):
 def test_unknown_variant_raises():
     with pytest.raises(ValueError):
         build_block("explorer", "bogus")
+
+
+def test_replicates_use_prompt_of_replicated_variant():
+    from museumbot.common.prompts import REPLICATES, build_system, prompt_variant
+
+    for rep, base in REPLICATES.items():
+        assert rep not in VARIANTS and base in VARIANTS
+        assert prompt_variant(rep) == base
+        assert build_system("explorer", prompt_variant(rep)) == build_system("explorer", base)
+    assert prompt_variant("no_style") == "no_style"

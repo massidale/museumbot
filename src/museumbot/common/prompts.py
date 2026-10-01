@@ -126,6 +126,16 @@ VARIANTS = {
 }
 PARTS = ("def", "need", "style")
 
+# Repliche: stesso prompt di una variante, generazione indipendente. Non entrano nel
+# disegno fattoriale. `full_rep` calibra il coseno con il full: il coseno fra due run del
+# medesimo prompt a T = 0.7 e' il tetto che nessuna variante puo' superare.
+REPLICATES = {"full_rep": "full"}
+
+
+def prompt_variant(variant: str) -> str:
+    """Variante il cui prompt va usato: per una replica, quella che replica."""
+    return REPLICATES.get(variant, variant)
+
 
 def build_block(category: str, variant: str = "full") -> str:
     """Blocco di categoria per una variante: nome sempre presente, parti solo se attive."""

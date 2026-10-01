@@ -5,8 +5,18 @@ aggiunge la metrica chiave: il coseno fra lo steering vector della variante e qu
 `full`, per categoria. Dice se la parte conserva la *direzione* dello shift, non soltanto
 la separabilita'.
 
+Gli steering vector sono presi rispetto al flat (analyze.steering). Il flat non ha varianti
+ed e' lo stesso testo in tutte (embed.select_rows), quindi il riferimento e' identico fra
+varianti: con il centering sulla media, invece, il riferimento include le 5 categorie della
+variante e si sposterebbe con essa, contaminando il confronto con `full`.
+
 Chiude un'analisi fattoriale 2x2x2 sulle tre parti (def, need, style): effetti principali
 e interazioni a due vie, calcolati direttamente sulle medie delle 8 celle.
+
+Calibrazione: se esiste la replica `full_rep` (stesso prompt del full, generazione
+indipendente, stesso flat), il suo coseno con il full e' il tetto di rumore della
+generazione. Ogni variante viene riportata anche come rapporto col tetto (`cos_rel`): ~1
+vuol dire indistinguibile dal full, non soltanto "vicino".
 """
 
 import argparse
@@ -20,20 +30,15 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-from museumbot.rq1_embeddings.analyze import COLORS, load, probe, split_half
+from museumbot.rq1_embeddings.analyze import COLORS, center, load, probe, split_half, steering
 from museumbot.common.config import ROOT, emb_path
-from museumbot.common.prompts import CONDITIONS, FALK_CATEGORIES, LABELS, PARTS, VARIANTS
+from museumbot.common.prompts import CONDITIONS, FALK_CATEGORIES, LABELS, PARTS, REPLICATES, VARIANTS
 
 RESULTS = ROOT / "results"
 FIGS = ROOT / "figures"
 
 N_FALK = len(FALK_CATEGORIES)  # le prime 5 di CONDITIONS; flat e' l'ultima
 assert CONDITIONS[N_FALK:] == ["flat"], "l'analisi assume flat come ultima condizione"
-
-
-def steering(X: np.ndarray) -> np.ndarray:
-    """(A, C, D) -> (C, D): media sulle opere degli embedding centrati per opera."""
-    return (X - X.mean(axis=1, keepdims=True)).mean(axis=0)
 
 
 def cos_with_full(V: np.ndarray, V_full: np.ndarray) -> np.ndarray:
@@ -69,10 +74,10 @@ def factorial_effects(table: dict[str, float]) -> dict:
 
 def analyse_variant(model: str, variant: str, V_full: np.ndarray | None) -> tuple[dict, np.ndarray]:
     X, _, meta = load(model, variant)
-    Xc = X - X.mean(axis=1, keepdims=True)
-    V = steering(X)
+    Xc = center(X, "mean")
+    V = steering(X)                                    # (5, D), rispetto al flat
     acc, cm, _, _ = probe(Xc[:, :N_FALK, :])          # 5 classi: flat escluso
-    sh_mu, _ = split_half(X)
+    sh_mu, _ = split_half(X, "flat")
     norms = np.linalg.norm(V, axis=1)
     words = meta.groupby("condition")["words"].mean()
     out = {
@@ -81,14 +86,14 @@ def analyse_variant(model: str, variant: str, V_full: np.ndarray | None) -> tupl
         "probe5_accuracy": float(acc),
         "probe5_recall": {LABELS[c]: float(cm[i, i] / cm[i].sum()) for i, c in enumerate(FALK_CATEGORIES)},
         "norm": {LABELS[c]: float(norms[i]) for i, c in enumerate(FALK_CATEGORIES)},
-        "norm_mean": float(norms[:N_FALK].mean()),
+        "norm_mean": float(norms.mean()),
         "split_half": {LABELS[c]: float(sh_mu[i]) for i, c in enumerate(FALK_CATEGORIES)},
         "words": {LABELS[c]: float(words[c]) for c in FALK_CATEGORIES if c in words.index},
     }
     if V_full is not None:
         cos = cos_with_full(V, V_full)
         out["cos_with_full"] = {LABELS[c]: float(cos[i]) for i, c in enumerate(FALK_CATEGORIES)}
-        out["cos_with_full_mean"] = float(cos[:N_FALK].mean())
+        out["cos_with_full_mean"] = float(cos.mean())
     return out, V
 
 
@@ -115,16 +120,41 @@ def run(model: str) -> dict:
         for metric in ("norm_mean", "cos_with_full_mean", "probe5_accuracy"):
             factorial[metric] = factorial_effects({v: per_variant[v][metric] for v in VARIANTS})
 
-    return {"model": model, "variants": per_variant, "factorial": factorial}
+    replicates = {r: analyse_variant(model, r, V_full)[0]
+                  for r in REPLICATES if emb_path(model, r).exists()}
+    if "full_rep" in replicates:
+        calibrate(per_variant, replicates["full_rep"]["cos_with_full"])
+
+    return {"model": model, "variants": per_variant, "replicates": replicates,
+            "factorial": factorial}
+
+
+def calibrate(per_variant: dict, ceiling: dict[str, float]) -> None:
+    """Aggiunge a ogni variante il coseno con il full diviso per il tetto della replica.
+    Il full e' escluso: il suo coseno con se stesso vale 1 per costruzione."""
+    for v, r in per_variant.items():
+        if v == "full":
+            continue
+        rel = {c: r["cos_with_full"][c] / ceiling[c] for c in ceiling}
+        r["cos_rel"] = rel
+        r["cos_rel_mean"] = float(np.mean(list(rel.values())))
 
 
 def print_summary(res: dict) -> None:
-    print(f"\n{'variante':12} {'probe5':>7} {'||v|| media':>12} {'cos·full':>9} {'split-half':>11}")
+    calibrated = "full_rep" in res.get("replicates", {})
+    head = f"\n{'variante':12} {'probe5':>7} {'||v|| media':>12} {'cos·full':>9} {'split-half':>11}"
+    print(head + (f" {'cos/tetto':>10}" if calibrated else ""))
     rows = sorted(res["variants"].values(), key=lambda r: -r["cos_with_full_mean"])
-    for r in rows:
+    for r in [*rows, *res.get("replicates", {}).values()]:
         sh = np.mean(list(r["split_half"].values()))
-        print(f"{r['variant']:12} {r['probe5_accuracy']:7.1%} {r['norm_mean']:12.4f} "
-              f"{r['cos_with_full_mean']:9.3f} {sh:11.3f}")
+        line = (f"{r['variant']:12} {r['probe5_accuracy']:7.1%} {r['norm_mean']:12.4f} "
+                f"{r['cos_with_full_mean']:9.3f} {sh:11.3f}")
+        if calibrated and "cos_rel_mean" in r:
+            line += f" {r['cos_rel_mean']:10.3f}"
+        print(line)
+    if calibrated:
+        ceil = res["replicates"]["full_rep"]["cos_with_full"]
+        print("tetto (cos full_rep·full): " + "  ".join(f"{c} {v:.3f}" for c, v in ceil.items()))
     if res["factorial"]:
         print("\neffetti principali (con parte - senza parte):")
         for metric, eff in res["factorial"].items():
@@ -160,9 +190,13 @@ def fig_bars(res: dict, path: Path) -> None:
     a.set_title("Ablazione del prompt — separabilita' e ampiezza dello shift", fontsize=11)
 
     w = 0.8 / N_FALK
+    ceil = res.get("replicates", {}).get("full_rep", {}).get("cos_with_full")
     for i, c in enumerate(FALK_CATEGORIES):
         b.bar(x + (i - (N_FALK - 1) / 2) * w, [R[v]["cos_with_full"][LABELS[c]] for v in vs],
               w, color=COLORS[c], label=LABELS[c])
+    if ceil:
+        b.axhline(np.mean(list(ceil.values())), color="#444", ls="--", lw=1,
+                  label="tetto (replica del full)")
     b.axhline(0, color="#ccc", lw=0.8)
     b.set_ylabel("cos(v_variante, v_full)")
     b.set_ylim(-0.2, 1.05)
@@ -178,16 +212,21 @@ def fig_bars(res: dict, path: Path) -> None:
 
 def fig_cosine_heatmap(res: dict, path: Path) -> None:
     """Heatmap variante x categoria del coseno con full, su scala sequenziale ristretta al range osservato."""
-    vs = [v for v in VARIANTS if v in res["variants"]]
-    M = np.array([[res["variants"][v]["cos_with_full"][LABELS[c]] for c in FALK_CATEGORIES] for v in vs])
-    fig, ax = plt.subplots(figsize=(7.5, 6))
-    im = ax.imshow(M, cmap="YlOrRd", vmin=0.4, vmax=1.0)
+    rows = {v: res["variants"][v] for v in VARIANTS if v in res["variants"]}
+    rows |= {f"{r} (tetto)": d for r, d in res.get("replicates", {}).items()}
+    vs = list(rows)
+    M = np.array([[rows[v]["cos_with_full"][LABELS[c]] for c in FALK_CATEGORIES] for v in vs])
+    fig, ax = plt.subplots(figsize=(7.5, 6.4))
+    vmin = min(0.4, np.floor(M.min() * 10) / 10)
+    im = ax.imshow(M, cmap="YlOrRd", vmin=vmin, vmax=1.0)
     ax.set_xticks(range(N_FALK), [LABELS[c] for c in FALK_CATEGORIES], rotation=40, ha="right", fontsize=9)
     ax.set_yticks(range(len(vs)), vs, fontsize=9)
     for i in range(len(vs)):
         for j in range(N_FALK):
             ax.text(j, i, f"{M[i, j]:.2f}", ha="center", va="center", fontsize=8,
                     color="white" if M[i, j] > 0.85 else "black")
+    if len(vs) > len(VARIANTS):
+        ax.axhline(len(VARIANTS) - 0.5, color="black", lw=1.5)
     ax.set_title("Coseno fra v_variante[c] e v_full[c]", fontsize=11)
     fig.colorbar(im, shrink=0.8)
     fig.tight_layout()

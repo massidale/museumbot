@@ -11,12 +11,13 @@ def synthetic(rng, A=10, C=6, D=8, scale=1.0):
     return art + shifts + rng.normal(size=(A, C, D)) * 0.01, shifts[0]
 
 
-def test_steering_recovers_shifts_up_to_condition_mean():
+def test_steering_recovers_shifts_relative_to_flat():
     rng = np.random.default_rng(0)
     X, shifts = synthetic(rng)
     V = steering(X)
-    expected = shifts - shifts.mean(axis=0, keepdims=True)
-    assert np.allclose(V, expected, atol=0.02)
+    expected = shifts[:5] - shifts[5]  # flat e' l'ultima condizione
+    assert V.shape == (5, X.shape[2])
+    assert np.allclose(V, expected, atol=0.03)
 
 
 def test_cos_with_full_is_one_for_identical():
@@ -53,3 +54,14 @@ def test_factorial_interaction():
     # (d,n)=1 ; (d,¬n)=0 ; (¬d,n)=0 ; (¬d,¬n)=0  ->  1 - 0 - 0 + 0
     assert eff["interaction"]["def×need"] == pytest.approx(1.0)
     assert eff["main"]["def"] == pytest.approx(0.5)
+
+
+def test_calibrate_divides_by_ceiling_and_skips_full():
+    from museumbot.rq1_embeddings.ablation import calibrate
+
+    per = {"full": {"cos_with_full": {"A": 1.0, "B": 1.0}},
+           "no_def": {"cos_with_full": {"A": 0.9, "B": 0.4}}}
+    calibrate(per, {"A": 0.9, "B": 0.8})
+    assert "cos_rel" not in per["full"]
+    assert per["no_def"]["cos_rel"] == pytest.approx({"A": 1.0, "B": 0.5})
+    assert per["no_def"]["cos_rel_mean"] == pytest.approx(0.75)

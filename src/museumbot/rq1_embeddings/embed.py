@@ -9,7 +9,7 @@ resta assente per tutti, in modo uniforme.
 
 Output: data/emb_{alias}.npy + data/meta.csv per la variante `full`; per le altre varianti
 data/emb_{alias}_{variante}.npy + data/meta_{variante}.csv. Le righe flat vengono sempre
-dalla variante `full`.
+dalla variante `full`, anche per le repliche (es. `full_rep`).
 """
 
 import argparse
@@ -19,7 +19,7 @@ import numpy as np
 import pandas as pd
 
 from museumbot.common.config import ROOT, emb_path, meta_path
-from museumbot.common.prompts import VARIANTS
+from museumbot.common.prompts import REPLICATES, VARIANTS
 
 GEN = ROOT / "data" / "generations.jsonl"
 
@@ -93,7 +93,7 @@ def main() -> None:
         default="deepseek/deepseek-v4-flash",
         help="usa soltanto i testi prodotti da questo modello generativo",
     )
-    ap.add_argument("--variant", default="full", choices=list(VARIANTS))
+    ap.add_argument("--variant", default="full", choices=[*VARIANTS, *REPLICATES])
     ap.add_argument("--all-variants", action="store_true",
                     help="embedda ogni variante presente in generations.jsonl")
     ap.add_argument("--batch-size", type=int, default=8)
@@ -106,7 +106,7 @@ def main() -> None:
     all_rows = [json.loads(l) for l in GEN.open()]
     if args.all_variants:
         present = {r.get("variant", "full") for r in all_rows if r.get("model") == args.generator_model}
-        variants = [v for v in VARIANTS if v in present]
+        variants = [v for v in [*VARIANTS, *REPLICATES] if v in present]
     else:
         variants = [args.variant]
 

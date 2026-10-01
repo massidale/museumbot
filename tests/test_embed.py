@@ -30,3 +30,10 @@ def test_select_rows_rejects_duplicates():
 
 def test_select_rows_rejects_other_model():
     assert select_rows([row("Q1", "explorer", "full", model="other")], "m", "full") == []
+
+
+def test_select_rows_replicate_borrows_flat_from_full():
+    rows = [row("Q1", "flat", "full"), row("Q1", "explorer", "full"),
+            row("Q1", "explorer", "full_rep")]
+    out = select_rows(rows, "m", "full_rep")
+    assert {(r["condition"], r["variant"]) for r in out} == {("flat", "full"), ("explorer", "full_rep")}

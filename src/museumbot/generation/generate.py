@@ -6,19 +6,27 @@ una seconda generazione.
 
 Guardie di spesa: un tetto in dollari controllato dopo ogni chiamata, e il costo cumulato
 stampato durante il run.
+
+Provider: OpenRouter distribuisce lo stesso modello su molti provider, con quantizzazioni
+diverse (fp4, fp8, non dichiarata). Senza vincoli ogni chiamata puo' finire su un provider
+diverso, e il corpus diventa una miscela non tracciata. `--provider` fissa un provider
+senza fallback; il provider effettivo di ogni risposta viene comunque salvato nella riga.
+Il corpus principale (settembre 2026) e' stato generato prima di questa opzione, con
+routing libero.
 """
 
 import argparse
 import json
 import re
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import requests
 
 from museumbot.common.config import ROOT, openrouter_key
-from museumbot.common.prompts import CONDITIONS, VARIANTS, build_messages
+from museumbot.common.prompts import CONDITIONS, REPLICATES, VARIANTS, build_messages, prompt_variant
 
 ARTWORKS = ROOT / "data" / "artworks.jsonl"
 OUT = ROOT / "data" / "generations.jsonl"
@@ -53,24 +61,44 @@ class Budget:
                 raise RuntimeError(f"tetto di spesa superato: ${self.spent:.4f}")
 
 
+def provider_routing(spec: str | None) -> dict | None:
+    """`deepinfra/fp8` -> routing OpenRouter vincolato a quel provider e quantizzazione."""
+    if not spec:
+        return None
+    name, _, quant = spec.partition("/")
+    routing = {"only": [name], "allow_fallbacks": False}
+    if quant:
+        routing["quantizations"] = [quant]
+    return routing
+
+
 def generate_one(
-    session: requests.Session, model: str, msgs: list[dict], budget: Budget, temp: float
+    session: requests.Session, model: str, msgs: list[dict], budget: Budget, temp: float,
+    provider: dict | None = None, banned: re.Pattern | None = BANNED,
+    reasoning: bool | None = None, clean=None,
 ) -> tuple[str, dict]:
-    """Genera un testo, rigenerando se viola il vincolo di stile o torna vuoto."""
+    """Genera un testo, rigenerando se viola il vincolo di stile o torna vuoto.
+    `banned=None` disattiva il filtro (turni della chain che nominano le categorie).
+    `reasoning` imposta esplicitamente il ragionamento (None = default del provider).
+    `clean` e' applicata prima del filtro; se cambia il testo, l'originale va in `raw`."""
+    body = {
+        "model": model,
+        "messages": msgs,
+        "temperature": temp,
+        "max_tokens": 2000,
+        "usage": {"include": True},
+    }
+    if provider:
+        body["provider"] = provider
+    if reasoning is not None:
+        body["reasoning"] = {"enabled": reasoning}
+    reason = None
     for attempt in range(4):
         budget.check()
-        r = session.post(
-            API,
-            json={
-                "model": model,
-                "messages": msgs,
-                "temperature": temp,
-                "max_tokens": 2000,
-                "usage": {"include": True},
-            },
-            timeout=300,
-        )
+        r = session.post(API, json=body, timeout=300)
         if r.status_code in (429, 500, 502, 503, 529):
+            reason = f"http {r.status_code}"
+            time.sleep(2 ** attempt)
             continue
         r.raise_for_status()
         d = r.json()
@@ -80,15 +108,21 @@ def generate_one(
         budget.add(float(usage.get("cost") or 0.0))
         # Il prompt richiede gia' soltanto il testo parlato. Evitiamo euristiche su
         # preamboli o heading: potrebbero modificare un incipit perfettamente valido.
-        text = (d["choices"][0]["message"].get("content") or "").strip()
-        if text and not BANNED.search(text):
-            return text, {
+        raw = (d["choices"][0]["message"].get("content") or "").strip()
+        text = clean(raw) if clean else raw
+        hit = banned.search(text) if banned and text else None
+        reason = f"riferimento esplicito: {hit.group(0)!r}" if hit else (None if text else "vuoto")
+        if text and not hit:
+            extra = {"raw": raw} if text != raw else {}
+            return text, extra | {
+                "provider": d.get("provider"),
                 "prompt_tokens": usage.get("prompt_tokens"),
                 "completion_tokens": usage.get("completion_tokens"),
+                "reasoning_tokens": (usage.get("completion_tokens_details") or {}).get("reasoning_tokens"),
                 "cost": usage.get("cost"),
                 "attempts": attempt + 1,
             }
-    raise RuntimeError("nessun testo valido dopo 4 tentativi")
+    raise RuntimeError(f"nessun testo valido dopo 4 tentativi (ultimo: {reason})")
 
 
 def read_done(path: Path) -> set[tuple[str, str, str, str]]:
@@ -123,11 +157,13 @@ def main() -> None:
     ap.add_argument("--limit", type=int, help="usa solo le prime N opere (smoke test)")
     ap.add_argument("--cap", type=float, default=1.00, help="tetto di spesa in dollari")
     ap.add_argument("--workers", type=int, default=6)
-    ap.add_argument("--variant", default="full", choices=list(VARIANTS),
-                    help="variante del blocco di categoria (ablazione)")
+    ap.add_argument("--variant", default="full", choices=[*VARIANTS, *REPLICATES],
+                    help="variante del blocco di categoria (ablazione) o replica")
     ap.add_argument("--all-variants", action="store_true",
                     help="genera tutte le varianti diverse da full in un solo run")
+    ap.add_argument("--provider", help="provider fisso senza fallback, es. deepinfra/fp8")
     args = ap.parse_args()
+    routing = provider_routing(args.provider)
 
     artworks = [json.loads(l) for l in ARTWORKS.open()]
     if args.limit:
@@ -151,8 +187,9 @@ def main() -> None:
 
     def work(job):
         art, cond, variant = job
-        msgs = build_messages(cond, art["title"], art["artist"], art["source_text"], variant)
-        text, usage = generate_one(session, args.model, msgs, budget, args.temperature)
+        msgs = build_messages(cond, art["title"], art["artist"], art["source_text"],
+                              prompt_variant(variant))
+        text, usage = generate_one(session, args.model, msgs, budget, args.temperature, routing)
         row = {
             "artwork_id": art["id"],
             "title": art["title"],

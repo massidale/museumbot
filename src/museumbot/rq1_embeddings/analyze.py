@@ -2,16 +2,25 @@
 
 Il passaggio critico e' il CENTERING PER OPERA. In uno spazio di embedding la varianza
 dominante e' *quale opera* si sta descrivendo, non *per chi*: senza centering qualsiasi
-PCA/t-SNE mostra 100 cluster-opera e zero struttura di categoria.
+PCA/t-SNE mostra 100 cluster-opera e zero struttura di categoria. Si usano due riferimenti:
 
-    e'[a,c] = e[a,c] - mean_over_c( e[a,.] )    rimuove l'identita' dell'opera
-    v[c]    = mean_over_a( e'[a,c] )            steering vector della categoria c
+    media:  e'[a,c] = e[a,c] - mean_over_c( e[a,.] )    tutte le condizioni trattate allo stesso modo
+    flat:   e'[a,c] = e[a,c] - e[a,flat]                 effetto della categoria rispetto al neutro
+    v[c]    = mean_over_a( e'[a,c] )                     steering vector della categoria c
+
+Il riferimento flat da' agli steering vector il significato che interessa ("quanto e in che
+direzione la categoria sposta il testo rispetto alla descrizione neutra") ed e' identico in
+tutte le varianti dell'ablazione. Con la media, invece, i 6 v[c] sommano a zero per
+costruzione e i coseni fra categorie sono spinti verso -1/(C-1): un artefatto, non
+un'opposizione. La media resta per le procedure per singola opera basate sulle etichette
+(probe, permutazione, varianza), dove sottrarre un solo testo flat aggiungerebbe il suo rumore.
 
 Metriche, in ordine di forza probatoria:
-  1. probe lineare cross-validata, raggruppata per opera  -> lo shift e' preciso?
-  2. consistenza split-half della direzione v[c]           -> e' una proprieta' della categoria?
-  3. geometria fra i v[c] (coseni, norme)                  -> quali categorie collassano?
-  4. test di permutazione entro opera                      -> p-value
+  1. probe lineare cross-validata, raggruppata per opera  -> lo shift e' preciso?     [media]
+  2. consistenza split-half della direzione v[c]           -> proprieta' della categoria? [flat]
+  3. distanza cross-validata fra condizioni                -> quali categorie sono vicine?
+     (indipendente dal riferimento), coseni e norme dei v[c] -> direzione degli effetti [flat]
+  4. test di permutazione entro opera                      -> p-value              [media]
   5. ablazione lessicale                                   -> registro o solo vocabolario?
 """
 
@@ -34,12 +43,14 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.model_selection import GroupKFold
 
 from museumbot.common.config import ROOT, emb_path, meta_path
-from museumbot.common.prompts import CONDITIONS, LABELS
+from museumbot.common.prompts import CONDITIONS, FALK_CATEGORIES, LABELS
 
 FIGS = ROOT / "figures"
 RESULTS = ROOT / "results"
 
 RNG = np.random.default_rng(0)
+FLAT = CONDITIONS.index("flat")
+FALK_IDX = [CONDITIONS.index(c) for c in FALK_CATEGORIES]
 COLORS = {
     "explorer": "#E8743B",
     "facilitator": "#19A979",
@@ -74,6 +85,22 @@ def load(model: str, variant: str = "full"):
     return X, [a for a, k in zip(arts, ok) if k], meta
 
 
+def center(X, ref="mean"):
+    """Centering per opera. `mean`: sottrae la media delle condizioni dell'opera.
+    `flat`: sottrae il testo flat dell'opera (la riga flat diventa zero)."""
+    if ref == "mean":
+        return X - X.mean(axis=1, keepdims=True)
+    if ref == "flat":
+        return X - X[:, FLAT : FLAT + 1, :]
+    raise ValueError(f"riferimento sconosciuto: {ref!r}")
+
+
+def steering(X):
+    """(A, C, D) -> (5, D): steering vector delle categorie rispetto al flat, nell'ordine
+    di FALK_CATEGORIES. Il flat e' l'origine e non ha un vettore proprio."""
+    return center(X, "flat")[:, FALK_IDX].mean(axis=0)
+
+
 def flatten(X):
     """(A, C, D) -> matrice (A*C, D), etichette di condizione, gruppi di opera."""
     A, C, D = X.shape
@@ -97,25 +124,61 @@ def probe(Xc, n_splits=5):
 # --------------------------------------------------- 2. consistenza della direzione
 
 
-def split_half(X, n_rep=200):
-    """Coseno fra v[c] stimato su due meta' disgiunte di opere, mediato su n_rep split."""
-    A, C, _ = X.shape
-    out = np.zeros((n_rep, C))
-    for i in range(n_rep):
+def halves(A, n_rep):
+    """n_rep coppie di meta' disgiunte e casuali degli indici di opera."""
+    for _ in range(n_rep):
         p = RNG.permutation(A)
-        h1, h2 = p[: A // 2], p[A // 2 :]
+        yield p[: A // 2], p[A // 2 :]
+
+
+def split_half(X, ref="flat", n_rep=200):
+    """Coseno fra v[c] stimato su due meta' disgiunte di opere, mediato su n_rep split.
+
+    ref="flat": 5 valori (nell'ordine di FALK_CATEGORIES), affidabilita' degli steering
+    vector riportati. ref="mean": 6 valori (tutte le CONDITIONS), include la stabilita' del
+    flat; e' piu' alta perche' la media di 6 testi e' un riferimento meno rumoroso di uno solo.
+    """
+    out = []
+    for h1, h2 in halves(len(X), n_rep):
         # ogni meta' viene centrata per opera in modo indipendente
-        for j, half in enumerate((h1, h2)):
-            Xi = X[half] - X[half].mean(axis=1, keepdims=True)
-            v = Xi.mean(axis=0)
-            if j == 0:
-                v1 = v
-            else:
-                v2 = v
-        out[i] = np.sum(v1 * v2, axis=1) / (
+        if ref == "flat":
+            v1, v2 = steering(X[h1]), steering(X[h2])
+        else:
+            v1, v2 = center(X[h1], ref).mean(axis=0), center(X[h2], ref).mean(axis=0)
+        out.append(np.sum(v1 * v2, axis=1) / (
             np.linalg.norm(v1, axis=1) * np.linalg.norm(v2, axis=1) + 1e-12
-        )
+        ))
+    out = np.array(out)
     return out.mean(axis=0), out.std(axis=0)
+
+
+# ------------------------------------------------ 3. distanza cross-validata e geometria
+
+
+def crossval_distance(X, n_rep=200):
+    """Distanza euclidea quadrata cross-validata fra condizioni: (C, C) media e std.
+
+        d2[a,b] = (v1[a] - v1[b]) . (v2[a] - v2[b])     v1, v2 da meta' disgiunte di opere
+
+    E' la crossnobis senza normalizzazione per la covarianza del rumore. Imparziale: vale
+    ~0 (anche leggermente negativa) se due condizioni non differiscono, mentre la distanza
+    semplice e' sempre gonfiata dal rumore. Usa solo differenze fra condizioni, quindi non
+    dipende dal riferimento del centering.
+    """
+    out = []
+    for h1, h2 in halves(len(X), n_rep):
+        # media per condizione senza centering: l'effetto-opera si cancella nelle differenze
+        v1, v2 = X[h1].mean(axis=0), X[h2].mean(axis=0)
+        d1 = v1[:, None] - v1[None]
+        d2 = v2[:, None] - v2[None]
+        out.append(np.sum(d1 * d2, axis=-1))
+    out = np.array(out)
+    return out.mean(axis=0), out.std(axis=0)
+
+
+def cosine_matrix(V):
+    Vn = V / (np.linalg.norm(V, axis=1, keepdims=True) + 1e-12)
+    return Vn @ Vn.T
 
 
 # ------------------------------------------------------------ 4. test di permutazione
@@ -196,20 +259,23 @@ def fig_lda(Xc, arts, path):
 def fig_pca(Xc, path):
     F, y, _ = flatten(Xc)
     Z = PCA(n_components=2).fit_transform(F)
+    mu = {c: Z[y == ci].mean(axis=0) for ci, c in enumerate(CONDITIONS)}
     fig, ax = plt.subplots(figsize=(7.5, 6.5))
     for ci, c in enumerate(CONDITIONS):
         m = y == ci
         ax.scatter(Z[m, 0], Z[m, 1], s=22, alpha=0.5, c=COLORS[c], label=LABELS[c],
                    edgecolors="none")
-        mu = Z[m].mean(axis=0)
-        ax.annotate("", xy=mu, xytext=(0, 0),
-                    arrowprops=dict(arrowstyle="->", color=COLORS[c], lw=2.2))
+        if c != "flat":
+            ax.annotate("", xy=mu[c], xytext=mu["flat"],
+                        arrowprops=dict(arrowstyle="->", color=COLORS[c], lw=2.2))
+    ax.scatter(*mu["flat"], s=140, marker="o", c=COLORS["flat"], edgecolors="white",
+               linewidths=1.5, zorder=5)
     ax.axhline(0, color="#ccc", lw=0.8, zorder=0)
     ax.axvline(0, color="#ccc", lw=0.8, zorder=0)
     ax.set_xlabel("PC1")
     ax.set_ylabel("PC2")
     ax.set_title("PCA sui dati centrati per opera\n"
-                 "le frecce sono i vettori di steering v[c]", fontsize=11)
+                 "le frecce sono i vettori di steering v[c], dal centroide del flat", fontsize=11)
     ax.legend(frameon=False, fontsize=9)
     ax.spines[["top", "right"]].set_visible(False)
     fig.tight_layout()
@@ -239,14 +305,37 @@ def fig_tsne(Xc, path):
 def fig_cosine(M, path):
     fig, ax = plt.subplots(figsize=(7.2, 6))
     im = ax.imshow(M, cmap="RdBu_r", vmin=-1, vmax=1)
-    labs = [LABELS[c] for c in CONDITIONS]
+    labs = [LABELS[c] for c in FALK_CATEGORIES]
     ax.set_xticks(range(len(labs)), labs, rotation=40, ha="right", fontsize=9)
     ax.set_yticks(range(len(labs)), labs, fontsize=9)
     for i in range(len(labs)):
         for j in range(len(labs)):
             ax.text(j, i, f"{M[i, j]:.2f}", ha="center", va="center", fontsize=8,
                     color="white" if abs(M[i, j]) > 0.55 else "black")
-    ax.set_title("Coseno fra i vettori di steering v[c]", fontsize=11)
+    ax.set_title("Coseno fra gli steering vector v[c] (riferimento: flat)", fontsize=11)
+    fig.colorbar(im, shrink=0.8)
+    fig.tight_layout()
+    fig.savefig(path, dpi=160)
+    plt.close(fig)
+
+
+def fig_distance(d2, path):
+    """Heatmap della distanza quadrata cross-validata (valori x100 per leggibilita')."""
+    d2 = d2 * 100
+    fig, ax = plt.subplots(figsize=(7.2, 6))
+    im = ax.imshow(d2, cmap="viridis", vmin=0)
+    labs = [LABELS[c] for c in CONDITIONS]
+    ax.set_xticks(range(len(labs)), labs, rotation=40, ha="right", fontsize=9)
+    ax.set_yticks(range(len(labs)), labs, fontsize=9)
+    hi = d2.max()
+    for i in range(len(labs)):
+        for j in range(len(labs)):
+            if i == j:
+                continue
+            ax.text(j, i, f"{d2[i, j]:.1f}", ha="center", va="center", fontsize=8,
+                    color="black" if d2[i, j] > 0.6 * hi else "white")
+    ax.set_title("Distanza quadrata cross-validata fra condizioni (x100)\n"
+                 "split-half, indipendente dal riferimento; ~0 = indistinguibili", fontsize=11)
     fig.colorbar(im, shrink=0.8)
     fig.tight_layout()
     fig.savefig(path, dpi=160)
@@ -292,15 +381,16 @@ def main() -> None:
     A, C, D = X.shape
     print(f"\n{A} opere x {C} condizioni x {D} dim  [{args.model}]")
 
-    Xc = X - X.mean(axis=1, keepdims=True)  # centering per opera
-    V = Xc.mean(axis=0)                     # steering vectors
+    Xc = center(X, "mean")  # per probe, permutazione, varianza e figure di proiezione
+    Vm = Xc.mean(axis=0)    # (C, D) scostamenti dal baricentro dell'opera
+    V = steering(X)         # (5, D) steering vector rispetto al flat
 
     out = {"model": args.model, "n_artworks": A, "n_conditions": C, "dim": D}
 
     # --- varianza: quanto pesa l'opera rispetto alla categoria ---
     var_total = X.reshape(A * C, D).var(axis=0).sum()
     var_art = X.mean(axis=1).var(axis=0).sum()
-    var_cond = V.var(axis=0).sum()
+    var_cond = Vm.var(axis=0).sum()
     out["variance"] = {
         "artwork_share": float(var_art / var_total),
         "condition_share": float(var_cond / var_total),
@@ -320,37 +410,58 @@ def main() -> None:
     out["probe"]["per_class_recall"] = per
 
     # --- 2. consistenza split-half ---
-    mu, sd = split_half(X)
+    mu, sd = split_half(X, "flat")
     out["split_half_cosine"] = {
-        LABELS[c]: {"mean": float(mu[i]), "std": float(sd[i])} for i, c in enumerate(CONDITIONS)
+        LABELS[c]: {"mean": float(mu[i]), "std": float(sd[i])} for i, c in enumerate(FALK_CATEGORIES)
     }
-    print("\n[2] consistenza split-half della direzione v[c]:")
+    mu_m, sd_m = split_half(X, "mean")
+    out["split_half_cosine_mean_ref"] = {
+        LABELS[c]: {"mean": float(mu_m[i]), "std": float(sd_m[i])} for i, c in enumerate(CONDITIONS)
+    }
+    print("\n[2] consistenza split-half della direzione v[c]   (rif. flat | rif. media):")
+    sh = dict(zip(FALK_CATEGORIES, zip(mu, sd)))
     for i, c in enumerate(CONDITIONS):
-        print(f"      {LABELS[c]:24} {mu[i]:.3f} +/- {sd[i]:.3f}")
+        f = f"{sh[c][0]:.3f} +/- {sh[c][1]:.3f}" if c in sh else "-".center(14)
+        print(f"      {LABELS[c]:24} {f}  |  {mu_m[i]:.3f} +/- {sd_m[i]:.3f}")
 
-    # --- 3. geometria ---
-    Vn = V / (np.linalg.norm(V, axis=1, keepdims=True) + 1e-12)
-    M = Vn @ Vn.T
-    out["cosine_matrix"] = {
-        LABELS[a]: {LABELS[b]: float(M[i, j]) for j, b in enumerate(CONDITIONS)}
+    # --- 3. distanza cross-validata e geometria ---
+    d2, d2_sd = crossval_distance(X)
+    out["crossval_distance"] = {
+        LABELS[a]: {LABELS[b]: {"mean": float(d2[i, j]), "std": float(d2_sd[i, j])}
+                    for j, b in enumerate(CONDITIONS)}
         for i, a in enumerate(CONDITIONS)
     }
-    out["steering_norms"] = {
-        LABELS[c]: float(np.linalg.norm(V[i])) for i, c in enumerate(CONDITIONS)
+    pairs = sorted((d2[i, j], CONDITIONS[i], CONDITIONS[j])
+                   for i in range(C) for j in range(i + 1, C))
+    print("\n[3] distanza quadrata cross-validata — coppie piu' vicine:")
+    for v, a, b in pairs[:3]:
+        print(f"      {LABELS[a]:24} ~ {LABELS[b]:24} {v:.4f}")
+    print("    piu' lontane:")
+    for v, a, b in pairs[-2:]:
+        print(f"      {LABELS[a]:24} ~ {LABELS[b]:24} {v:.4f}")
+
+    M = cosine_matrix(V)
+    out["cosine_matrix"] = {
+        LABELS[a]: {LABELS[b]: float(M[i, j]) for j, b in enumerate(FALK_CATEGORIES)}
+        for i, a in enumerate(FALK_CATEGORIES)
     }
-    print("\n[3] coppie piu' collineari (categorie che rischiano di collassare):")
-    pairs = sorted(
-        ((M[i, j], CONDITIONS[i], CONDITIONS[j]) for i in range(C) for j in range(i + 1, C)),
+    out["steering_norms"] = {
+        LABELS[c]: float(np.linalg.norm(V[i])) for i, c in enumerate(FALK_CATEGORIES)
+    }
+    K = len(FALK_CATEGORIES)
+    cpairs = sorted(
+        ((M[i, j], FALK_CATEGORIES[i], FALK_CATEGORIES[j]) for i in range(K) for j in range(i + 1, K)),
         reverse=True,
     )
-    for v, a, b in pairs[:3]:
+    print("    coseno fra steering vector (rif. flat) — stessa direzione:")
+    for v, a, b in cpairs[:3]:
         print(f"      {LABELS[a]:24} ~ {LABELS[b]:24} {v:+.3f}")
-    print("    piu' opposte:")
-    for v, a, b in pairs[-2:]:
+    print("    direzioni piu' opposte:")
+    for v, a, b in cpairs[-2:]:
         print(f"      {LABELS[a]:24} ~ {LABELS[b]:24} {v:+.3f}")
 
-    # --- 4. permutazione ---
-    observed = np.linalg.norm(V, axis=1).mean()
+    # --- 4. permutazione (sugli scostamenti dalla media: tutte le condizioni scambiabili) ---
+    observed = np.linalg.norm(Vm, axis=1).mean()
     p, null = permutation_test(Xc, observed)
     out["permutation"] = {
         "observed_mean_norm": float(observed),
@@ -372,6 +483,7 @@ def main() -> None:
     fig_lda(Xc, arts, FIGS / f"lda_{tag}.png")
     fig_pca(Xc, FIGS / f"pca_{tag}.png")
     fig_cosine(M, FIGS / f"cosine_{tag}.png")
+    fig_distance(d2, FIGS / f"distance_{tag}.png")
     fig_confusion(cm, acc, FIGS / f"confusion_{tag}.png")
     fig_tsne(Xc, FIGS / f"tsne_{tag}.png")
     print(f"\nfigure -> {FIGS.relative_to(ROOT)}/*_{tag}.png")

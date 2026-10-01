@@ -18,8 +18,8 @@ import json
 import numpy as np
 import pandas as pd
 
-from config import ROOT, emb_path, meta_path
-from prompts import VARIANTS
+from museumbot.common.config import ROOT, emb_path, meta_path
+from museumbot.common.prompts import VARIANTS
 
 GEN = ROOT / "data" / "generations.jsonl"
 

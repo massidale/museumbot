@@ -11,11 +11,11 @@ import argparse
 import json
 import re
 import time
-from pathlib import Path
 
 import requests
 
-ROOT = Path(__file__).resolve().parent.parent
+from museumbot.common.config import ROOT
+
 OUT = ROOT / "data" / "artworks.jsonl"
 
 UA = "museumbot-research/0.1 (https://github.com/, massidale)"

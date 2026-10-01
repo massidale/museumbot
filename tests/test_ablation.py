@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from ablation import cos_with_full, factorial_effects, steering
+from museumbot.rq1_embeddings.ablation import cos_with_full, factorial_effects, steering
 
 
 def synthetic(rng, A=10, C=6, D=8, scale=1.0):

@@ -16,14 +16,12 @@ paper, dove i Prompt 3-7 seguono un'unica coppia di turni introduttivi.
 
 import argparse
 import json
-from pathlib import Path
 
 import requests
 
-from config import openrouter_key
-from prompts import USER_TEMPLATE, build_messages
+from museumbot.common.config import ROOT, openrouter_key
+from museumbot.common.prompts import USER_TEMPLATE, build_messages
 
-ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "results" / "chain_vs_single.json"
 API = "https://openrouter.ai/api/v1/chat/completions"
 

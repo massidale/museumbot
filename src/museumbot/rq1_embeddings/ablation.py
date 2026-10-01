@@ -20,11 +20,10 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-from analyze import COLORS, load, probe, split_half
-from config import emb_path
-from prompts import CONDITIONS, FALK_CATEGORIES, LABELS, PARTS, VARIANTS
+from museumbot.rq1_embeddings.analyze import COLORS, load, probe, split_half
+from museumbot.common.config import ROOT, emb_path
+from museumbot.common.prompts import CONDITIONS, FALK_CATEGORIES, LABELS, PARTS, VARIANTS
 
-ROOT = Path(__file__).resolve().parent.parent
 RESULTS = ROOT / "results"
 FIGS = ROOT / "figures"
 

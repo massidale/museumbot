@@ -185,7 +185,7 @@ def build_messages(
 
 
 if __name__ == "__main__":
-    # Ispezione a occhio dei 6 prompt: `python src/prompts.py`
+    # Ispezione a occhio dei 6 prompt: `python -m museumbot.common.prompts`
     for cond in CONDITIONS:
         print("=" * 78)
         print(f"### {LABELS[cond]}  ({cond})")

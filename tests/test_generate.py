@@ -1,6 +1,6 @@
 import json
 
-from generate import plan_jobs, read_done
+from museumbot.generation.generate import plan_jobs, read_done
 
 
 def test_read_done_defaults_missing_variant_to_full(tmp_path):

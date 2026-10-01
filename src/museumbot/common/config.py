@@ -6,7 +6,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[3]  # src/museumbot/common/config.py -> root
 
 # Le variabili gia' presenti nell'ambiente hanno precedenza sul file locale.
 load_dotenv(ROOT / ".env", override=False)

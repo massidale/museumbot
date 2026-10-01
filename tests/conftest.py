@@ -1,4 +1,4 @@
-"""Mette src/ sul path: gli script importano i moduli fratelli per nome semplice."""
+"""Mette src/ sul path, cosi' `import museumbot` funziona anche senza installazione editable."""
 
 import sys
 from pathlib import Path

@@ -19,7 +19,6 @@ import argparse
 import json
 import re
 from collections import Counter
-from pathlib import Path
 
 import matplotlib
 
@@ -34,10 +33,9 @@ from sklearn.manifold import TSNE
 from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.model_selection import GroupKFold
 
-from config import emb_path, meta_path
-from prompts import CONDITIONS, LABELS
+from museumbot.common.config import ROOT, emb_path, meta_path
+from museumbot.common.prompts import CONDITIONS, LABELS
 
-ROOT = Path(__file__).resolve().parent.parent
 FIGS = ROOT / "figures"
 RESULTS = ROOT / "results"
 

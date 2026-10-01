@@ -1,4 +1,4 @@
-from config import ROOT, emb_path, meta_path
+from museumbot.common.config import ROOT, emb_path, meta_path
 
 
 def test_full_paths_are_legacy_names():

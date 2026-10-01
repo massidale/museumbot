@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from prompts import CONDITIONS, build_system
+from museumbot.common.prompts import CONDITIONS, build_system
 
 SNAP = json.loads((Path(__file__).parent / "snapshots" / "system_full.json").read_text())
 
@@ -14,7 +14,7 @@ def test_full_matches_snapshot(cond):
     assert build_system(cond) == SNAP[cond]
 
 
-from prompts import CATEGORY_PARTS, FALK_CATEGORIES, VARIANTS, build_block
+from museumbot.common.prompts import CATEGORY_PARTS, FALK_CATEGORIES, VARIANTS, build_block
 
 
 def test_variants_table():
@@ -30,7 +30,7 @@ def test_variants_table():
 
 @pytest.mark.parametrize("cat", FALK_CATEGORIES)
 def test_full_block_equals_legacy_block(cat):
-    from prompts import CATEGORY_BLOCKS
+    from museumbot.common.prompts import CATEGORY_BLOCKS
     assert build_block(cat, "full") == CATEGORY_BLOCKS[cat]
 
 

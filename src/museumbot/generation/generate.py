@@ -17,10 +17,9 @@ from pathlib import Path
 
 import requests
 
-from config import openrouter_key
-from prompts import CONDITIONS, VARIANTS, build_messages
+from museumbot.common.config import ROOT, openrouter_key
+from museumbot.common.prompts import CONDITIONS, VARIANTS, build_messages
 
-ROOT = Path(__file__).resolve().parent.parent
 ARTWORKS = ROOT / "data" / "artworks.jsonl"
 OUT = ROOT / "data" / "generations.jsonl"
 API = "https://openrouter.ai/api/v1/chat/completions"

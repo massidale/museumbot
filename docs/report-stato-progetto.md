@@ -18,13 +18,13 @@ dall'opera) ma è nitido, e le cinque categorie non collassano fra loro.
 
 ## 1. Pipeline
 
-| passo | script | output |
+| passo | modulo (in `src/museumbot/`) | output |
 |---|---|---|
-| corpus | `src/fetch_artworks.py` | `data/artworks.jsonl` — 100 dipinti da Wikidata (15 grandi musei, filtro sui sitelink), con l'intro della voce Wikipedia inglese troncata su confine di frase (67–207 parole, mediana 135) |
-| prompt | `src/prompts.py` | 6 condizioni: 5 categorie Falk + `flat` (nessun blocco categoria) |
-| generazione | `src/generate.py` | `data/generations.jsonl` — 600 testi, DeepSeek V4 Flash via OpenRouter, T = 0.7, costo totale 0.09 $ |
-| embedding | `src/embed.py` | `data/emb_qwen.npy` (Qwen3-Embedding-0.6B) e `data/emb_bge-m3.npy` (BGE-M3), locali, L2-normalizzati |
-| analisi | `src/analyze.py` | `results/metrics_{qwen,bge-m3}.json` + figure |
+| corpus | `corpus/fetch_artworks.py` | `data/artworks.jsonl` — 100 dipinti da Wikidata (15 grandi musei, filtro sui sitelink), con l'intro della voce Wikipedia inglese troncata su confine di frase (67–207 parole, mediana 135) |
+| prompt | `common/prompts.py` | 6 condizioni: 5 categorie Falk + `flat` (nessun blocco categoria) |
+| generazione | `generation/generate.py` | `data/generations.jsonl` — 600 testi, DeepSeek V4 Flash via OpenRouter, T = 0.7, costo totale 0.09 $ |
+| embedding | `rq1_embeddings/embed.py` | `data/emb_qwen.npy` (Qwen3-Embedding-0.6B) e `data/emb_bge-m3.npy` (BGE-M3), locali, L2-normalizzati |
+| analisi | `rq1_embeddings/analyze.py` | `results/metrics_{qwen,bge-m3}.json` + figure |
 
 Il corpus è sbilanciato sui musei (Orsay 27, Prado 26, NGA 14, Met 13, resto < 10): non è
 un problema per l'analisi, che centra per opera, ma va detto se si riporta il dataset.
@@ -46,7 +46,7 @@ decoding sono identici. Il prompt vieta riferimenti espliciti alla categoria ("F
 
 ### 1.2 Chain vs prompt singolo (analisi preliminare)
 
-`src/compare_chain.py` confronta chain e singolo su 3 opere × 3 categorie, con V4 Flash e V4
+`generation/compare_chain.py` confronta chain e singolo su 3 opere × 3 categorie, con V4 Flash e V4
 Pro, passando la stessa fonte a entrambi i metodi. Al momento il confronto si limita al
 numero di parole (chain 250–318, singolo 238–285) e a una lettura qualitativa: i testi sono
 equivalenti nel registro. Non c'è ancora una misura di equivalenza semantica; è un punto

@@ -1,6 +1,6 @@
 import pytest
 
-from embed import select_rows
+from museumbot.rq1_embeddings.embed import select_rows
 
 
 def row(a, c, v, model="m"):

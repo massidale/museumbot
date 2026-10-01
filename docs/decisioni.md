@@ -202,3 +202,89 @@ setup un po' diverso (un solo provider, testi puliti), quindi è usato come limi
 nuovo tetto.
 **Effetto.** Con Qwen3 i due tetti quasi coincidono e `no_def`/`no_need` restano a 1.00.
 Con BGE-M3 e il tetto severo scendono a 0.97–0.98.
+
+---
+
+## 2026-10-02 — Corpus principale di RQ1 su provider fisso
+
+**Decisione.** L'analisi principale di RQ1 (§3 del report) usa i testi a prompt singolo
+dello studio chain: `single_a` come `full`, `single_b` come replica `full_rep`, più il flat
+della stessa sessione (`common/corpus.py`, corpus `main`). Il corpus di settembre resta solo
+per l'ablazione (corpus `ablation`). Gli embedding stanno ora in `data/emb/<corpus>/`; il
+tetto severo dell'ablazione viene dalla sezione `ceiling` di `results/metrics_*.json`.
+**Motivo.** Il corpus di settembre è una miscela non tracciata di provider; lo studio chain
+ha già, su DeepInfra fp8 e nella stessa sessione, due run del prompt singolo e il flat: è
+un corpus completo con la replica per il tetto, senza nuove generazioni.
+**Effetto.** Nessuna conclusione cambia. Qwen3: probe da 94.7% a 95.3%, varianza
+opera/categoria da 70.0%/7.4% a 73.3%/6.5%, split-half sempre 0.85–0.94. BGE-M3: probe
+90.3% in entrambi i casi; split-half di Facilitator da 0.59 a 0.65.
+
+## 2026-10-02 — Pulizia unica dei testi e regola del preambolo corretta
+
+**Decisione.** `clean_guide` passa da `chain_study.py` a `common/clean.py` ed è applicata a
+tutti i corpus, sempre dal testo originale; `generate.py` la applica anche alle nuove
+generazioni. Il preambolo si toglie solo se la prima frase nomina il testo stesso
+("audio guide", "script", "text", "N words"…), se la riga finisce con `:` o se è seguita
+da `---`. Riconosce anche l'apostrofo tipografico ("Here’s") e toglie i corsivi lasciati
+aperti.
+**Motivo.** La regola precedente toglieva qualunque prima riga iniziasse con "Here is":
+nel corpus di settembre 4 testi aprono la descrizione così ("Here is a painting that
+rewards a second look. …") e avrebbero perso l'intero primo paragrafo. In più non
+riconosceva "Here’s your audio guide:" e lasciava asterischi di corsivi non chiusi. Il
+corpus di settembre non era pulito affatto.
+**Effetto.** Corpus di settembre: 35 preamboli tolti, markdown tolto da 3 382 testi su
+4 600. Corpus principale: 5 preamboli, markdown da 847 testi su 1 100. Chain: 498
+preamboli su 500. Studio chain vs singolo: R invariato (1.43 / 1.45); deriva di routing da
+1.19 a 1.16 (Qwen3) e da 1.17 a 1.16 (BGE-M3), anche per l'esclusione sotto.
+
+## 2026-10-02 — Ablazione senza le 10 opere con testi troncati
+
+**Decisione.** Le opere con almeno un testo che, dopo la pulizia, non finisce con
+punteggiatura di chiusura sono escluse per intero dal corpus di ablazione: 10 opere, ne
+restano 90. Regola in `common.clean.is_truncated`, applicata da `load_corpus`.
+**Motivo.** 10 testi del corpus di settembre si interrompono a metà frase (8 hanno
+esaurito i 2 000 token di output, ragionamento compreso; 2 si fermano prima). Cadono in 10
+opere diverse: escludere solo le celle avrebbe obbligato le metriche a gestire opere
+incomplete (centering sulla media, permutazione entro opera); escludere le opere tiene
+appaiati i confronti fra varianti. Rigenerarli avrebbe mescolato un'altra sessione e un
+altro provider nel corpus. Nel corpus principale la regola non trova testi troncati.
+Decisa prima di vedere i risultati.
+**Effetto.** Nessuna conclusione dell'ablazione cambia. Qwen3: `no_def` e `no_need` a 1.00
+del tetto indulgente e 0.99 di quello severo; effetto principale dello stile sul coseno
++0.197 (prima +0.182); `name_only` conserva 0.70 del coseno (prima 0.73).
+
+## 2026-10-02 — RQ2: giudice GLM-5.3 su Ollama Cloud, persona con definizione
+
+**Decisione.** RQ2 usa un solo giudice, GLM-5.3 su Ollama Cloud (FP8), in confronto a coppie
+con scelta forzata. La persona è nome della categoria più definizione di Falk, senza
+bisogno né stile. Coppie A (k vs flat), B (k vs j), C (j vs flat), baseline N senza persona
+e controllo di attenzione, in entrambi gli ordini, sul corpus principale. Disegno e soglie
+in `docs/plans/2026-10-01-rq2-giudice-design.md`, scritto prima dei giudizi.
+**Motivo.** GLM-5.3 è il miglior giudice a pesi aperti su Judgemark v4 (72.6) fra quelli
+disponibili su Ollama, ed è di una famiglia diversa dal generatore (Qwen3.8 non è su Ollama
+Cloud, Kimi K3 costa circa 5 volte di più). Il confronto a coppie evita la compressione dei
+voti su scala assoluta. Bisogno e stile sono istruzioni per lo scrittore: darli al giudice
+renderebbe il compito un riconoscimento lessicale del prompt. Il piano di tesi prevedeva
+più giudici e DeepSeek come controllo dell'auto-preferenza: con un solo generatore e un
+giudice di un'altra famiglia, Massimo ha scelto un giudice solo.
+**Effetto.** Nessun risultato precedente da confrontare.
+
+## 2026-10-02 — RQ2: `reasoning_effort: "low"` invece di ragionamento spento
+
+**Decisione.** Il giudice gira con `reasoning_effort: "low"`, non `"none"`.
+**Motivo.** Nello smoke test, con `"none"` (e con `think: false` nell'API nativa) Ollama
+non spegne il ragionamento di GLM-5.3 ma lo scrive dentro la risposta; con `"low"` la
+risposta è JSON pulito e il ragionamento interno è minimo (21 caratteri in media, 56 token
+di output per giudizio). Il parsing prende comunque l'ultimo oggetto JSON della risposta.
+**Effetto.** Nessuno sui criteri: 4 200 risposte valide su 4 200.
+
+## 2026-10-02 — RQ2: pilota e giro completo
+
+**Decisione.** Pilota (controllo di attenzione su 100 opere, coppie su 20 opere, 1 000
+giudizi, $1.25), poi giro completo sulle 100 opere (altri 3 200 giudizi, $4.07; totale
+$5.32 di crediti Ollama).
+**Esito dei criteri fissati prima.** Risposte valide 100% (soglia 98%), controllo di
+attenzione 100% (soglia 95%): giudice utilizzabile, nessuna modifica al prompt.
+**Risultato.** A = 0.967 [0.953, 0.979], B = 0.991 [0.984, 0.996], C = 0.207, N = 0.432,
+A − C = 0.760 [0.718, 0.799], A − N = 0.535 [0.495, 0.573]. Consistenza fra i due ordini
+0.88, scelte "A" 53%.

@@ -1,6 +1,6 @@
 # Museumbot — stato del progetto
 
-*Ultimo aggiornamento: 1 ottobre 2026. Il report descrive solo lo stato attuale del codice e
+*Ultimo aggiornamento: 2 ottobre 2026. Il report descrive solo lo stato attuale del codice e
 dei risultati; le decisioni e le correzioni nel tempo sono in `docs/decisioni.md`.*
 
 **Domanda di ricerca.** Quando un LLM genera un'audioguida "personalizzata" su una
@@ -11,12 +11,16 @@ audioguide con giudizio umano. Qui la domanda viene posta nello spazio latente: 
 ogni categoria, uno **shift direzionale** misurabile e riproducibile rispetto a una
 descrizione neutra?
 
-**Risposta breve.** Sì. Con 100 opere e 6 condizioni, un probe lineare distingue la
-condizione di generazione con accuracy del 94.7% (chance 16.7%), le direzioni di shift
-rispetto al testo neutro sono stabili su metà disgiunte del corpus (coseno 0.85–0.94) e il
-test di permutazione entro opera dà p = 0.0005. L'effetto è piccolo in termini di varianza
-(7% contro il 70% spiegato dall'opera) ma è nitido, e le cinque categorie non collassano
-fra loro.
+**Risposta breve.** Sì. Con 100 opere e 6 condizioni, generate su un provider fisso, un
+probe lineare distingue la condizione di generazione con accuracy del 95.3% (chance 16.7%),
+le direzioni di shift rispetto al testo neutro sono stabili su metà disgiunte del corpus
+(coseno 0.85–0.94) e il test di permutazione entro opera dà p = 0.0005. L'effetto è piccolo
+in termini di varianza (6.5% contro il 73% spiegato dall'opera) ma è nitido, e le cinque
+categorie non collassano fra loro.
+
+**RQ2** (§6). Un giudice LLM (GLM-5.3) nei panni di una categoria preferisce il testo scritto
+per quella categoria al flat nel 97% dei casi e a quello per un'altra categoria nel 99%;
+senza persona, o con la persona sbagliata, preferisce invece il flat.
 
 ---
 
@@ -26,28 +30,48 @@ fra loro.
 |---|---|---|
 | corpus | `corpus/fetch_artworks.py` | `data/artworks.jsonl` — 100 dipinti da Wikidata (15 grandi musei, filtro sui sitelink), con l'intro della voce Wikipedia inglese troncata su confine di frase (67–207 parole, mediana 135) |
 | prompt | `common/prompts.py` | 6 condizioni: 5 categorie Falk + `flat` (nessun blocco categoria) |
-| generazione | `generation/generate.py` | `data/generations.jsonl` — 600 testi dello studio principale, 4 000 dell'ablazione (§5) e 500 della replica `full_rep` (§5.4); DeepSeek V4 Flash via OpenRouter, T = 0.7 |
-| embedding | `rq1_embeddings/embed.py` | `data/emb_{qwen,bge-m3}[_variante].npy` (Qwen3-Embedding-0.6B, BGE-M3), locali, L2-normalizzati |
-| analisi | `rq1_embeddings/analyze.py` | `results/metrics_{qwen,bge-m3}.json` + figure |
+| generazione, corpus principale | `generation/chain_study.py` | `data/chain_study.jsonl` — testi a prompt singolo `single_a` e `single_b` (500 + 500) e `flat` (100), più i 500 della chain (§1.2); DeepSeek V4 Flash su DeepInfra fp8, T = 0.7 |
+| generazione, ablazione | `generation/generate.py` | `data/generations.jsonl` — corpus di settembre: 600 testi `full` + flat, 4 000 dell'ablazione (§5), 500 della replica `full_rep`; routing libero |
+| pulizia e corpus | `common/clean.py`, `common/corpus.py` | corpus `main` e `ablation`, testi puliti (sotto) |
+| embedding | `rq1_embeddings/embed.py` | `data/emb/<corpus>/<modello>_<variante>.npy` (Qwen3-Embedding-0.6B, BGE-M3), locali, L2-normalizzati |
+| analisi | `rq1_embeddings/analyze.py` | `results/metrics_{qwen,bge-m3}.json` + figure (corpus principale) |
 | ablazione | `rq1_embeddings/ablation.py` | `results/ablation_{qwen,bge-m3}.json` + figure |
-| chain vs singolo | `generation/chain_study.py`, `rq1_embeddings/chain_noise.py` | `data/chain_study.jsonl`, `results/chain_noise_{qwen,bge-m3}.json` (§1.2) |
+| chain vs singolo | `rq1_embeddings/chain_noise.py` | `results/chain_noise_{qwen,bge-m3}.json` (§1.2) |
+| RQ2 | `rq2_judge/judge.py`, `rq2_judge/analyze.py` | `data/judgments.jsonl`, `results/judge_glm-5.3.json` + figura (§6) |
 
 Il corpus è sbilanciato sui musei (Orsay 27, Prado 26, NGA 14, Met 13, resto < 10): non è
 un problema per l'analisi, che centra per opera, ma va detto se si riporta il dataset.
 
-**Provider.** OpenRouter distribuisce DeepSeek V4 Flash su circa 15 provider, con
+**Due corpus.** OpenRouter distribuisce DeepSeek V4 Flash su circa 15 provider, con
 quantizzazioni diverse (fp4, fp8, non dichiarata) e comportamento diverso sul
-ragionamento (alcuni ragionano di default, altri no). Lo studio principale e l'ablazione
-sono stati generati con routing libero e senza registrare il provider: il corpus è una
-miscela non tracciata di provider, ed è un limite da dichiarare. `generate.py` ora salva il
-provider e i token di ragionamento di ogni risposta e accetta `--provider` (es.
-`deepinfra/fp8`) per fissarlo senza fallback. Lo studio chain vs singolo usa un provider
-fisso.
+ragionamento. Per questo:
 
-**Preamboli.** `generate.py` non pulisce l'output: 135 testi su 4 548 del corpus iniziano
-con un preambolo ("Here is …") e la maggior parte usa markdown (titoli in corsivo). Lo
-studio chain vs singolo applica a tutti i testi la stessa pulizia (§1.2); il corpus
-principale non è pulito.
+- il **corpus principale** (`main`), su cui girano le analisi di §3 e RQ2, sono i testi a
+  prompt singolo dello studio chain: tutti su DeepInfra fp8, con ragionamento attivato
+  esplicitamente, provider registrato per riga e generati nella stessa sessione.
+  `single_a` è la variante `full`, `single_b` la sua replica (`full_rep`), che dà il tetto
+  di rumore; 140 testi su 1 100 hanno richiesto più di un tentativo;
+- il **corpus di ablazione** (`ablation`) è quello di settembre, l'unico con le 8 varianti
+  del blocco (§5). È stato generato con routing libero e senza registrare il provider: è
+  una miscela non tracciata, ed è un limite da dichiarare. I suoi numeri non si
+  confrontano direttamente con quelli del corpus principale.
+
+`generate.py` salva il provider e i token di ragionamento di ogni risposta e accetta
+`--provider` (es. `deepinfra/fp8`) per fissarlo senza fallback.
+
+**Pulizia.** Tutti i testi passano per `common/clean.py`, sempre dal testo originale: toglie
+il preambolo ("Here is the audio guide …"), i separatori, il markdown (anche i corsivi
+lasciati aperti), i conteggi di parole, le intestazioni da copione e le didascalie di regia.
+Il preambolo si toglie solo se è un'introduzione al testo (nomina la guida o il testo,
+finisce con `:` o è seguito da `---`): righe come "Here is a painting that rewards a second
+look." sono già descrizione e restano. Nel corpus di settembre la pulizia toglie 35
+preamboli e il markdown di 3 382 testi su 4 600; nel corpus principale 5 preamboli e il
+markdown di 847 testi su 1 100.
+
+**Testi troncati.** 10 testi del corpus di settembre si interrompono a metà frase (8 hanno
+esaurito i 2 000 token di output, ragionamento compreso). Cadono in 10 opere diverse, che
+vengono escluse per intero da tutte le varianti dell'ablazione: restano 90 opere, e i
+confronti fra varianti restano appaiati. Nel corpus principale nessun testo è troncato.
 
 ### 1.1 Il prompt singolo
 
@@ -62,7 +86,7 @@ unico system prompt, inserendo come contenuto la risposta che GPT-4 aveva dato a
 
 Fra le condizioni cambia *solo* il blocco. Opera, fonte, vincoli, limite di parole e
 decoding sono identici. Il prompt vieta riferimenti espliciti alla categoria ("For those",
-"As a …"); 23 testi su 600 hanno richiesto una rigenerazione per questo motivo.
+"As a …"): un testo che li contiene viene rigenerato.
 
 ### 1.2 Chain vs prompt singolo
 
@@ -80,10 +104,9 @@ viene generato in un momento diverso dagli altri.
 La chain apre sempre con una presentazione ("Here is a 250-word audio guide … for the
 Recharger"), separata da `---`, usa markdown e in circa metà dei testi scrive in formato
 copione: un'intestazione ("Audio Guide Script (approx. 250 words):", 240 testi su 500) e
-didascalie di regia ("(Soft, inviting tone)", "(Fade out)"). `clean_guide` toglie
-preambolo, separatori, markdown, conteggi delle parole, intestazioni e didascalie, ed è
-applicata a **tutti** i metodi (sui singoli e sul flat non trova nulla da togliere oltre
-al markdown); il testo originale resta nella riga.
+didascalie di regia ("(Soft, inviting tone)", "(Fade out)"). La pulizia (§1) è applicata a
+**tutti** i metodi: sulla chain toglie 498 preamboli su 500, sui singoli e sul flat quasi
+solo il markdown; il testo originale resta nella riga.
 
 **Analisi** (`rq1_embeddings/chain_noise.py`). Per ogni cella (opera, categoria):
 
@@ -102,8 +125,8 @@ va verificato con una seconda run della chain.
 
 A livello di steering si confronta lo shift di categoria: `cos(v_C[c], v_S[c])` diviso per
 il tetto `cos(v_Sa[c], v_Sb[c])`. Lo stesso `within` calcolato fra `full` e `full_rep` del
-corpus principale (routing libero, settembre contro ottobre) misura quanto rumore aggiunge
-il cambio di provider (§5.4).
+corpus di settembre (routing libero, settembre contro ottobre; 90 opere) misura quanto
+rumore aggiunge il cambio di provider (§5.4).
 
 **Risultati** (`results/chain_noise_{qwen,bge-m3}.json`; Qwen3, BGE-M3 fra parentesi).
 
@@ -142,7 +165,7 @@ singolo, parte di R sarebbe rumore della chain e non differenza fra metodi. Una 
 della chain (`chain_rep`, 500 testi) la scioglierebbe; non è ancora stata generata.
 
 **Deriva di routing.** Fra `full` e `full_rep` (provider misti, settembre contro ottobre) la
-dissimilarità per cella è 1.19 [1.14, 1.24] (1.17 [1.13, 1.21]) volte quella fra due run
+dissimilarità per cella è 1.16 [1.10, 1.21] (1.16 [1.11, 1.20]) volte quella fra due run
 sullo stesso provider: il cambio di provider sposta i singoli testi in modo misurabile.
 
 `generation/compare_chain.py` resta come prova esplorativa (3 opere × 3 categorie, V4
@@ -202,14 +225,14 @@ le coppie.
 Le figure LDA sono addestrate su metà delle opere e proiettate sull'altra metà: senza questa
 separazione la figura sovrastima grossolanamente la separabilità.
 
-## 3. Risultati (embedding Qwen3; BGE-M3 fra parentesi)
+## 3. Risultati (corpus principale; embedding Qwen3, BGE-M3 fra parentesi)
 
 ### 3.1 Varianza
 
 | sorgente | quota di varianza |
 |---|---|
-| opera | 70.0% (77.1%) |
-| categoria | 7.4% (3.7%) |
+| opera | 73.3% (79.3%) |
+| categoria | 6.5% (3.8%) |
 
 L'effetto di categoria è un ordine di grandezza sotto l'effetto opera. È atteso, e giustifica
 il centering.
@@ -218,20 +241,19 @@ il centering.
 
 ![Matrice di confusione del probe lineare, embedding Qwen3](../figures/confusion_qwen.png)
 
-Accuracy **94.7%** (90.3%). Recall per classe:
+Accuracy **95.3%** (90.3%). Recall per classe:
 
 | condizione | Qwen3 | BGE-M3 |
 |---|---|---|
-| Explorer | 0.97 | 0.97 |
-| Facilitator | 0.92 | 0.86 |
-| Experience Seeker | 0.96 | 0.99 |
-| Professional/Hobbyist | 0.98 | 1.00 |
+| Explorer | 0.97 | 0.94 |
+| Facilitator | 0.95 | 0.86 |
+| Experience Seeker | 0.98 | 1.00 |
+| Professional/Hobbyist | 1.00 | 1.00 |
 | Recharger | 1.00 | 1.00 |
-| Flat (baseline) | 0.85 | 0.60 |
+| Flat (baseline) | 0.82 | 0.62 |
 
-Le confusioni residue coinvolgono quasi solo il flat: è coerente, il flat non è una
-categoria ma il punto da cui le categorie si allontanano. Il probe lo scambia soprattutto
-con Experience Seeker ed Explorer (Qwen3).
+Le confusioni residue coinvolgono soprattutto il flat: è coerente, il flat non è una
+categoria ma il punto da cui le categorie si allontanano.
 
 ### 3.3 Stabilità delle direzioni (split-half)
 
@@ -239,22 +261,22 @@ Coseno fra v[c] stimati su due metà disgiunte di opere, riferimento flat.
 
 | condizione | Qwen3 | BGE-M3 |
 |---|---|---|
-| Explorer | 0.85 ± 0.02 | 0.74 ± 0.02 |
-| Facilitator | 0.88 ± 0.02 | 0.59 ± 0.03 |
-| Experience Seeker | 0.90 ± 0.01 | 0.86 ± 0.01 |
-| Professional/Hobbyist | 0.93 ± 0.01 | 0.86 ± 0.01 |
-| Recharger | 0.94 ± 0.01 | 0.92 ± 0.01 |
+| Explorer | 0.85 ± 0.02 | 0.79 ± 0.02 |
+| Facilitator | 0.85 ± 0.02 | 0.65 ± 0.03 |
+| Experience Seeker | 0.91 ± 0.01 | 0.87 ± 0.01 |
+| Professional/Hobbyist | 0.93 ± 0.01 | 0.88 ± 0.01 |
+| Recharger | 0.94 ± 0.01 | 0.93 ± 0.01 |
 
 Le direzioni sono stabili. Explorer e Facilitator sono le due più deboli in entrambi gli
 embedding: sono anche le due il cui blocco di prompt è più "generico" (curiosità, gruppo) e
-meno prescrittivo sullo stile. Il punto debole è Facilitator su BGE-M3 (0.59): con quel
+meno prescrittivo sullo stile. Il punto debole è Facilitator su BGE-M3 (0.65): con quel
 modello la sua direzione rispetto al neutro è poco riproducibile.
 
-Con il riferimento media i valori sono più alti (Qwen3 0.88–0.96, BGE-M3 0.76–0.95), perché
+Con il riferimento media i valori sono più alti (Qwen3 0.89–0.96, BGE-M3 0.77–0.95), perché
 la media di 6 testi è un riferimento meno rumoroso di un solo testo flat. Sono il limite
 superiore dell'affidabilità della direzione; i valori sopra sono l'affidabilità degli
 steering vector effettivamente riportati. Con il riferimento media si misura anche la
-stabilità del flat stesso: 0.78 (0.57).
+stabilità del flat stesso: 0.77 (0.66).
 
 ### 3.4 Geometria
 
@@ -267,42 +289,43 @@ stabilità del flat stesso: 0.78 (0.57).
 ![Coseno fra gli steering vector, riferimento flat](../figures/cosine_qwen.png)
 
 **Separazione (distanza cross-validata, ×100).** Le coppie più vicine sono Explorer–Facilitator
-(2.9) e poi queste due con il flat (3.5 e 4.1). Le più lontane sono Professional/Hobbyist–
-Recharger (22.5) ed Experience Seeker–Recharger (19.0). Nessuna distanza è vicina a zero: le
-cinque categorie non collassano. Su BGE-M3 l'ordine è lo stesso, ma Facilitator è quasi
-sovrapposto al flat (0.5, contro 1.0 per Explorer–Facilitator): coerente con la sua
-split-half bassa e con il recall del flat al 60%.
+(2.0) e poi queste due con il flat (2.8 e 3.1). Le più lontane sono Professional/Hobbyist–
+Recharger (19.8) ed Experience Seeker–Recharger (18.3). Nessuna distanza è vicina a zero: le
+cinque categorie non collassano. Su BGE-M3 Facilitator è quasi sovrapposto al flat (0.6,
+contro 1.0 per Explorer–Facilitator): coerente con la sua split-half bassa e con il recall
+del flat al 62%.
 
-**Ampiezza (norme dei v[c], rispetto al flat, Qwen3).** Recharger 0.32,
-Professional/Hobbyist 0.30, Experience Seeker 0.22, Facilitator 0.21, Explorer 0.20. Lo
+**Ampiezza (norme dei v[c], rispetto al flat, Qwen3).** Recharger 0.31,
+Professional/Hobbyist 0.27, Experience Seeker 0.22, Explorer 0.18, Facilitator 0.18. Lo
 shift più forte è quello di Recharger e Professional/Hobbyist.
 
 **Direzione (coseno fra i v[c], rispetto al flat).** Explorer e Facilitator spostano il
-testo nella stessa direzione (+0.61; +0.45 su BGE-M3), e nella LDA e nella PCA i loro
+testo nella stessa direzione (+0.65; +0.51 su BGE-M3), e nella LDA e nella PCA i loro
 cluster si sovrappongono: sono le due categorie che rischiano di collassare l'una
-sull'altra. Anche Recharger condivide in parte quella direzione (+0.32 con Explorer, +0.37
-con Facilitator). Le direzioni più opposte sono Explorer–Experience Seeker (−0.36):
-"guarda più da vicino" vs "must-see", ed Experience Seeker–Recharger (−0.30).
-Professional/Hobbyist e Recharger sono la coppia più distante, ma le loro direzioni sono
-solo moderatamente opposte (−0.20): la distanza viene soprattutto dal fatto che sono i due
-shift più ampi.
+sull'altra. Anche Recharger condivide in parte quella direzione (+0.31 con Explorer, +0.36
+con Facilitator). Le direzioni più opposte sono Explorer–Experience Seeker (−0.46):
+"guarda più da vicino" vs "must-see", poi Facilitator–Experience Seeker (−0.38) ed
+Experience Seeker–Recharger (−0.31). Professional/Hobbyist e Recharger sono la coppia più
+distante, ma le loro direzioni sono solo moderatamente opposte (−0.17): la distanza viene
+soprattutto dal fatto che sono i due shift più ampi.
 
 ### 3.5 Permutazione
 
-Norma media osservata 0.200 contro null 0.042, **p = 0.0005** (2000 permutazioni entro opera).
-Identico con BGE-M3 (0.121 vs 0.033).
+Norma media osservata 0.188 contro null 0.040, **p = 0.0005** (2000 permutazioni entro opera).
+Identico con BGE-M3 (0.123 vs 0.031).
 
 ### 3.6 Confondenti
 
-**Lunghezza.** Professional/Hobbyist produce testi più lunghi (258 parole contro 224–239
+**Lunghezza.** Professional/Hobbyist produce testi più lunghi (254 parole contro 222–235
 delle altre condizioni). Parte del suo steering vector potrebbe essere "lunghezza" e non
 registro. Va controllato, ad esempio con un probe che riceve anche la lunghezza come feature,
 o sottraendo la componente correlata con la lunghezza.
 
 **Lessico.** Le parole discriminative sono coerenti con i blocchi di prompt: Recharger
-(*breath, settle, slowly, pause, rest*), Facilitator (*talk, discuss, companions, group*),
-Experience Seeker (*must, iconic, legendary, unforgettable*), Professional/Hobbyist
-(*scholarly, tonal, compositional, compare*), Explorer (*closer, curious, clue, puzzle*).
+(*breathe, settle, slowly, breath, rest*), Facilitator (*discuss, talk, companions, group,
+conversation*), Experience Seeker (*must, unforgettable, cornerstone, iconic*),
+Professional/Hobbyist (*spatial, technically, compositional, glazes, scholarly*), Explorer
+(*twist, discover, clue, closer*).
 È una conferma, ma anche un avvertimento: parte dello shift potrebbe essere puro eco
 lessicale delle istruzioni di stile, più che un cambio di registro. È esattamente la
 domanda a cui risponde il passo successivo.
@@ -316,8 +339,8 @@ domanda a cui risponde il passo successivo.
   in direzioni simili.
 - Il flat si comporta come baseline: è il testo da cui le categorie si allontanano, e il
   probe lo confonde solo con le categorie a esso più vicine.
-- I risultati valgono per il prompt singolo. La chain del paper produce testi diversi
-  oltre il rumore e uno shift di categoria solo in parte uguale (§1.2).
+- I risultati valgono per il prompt singolo su provider fisso. La chain del paper produce
+  testi diversi oltre il rumore e uno shift di categoria solo in parte uguale (§1.2).
 - Punto aperto: il confondente lunghezza per Professional/Hobbyist.
 
 ## 5. Ablazione del prompt: quale parte del blocco produce lo shift?
@@ -327,7 +350,12 @@ visitatore), **bisogno** ("Their need is …"), **stile** (come scrivere). L'abl
 le stesse 500 audioguide (5 categorie × 100 opere) per 8 varianti del blocco, in un disegno
 fattoriale 2×2×2 più la variante "solo nome". Il flat non varia. Stesso modello, stessa
 temperatura, stesso filtro sui riferimenti espliciti. Costo 0.45 $; rigenerazioni per
-violazione del filtro 3.9% (3.8% nel run originale).
+violazione del filtro 3.9%.
+
+L'ablazione usa il corpus di settembre (routing libero, §1), pulito e senza le 10 opere con
+testi troncati: **90 opere**. Il suo `full` è quello di settembre, non il corpus principale
+di §3, quindi i valori assoluti delle due sezioni non si confrontano direttamente; dentro
+l'ablazione tutte le varianti hanno lo stesso flat e le stesse opere.
 
 | variante | def | need | style |
 |---|---|---|---|
@@ -363,17 +391,17 @@ severo (§5.4).
 
 | variante | probe 5 classi | ‖v‖ media | cos·full | cos/tetto | split-half |
 |---|---|---|---|---|---|
-| `full` | 98.4% (97.0%) | 0.249 (0.149) | 1.000 (1.000) | — | 0.90 (0.79) |
-| `no_need` | 98.6% (95.0%) | 0.251 (0.149) | 0.973 (0.929) | 1.00–1.00 (0.97–0.99) | 0.90 (0.79) |
-| `no_def` | 98.2% (95.2%) | 0.254 (0.147) | 0.970 (0.935) | 1.00–1.00 (0.98–1.00) | 0.91 (0.79) |
-| `style_only` | 97.0% (95.2%) | 0.243 (0.142) | 0.958 (0.909) | 0.98–0.99 (0.95–0.97) | 0.90 (0.77) |
-| `no_style` | 91.8% (90.4%) | 0.181 (0.121) | 0.855 (0.850) | 0.88–0.88 (0.89–0.91) | 0.81 (0.72) |
-| `def_only` | 93.0% (90.0%) | 0.186 (0.121) | 0.852 (0.827) | 0.87–0.88 (0.86–0.88) | 0.82 (0.69) |
-| `need_only` | 85.2% (87.4%) | 0.172 (0.111) | 0.740 (0.738) | 0.76–0.76 (0.77–0.79) | 0.80 (0.66) |
-| `name_only` | 77.4% (74.6%) | 0.146 (0.098) | 0.725 (0.677) | 0.74–0.75 (0.71–0.72) | 0.66 (0.53) |
-| `full_rep` | 96.6% (95.4%) | 0.246 (0.144) | 0.972 (0.934) | — | 0.90 (0.78) |
+| `full` | 98.2% (96.4%) | 0.232 (0.149) | 1.000 (1.000) | — | 0.87 (0.77) |
+| `no_need` | 97.8% (95.8%) | 0.234 (0.149) | 0.966 (0.924) | 1.00–0.99 (0.99–0.97) | 0.87 (0.77) |
+| `no_def` | 96.4% (95.3%) | 0.237 (0.148) | 0.962 (0.929) | 1.00–0.99 (1.00–0.97) | 0.88 (0.78) |
+| `style_only` | 96.7% (95.1%) | 0.229 (0.143) | 0.951 (0.906) | 0.99–0.98 (0.97–0.95) | 0.87 (0.76) |
+| `def_only` | 92.9% (90.0%) | 0.173 (0.122) | 0.841 (0.826) | 0.87–0.86 (0.88–0.86) | 0.78 (0.67) |
+| `no_style` | 91.8% (89.1%) | 0.168 (0.122) | 0.828 (0.843) | 0.86–0.85 (0.90–0.88) | 0.76 (0.69) |
+| `need_only` | 83.8% (86.0%) | 0.160 (0.112) | 0.724 (0.739) | 0.75–0.74 (0.79–0.77) | 0.75 (0.64) |
+| `name_only` | 76.7% (73.1%) | 0.137 (0.100) | 0.695 (0.669) | 0.72–0.71 (0.72–0.70) | 0.60 (0.52) |
+| `full_rep` | 96.4% (94.7%) | 0.227 (0.145) | 0.964 (0.931) | — | 0.87 (0.77) |
 
-Chance del probe a 5 classi: 20%. La lunghezza media resta fra 229 e 240 parole per tutte
+Chance del probe a 5 classi: 20%. La lunghezza media resta fra 229 e 241 parole per tutte
 le varianti: l'ablazione non introduce un confondente di lunghezza.
 
 ### 5.2 Analisi fattoriale
@@ -383,42 +411,42 @@ interazioni a due vie, sul coseno medio con il full e sulla norma media.
 
 | | def | need | style | def×need | def×style | need×style |
 |---|---|---|---|---|---|---|
-| cos·full (Qwen3) | +0.072 | +0.014 | **+0.182** | +0.001 | **−0.100** | +0.011 |
-| cos·full (BGE-M3) | +0.087 | +0.045 | **+0.170** | +0.003 | **−0.088** | +0.006 |
-| ‖v‖ media (Qwen3) | +0.013 | +0.007 | **+0.078** | −0.022 | −0.023 | −0.006 |
-| ‖v‖ media (BGE-M3) | +0.010 | +0.004 | **+0.034** | −0.009 | −0.012 | −0.004 |
+| cos·full (Qwen3) | +0.076 | +0.015 | **+0.197** | −0.009 | **−0.099** | +0.014 |
+| cos·full (BGE-M3) | +0.088 | +0.047 | **+0.170** | +0.000 | **−0.086** | +0.006 |
+| ‖v‖ media (Qwen3) | +0.011 | +0.006 | **+0.074** | −0.020 | −0.022 | −0.006 |
+| ‖v‖ media (BGE-M3) | +0.010 | +0.004 | **+0.033** | −0.009 | −0.013 | −0.003 |
 
 ### 5.3 Lettura
 
 **Lo stile è la discriminante.** È sufficiente: da solo riproduce la direzione del blocco
-completo (coseno 0.96 / 0.91) con la stessa ampiezza e la stessa separabilità. Ed è
-necessaria: toglierlo è l'unica rimozione singola con un costo netto (0.86 / 0.85, e
-la norma cala di un quarto su Qwen3 e di un quinto su BGE-M3). L'effetto principale dello
-stile sul coseno è 2.5 volte quello della definizione e 13 volte quello del bisogno (Qwen3;
-2.0 e 3.8 volte su BGE-M3).
+completo (coseno 0.95 / 0.91) con la stessa ampiezza e la stessa separabilità. Ed è
+necessaria: toglierlo è l'unica rimozione singola con un costo netto (0.83 / 0.84, e
+la norma cala del 28% su Qwen3 e del 18% su BGE-M3). L'effetto principale dello
+stile sul coseno è 2.6 volte quello della definizione e 13 volte quello del bisogno (Qwen3;
+1.9 e 3.6 volte su BGE-M3).
 
 **La definizione conta solo in assenza dello stile.** L'interazione def×style è negativa e
-grande (−0.10 / −0.09): la definizione porta il coseno da 0.73 a 0.85 (0.71 a 0.84) quando
-lo stile manca, ma da 0.96 a 0.99 (0.92 a 0.96) quando c'è. Le due parti dicono al modello
-la stessa cosa e lo stile la dice in modo più operativo.
+grande (−0.10 / −0.09): la definizione porta il coseno da 0.70 a 0.84 (0.67 a 0.83) quando
+lo stile manca, ma solo da 0.95 a 0.97 (0.91 a 0.92) quando c'è. Le due parti dicono al
+modello la stessa cosa e lo stile la dice in modo più operativo.
 
 **Il bisogno da solo non basta, e in un caso devia.** `need_only` è la più debole delle
-varianti a una parte, e per Experience Seeker il coseno crolla a 0.25 / 0.39: la frase
+varianti a una parte, e per Experience Seeker il coseno crolla a 0.24 / 0.40: la frase
 "Their need is memorable, high-impact takeaways", senza definizione né stile, spinge il
 testo in una direzione quasi scorrelata da quella del blocco completo, e più debole (norma
-ridotta di circa il 40%). È l'unico caso in cui una
+ridotta del 42% / 40%). È l'unico caso in cui una
 parte del prompt non è un sottoinsieme dell'effetto totale ma un effetto diverso.
 
-**Il nome da solo conserva circa tre quarti dello shift.** Con "Your listener is a
-Recharger." e nient'altro, il probe resta al 77% / 75% contro il 20% di chance, e il
-coseno medio è 0.73 / 0.68. Questa è la conoscenza parametrica di Falk del modello. Ma è
+**Il nome da solo conserva circa il 70% dello shift.** Con "Your listener is a
+Recharger." e nient'altro, il probe resta al 77% / 73% contro il 20% di chance, e il
+coseno medio è 0.70 / 0.67. Questa è la conoscenza parametrica di Falk del modello. Ma è
 distribuita in modo molto diseguale: Recharger (0.94 / 0.94) e Professional/Hobbyist
-(0.78 / 0.84) sono nomi autoesplicativi e il modello li interpreta come il blocco
-completo; Explorer e Facilitator stanno nel mezzo (0.71 e 0.74 / 0.60 e 0.60); Experience
-Seeker no (0.46 / 0.40), ed è anche il nome più ambiguo in inglese comune.
+(0.78 / 0.85) sono nomi autoesplicativi e il modello li interpreta come il blocco
+completo; Explorer e Facilitator stanno nel mezzo (0.63 e 0.72 / 0.58 e 0.60); Experience
+Seeker no (0.41 / 0.37), ed è anche il nome più ambiguo in inglese comune.
 
 **Asimmetria fra categorie.** Recharger è robusto a ogni ablazione (coseno ≥ 0.93 in tutte
-le varianti): la sua direzione, quella contemplativa, è così marcata che qualunque indizio
+le varianti, ≥ 0.94 su BGE-M3): la sua direzione, quella contemplativa, è così marcata che qualunque indizio
 basta a evocarla. Experience Seeker è la più fragile quando manca lo stile (`need_only`,
 `name_only`): la sua direzione dipende dall'istruzione esplicita, non dal nome.
 
@@ -432,25 +460,27 @@ di settembre, che non è più riproducibile (§1). Due stime lo racchiudono:
   ottobre con routing libero e lo stesso flat (registro `REPLICATES` in
   `common/prompts.py`, fuori dal disegno fattoriale). Include anche la deriva di provider,
   quindi è più basso del vero e i rapporti sono sovrastimati;
-- **severo**: coseno fra `single_a` e `single_b` dello studio chain (§1.2), due run del full
+- **severo**: il tetto del corpus principale (§3, sezione `ceiling` di
+  `results/metrics_*.json`), cioè il coseno fra `single_a` e `single_b`, due run del full
   sullo stesso provider. Solo rumore di generazione, quindi più alto del vero.
 
 | | Explorer | Facilitator | Exp. Seeker | Prof./Hobbyist | Recharger |
 |---|---|---|---|---|---|
-| indulgente Qwen3 | 0.965 | 0.963 | 0.975 | 0.974 | 0.981 |
+| indulgente Qwen3 | 0.954 | 0.955 | 0.962 | 0.971 | 0.978 |
 | severo Qwen3 | 0.957 | 0.958 | 0.980 | 0.985 | 0.990 |
-| indulgente BGE-M3 | 0.899 | 0.875 | 0.971 | 0.958 | 0.969 |
-| severo BGE-M3 | 0.937 | 0.905 | 0.974 | 0.977 | 0.985 |
+| indulgente BGE-M3 | 0.899 | 0.868 | 0.965 | 0.956 | 0.968 |
+| severo BGE-M3 | 0.937 | 0.905 | 0.973 | 0.977 | 0.985 |
 
-Con Qwen3 i due tetti quasi coincidono: sugli steering vector, che sono medie su 100 opere,
-la deriva di provider pesa poco, anche se sui singoli testi è misurabile (§1.2). Con
+Con Qwen3 i due tetti quasi coincidono: sugli steering vector, che sono medie su 90–100
+opere, la deriva di provider pesa poco, anche se sui singoli testi è misurabile (§1.2). Con
 BGE-M3 il tetto severo è più alto per Explorer e Facilitator.
 
 Rapportate al tetto (colonna `cos/tetto` in §5.1), `no_def` e `no_need` valgono 1.00 con
-Qwen3 con entrambi i tetti: togliere la definizione o il bisogno **non lascia traccia
-misurabile oltre al rumore**. Con BGE-M3 e il tetto severo valgono 0.97–0.98: una perdita
-piccola ma visibile. `style_only` è a 0.98–0.99 (0.95–0.97). Togliere lo stile costa circa
-il 10%, `need_only` e `name_only` un quarto, con entrambi i tetti.
+Qwen3 e il tetto indulgente, 0.99 con quello severo: togliere la definizione o il bisogno
+**non lascia traccia misurabile oltre al rumore**. Con BGE-M3 e il tetto severo valgono
+0.97: una perdita piccola ma visibile. `style_only` è a 0.98–0.99 (0.95–0.97). Togliere lo
+stile costa il 14–15% su Qwen3 e il 10–12% su BGE-M3, `need_only` e `name_only` circa un
+quarto, con entrambi i tetti.
 
 ### 5.5 Implicazione per il prompt
 
@@ -460,18 +490,134 @@ cambia). Per lo studio scientifico l'ablazione dice che quello che
 il paper chiama "adattamento alla categoria di Falk" è, nel modello, in larga parte
 l'esecuzione di un'istruzione stilistica esplicita, e in misura minore l'evocazione di uno
 stereotipo associato al nome. La definizione sociologica della categoria non aggiunge
-nulla di misurabile quando lo stile è presente (al più il 2–3% con BGE-M3, §5.4).
+nulla di misurabile quando lo stile è presente (al più il 3% con BGE-M3, §5.4).
 
-## 6. Prossimi passi
+## 6. RQ2: un giudice LLM con persona preferisce il testo personalizzato?
+
+**Disegno** (`rq2_judge/`; spec e soglie in `docs/plans/2026-10-01-rq2-giudice-design.md`,
+scritte prima dei giudizi). Il giudice è GLM-5.3 su Ollama Cloud (FP8; famiglia Zhipu,
+diversa dal generatore), scelto con Judgemark v4. Confronto a coppie con scelta forzata
+fra due audioguide della stessa opera, in entrambi gli ordini. La persona è il nome della
+categoria più la sua definizione di Falk ("You are an Explorer: a curiosity-driven visitor
+…"), senza bisogno né istruzioni di stile, che renderebbero il compito un riconoscimento
+lessicale del prompt di generazione. Testi: corpus principale (`full` e flat).
+
+| tipo | coppia | giudice |
+|---|---|---|
+| A | testo *k* vs flat | persona *k* |
+| B | testo *k* vs testo *j* | persona *k* |
+| C | testo *j* vs flat | persona *k* |
+| N | testo *k* vs flat | senza persona |
+| attenzione | flat dell'opera vs flat di un'altra opera | senza persona |
+
+*j* ruota in modo bilanciato (ogni *j* 25 volte per ogni *k*) ed è lo stesso in B e C. In
+tutto 4 200 giudizi, $5.32. Il ragionamento del giudice è al minimo (`reasoning_effort:
+"low"`): con `"none"` Ollama riversa il ragionamento nella risposta invece di spegnerlo.
+Il punteggio di una coppia è la media dei due ordini (1, 0.5 o 0), che neutralizza il bias
+di posizione; IC al 95% con bootstrap sulle opere.
+
+**Criteri di utilizzabilità** (fissati prima): risposte valide 100% (soglia 98%), controllo
+di attenzione 100% (soglia 95%). Consistenza fra i due ordini 0.88; scelte "A" 53%.
+
+**Risultati** (`results/judge_glm-5.3.json`): tasso di vittoria dell'elemento di interesse.
+
+![Tassi di vittoria per tipo di coppia e categoria](../figures/judge_glm-5.3.png)
+
+| | totale | Explorer | Facilitator | Exp. Seeker | Prof./Hobbyist | Recharger |
+|---|---|---|---|---|---|---|
+| **A** (*k* vs flat) | **0.967** [0.953, 0.979] | 0.90 | 1.00 | 1.00 | 0.94 | 1.00 |
+| **B** (*k* vs *j*) | **0.991** [0.984, 0.996] | 0.98 | 0.98 | 1.00 | 0.99 | 1.00 |
+| C (*j* vs flat) | 0.207 [0.167, 0.249] | 0.23 | 0.34 | 0.07 | 0.15 | 0.23 |
+| N (senza persona) | 0.432 [0.390, 0.476] | 0.76 | 0.57 | 0.12 | 0.34 | 0.37 |
+| **A − C** | **0.760** [0.718, 0.799] | 0.67 | 0.66 | 0.93 | 0.78 | 0.77 |
+| **A − N** | **0.535** [0.495, 0.573] | 0.14 | 0.43 | 0.88 | 0.59 | 0.63 |
+
+Nella riga N la categoria è quella del testo, non del giudice.
+
+**Lettura.** Il giudice nei panni di *k* sceglie il testo per *k* quasi sempre, sia contro
+il flat (A) sia contro il testo per un'altra categoria (B). La preferenza è specifica: con
+la persona sbagliata il testo personalizzato perde contro il flat (C = 0.21), e senza
+persona lo batte meno della metà delle volte (N = 0.43). Le motivazioni lo dicono in
+chiaro: un Recharger scarta il testo Facilitator perché "prompts to discuss" rompono la
+contemplazione; il giudice neutro preferisce il flat perché ha più contenuto storico-artistico.
+Explorer è l'eccezione: il suo testo piace anche senza persona (N = 0.76), quindi A − N è
+piccolo (0.14). Experience Seeker è il caso opposto: il suo tono "must-see" piace solo a lui
+(N = 0.12, C = 0.07).
+
+**Lunghezza.** A parità di tipo di coppia, il testo più lungo è un po' favorito (logit
++0.36 [+0.27, +0.51] per 30 parole), ma sulle sole coppie con lunghezze entro il 10% i
+tassi non cambiano (A 0.96, B 0.99, C 0.19, N 0.41). Le motivazioni citano la lunghezza in
+meno dell'1% dei casi.
+
+### 6.1 Analisi esplorative
+
+Decise dopo aver visto i risultati (sezione `exploratory` di `results/judge_glm-5.3.json`):
+descrivono, non verificano ipotesi.
+
+**Matrice di preferenza.** Per ogni persona (righe) e categoria del testo (colonne), quanto
+spesso il testo batte il flat: diagonale dalle coppie A (100 per cella), fuori diagonale
+dalle C (25 per cella).
+
+![Matrice di preferenza persona × testo](../figures/judge_glm-5.3_matrix.png)
+
+- **I testi più "trasferibili" sono Explorer e Facilitator.** Il testo Explorer batte il
+  flat in media nel 41% dei casi quando lo giudica un'altra persona (Facilitator 0.84,
+  Recharger 0.42, Professional/Hobbyist 0.30); Facilitator nel 26% (Recharger 0.46,
+  Explorer 0.36). I testi Recharger (0.07) e Professional/Hobbyist (0.10) piacciono quasi
+  solo alla propria persona: sono anche i due shift più ampi di RQ1 (§3.4).
+- **Experience Seeker è la persona più esclusiva**: rifiuta ogni testo altrui (al massimo
+  0.14) e il suo testo, senza persona, piace solo nel 12% dei casi (N, §6).
+- **La confusione principale è Explorer ↔ Facilitator, ed è asimmetrica.** La persona
+  Facilitator accetta il testo Explorer nell'84% dei casi; la persona Explorer accetta il
+  testo Facilitator solo nel 36%. Nelle coppie B è anche l'unica confusione sopra il 5%:
+  il Facilitator sceglie il testo Explorer al posto del proprio nel 6% delle coppie;
+  tutte le altre sono al 4% o meno.
+
+**Legame con RQ1.** L'accettazione dei testi altrui (le 20 celle fuori diagonale) segue la
+geometria degli embedding: più due categorie sono vicine in RQ1, più la persona dell'una
+accetta il testo dell'altra.
+
+| | Spearman con la distanza cross-validata | Spearman con il coseno degli steering vector |
+|---|---|---|
+| Qwen3 | −0.79 (10 coppie: −0.90) | +0.55 (+0.72) |
+| BGE-M3 | −0.68 (−0.66) | +0.79 (+0.95) |
+
+Le 20 celle non sono indipendenti (distanza e coseno sono simmetrici), quindi la versione
+su 10 coppie, che media i due versi, è quella da citare. È un collegamento fra le due RQ:
+le categorie che il giudice confonde sono le stesse che gli embedding separano meno.
+
+**Dove la persona non sceglie il proprio testo.** Solo Explorer (20 giudizi su 200 nelle
+coppie A) e Professional/Hobbyist (13) perdono qualche volta contro il flat, quasi sempre
+con un cambio di idea fra i due ordini. Le motivazioni dell'Explorer sono ricorrenti: il
+flat "soddisfa la curiosità con informazioni concrete" invece che con "domande
+retoriche". La persona, che riceve la definizione di Falk (curiosità e apprendimento),
+interpreta la curiosità come voglia di fatti; il generatore, guidato dall'istruzione di
+stile, la traduce in domande. È anche il motivo per cui A − N è piccolo per Explorer.
+
+**Consistenza e posizione.** La consistenza fra i due ordini è alta quando la persona ha
+una preferenza netta (A 0.96, B 0.99) e scende dove il compito è più ambiguo (C 0.84, N
+0.74). Il bias di posizione è trascurabile con le persone (scelte "A" fra 50% e 53%) e
+leggero senza persona (58%): la media dei due ordini lo neutralizza comunque.
+
+**Motivazioni.** Quanto il giudice cita la propria categoria nella motivazione varia molto:
+Experience Seeker 98%, Facilitator 96%, Recharger 62%, Explorer 32%,
+Professional/Hobbyist 28%. Le due persone che citano di più il proprio nome sono anche
+quelle con A = 1.00 e i nomi più "parlanti"; è un indizio, non una prova, del rischio di
+corrispondenza fra persona e testo discusso sotto.
+
+**Limiti.** Un solo giudice. La persona contiene la definizione di Falk, e il giudice cita
+spesso il proprio nome ("As a Recharger…"): parte della preferenza può essere
+corrispondenza fra la definizione e il testo, che i testi a loro volta riecheggiano.
+Quanto queste preferenze coincidano con quelle di visitatori reali è la domanda di RQ3.
+
+## 7. Prossimi passi
 
 1. Chain vs singolo: decidere se generare `chain_rep` per separare il rumore della chain
    dalla differenza fra metodi (§1.2).
-2. Robustezza dello studio principale: rifare probe, split-half e distanze sul corpus
-   dello studio chain (`single_a` + flat, provider fisso, testi puliti) e confrontarli con
-   quelli di settembre. Solo calcolo locale.
-3. Confondente lunghezza per Professional/Hobbyist nello studio principale (§3.6).
-4. Preamboli e markdown nel corpus principale (§1): decidere se pulirli e ricalcolare.
-5. RQ2 e RQ3: vedi `docs/plans/piano-progetto-tesi.md`.
+2. Confondente lunghezza per Professional/Hobbyist nel corpus principale (§3.6).
+3. RQ2: estensioni possibili (secondo giudice su un campione, persone ricavate dal
+   dataset BIRD, compito di riconoscimento); scelta degli stimoli per RQ3.
+4. RQ3: vedi `docs/plans/piano-progetto-tesi.md`.
 
 ## Riferimenti
 

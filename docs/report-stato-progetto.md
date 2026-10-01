@@ -78,10 +78,12 @@ ragionamento attivato esplicitamente; i job sono mescolati fra metodi, così nes
 viene generato in un momento diverso dagli altri.
 
 La chain apre sempre con una presentazione ("Here is a 250-word audio guide … for the
-Recharger"), separata da `---`, e usa markdown. `clean_guide` toglie preambolo,
-separatori, markdown e note sul conteggio delle parole, ed è applicata a **tutti** i
-metodi prima del filtro sui riferimenti espliciti alla categoria; il testo originale resta
-nella riga.
+Recharger"), separata da `---`, usa markdown e in circa metà dei testi scrive in formato
+copione: un'intestazione ("Audio Guide Script (approx. 250 words):", 240 testi su 500) e
+didascalie di regia ("(Soft, inviting tone)", "(Fade out)"). `clean_guide` toglie
+preambolo, separatori, markdown, conteggi delle parole, intestazioni e didascalie, ed è
+applicata a **tutti** i metodi (sui singoli e sul flat non trova nulla da togliere oltre
+al markdown); il testo originale resta nella riga.
 
 **Analisi** (`rq1_embeddings/chain_noise.py`). Per ogni cella (opera, categoria):
 
@@ -103,7 +105,45 @@ il tetto `cos(v_Sa[c], v_Sb[c])`. Lo stesso `within` calcolato fra `full` e `ful
 corpus principale (routing libero, settembre contro ottobre) misura quanto rumore aggiunge
 il cambio di provider (§5.4).
 
-**Stato:** generazione in corso; risultati non ancora disponibili.
+**Risultati** (`results/chain_noise_{qwen,bge-m3}.json`; Qwen3, BGE-M3 fra parentesi).
+
+![Dissimilarità per cella: rumore, chain vs singolo, deriva di routing (Qwen3)](../figures/chain_noise_qwen.png)
+
+| | Qwen3 | BGE-M3 |
+|---|---|---|
+| cos singolo–singolo (rumore) | 0.885 | 0.920 |
+| cos chain–singolo | 0.835 | 0.884 |
+| **R** | **1.43** [1.39, 1.49] | **1.45** [1.40, 1.50] |
+
+**I due metodi non sono equivalenti**: R supera la soglia di 1.10 con entrambi gli
+embedding, e l'IC è lontano dalla soglia. Un testo della chain dista da un testo singolo
+circa il 45% in più di quanto distino fra loro due testi singoli. R per categoria va da
+1.26 (Explorer) a 1.63 (Professional/Hobbyist).
+
+Anche lo shift di categoria cambia. Rapporto fra il coseno chain–singolo degli steering
+vector e il tetto singolo–singolo (IC 95% bootstrap sulle opere):
+
+| | tetto | chain / tetto | ‖v_chain‖ / ‖v_singolo‖ |
+|---|---|---|---|
+| Explorer | 0.96 (0.94) | 0.82 [0.75, 0.87] (0.89) | 0.93 (1.07) |
+| Facilitator | 0.96 (0.91) | 0.71 [0.64, 0.78] (0.70) | 1.00 (1.66) |
+| Experience Seeker | 0.98 (0.97) | 0.52 [0.45, 0.61] (0.69) | 0.74 (0.94) |
+| Professional/Hobbyist | 0.99 (0.98) | 0.73 [0.68, 0.76] (0.77) | 0.79 (1.14) |
+| Recharger | 0.99 (0.99) | 0.88 [0.84, 0.91] (0.94) | 0.94 (1.16) |
+| media | | 0.73 (0.80) | |
+
+La chain conserva la direzione di Recharger ed Explorer, molto meno quella di Experience
+Seeker e Facilitator. I testi della chain sono un po' più lunghi (244 parole contro 236).
+
+**Come leggerlo.** I risultati di RQ1 valgono per il prompt singolo, non per la chain del
+paper: le due implementazioni della stessa idea producono testi e shift di categoria
+diversi. Resta una riserva prevista dal disegno: se la chain fosse più rumorosa del
+singolo, parte di R sarebbe rumore della chain e non differenza fra metodi. Una seconda run
+della chain (`chain_rep`, 500 testi) la scioglierebbe; non è ancora stata generata.
+
+**Deriva di routing.** Fra `full` e `full_rep` (provider misti, settembre contro ottobre) la
+dissimilarità per cella è 1.19 [1.14, 1.24] (1.17 [1.13, 1.21]) volte quella fra due run
+sullo stesso provider: il cambio di provider sposta i singoli testi in modo misurabile.
 
 `generation/compare_chain.py` resta come prova esplorativa (3 opere × 3 categorie, V4
 Flash e V4 Pro, un testo per metodo): non ha un termine di confronto per il rumore e non va
@@ -276,8 +316,9 @@ domanda a cui risponde il passo successivo.
   in direzioni simili.
 - Il flat si comporta come baseline: è il testo da cui le categorie si allontanano, e il
   probe lo confonde solo con le categorie a esso più vicine.
-- Due punti aperti: il confondente lunghezza per Professional/Hobbyist e l'equivalenza
-  chain/singolo, finora solo qualitativa.
+- I risultati valgono per il prompt singolo. La chain del paper produce testi diversi
+  oltre il rumore e uno shift di categoria solo in parte uguale (§1.2).
+- Punto aperto: il confondente lunghezza per Professional/Hobbyist.
 
 ## 5. Ablazione del prompt: quale parte del blocco produce lo shift?
 
@@ -317,18 +358,19 @@ medie delle 8 celle.
 ### 5.1 Risultati per variante (Qwen3; BGE-M3 fra parentesi)
 
 Ordinate per coseno medio con il full. `cos/tetto` è il coseno con il full diviso per il
-coseno fra due run del full (§5.4).
+coseno fra due run del full: il primo valore usa il tetto indulgente, il secondo quello
+severo (§5.4).
 
 | variante | probe 5 classi | ‖v‖ media | cos·full | cos/tetto | split-half |
 |---|---|---|---|---|---|
 | `full` | 98.4% (97.0%) | 0.249 (0.149) | 1.000 (1.000) | — | 0.90 (0.79) |
-| `no_need` | 98.6% (95.0%) | 0.251 (0.149) | 0.973 (0.929) | 1.00 (0.99) | 0.90 (0.79) |
-| `no_def` | 98.2% (95.2%) | 0.254 (0.147) | 0.970 (0.935) | 1.00 (1.00) | 0.91 (0.79) |
-| `style_only` | 97.0% (95.2%) | 0.243 (0.142) | 0.958 (0.909) | 0.99 (0.97) | 0.90 (0.77) |
-| `no_style` | 91.8% (90.4%) | 0.181 (0.121) | 0.855 (0.850) | 0.88 (0.91) | 0.81 (0.72) |
-| `def_only` | 93.0% (90.0%) | 0.186 (0.121) | 0.852 (0.827) | 0.88 (0.88) | 0.82 (0.69) |
-| `need_only` | 85.2% (87.4%) | 0.172 (0.111) | 0.740 (0.738) | 0.76 (0.79) | 0.80 (0.66) |
-| `name_only` | 77.4% (74.6%) | 0.146 (0.098) | 0.725 (0.677) | 0.75 (0.72) | 0.66 (0.53) |
+| `no_need` | 98.6% (95.0%) | 0.251 (0.149) | 0.973 (0.929) | 1.00–1.00 (0.97–0.99) | 0.90 (0.79) |
+| `no_def` | 98.2% (95.2%) | 0.254 (0.147) | 0.970 (0.935) | 1.00–1.00 (0.98–1.00) | 0.91 (0.79) |
+| `style_only` | 97.0% (95.2%) | 0.243 (0.142) | 0.958 (0.909) | 0.98–0.99 (0.95–0.97) | 0.90 (0.77) |
+| `no_style` | 91.8% (90.4%) | 0.181 (0.121) | 0.855 (0.850) | 0.88–0.88 (0.89–0.91) | 0.81 (0.72) |
+| `def_only` | 93.0% (90.0%) | 0.186 (0.121) | 0.852 (0.827) | 0.87–0.88 (0.86–0.88) | 0.82 (0.69) |
+| `need_only` | 85.2% (87.4%) | 0.172 (0.111) | 0.740 (0.738) | 0.76–0.76 (0.77–0.79) | 0.80 (0.66) |
+| `name_only` | 77.4% (74.6%) | 0.146 (0.098) | 0.725 (0.677) | 0.74–0.75 (0.71–0.72) | 0.66 (0.53) |
 | `full_rep` | 96.6% (95.4%) | 0.246 (0.144) | 0.972 (0.934) | — | 0.90 (0.78) |
 
 Chance del probe a 5 classi: 20%. La lunghezza media resta fra 229 e 240 parole per tutte
@@ -382,25 +424,33 @@ basta a evocarla. Experience Seeker è la più fragile quando manca lo stile (`n
 
 ### 5.4 Calibrazione del coseno
 
-`full_rep` è una seconda generazione del prompt `full` sulle stesse 100 opere, con lo stesso
-flat (registro `REPLICATES` in `common/prompts.py`, fuori dal disegno fattoriale). Il suo
-coseno con il full è il **tetto**: il valore che otterrebbe una variante identica al full,
-dato il rumore di generazione a T = 0.7.
+Il **tetto** è il coseno che otterrebbe una variante identica al full, dato il rumore di
+generazione a T = 0.7. Quello giusto sarebbe fra due run del full con la miscela di provider
+di settembre, che non è più riproducibile (§1). Due stime lo racchiudono:
+
+- **indulgente**: coseno fra il full e `full_rep`, una seconda generazione del full a
+  ottobre con routing libero e lo stesso flat (registro `REPLICATES` in
+  `common/prompts.py`, fuori dal disegno fattoriale). Include anche la deriva di provider,
+  quindi è più basso del vero e i rapporti sono sovrastimati;
+- **severo**: coseno fra `single_a` e `single_b` dello studio chain (§1.2), due run del full
+  sullo stesso provider. Solo rumore di generazione, quindi più alto del vero.
 
 | | Explorer | Facilitator | Exp. Seeker | Prof./Hobbyist | Recharger |
 |---|---|---|---|---|---|
-| tetto Qwen3 | 0.965 | 0.963 | 0.975 | 0.974 | 0.981 |
-| tetto BGE-M3 | 0.899 | 0.875 | 0.971 | 0.958 | 0.969 |
+| indulgente Qwen3 | 0.965 | 0.963 | 0.975 | 0.974 | 0.981 |
+| severo Qwen3 | 0.957 | 0.958 | 0.980 | 0.985 | 0.990 |
+| indulgente BGE-M3 | 0.899 | 0.875 | 0.971 | 0.958 | 0.969 |
+| severo BGE-M3 | 0.937 | 0.905 | 0.974 | 0.977 | 0.985 |
 
-Rapportate al tetto (colonna `cos/tetto` in §5.1), `no_def` e `no_need` valgono 1.00: togliere
-la definizione o il bisogno **non lascia traccia misurabile oltre al rumore**. `style_only`
-è a 0.99 (0.97). Togliere lo stile costa circa il 10% (0.88 / 0.91), `need_only` e
-`name_only` un quarto.
+Con Qwen3 i due tetti quasi coincidono: sugli steering vector, che sono medie su 100 opere,
+la deriva di provider pesa poco, anche se sui singoli testi è misurabile (§1.2). Con
+BGE-M3 il tetto severo è più alto per Explorer e Facilitator.
 
-**Riserva.** `full_rep` è stato generato a ottobre, il full a settembre, entrambi con
-routing libero fra provider (§1). Se il cambio di provider sposta i testi, il tetto include
-anche quella deriva, è più basso del vero e i rapporti sono sovrastimati. Lo studio chain
-vs singolo misura il rumore su un provider fisso e permette di verificarlo (§1.2).
+Rapportate al tetto (colonna `cos/tetto` in §5.1), `no_def` e `no_need` valgono 1.00 con
+Qwen3 con entrambi i tetti: togliere la definizione o il bisogno **non lascia traccia
+misurabile oltre al rumore**. Con BGE-M3 e il tetto severo valgono 0.97–0.98: una perdita
+piccola ma visibile. `style_only` è a 0.98–0.99 (0.95–0.97). Togliere lo stile costa circa
+il 10%, `need_only` e `name_only` un quarto, con entrambi i tetti.
 
 ### 5.5 Implicazione per il prompt
 
@@ -410,15 +460,18 @@ cambia). Per lo studio scientifico l'ablazione dice che quello che
 il paper chiama "adattamento alla categoria di Falk" è, nel modello, in larga parte
 l'esecuzione di un'istruzione stilistica esplicita, e in misura minore l'evocazione di uno
 stereotipo associato al nome. La definizione sociologica della categoria non aggiunge
-nulla quando lo stile è presente.
+nulla di misurabile quando lo stile è presente (al più il 2–3% con BGE-M3, §5.4).
 
 ## 6. Prossimi passi
 
-1. Completare lo studio chain vs singolo (§1.2) e, con il rumore su provider fisso,
-   verificare la deriva di routing che pesa sul tetto dell'ablazione (§5.4).
-2. Confondente lunghezza per Professional/Hobbyist nello studio principale (§3.6).
-3. Preamboli e markdown nel corpus principale (§1): decidere se pulirli e ricalcolare.
-4. RQ2 e RQ3: vedi `docs/plans/piano-progetto-tesi.md`.
+1. Chain vs singolo: decidere se generare `chain_rep` per separare il rumore della chain
+   dalla differenza fra metodi (§1.2).
+2. Robustezza dello studio principale: rifare probe, split-half e distanze sul corpus
+   dello studio chain (`single_a` + flat, provider fisso, testi puliti) e confrontarli con
+   quelli di settembre. Solo calcolo locale.
+3. Confondente lunghezza per Professional/Hobbyist nello studio principale (§3.6).
+4. Preamboli e markdown nel corpus principale (§1): decidere se pulirli e ricalcolare.
+5. RQ2 e RQ3: vedi `docs/plans/piano-progetto-tesi.md`.
 
 ## Riferimenti
 

@@ -13,10 +13,15 @@ variante e si sposterebbe con essa, contaminando il confronto con `full`.
 Chiude un'analisi fattoriale 2x2x2 sulle tre parti (def, need, style): effetti principali
 e interazioni a due vie, calcolati direttamente sulle medie delle 8 celle.
 
-Calibrazione: se esiste la replica `full_rep` (stesso prompt del full, generazione
-indipendente, stesso flat), il suo coseno con il full e' il tetto di rumore della
-generazione. Ogni variante viene riportata anche come rapporto col tetto (`cos_rel`): ~1
-vuol dire indistinguibile dal full, non soltanto "vicino".
+Calibrazione: ogni variante viene riportata anche come rapporto col tetto di rumore della
+generazione; ~1 vuol dire indistinguibile dal full, non soltanto "vicino". Due tetti
+racchiudono quello vero (due run del full con la miscela di provider di settembre, non
+piu' riproducibile):
+  `cos_rel`        tetto = cos(v_full, v_full_rep): routing libero, settembre vs ottobre.
+                   Include anche la deriva di provider: tetto basso, rapporto indulgente.
+  `cos_rel_strict` tetto = cos(v_single_a, v_single_b) dallo studio chain
+                   (results/chain_noise_<model>.json): stesso provider e stessa sessione.
+                   Solo rumore di generazione: tetto alto, rapporto severo.
 """
 
 import argparse
@@ -122,28 +127,45 @@ def run(model: str) -> dict:
 
     replicates = {r: analyse_variant(model, r, V_full)[0]
                   for r in REPLICATES if emb_path(model, r).exists()}
+    ceilings = {}
     if "full_rep" in replicates:
-        calibrate(per_variant, replicates["full_rep"]["cos_with_full"])
+        ceilings["lenient"] = replicates["full_rep"]["cos_with_full"]
+        calibrate(per_variant, ceilings["lenient"], "cos_rel")
+    strict = strict_ceiling(model)
+    if strict:
+        ceilings["strict"] = strict
+        calibrate(per_variant, strict, "cos_rel_strict")
 
     return {"model": model, "variants": per_variant, "replicates": replicates,
-            "factorial": factorial}
+            "ceilings": ceilings, "factorial": factorial}
 
 
-def calibrate(per_variant: dict, ceiling: dict[str, float]) -> None:
-    """Aggiunge a ogni variante il coseno con il full diviso per il tetto della replica.
+def strict_ceiling(model: str) -> dict[str, float] | None:
+    """Tetto su provider fisso: cos(v_single_a, v_single_b) per categoria, dallo studio chain."""
+    path = RESULTS / f"chain_noise_{model}.json"
+    if not path.exists():
+        return None
+    st = json.loads(path.read_text())["steering"]
+    return {LABELS[c]: st[LABELS[c]]["ceiling"] for c in FALK_CATEGORIES}
+
+
+def calibrate(per_variant: dict, ceiling: dict[str, float], key: str = "cos_rel") -> None:
+    """Aggiunge a ogni variante il coseno con il full diviso per il tetto (`key`, `key_mean`).
     Il full e' escluso: il suo coseno con se stesso vale 1 per costruzione."""
     for v, r in per_variant.items():
         if v == "full":
             continue
         rel = {c: r["cos_with_full"][c] / ceiling[c] for c in ceiling}
-        r["cos_rel"] = rel
-        r["cos_rel_mean"] = float(np.mean(list(rel.values())))
+        r[key] = rel
+        r[f"{key}_mean"] = float(np.mean(list(rel.values())))
 
 
 def print_summary(res: dict) -> None:
     calibrated = "full_rep" in res.get("replicates", {})
+    strict = "strict" in res.get("ceilings", {})
     head = f"\n{'variante':12} {'probe5':>7} {'||v|| media':>12} {'cos·full':>9} {'split-half':>11}"
-    print(head + (f" {'cos/tetto':>10}" if calibrated else ""))
+    print(head + (f" {'cos/tetto':>10}" if calibrated else "")
+          + (f" {'cos/tetto severo':>17}" if strict else ""))
     rows = sorted(res["variants"].values(), key=lambda r: -r["cos_with_full_mean"])
     for r in [*rows, *res.get("replicates", {}).values()]:
         sh = np.mean(list(r["split_half"].values()))
@@ -151,10 +173,15 @@ def print_summary(res: dict) -> None:
                 f"{r['cos_with_full_mean']:9.3f} {sh:11.3f}")
         if calibrated and "cos_rel_mean" in r:
             line += f" {r['cos_rel_mean']:10.3f}"
+        if strict and "cos_rel_strict_mean" in r:
+            line += f" {r['cos_rel_strict_mean']:17.3f}"
         print(line)
     if calibrated:
         ceil = res["replicates"]["full_rep"]["cos_with_full"]
         print("tetto (cos full_rep·full): " + "  ".join(f"{c} {v:.3f}" for c, v in ceil.items()))
+    if strict:
+        print("tetto severo (provider fisso): "
+              + "  ".join(f"{c} {v:.3f}" for c, v in res["ceilings"]["strict"].items()))
     if res["factorial"]:
         print("\neffetti principali (con parte - senza parte):")
         for metric, eff in res["factorial"].items():

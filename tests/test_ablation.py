@@ -65,3 +65,12 @@ def test_calibrate_divides_by_ceiling_and_skips_full():
     assert "cos_rel" not in per["full"]
     assert per["no_def"]["cos_rel"] == pytest.approx({"A": 1.0, "B": 0.5})
     assert per["no_def"]["cos_rel_mean"] == pytest.approx(0.75)
+
+
+def test_calibrate_custom_key():
+    from museumbot.rq1_embeddings.ablation import calibrate
+
+    per = {"no_def": {"cos_with_full": {"A": 0.8}}}
+    calibrate(per, {"A": 0.9}, "cos_rel_strict")
+    assert per["no_def"]["cos_rel_strict"]["A"] == pytest.approx(0.8 / 0.9)
+    assert "cos_rel" not in per["no_def"]

@@ -146,3 +146,59 @@ maggior parte usa markdown.
 salta e segnala le celle che falliscono 4 tentativi invece di fermare il run.
 **Motivo.** Una sola cella rifiutata 4 volte dal filtro fermava l'intero run (successo a
 152 testi su 1 600).
+
+## 2026-10-01 — Rimossa la figura t-SNE
+
+**Decisione.** `analyze.py` non produce più `figures/tsne_{qwen,bge-m3}.png`; le figure di
+proiezione restano PCA e LDA.
+**Motivo.** RQ1 chiede in che direzione e di quanto la categoria sposta il testo. La t-SNE
+conserva solo i vicini locali: non ha direzioni (niente steering vector), le distanze e le
+dimensioni dei cluster non sono interpretabili, dipende da perplexity e seed e non permette
+di proiettare opere tenute fuori. La PCA mostra la stessa separazione senza usare le
+etichette e con le frecce dei v[c]; la LDA held-out la affianca come controparte visiva del
+probe.
+**Effetto sui risultati.** Nessuno: la figura era supplementare e nessuna metrica ne
+dipendeva.
+
+## 2026-10-01 — Pulizia estesa al formato copione della chain
+
+**Decisione.** `clean_guide` toglie anche le intestazioni ("Audio Guide Script (approx. 250
+words):", "Audio Guide: <titolo>") e le didascalie di regia ("(Soft, inviting tone)",
+"(Fade out)", "(pause)"); `chain_noise.py` la riapplica ai testi già salvati.
+**Motivo.** Dopo la prima analisi è emerso che 240 testi della chain su 500 avevano
+un'intestazione da copione e 98 didascalie su righe a sé; nei singoli e nel flat nessuna.
+Si confronta il testo parlato, non il formato. La pulizia è stata estesa *dopo* aver visto i
+primi risultati; il criterio di equivalenza no.
+**Effetto.** Nessuno sulle conclusioni: R da 1.42 a 1.43 (Qwen3), da 1.43 a 1.45 (BGE-M3);
+shift relativo della chain da 0.70 a 0.73 (Qwen3), da 0.69 a 0.80 (BGE-M3).
+
+## 2026-10-01 — Cache degli embedding dello studio chain per modello
+
+**Correzione.** `chain_noise.py` usava un solo file di metadati per entrambi i modelli di
+embedding: dopo il ricalcolo con Qwen3, BGE-M3 trovava i metadati aggiornati e riusava i
+propri embedding vecchi. Ora la cache è per modello (`meta_<modello>_chain_study.csv`).
+**Effetto.** Il primo risultato BGE-M3 dopo la pulizia estesa era quello vecchio; i valori
+riportati sopra sono quelli ricalcolati.
+
+## 2026-10-01 — Chain vs singolo: esito
+
+**Esito.** Con il criterio fissato prima dei dati i due metodi **non sono equivalenti**:
+R = 1.43 [1.39, 1.49] (Qwen3), 1.45 [1.40, 1.50] (BGE-M3). Lo shift di categoria della
+chain conserva in media 0.73 (0.80) di quello del singolo, rispetto al tetto; Experience
+Seeker e Facilitator sono le categorie più diverse.
+**Conseguenza.** I risultati di RQ1 valgono per il prompt singolo e non si trasferiscono
+automaticamente alla chain del paper. La riserva prevista dal disegno (chain più rumorosa
+del singolo) richiederebbe una seconda run della chain; non generata, in attesa di
+decisione.
+
+## 2026-10-01 — Tetto severo per la calibrazione dell'ablazione
+
+**Decisione.** `ablation.py` riporta il coseno con il full rispetto a due tetti: quello di
+`full_rep` (indulgente, include la deriva di provider) e quello fra `single_a` e
+`single_b` dello studio chain (severo, stesso provider). Il tetto vero sta in mezzo.
+**Motivo.** La deriva di provider misurata sui testi (D = 1.19 Qwen3, 1.17 BGE-M3) rende il
+tetto di `full_rep` troppo basso; il tetto su provider fisso non ha deriva ma viene da un
+setup un po' diverso (un solo provider, testi puliti), quindi è usato come limite, non come
+nuovo tetto.
+**Effetto.** Con Qwen3 i due tetti quasi coincidono e `no_def`/`no_need` restano a 1.00.
+Con BGE-M3 e il tetto severo scendono a 0.97–0.98.

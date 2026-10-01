@@ -56,9 +56,11 @@ RNG = np.random.default_rng(0)
 
 def collect_rows() -> list[dict]:
     """Testi dello studio + full/full_rep del corpus (per la deriva), tutti puliti."""
-    rows = [{"artwork_id": r["artwork_id"], "condition": r["condition"],
-             "method": r["method"], "text": r["text"], "words": r["words"]}
-            for r in map(json.loads, STUDY.open())]
+    rows = []
+    for r in map(json.loads, STUDY.open()):
+        t = clean_guide(r["text"])  # regole aggiunte dopo la generazione
+        rows.append({"artwork_id": r["artwork_id"], "condition": r["condition"],
+                     "method": r["method"], "text": t, "words": len(t.split())})
     for r in map(json.loads, GEN.open()):
         v = r.get("variant", "full")
         if v in ("full", "full_rep") and r["condition"] != "flat":
@@ -74,7 +76,7 @@ def embed(alias: str, device: str) -> tuple[pd.DataFrame, np.ndarray]:
     rows = collect_rows()
     meta = pd.DataFrame(rows)
     emb_file = ROOT / "data" / f"emb_{alias}_chain_study.npy"
-    meta_file = ROOT / "data" / "meta_chain_study.csv"
+    meta_file = ROOT / "data" / f"meta_{alias}_chain_study.csv"  # una cache per modello
     if emb_file.exists() and meta_file.exists():
         cached = pd.read_csv(meta_file)
         E = np.load(emb_file)

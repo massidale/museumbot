@@ -2,7 +2,7 @@
 
 Il passaggio critico e' il CENTERING PER OPERA. In uno spazio di embedding la varianza
 dominante e' *quale opera* si sta descrivendo, non *per chi*: senza centering qualsiasi
-PCA/t-SNE mostra 100 cluster-opera e zero struttura di categoria. Si usano due riferimenti:
+proiezione mostra 100 cluster-opera e zero struttura di categoria. Si usano due riferimenti:
 
     media:  e'[a,c] = e[a,c] - mean_over_c( e[a,.] )    tutte le condizioni trattate allo stesso modo
     flat:   e'[a,c] = e[a,c] - e[a,flat]                 effetto della categoria rispetto al neutro
@@ -38,7 +38,6 @@ import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.linear_model import LogisticRegression
-from sklearn.manifold import TSNE
 from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.model_selection import GroupKFold
 
@@ -283,25 +282,6 @@ def fig_pca(Xc, path):
     plt.close(fig)
 
 
-def fig_tsne(Xc, path):
-    F, y, _ = flatten(Xc)
-    Z = TSNE(n_components=2, perplexity=30, init="pca", random_state=0).fit_transform(F)
-    fig, ax = plt.subplots(figsize=(7.5, 6.5))
-    for ci, c in enumerate(CONDITIONS):
-        m = y == ci
-        ax.scatter(Z[m, 0], Z[m, 1], s=22, alpha=0.6, c=COLORS[c], label=LABELS[c],
-                   edgecolors="none")
-    ax.set_title("t-SNE (figura supplementare)\n"
-                 "non conserva direzioni ne' distanze fra cluster: non usarla per lo shift",
-                 fontsize=10)
-    ax.legend(frameon=False, fontsize=9)
-    ax.set_xticks([])
-    ax.set_yticks([])
-    fig.tight_layout()
-    fig.savefig(path, dpi=160)
-    plt.close(fig)
-
-
 def fig_cosine(M, path):
     fig, ax = plt.subplots(figsize=(7.2, 6))
     im = ax.imshow(M, cmap="RdBu_r", vmin=-1, vmax=1)
@@ -485,7 +465,6 @@ def main() -> None:
     fig_cosine(M, FIGS / f"cosine_{tag}.png")
     fig_distance(d2, FIGS / f"distance_{tag}.png")
     fig_confusion(cm, acc, FIGS / f"confusion_{tag}.png")
-    fig_tsne(Xc, FIGS / f"tsne_{tag}.png")
     print(f"\nfigure -> {FIGS.relative_to(ROOT)}/*_{tag}.png")
 
     # --- parole discriminative ---

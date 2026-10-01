@@ -1,0 +1,613 @@
+{
+  "model": "glm-5.3",
+  "criteria": {
+    "n_judgments": 4200,
+    "valid_rate": 1.0,
+    "attention_accuracy": 1.0,
+    "order_consistency": 0.8835,
+    "position_A_rate": 0.5302380952380953,
+    "passed": {
+      "valid_rate": true,
+      "attention_accuracy": true
+    }
+  },
+  "n_pairs": {
+    "A": 500,
+    "B": 500,
+    "N": 500,
+    "C": 500,
+    "attention": 100
+  },
+  "rates": {
+    "A": {
+      "overall": {
+        "mean": 0.967,
+        "ci95": [
+          0.953,
+          0.979
+        ],
+        "n": 500
+      },
+      "Explorer": {
+        "mean": 0.9,
+        "ci95": [
+          0.845,
+          0.95
+        ],
+        "n": 100
+      },
+      "Facilitator": {
+        "mean": 1.0,
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "n": 100
+      },
+      "Experience Seeker": {
+        "mean": 1.0,
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "n": 100
+      },
+      "Professional/Hobbyist": {
+        "mean": 0.935,
+        "ci95": [
+          0.895,
+          0.97
+        ],
+        "n": 100
+      },
+      "Recharger": {
+        "mean": 1.0,
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "n": 100
+      }
+    },
+    "B": {
+      "overall": {
+        "mean": 0.991,
+        "ci95": [
+          0.984,
+          0.996
+        ],
+        "n": 500
+      },
+      "Explorer": {
+        "mean": 0.98,
+        "ci95": [
+          0.9598749999999999,
+          0.995
+        ],
+        "n": 100
+      },
+      "Facilitator": {
+        "mean": 0.985,
+        "ci95": [
+          0.96,
+          1.0
+        ],
+        "n": 100
+      },
+      "Experience Seeker": {
+        "mean": 1.0,
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "n": 100
+      },
+      "Professional/Hobbyist": {
+        "mean": 0.99,
+        "ci95": [
+          0.975,
+          1.0
+        ],
+        "n": 100
+      },
+      "Recharger": {
+        "mean": 1.0,
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "n": 100
+      }
+    },
+    "C": {
+      "overall": {
+        "mean": 0.207,
+        "ci95": [
+          0.167,
+          0.249
+        ],
+        "n": 500
+      },
+      "Explorer": {
+        "mean": 0.23,
+        "ci95": [
+          0.165,
+          0.3
+        ],
+        "n": 100
+      },
+      "Facilitator": {
+        "mean": 0.345,
+        "ci95": [
+          0.26,
+          0.425
+        ],
+        "n": 100
+      },
+      "Experience Seeker": {
+        "mean": 0.07,
+        "ci95": [
+          0.03,
+          0.115
+        ],
+        "n": 100
+      },
+      "Professional/Hobbyist": {
+        "mean": 0.155,
+        "ci95": [
+          0.105,
+          0.21
+        ],
+        "n": 100
+      },
+      "Recharger": {
+        "mean": 0.235,
+        "ci95": [
+          0.16,
+          0.31
+        ],
+        "n": 100
+      }
+    },
+    "N": {
+      "overall": {
+        "mean": 0.432,
+        "ci95": [
+          0.39,
+          0.476
+        ],
+        "n": 500
+      },
+      "Explorer": {
+        "mean": 0.755,
+        "ci95": [
+          0.68,
+          0.825
+        ],
+        "n": 100
+      },
+      "Facilitator": {
+        "mean": 0.57,
+        "ci95": [
+          0.49,
+          0.655
+        ],
+        "n": 100
+      },
+      "Experience Seeker": {
+        "mean": 0.12,
+        "ci95": [
+          0.07,
+          0.175
+        ],
+        "n": 100
+      },
+      "Professional/Hobbyist": {
+        "mean": 0.345,
+        "ci95": [
+          0.265,
+          0.425
+        ],
+        "n": 100
+      },
+      "Recharger": {
+        "mean": 0.37,
+        "ci95": [
+          0.304875,
+          0.445
+        ],
+        "n": 100
+      }
+    },
+    "A-C": {
+      "overall": {
+        "mean": 0.76,
+        "ci95": [
+          0.718,
+          0.799
+        ],
+        "n": 500
+      },
+      "Explorer": {
+        "mean": 0.67,
+        "ci95": [
+          0.585,
+          0.75
+        ],
+        "n": 100
+      },
+      "Facilitator": {
+        "mean": 0.655,
+        "ci95": [
+          0.57,
+          0.735
+        ],
+        "n": 100
+      },
+      "Experience Seeker": {
+        "mean": 0.93,
+        "ci95": [
+          0.885,
+          0.97
+        ],
+        "n": 100
+      },
+      "Professional/Hobbyist": {
+        "mean": 0.78,
+        "ci95": [
+          0.715,
+          0.84
+        ],
+        "n": 100
+      },
+      "Recharger": {
+        "mean": 0.765,
+        "ci95": [
+          0.685,
+          0.835
+        ],
+        "n": 100
+      }
+    },
+    "A-N": {
+      "overall": {
+        "mean": 0.535,
+        "ci95": [
+          0.495,
+          0.573
+        ],
+        "n": 500
+      },
+      "Explorer": {
+        "mean": 0.145,
+        "ci95": [
+          0.085,
+          0.21
+        ],
+        "n": 100
+      },
+      "Facilitator": {
+        "mean": 0.43,
+        "ci95": [
+          0.35,
+          0.5101249999999993
+        ],
+        "n": 100
+      },
+      "Experience Seeker": {
+        "mean": 0.88,
+        "ci95": [
+          0.82,
+          0.935
+        ],
+        "n": 100
+      },
+      "Professional/Hobbyist": {
+        "mean": 0.59,
+        "ci95": [
+          0.505,
+          0.675
+        ],
+        "n": 100
+      },
+      "Recharger": {
+        "mean": 0.63,
+        "ci95": [
+          0.56,
+          0.695
+        ],
+        "n": 100
+      }
+    }
+  },
+  "length": {
+    "logit_per_sd_words": {
+      "coef": 0.36407881108526874,
+      "ci95": [
+        0.2662950026083266,
+        0.5064678036194489
+      ],
+      "sd_words": 29.782079578162435
+    },
+    "close_length_pairs": {
+      "A": {
+        "mean": 0.9619565217391305,
+        "ci95": [
+          0.9428558249868213,
+          0.9781021897810219
+        ],
+        "n": 276
+      },
+      "B": {
+        "mean": 0.9927536231884058,
+        "ci95": [
+          0.9826974601114955,
+          1.0
+        ],
+        "n": 276
+      },
+      "C": {
+        "mean": 0.18587360594795538,
+        "ci95": [
+          0.13586905250205086,
+          0.23333910034602073
+        ],
+        "n": 269
+      },
+      "N": {
+        "mean": 0.40942028985507245,
+        "ci95": [
+          0.35580000405630147,
+          0.46255722014148976
+        ],
+        "n": 276
+      }
+    },
+    "target_longer_rate": {
+      "A": 0.676,
+      "B": 0.518,
+      "C": 0.648,
+      "N": 0.676
+    }
+  },
+  "reasons": {
+    "mentions_length": {
+      "A": 0.001,
+      "B": 0.002,
+      "C": 0.008,
+      "N": 0.008
+    },
+    "top_words": {
+      "Explorer": [
+        "curiosity",
+        "questions",
+        "open",
+        "invites",
+        "details",
+        "facts",
+        "rather",
+        "looking",
+        "like",
+        "explorer",
+        "vivid",
+        "about"
+      ],
+      "Facilitator": [
+        "group",
+        "facilitator",
+        "discussion",
+        "shared",
+        "conversation",
+        "want",
+        "questions",
+        "spark",
+        "invites",
+        "prompts",
+        "open",
+        "together"
+      ],
+      "Experience Seeker": [
+        "experience",
+        "seeker",
+        "must",
+        "want",
+        "iconic",
+        "status",
+        "masterpiece",
+        "painting",
+        "confirmation",
+        "frames",
+        "emphasizes",
+        "painting's"
+      ],
+      "Professional/Hobbyist": [
+        "visitor",
+        "content",
+        "scholarly",
+        "related",
+        "objective",
+        "interest",
+        "works",
+        "offers",
+        "detail",
+        "want",
+        "context",
+        "richer"
+      ],
+      "Recharger": [
+        "restorative",
+        "contemplative",
+        "experience",
+        "rather",
+        "invites",
+        "recharger",
+        "seek",
+        "reflection",
+        "slow",
+        "stillness",
+        "painting",
+        "facts"
+      ]
+    }
+  },
+  "exploratory": {
+    "preference_matrix": {
+      "Explorer": {
+        "Explorer": 0.9,
+        "Facilitator": 0.36,
+        "Experience Seeker": 0.14,
+        "Professional/Hobbyist": 0.24,
+        "Recharger": 0.18
+      },
+      "Facilitator": {
+        "Explorer": 0.84,
+        "Facilitator": 1.0,
+        "Experience Seeker": 0.36,
+        "Professional/Hobbyist": 0.08,
+        "Recharger": 0.1
+      },
+      "Experience Seeker": {
+        "Explorer": 0.08,
+        "Facilitator": 0.14,
+        "Experience Seeker": 1.0,
+        "Professional/Hobbyist": 0.06,
+        "Recharger": 0.0
+      },
+      "Professional/Hobbyist": {
+        "Explorer": 0.3,
+        "Facilitator": 0.08,
+        "Experience Seeker": 0.24,
+        "Professional/Hobbyist": 0.935,
+        "Recharger": 0.0
+      },
+      "Recharger": {
+        "Explorer": 0.42,
+        "Facilitator": 0.46,
+        "Experience Seeker": 0.06,
+        "Professional/Hobbyist": 0.0,
+        "Recharger": 1.0
+      }
+    },
+    "preference_n": {
+      "Explorer": {
+        "Explorer": 100,
+        "Facilitator": 25,
+        "Experience Seeker": 25,
+        "Professional/Hobbyist": 25,
+        "Recharger": 25
+      },
+      "Facilitator": {
+        "Explorer": 25,
+        "Facilitator": 100,
+        "Experience Seeker": 25,
+        "Professional/Hobbyist": 25,
+        "Recharger": 25
+      },
+      "Experience Seeker": {
+        "Explorer": 25,
+        "Facilitator": 25,
+        "Experience Seeker": 100,
+        "Professional/Hobbyist": 25,
+        "Recharger": 25
+      },
+      "Professional/Hobbyist": {
+        "Explorer": 25,
+        "Facilitator": 25,
+        "Experience Seeker": 25,
+        "Professional/Hobbyist": 100,
+        "Recharger": 25
+      },
+      "Recharger": {
+        "Explorer": 25,
+        "Facilitator": 25,
+        "Experience Seeker": 25,
+        "Professional/Hobbyist": 25,
+        "Recharger": 100
+      }
+    },
+    "accepted_by_others": {
+      "Explorer": 0.41,
+      "Facilitator": 0.26,
+      "Experience Seeker": 0.2,
+      "Professional/Hobbyist": 0.095,
+      "Recharger": 0.07
+    },
+    "b_confusions": {
+      "Explorer -> Facilitator": {
+        "own_rate": 0.98,
+        "n": 25
+      },
+      "Explorer -> Professional/Hobbyist": {
+        "own_rate": 0.96,
+        "n": 25
+      },
+      "Explorer -> Recharger": {
+        "own_rate": 0.98,
+        "n": 25
+      },
+      "Facilitator -> Explorer": {
+        "own_rate": 0.94,
+        "n": 25
+      },
+      "Professional/Hobbyist -> Experience Seeker": {
+        "own_rate": 0.98,
+        "n": 25
+      },
+      "Professional/Hobbyist -> Explorer": {
+        "own_rate": 0.98,
+        "n": 25
+      }
+    },
+    "consistency_by_type": {
+      "A": 0.962,
+      "B": 0.986,
+      "C": 0.842,
+      "N": 0.744
+    },
+    "position_A_by_persona": {
+      "experience_seeker": 0.51,
+      "explorer": 0.5333333333333333,
+      "facilitator": 0.5066666666666667,
+      "neutral": 0.576,
+      "professional_hobbyist": 0.53,
+      "recharger": 0.505
+    },
+    "reason_cites_own_category": {
+      "Explorer": 0.31666666666666665,
+      "Facilitator": 0.96,
+      "Experience Seeker": 0.9833333333333333,
+      "Professional/Hobbyist": 0.2816666666666667,
+      "Recharger": 0.6233333333333333
+    },
+    "rq1_link": {
+      "qwen": {
+        "distance": {
+          "rho_20": -0.7930252468659089,
+          "p_20": 3.037130988436532e-05,
+          "rho_10": -0.9030303030303028,
+          "p_10": 0.00034361219776328245
+        },
+        "cosine": {
+          "rho_20": 0.5534497420765904,
+          "p_20": 0.011358482762146408,
+          "rho_10": 0.7212121212121211,
+          "p_10": 0.018573155089460232
+        }
+      },
+      "bge-m3": {
+        "distance": {
+          "rho_20": -0.6838515991138144,
+          "p_20": 0.0008849650125916125,
+          "rho_10": -0.6606060606060605,
+          "p_10": 0.03758837757140935
+        },
+        "cosine": {
+          "rho_20": 0.7930252468659089,
+          "p_20": 3.037130988436532e-05,
+          "rho_10": 0.9515151515151514,
+          "p_10": 2.279854920641689e-05
+        }
+      }
+    }
+  }
+}

@@ -11,8 +11,11 @@ Provider: OpenRouter distribuisce lo stesso modello su molti provider, con quant
 diverse (fp4, fp8, non dichiarata). Senza vincoli ogni chiamata puo' finire su un provider
 diverso, e il corpus diventa una miscela non tracciata. `--provider` fissa un provider
 senza fallback; il provider effettivo di ogni risposta viene comunque salvato nella riga.
-Il corpus principale (settembre 2026) e' stato generato prima di questa opzione, con
-routing libero.
+Il corpus di settembre 2026 (oggi usato solo per l'ablazione) e' stato generato prima di
+questa opzione, con routing libero.
+
+Pulizia: il testo salvato passa per `common.clean.clean_guide`; se la pulizia lo cambia,
+l'originale resta in `usage.raw`.
 """
 
 import argparse
@@ -25,6 +28,7 @@ from pathlib import Path
 
 import requests
 
+from museumbot.common.clean import clean_guide
 from museumbot.common.config import ROOT, openrouter_key
 from museumbot.common.prompts import CONDITIONS, REPLICATES, VARIANTS, build_messages, prompt_variant
 
@@ -189,7 +193,8 @@ def main() -> None:
         art, cond, variant = job
         msgs = build_messages(cond, art["title"], art["artist"], art["source_text"],
                               prompt_variant(variant))
-        text, usage = generate_one(session, args.model, msgs, budget, args.temperature, routing)
+        text, usage = generate_one(session, args.model, msgs, budget, args.temperature, routing,
+                                   clean=clean_guide)
         row = {
             "artwork_id": art["id"],
             "title": art["title"],

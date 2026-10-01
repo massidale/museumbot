@@ -23,8 +23,9 @@ Livello steering (l'effetto di categoria e' lo stesso?), riferimento flat della 
     rel    = chain / tetto                      ~1 = stesso shift di categoria
 
 Deriva di routing: lo stesso `within`, calcolato fra `full` e `full_rep` del corpus
-principale (routing libero, settembre vs ottobre), dice quanto rumore aggiunge cambiare
-provider. Tutti i testi, anche quelli del corpus, passano per la stessa `clean_guide`.
+di settembre (routing libero, settembre vs ottobre), dice quanto rumore aggiunge cambiare
+provider. Tutti i testi passano per la stessa `clean_guide`, dal testo originale; i
+full/full_rep vengono da `load_corpus("ablation")`, quindi senza le opere troncate.
 """
 
 import argparse
@@ -37,14 +38,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from museumbot.common.clean import clean_guide
 from museumbot.common.config import ROOT
+from museumbot.common.corpus import load_corpus, original_text
 from museumbot.common.prompts import CONDITIONS, FALK_CATEGORIES, LABELS
 from museumbot.generation.chain_study import OUT as STUDY
-from museumbot.generation.chain_study import clean_guide
 from museumbot.rq1_embeddings.analyze import FLAT, steering
 from museumbot.rq1_embeddings.embed import MODELS
 
-GEN = ROOT / "data" / "generations.jsonl"
 RESULTS = ROOT / "results"
 FIGS = ROOT / "figures"
 EQUIV_MARGIN = 1.10
@@ -55,18 +56,16 @@ RNG = np.random.default_rng(0)
 
 
 def collect_rows() -> list[dict]:
-    """Testi dello studio + full/full_rep del corpus (per la deriva), tutti puliti."""
+    """Testi dello studio + full/full_rep del corpus di settembre (per la deriva), puliti."""
     rows = []
     for r in map(json.loads, STUDY.open()):
-        t = clean_guide(r["text"])  # regole aggiunte dopo la generazione
+        t = clean_guide(original_text(r))  # regole aggiunte dopo la generazione
         rows.append({"artwork_id": r["artwork_id"], "condition": r["condition"],
                      "method": r["method"], "text": t, "words": len(t.split())})
-    for r in map(json.loads, GEN.open()):
-        v = r.get("variant", "full")
-        if v in ("full", "full_rep") and r["condition"] != "flat":
-            t = clean_guide(r["text"])
+    for r in load_corpus("ablation", verbose=False):
+        if r["variant"] in ("full", "full_rep") and r["condition"] != "flat":
             rows.append({"artwork_id": r["artwork_id"], "condition": r["condition"],
-                         "method": v, "text": t, "words": len(t.split())})
+                         "method": r["variant"], "text": r["text"], "words": r["words"]})
     rows.sort(key=lambda r: (r["method"], r["artwork_id"], r["condition"]))
     return rows
 
@@ -75,8 +74,10 @@ def embed(alias: str, device: str) -> tuple[pd.DataFrame, np.ndarray]:
     """Embedding in cache: si ricalcola solo se i testi sono cambiati."""
     rows = collect_rows()
     meta = pd.DataFrame(rows)
-    emb_file = ROOT / "data" / f"emb_{alias}_chain_study.npy"
-    meta_file = ROOT / "data" / f"meta_{alias}_chain_study.csv"  # una cache per modello
+    cache = ROOT / "data" / "emb" / "chain_study"
+    cache.mkdir(parents=True, exist_ok=True)
+    emb_file = cache / f"{alias}.npy"
+    meta_file = cache / f"meta_{alias}.csv"  # una cache per modello
     if emb_file.exists() and meta_file.exists():
         cached = pd.read_csv(meta_file)
         E = np.load(emb_file)

@@ -71,7 +71,7 @@ def test_chain_messages_extend_prefix_with_p3_and_source():
 
 
 def test_clean_guide_strips_preamble_markdown_and_word_count():
-    from museumbot.generation.chain_study import clean_guide
+    from museumbot.common.clean import clean_guide
 
     raw = ("Here is a 250-word audio guide for *The Starry Night*, written for the **Explorer**.\n\n"
            "---\n\nPause here. Look at *The Starry Night* and its **swirling** sky.\n\n"
@@ -81,14 +81,14 @@ def test_clean_guide_strips_preamble_markdown_and_word_count():
 
 
 def test_clean_guide_leaves_plain_text_untouched():
-    from museumbot.generation.chain_study import clean_guide
+    from museumbot.common.clean import clean_guide
 
     plain = "Stand back a little.\n\nThe painting measures 73 by 92 cm, 3*4 grid aside."
     assert clean_guide(plain) == plain
 
 
 def test_clean_guide_strips_script_headers_and_stage_directions():
-    from museumbot.generation.chain_study import clean_guide
+    from museumbot.common.clean import clean_guide
 
     raw = ("**Audio Guide Script (approx. 250 words):**\n\n(Soft, inviting tone)\n\n"
            "Look at the sky (pause) and breathe. Painted in 1889 (in Saint-Rémy).\n\n(Fade out)")

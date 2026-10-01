@@ -22,6 +22,10 @@ Metriche, in ordine di forza probatoria:
      (indipendente dal riferimento), coseni e norme dei v[c] -> direzione degli effetti [flat]
   4. test di permutazione entro opera                      -> p-value              [media]
   5. ablazione lessicale                                   -> registro o solo vocabolario?
+
+Tetto: se il corpus ha la replica `full_rep` (nel corpus principale e' `single_b`), il
+coseno fra gli steering vector delle due run, per categoria, e' il massimo che un confronto
+fra coseni puo' raggiungere (sezione `ceiling` del JSON; la usa anche ablation.py).
 """
 
 import argparse
@@ -42,6 +46,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.model_selection import GroupKFold
 
 from museumbot.common.config import ROOT, emb_path, meta_path
+from museumbot.common.corpus import CORPORA, load_corpus
 from museumbot.common.prompts import CONDITIONS, FALK_CATEGORIES, LABELS
 
 FIGS = ROOT / "figures"
@@ -63,9 +68,9 @@ COLORS = {
 # --------------------------------------------------------------------------- dati
 
 
-def load(model: str, variant: str = "full"):
-    emb = np.load(emb_path(model, variant))
-    meta = pd.read_csv(meta_path(variant))
+def load(model: str, variant: str = "full", corpus: str = "main"):
+    emb = np.load(emb_path(model, variant, corpus))
+    meta = pd.read_csv(meta_path(variant, corpus))
     assert len(meta) == len(emb), f"meta {len(meta)} != emb {len(emb)}"
 
     arts = sorted(meta["artwork_id"].unique())
@@ -173,6 +178,20 @@ def crossval_distance(X, n_rep=200):
         out.append(np.sum(d1 * d2, axis=-1))
     out = np.array(out)
     return out.mean(axis=0), out.std(axis=0)
+
+
+def row_cosines(U, V):
+    """Coseno riga per riga fra due matrici (K, D)."""
+    return np.sum(U * V, axis=1) / (
+        np.linalg.norm(U, axis=1) * np.linalg.norm(V, axis=1) + 1e-12)
+
+
+def replicate_ceiling(X, arts, Xr, arts_r):
+    """cos(v[c], v_rep[c]) sulle opere presenti in entrambe le run."""
+    common = sorted(set(arts) & set(arts_r))
+    i = [arts.index(a) for a in common]
+    j = [arts_r.index(a) for a in common]
+    return row_cosines(steering(X[i]), steering(Xr[j]))
 
 
 def cosine_matrix(V):
@@ -350,22 +369,25 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="qwen")
     ap.add_argument("--variant", default="full")
+    ap.add_argument("--corpus", default="main", choices=CORPORA)
     ap.add_argument("--no-ablation", action="store_true")
     args = ap.parse_args()
 
     FIGS.mkdir(exist_ok=True)
     RESULTS.mkdir(exist_ok=True)
-    tag = args.model if args.variant == "full" else f"{args.model}_{args.variant}"
+    tag = args.model + ("" if args.corpus == "main" else f"_{args.corpus}") + (
+        "" if args.variant == "full" else f"_{args.variant}")
 
-    X, arts, meta = load(args.model, args.variant)
+    X, arts, meta = load(args.model, args.variant, args.corpus)
     A, C, D = X.shape
-    print(f"\n{A} opere x {C} condizioni x {D} dim  [{args.model}]")
+    print(f"\n{A} opere x {C} condizioni x {D} dim  [{args.model}, corpus {args.corpus}]")
 
     Xc = center(X, "mean")  # per probe, permutazione, varianza e figure di proiezione
     Vm = Xc.mean(axis=0)    # (C, D) scostamenti dal baricentro dell'opera
     V = steering(X)         # (5, D) steering vector rispetto al flat
 
-    out = {"model": args.model, "n_artworks": A, "n_conditions": C, "dim": D}
+    out = {"model": args.model, "corpus": args.corpus, "variant": args.variant,
+           "n_artworks": A, "n_conditions": C, "dim": D}
 
     # --- varianza: quanto pesa l'opera rispetto alla categoria ---
     var_total = X.reshape(A * C, D).var(axis=0).sum()
@@ -440,6 +462,14 @@ def main() -> None:
     for v, a, b in cpairs[-2:]:
         print(f"      {LABELS[a]:24} ~ {LABELS[b]:24} {v:+.3f}")
 
+    # --- tetto dalla replica ---
+    if args.variant == "full" and emb_path(args.model, "full_rep", args.corpus).exists():
+        Xr, arts_r, _ = load(args.model, "full_rep", args.corpus)
+        ceil = replicate_ceiling(X, arts, Xr, arts_r)
+        out["ceiling"] = {LABELS[c]: float(ceil[i]) for i, c in enumerate(FALK_CATEGORIES)}
+        print("    tetto (cos fra steering vector di due run dello stesso prompt):")
+        print("      " + "  ".join(f"{LABELS[c]} {ceil[i]:.3f}" for i, c in enumerate(FALK_CATEGORIES)))
+
     # --- 4. permutazione (sugli scostamenti dalla media: tutte le condizioni scambiabili) ---
     observed = np.linalg.norm(Vm, axis=1).mean()
     p, null = permutation_test(Xc, observed)
@@ -468,9 +498,8 @@ def main() -> None:
     print(f"\nfigure -> {FIGS.relative_to(ROOT)}/*_{tag}.png")
 
     # --- parole discriminative ---
-    gens = [json.loads(l) for l in (ROOT / "data" / "generations.jsonl").open()]
-    gens = [g for g in gens if g.get("variant", "full") == args.variant
-            or (g["condition"] == "flat" and g.get("variant", "full") == "full")]
+    gens = [g for g in load_corpus(args.corpus, verbose=False)
+            if g["variant"] == args.variant or (g["condition"] == "flat" and g["variant"] == "full")]
     by_cond = {c: [g["text"] for g in gens if g["condition"] == c] for c in CONDITIONS}
     out["top_words"] = {LABELS[c]: w[:15] for c, w in top_words(by_cond).items()}
     print("\nparole piu' discriminative per categoria:")

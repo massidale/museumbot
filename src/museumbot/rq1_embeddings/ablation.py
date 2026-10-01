@@ -13,15 +13,19 @@ variante e si sposterebbe con essa, contaminando il confronto con `full`.
 Chiude un'analisi fattoriale 2x2x2 sulle tre parti (def, need, style): effetti principali
 e interazioni a due vie, calcolati direttamente sulle medie delle 8 celle.
 
+Corpus: `ablation` (common.corpus), cioe' il corpus di settembre a routing libero, pulito e
+senza le opere con testi troncati. I numeri non si confrontano direttamente con quelli del
+corpus principale, generato su provider fisso.
+
 Calibrazione: ogni variante viene riportata anche come rapporto col tetto di rumore della
 generazione; ~1 vuol dire indistinguibile dal full, non soltanto "vicino". Due tetti
 racchiudono quello vero (due run del full con la miscela di provider di settembre, non
 piu' riproducibile):
   `cos_rel`        tetto = cos(v_full, v_full_rep): routing libero, settembre vs ottobre.
                    Include anche la deriva di provider: tetto basso, rapporto indulgente.
-  `cos_rel_strict` tetto = cos(v_single_a, v_single_b) dallo studio chain
-                   (results/chain_noise_<model>.json): stesso provider e stessa sessione.
-                   Solo rumore di generazione: tetto alto, rapporto severo.
+  `cos_rel_strict` tetto = cos(v_full, v_full_rep) del corpus principale
+                   (results/metrics_<model>.json, sezione `ceiling`): stesso provider e
+                   stessa sessione. Solo rumore di generazione: tetto alto, rapporto severo.
 """
 
 import argparse
@@ -77,8 +81,11 @@ def factorial_effects(table: dict[str, float]) -> dict:
     return {"main": main, "interaction": inter}
 
 
+CORPUS = "ablation"
+
+
 def analyse_variant(model: str, variant: str, V_full: np.ndarray | None) -> tuple[dict, np.ndarray]:
-    X, _, meta = load(model, variant)
+    X, _, meta = load(model, variant, CORPUS)
     Xc = center(X, "mean")
     V = steering(X)                                    # (5, D), rispetto al flat
     acc, cm, _, _ = probe(Xc[:, :N_FALK, :])          # 5 classi: flat escluso
@@ -103,7 +110,7 @@ def analyse_variant(model: str, variant: str, V_full: np.ndarray | None) -> tupl
 
 
 def run(model: str) -> dict:
-    variants = [v for v in VARIANTS if emb_path(model, v).exists()]
+    variants = [v for v in VARIANTS if emb_path(model, v, CORPUS).exists()]
     missing = [v for v in VARIANTS if v not in variants]
     if missing:
         print(f"  varianti senza embedding, saltate: {missing}")
@@ -126,7 +133,7 @@ def run(model: str) -> dict:
             factorial[metric] = factorial_effects({v: per_variant[v][metric] for v in VARIANTS})
 
     replicates = {r: analyse_variant(model, r, V_full)[0]
-                  for r in REPLICATES if emb_path(model, r).exists()}
+                  for r in REPLICATES if emb_path(model, r, CORPUS).exists()}
     ceilings = {}
     if "full_rep" in replicates:
         ceilings["lenient"] = replicates["full_rep"]["cos_with_full"]
@@ -141,12 +148,11 @@ def run(model: str) -> dict:
 
 
 def strict_ceiling(model: str) -> dict[str, float] | None:
-    """Tetto su provider fisso: cos(v_single_a, v_single_b) per categoria, dallo studio chain."""
-    path = RESULTS / f"chain_noise_{model}.json"
+    """Tetto su provider fisso: cos(v_full, v_full_rep) per categoria nel corpus principale."""
+    path = RESULTS / f"metrics_{model}.json"
     if not path.exists():
         return None
-    st = json.loads(path.read_text())["steering"]
-    return {LABELS[c]: st[LABELS[c]]["ceiling"] for c in FALK_CATEGORIES}
+    return json.loads(path.read_text()).get("ceiling")
 
 
 def calibrate(per_variant: dict, ceiling: dict[str, float], key: str = "cos_rel") -> None:

@@ -23,7 +23,7 @@ Pulizia: la chain apre con una frase di presentazione ("Here is a 250-word audio
 for the Recharger"), separata da `---`, usa markdown e spesso scrive in formato copione:
 intestazioni ("Audio Guide Script (approx. 250 words):", "Audio Guide: <titolo>") e
 didascalie di regia ("(Soft, inviting tone)", "(Fade out)"). Si valuta il testo parlato:
-`clean_guide` toglie tutto questo ed e' applicata a TUTTI i metodi, prima del filtro sui
+`common.clean.clean_guide` toglie tutto questo ed e' applicata a TUTTI i metodi, prima del filtro sui
 riferimenti espliciti. Il testo originale resta in `usage.raw` quando la pulizia lo
 modifica; l'analisi riapplica `clean_guide` al testo salvato, quindi le regole aggiunte dopo
 la generazione valgono anche per i testi gia' generati.
@@ -35,12 +35,12 @@ salvato alla prima esecuzione e riusato, come nel paper.
 import argparse
 import json
 import random
-import re
 import threading
 from concurrent.futures import ThreadPoolExecutor
 
 import requests
 
+from museumbot.common.clean import clean_guide
 from museumbot.common.config import ROOT, openrouter_key
 from museumbot.common.prompts import FALK_CATEGORIES, USER_TEMPLATE, build_messages
 from museumbot.generation.compare_chain import (
@@ -54,29 +54,6 @@ from museumbot.generation.generate import ARTWORKS, Budget, generate_one, provid
 OUT = ROOT / "data" / "chain_study.jsonl"
 PREFIX = ROOT / "data" / "chain_study_prefix.json"
 METHODS = ("single_a", "single_b", "chain")
-
-PREAMBLE = re.compile(r"\A\s*(?:here is|here's|below is|sure\b)[^\n]*\n+", re.I)
-RULE = re.compile(r"^\s*(?:-{3,}|\*{3,}|_{3,})\s*$", re.M)
-WORD_COUNT = re.compile(r"\n\s*[(\[]?\s*word count\b[^\n]*\s*\Z", re.I)
-HEADER = re.compile(r"\A\s*audio ?guide\b[^\n]*\n+", re.I)
-STAGE_LINE = re.compile(r"^\s*[(\[][^\n]*[)\]]\s*$", re.M)
-STAGE_INLINE = re.compile(
-    r"\s*[(\[](?:[^)\]]*\b(?:pause|pauses|tone|voice|music|silence|fade|fades|beat)\b"
-    r"|end\b)[^)\]]*[)\]]", re.I)
-
-
-def clean_guide(text: str) -> str:
-    """Testo parlato dell'audioguida: senza preambolo, separatori, markdown, conteggi."""
-    text = PREAMBLE.sub("", text, count=1)
-    text = RULE.sub("", text)
-    text = re.sub(r"^#+\s*", "", text, flags=re.M)
-    text = re.sub(r"\*\*(.+?)\*\*", r"\1", text)
-    text = re.sub(r"(?<![\w*])\*(?!\s)(.+?)(?<!\s)\*(?![\w*])", r"\1", text)
-    text = WORD_COUNT.sub("", text.strip())  # dopo il markdown: "*(Word count: 250)*"
-    text = HEADER.sub("", text, count=1)      # dopo il markdown: "**Audio Guide: ...**"
-    text = STAGE_LINE.sub("", text)
-    text = STAGE_INLINE.sub("", text)
-    return re.sub(r"\n{3,}", "\n\n", text).strip()
 
 
 def chain_messages(prefix: list[dict], art: dict, category: str) -> list[dict]:

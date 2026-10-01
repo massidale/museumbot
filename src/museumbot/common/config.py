@@ -22,13 +22,21 @@ def openrouter_key() -> str:
     return key
 
 
-def emb_path(alias: str, variant: str = "full") -> Path:
-    """File degli embedding per (modello, variante). `full` mantiene il nome storico."""
-    suffix = "" if variant == "full" else f"_{variant}"
-    return ROOT / "data" / f"emb_{alias}{suffix}.npy"
+def emb_path(alias: str, variant: str = "full", corpus: str = "main") -> Path:
+    """File degli embedding per (modello, variante) di un corpus (vedi common.corpus)."""
+    return ROOT / "data" / "emb" / corpus / f"{alias}_{variant}.npy"
 
 
-def meta_path(variant: str = "full") -> Path:
-    """Metadati allineati riga per riga con `emb_path`. `full` mantiene il nome storico."""
-    suffix = "" if variant == "full" else f"_{variant}"
-    return ROOT / "data" / f"meta{suffix}.csv"
+def meta_path(variant: str = "full", corpus: str = "main") -> Path:
+    """Metadati allineati riga per riga con `emb_path`, uguali per tutti i modelli."""
+    return ROOT / "data" / "emb" / corpus / f"meta_{variant}.csv"
+
+
+def ollama_key() -> str:
+    """Restituisce la chiave di Ollama Cloud configurata nell'ambiente o in `.env`."""
+    key = os.getenv("OLLAMA_CLOUD_KEY")
+    if not key:
+        raise RuntimeError(
+            "OLLAMA_CLOUD_KEY non configurata: impostala nell'ambiente o nel file .env"
+        )
+    return key

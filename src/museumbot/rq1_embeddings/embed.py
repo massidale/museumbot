@@ -7,21 +7,19 @@ Nessuna instruction prefix: Qwen3-Embedding la supporta, ma un prefisso diverso 
 condizione introdurrebbe esattamente lo shift che l'esperimento vuole misurare. Il prefisso
 resta assente per tutti, in modo uniforme.
 
-Output: data/emb_{alias}.npy + data/meta.csv per la variante `full`; per le altre varianti
-data/emb_{alias}_{variante}.npy + data/meta_{variante}.csv. Le righe flat vengono sempre
-dalla variante `full`, anche per le repliche (es. `full_rep`).
+I testi vengono da `common.corpus.load_corpus` (puliti, senza opere troncate).
+Output: data/emb/<corpus>/<alias>_<variante>.npy + data/emb/<corpus>/meta_<variante>.csv.
+Le righe flat vengono sempre dalla variante `full`, anche per le repliche (es. `full_rep`).
 """
 
 import argparse
-import json
 
 import numpy as np
 import pandas as pd
 
 from museumbot.common.config import ROOT, emb_path, meta_path
+from museumbot.common.corpus import CORPORA, load_corpus
 from museumbot.common.prompts import REPLICATES, VARIANTS
-
-GEN = ROOT / "data" / "generations.jsonl"
 
 MODELS = {
     "qwen": "Qwen/Qwen3-Embedding-0.6B",
@@ -50,7 +48,8 @@ def select_rows(all_rows: list[dict], generator_model: str, variant: str) -> lis
     return rows
 
 
-def embed_rows(model, rows: list[dict], alias: str, variant: str, batch_size: int) -> None:
+def embed_rows(model, rows: list[dict], alias: str, variant: str, batch_size: int,
+               corpus: str = "main") -> None:
     emb = model.encode(
         [r["text"] for r in rows],
         batch_size=batch_size,
@@ -59,7 +58,8 @@ def embed_rows(model, rows: list[dict], alias: str, variant: str, batch_size: in
         convert_to_numpy=True,
     ).astype(np.float32)
 
-    out = emb_path(alias, variant)
+    out = emb_path(alias, variant, corpus)
+    out.parent.mkdir(parents=True, exist_ok=True)
     np.save(out, emb)
     pd.DataFrame(
         [
@@ -74,7 +74,7 @@ def embed_rows(model, rows: list[dict], alias: str, variant: str, batch_size: in
             }
             for r in rows
         ]
-    ).to_csv(meta_path(variant), index=False)
+    ).to_csv(meta_path(variant, corpus), index=False)
 
     norms = np.linalg.norm(emb, axis=1)
     print(f"\n{out.relative_to(ROOT)}  shape {emb.shape}")
@@ -93,9 +93,10 @@ def main() -> None:
         default="deepseek/deepseek-v4-flash",
         help="usa soltanto i testi prodotti da questo modello generativo",
     )
+    ap.add_argument("--corpus", default="main", choices=CORPORA)
     ap.add_argument("--variant", default="full", choices=[*VARIANTS, *REPLICATES])
     ap.add_argument("--all-variants", action="store_true",
-                    help="embedda ogni variante presente in generations.jsonl")
+                    help="embedda ogni variante presente nel corpus")
     ap.add_argument("--batch-size", type=int, default=8)
     ap.add_argument("--device", default="mps")
     args = ap.parse_args()
@@ -103,7 +104,7 @@ def main() -> None:
     if args.all_variants and args.variant != "full":
         print("--variant ignorato perche' e' impostato --all-variants")
 
-    all_rows = [json.loads(l) for l in GEN.open()]
+    all_rows = load_corpus(args.corpus)
     if args.all_variants:
         present = {r.get("variant", "full") for r in all_rows if r.get("model") == args.generator_model}
         variants = [v for v in [*VARIANTS, *REPLICATES] if v in present]
@@ -122,8 +123,9 @@ def main() -> None:
             print(f"[{v}] nessun testo, salto")
             continue
         n_art = len({r["artwork_id"] for r in rows})
-        print(f"\n[{v}] {len(rows)} testi da {n_art} opere [generatore: {args.generator_model}]")
-        embed_rows(m, rows, args.embedding_model, v, args.batch_size)
+        print(f"\n[{args.corpus}/{v}] {len(rows)} testi da {n_art} opere "
+              f"[generatore: {args.generator_model}]")
+        embed_rows(m, rows, args.embedding_model, v, args.batch_size, args.corpus)
 
 
 if __name__ == "__main__":

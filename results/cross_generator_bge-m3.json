@@ -1,0 +1,36 @@
+{
+  "model": "bge-m3",
+  "corpora": [
+    "main",
+    "local"
+  ],
+  "n_artworks": 100,
+  "cos": {
+    "explorer": 0.712,
+    "facilitator": 0.687,
+    "experience_seeker": 0.772,
+    "professional_hobbyist": 0.78,
+    "recharger": 0.869
+  },
+  "ceiling_main": {
+    "explorer": 0.937,
+    "facilitator": 0.905,
+    "experience_seeker": 0.973,
+    "professional_hobbyist": 0.977,
+    "recharger": 0.985
+  },
+  "ceiling_local": {
+    "explorer": 0.978,
+    "facilitator": 0.966,
+    "experience_seeker": 0.99,
+    "professional_hobbyist": 0.986,
+    "recharger": 0.993
+  },
+  "ratio": {
+    "explorer": 0.743,
+    "facilitator": 0.735,
+    "experience_seeker": 0.786,
+    "professional_hobbyist": 0.794,
+    "recharger": 0.879
+  }
+}

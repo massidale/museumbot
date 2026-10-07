@@ -32,7 +32,7 @@ senza persona, o con la persona sbagliata, preferisce invece il flat.
 | prompt | `common/prompts.py` | 6 condizioni: 5 categorie Falk + `flat` (nessun blocco categoria) |
 | generazione, corpus principale | `generation/chain_study.py` | `data/main/chain_study.jsonl` — testi a prompt singolo `single_a` e `single_b` (500 + 500) e `flat` (100), più i 500 della chain (§5); DeepSeek V4 Flash su DeepInfra fp8, T = 0.7 |
 | generazione, ablazione | `generation/generate.py` | `data/ablation/generations.jsonl` — corpus di settembre: 600 testi `full` + flat, 4 000 dell'ablazione (§6), 500 della replica `full_rep`; routing libero; usato solo per l'ablazione |
-| generazione modello aperto (sviluppo) | `generation/vllm_gen.py`, `generation/local.py`, `kaggle/` | `data/local/generations.jsonl` — Gemma 4 31B QAT a 4 bit con vLLM su Kaggle (2× T4): 600 testi `full` (5 categorie + flat) e 500 `full_rep`, 100 opere, tutti validi (13 Professional/Hobbyist recuperati in una seconda sessione con la stessa configurazione, `kaggle/retry`); `local.py` è il ciclo di miscela su MLX per le prove sul Mac |
+| generazione modello aperto (sviluppo) | `generation/vllm_gen.py`, `generation/local.py`, `kaggle/` | `data/local/generations.jsonl` — Gemma 4 31B QAT a 4 bit con vLLM su Kaggle (2× T4): 600 testi `full` (5 categorie + flat) e 500 `full_rep`, 100 opere, tutti validi (13 Professional/Hobbyist recuperati in una seconda sessione con la stessa configurazione, `kaggle/retry`), analisi in §8; `local.py` è il ciclo di miscela su MLX per le prove sul Mac |
 | pulizia e corpus | `common/clean.py`, `common/corpus.py` | corpus `main` e `ablation`, testi puliti (sotto) |
 | embedding | `rq1_embeddings/embed.py` | `data/emb/<corpus>/<modello>_<variante>.npy` (Qwen3-Embedding-0.6B, BGE-M3), locali, L2-normalizzati |
 | analisi | `rq1_embeddings/analyze.py` | `results/metrics_{qwen,bge-m3}.json` + figure (corpus principale) |
@@ -671,18 +671,55 @@ spesso il proprio nome ("As a Recharger…"): parte della preferenza può essere
 corrispondenza fra la definizione e il testo, che i testi a loro volta riecheggiano.
 Quanto queste preferenze coincidano con quelle di visitatori reali è la domanda di RQ3.
 
-## 8. Prossimi passi
+## 8. Sviluppo: lo shift di categoria su un modello aperto (Gemma 4 31B)
+
+Passo 2 della spec `docs/plans/2026-10-06-profilo-continuo-design.md`: prima di generare
+testi *fra* due categorie, verificare che il modello aperto che lo permette riproduca lo
+shift di categoria. **Corpus `local`**: Gemma 4 31B QAT a 4 bit (vLLM su Kaggle, 2× T4), le
+stesse 100 opere e gli stessi prompt del corpus principale più una riga contro il Markdown,
+600 testi `full` e 500 della replica `full_rep`, tutti validi. Analisi di §2 con
+`analyze.py --corpus local` (`results/metrics_{qwen,bge-m3}_local.json`) e confronto fra
+generatori con `rq1_embeddings/cross_generator.py` (`results/cross_generator_*.json`).
+
+**Lo shift c'è, ed è più netto che con DeepSeek.** Probe a 6 classi 0.98 (0.975), contro
+0.95 (0.90) del corpus principale; test di permutazione p = 0.0005 (il minimo con 2 000
+permutazioni) in entrambi gli embedding. La condizione spiega il 12.5% (4.5%) della
+varianza, contro il 6.5% (3.8%).
+
+| Qwen3 (BGE-M3) | Explorer | Facilitator | Exp. Seeker | Prof./Hobbyist | Recharger |
+|---|---|---|---|---|---|
+| split-half | 0.95 (0.87) | 0.96 (0.86) | 0.94 (0.91) | 0.93 (0.89) | 0.98 (0.96) |
+| tetto (replica) | 0.99 (0.98) | 0.99 (0.97) | 0.99 (0.99) | 0.99 (0.99) | 1.00 (0.99) |
+| cos con DeepSeek | 0.77 (0.71) | 0.87 (0.69) | 0.87 (0.77) | 0.87 (0.78) | 0.89 (0.87) |
+| rapporto sui tetti | 0.80 (0.74) | 0.90 (0.74) | 0.89 (0.79) | 0.88 (0.79) | 0.90 (0.88) |
+
+Il rapporto è `cos / sqrt(tetto_DeepSeek · tetto_Gemma)`: lo shift di Gemma punta nella
+stessa direzione di quello di DeepSeek all'80–90% (74–88%) del massimo atteso dal rumore.
+Tutte le soglie fissate nella spec prima dei dati sono superate (probe con p < 0.01,
+split-half ≥ 0.6, rapporto ≥ 0.5).
+
+![PCA del corpus local sui dati centrati per opera, con i vettori di steering](../figures/pca_qwen_local.png)
+
+**Differenze rispetto a DeepSeek.** Gli steering vector sono più lunghi (Qwen3: Recharger
+0.50 contro 0.31, Explorer 0.31 contro 0.18) e più simili fra loro: le coppie che con
+DeepSeek erano opposte lo sono meno (Explorer–Experience Seeker −0.11 contro −0.46,
+Recharger–Professional/Hobbyist −0.07 contro −0.17 con Qwen3). Una parte comune a tutte le
+categorie è probabile: il flat di Gemma è molto più corto dei testi di categoria (mediana
+178 parole contro 215–226; con DeepSeek 222 contro 234), quindi ogni steering vector
+contiene anche "più lungo del flat". Il confondente lunghezza (§3.7) qui pesa di più.
+
+## 9. Prossimi passi
 
 1. Chain vs singolo: decidere se generare `chain_rep` per separare il rumore della chain
    dalla differenza fra metodi (§5).
-2. Confondente lunghezza per Professional/Hobbyist nel corpus principale (§3.7).
+2. Confondente lunghezza per Professional/Hobbyist nel corpus principale (§3.7), e per
+   tutte le categorie rispetto al flat nel corpus `local` (§8).
 3. RQ2: estensioni possibili (secondo giudice su un campione, persone ricavate dal
    dataset BIRD, compito di riconoscimento); scelta degli stimoli per RQ3.
 4. RQ3: vedi `docs/plans/piano-progetto-tesi.md`.
-5. Profilo continuo (sviluppo): testi generati *fra* due categorie con un peso α, per
-   mescolanza delle distribuzioni dei prompt di categoria, su Gemma 4 31B (Kaggle). Passo 2:
-   testi puri e replica generati, da fare embedding e analisi; spec in
-   `docs/plans/2026-10-06-profilo-continuo-design.md`.
+5. Profilo continuo, passo 3: scegliere le coppie sulla matrice dei coseni del corpus
+   `local` e il metodo di miscela su vLLM, poi generare i testi a profilo misto (§8; spec
+   in `docs/plans/2026-10-06-profilo-continuo-design.md`).
 
 ## Riferimenti
 

@@ -1,0 +1,601 @@
+artwork_id,title,artist,condition,variant,words,generator_model
+Q1091086,The Third of May 1808,Francisco Goya,experience_seeker,full_rep,232,google/gemma-4-31B-it-qat-w4a16-ct
+Q1091086,The Third of May 1808,Francisco Goya,explorer,full_rep,230,google/gemma-4-31B-it-qat-w4a16-ct
+Q1091086,The Third of May 1808,Francisco Goya,facilitator,full_rep,231,google/gemma-4-31B-it-qat-w4a16-ct
+Q1091086,The Third of May 1808,Francisco Goya,flat,full,172,google/gemma-4-31B-it-qat-w4a16-ct
+Q1091086,The Third of May 1808,Francisco Goya,professional_hobbyist,full_rep,201,google/gemma-4-31B-it-qat-w4a16-ct
+Q1091086,The Third of May 1808,Francisco Goya,recharger,full_rep,235,google/gemma-4-31B-it-qat-w4a16-ct
+Q1118456,La Balançoire,Pierre-Auguste Renoir,experience_seeker,full_rep,221,google/gemma-4-31B-it-qat-w4a16-ct
+Q1118456,La Balançoire,Pierre-Auguste Renoir,explorer,full_rep,227,google/gemma-4-31B-it-qat-w4a16-ct
+Q1118456,La Balançoire,Pierre-Auguste Renoir,facilitator,full_rep,231,google/gemma-4-31B-it-qat-w4a16-ct
+Q1118456,La Balançoire,Pierre-Auguste Renoir,flat,full,215,google/gemma-4-31B-it-qat-w4a16-ct
+Q1118456,La Balançoire,Pierre-Auguste Renoir,professional_hobbyist,full_rep,234,google/gemma-4-31B-it-qat-w4a16-ct
+Q1118456,La Balançoire,Pierre-Auguste Renoir,recharger,full_rep,239,google/gemma-4-31B-it-qat-w4a16-ct
+Q1123378,Equestrian Portrait of Charles V,Titian,experience_seeker,full_rep,226,google/gemma-4-31B-it-qat-w4a16-ct
+Q1123378,Equestrian Portrait of Charles V,Titian,explorer,full_rep,225,google/gemma-4-31B-it-qat-w4a16-ct
+Q1123378,Equestrian Portrait of Charles V,Titian,facilitator,full_rep,211,google/gemma-4-31B-it-qat-w4a16-ct
+Q1123378,Equestrian Portrait of Charles V,Titian,flat,full,182,google/gemma-4-31B-it-qat-w4a16-ct
+Q1123378,Equestrian Portrait of Charles V,Titian,professional_hobbyist,full_rep,235,google/gemma-4-31B-it-qat-w4a16-ct
+Q1123378,Equestrian Portrait of Charles V,Titian,recharger,full_rep,219,google/gemma-4-31B-it-qat-w4a16-ct
+Q1133420,The Surrender of Brea,Diego Velázquez,experience_seeker,full_rep,202,google/gemma-4-31B-it-qat-w4a16-ct
+Q1133420,The Surrender of Brea,Diego Velázquez,explorer,full_rep,219,google/gemma-4-31B-it-qat-w4a16-ct
+Q1133420,The Surrender of Brea,Diego Velázquez,facilitator,full_rep,212,google/gemma-4-31B-it-qat-w4a16-ct
+Q1133420,The Surrender of Brea,Diego Velázquez,flat,full,150,google/gemma-4-31B-it-qat-w4a16-ct
+Q1133420,The Surrender of Brea,Diego Velázquez,professional_hobbyist,full_rep,201,google/gemma-4-31B-it-qat-w4a16-ct
+Q1133420,The Surrender of Brea,Diego Velázquez,recharger,full_rep,221,google/gemma-4-31B-it-qat-w4a16-ct
+Q1150997,Saturn Devouring His Son,Francisco Goya,experience_seeker,full_rep,207,google/gemma-4-31B-it-qat-w4a16-ct
+Q1150997,Saturn Devouring His Son,Francisco Goya,explorer,full_rep,237,google/gemma-4-31B-it-qat-w4a16-ct
+Q1150997,Saturn Devouring His Son,Francisco Goya,facilitator,full_rep,209,google/gemma-4-31B-it-qat-w4a16-ct
+Q1150997,Saturn Devouring His Son,Francisco Goya,flat,full,206,google/gemma-4-31B-it-qat-w4a16-ct
+Q1150997,Saturn Devouring His Son,Francisco Goya,professional_hobbyist,full_rep,233,google/gemma-4-31B-it-qat-w4a16-ct
+Q1150997,Saturn Devouring His Son,Francisco Goya,recharger,full_rep,233,google/gemma-4-31B-it-qat-w4a16-ct
+Q1167178,The Painter's Studio,Gustave Courbet,experience_seeker,full_rep,227,google/gemma-4-31B-it-qat-w4a16-ct
+Q1167178,The Painter's Studio,Gustave Courbet,explorer,full_rep,220,google/gemma-4-31B-it-qat-w4a16-ct
+Q1167178,The Painter's Studio,Gustave Courbet,facilitator,full_rep,233,google/gemma-4-31B-it-qat-w4a16-ct
+Q1167178,The Painter's Studio,Gustave Courbet,flat,full,211,google/gemma-4-31B-it-qat-w4a16-ct
+Q1167178,The Painter's Studio,Gustave Courbet,professional_hobbyist,full_rep,234,google/gemma-4-31B-it-qat-w4a16-ct
+Q1167178,The Painter's Studio,Gustave Courbet,recharger,full_rep,217,google/gemma-4-31B-it-qat-w4a16-ct
+Q1167912,Le Déjeuner sur l'herbe,Claude Monet,experience_seeker,full_rep,217,google/gemma-4-31B-it-qat-w4a16-ct
+Q1167912,Le Déjeuner sur l'herbe,Claude Monet,explorer,full_rep,236,google/gemma-4-31B-it-qat-w4a16-ct
+Q1167912,Le Déjeuner sur l'herbe,Claude Monet,facilitator,full_rep,228,google/gemma-4-31B-it-qat-w4a16-ct
+Q1167912,Le Déjeuner sur l'herbe,Claude Monet,flat,full,190,google/gemma-4-31B-it-qat-w4a16-ct
+Q1167912,Le Déjeuner sur l'herbe,Claude Monet,professional_hobbyist,full_rep,227,google/gemma-4-31B-it-qat-w4a16-ct
+Q1167912,Le Déjeuner sur l'herbe,Claude Monet,recharger,full_rep,219,google/gemma-4-31B-it-qat-w4a16-ct
+Q1212098,The Railway,Édouard Manet,experience_seeker,full_rep,215,google/gemma-4-31B-it-qat-w4a16-ct
+Q1212098,The Railway,Édouard Manet,explorer,full_rep,219,google/gemma-4-31B-it-qat-w4a16-ct
+Q1212098,The Railway,Édouard Manet,facilitator,full_rep,211,google/gemma-4-31B-it-qat-w4a16-ct
+Q1212098,The Railway,Édouard Manet,flat,full,168,google/gemma-4-31B-it-qat-w4a16-ct
+Q1212098,The Railway,Édouard Manet,professional_hobbyist,full_rep,229,google/gemma-4-31B-it-qat-w4a16-ct
+Q1212098,The Railway,Édouard Manet,recharger,full_rep,199,google/gemma-4-31B-it-qat-w4a16-ct
+Q1212861,The Birth of Venus,Alexandre Cabanel,experience_seeker,full_rep,217,google/gemma-4-31B-it-qat-w4a16-ct
+Q1212861,The Birth of Venus,Alexandre Cabanel,explorer,full_rep,224,google/gemma-4-31B-it-qat-w4a16-ct
+Q1212861,The Birth of Venus,Alexandre Cabanel,facilitator,full_rep,230,google/gemma-4-31B-it-qat-w4a16-ct
+Q1212861,The Birth of Venus,Alexandre Cabanel,flat,full,204,google/gemma-4-31B-it-qat-w4a16-ct
+Q1212861,The Birth of Venus,Alexandre Cabanel,professional_hobbyist,full_rep,235,google/gemma-4-31B-it-qat-w4a16-ct
+Q1212861,The Birth of Venus,Alexandre Cabanel,recharger,full_rep,202,google/gemma-4-31B-it-qat-w4a16-ct
+Q1215604,The Source,Jean-Auguste-Dominique Ingres,experience_seeker,full_rep,218,google/gemma-4-31B-it-qat-w4a16-ct
+Q1215604,The Source,Jean-Auguste-Dominique Ingres,explorer,full_rep,233,google/gemma-4-31B-it-qat-w4a16-ct
+Q1215604,The Source,Jean-Auguste-Dominique Ingres,facilitator,full_rep,222,google/gemma-4-31B-it-qat-w4a16-ct
+Q1215604,The Source,Jean-Auguste-Dominique Ingres,flat,full,199,google/gemma-4-31B-it-qat-w4a16-ct
+Q1215604,The Source,Jean-Auguste-Dominique Ingres,professional_hobbyist,full_rep,225,google/gemma-4-31B-it-qat-w4a16-ct
+Q1215604,The Source,Jean-Auguste-Dominique Ingres,recharger,full_rep,229,google/gemma-4-31B-it-qat-w4a16-ct
+Q1219263,The Sleeping Gypsy,Henri Rousseau,experience_seeker,full_rep,186,google/gemma-4-31B-it-qat-w4a16-ct
+Q1219263,The Sleeping Gypsy,Henri Rousseau,explorer,full_rep,234,google/gemma-4-31B-it-qat-w4a16-ct
+Q1219263,The Sleeping Gypsy,Henri Rousseau,facilitator,full_rep,223,google/gemma-4-31B-it-qat-w4a16-ct
+Q1219263,The Sleeping Gypsy,Henri Rousseau,flat,full,168,google/gemma-4-31B-it-qat-w4a16-ct
+Q1219263,The Sleeping Gypsy,Henri Rousseau,professional_hobbyist,full_rep,218,google/gemma-4-31B-it-qat-w4a16-ct
+Q1219263,The Sleeping Gypsy,Henri Rousseau,recharger,full_rep,209,google/gemma-4-31B-it-qat-w4a16-ct
+Q1220013,Opening of the Fifth Seal,El Greco,experience_seeker,full_rep,199,google/gemma-4-31B-it-qat-w4a16-ct
+Q1220013,Opening of the Fifth Seal,El Greco,explorer,full_rep,225,google/gemma-4-31B-it-qat-w4a16-ct
+Q1220013,Opening of the Fifth Seal,El Greco,facilitator,full_rep,226,google/gemma-4-31B-it-qat-w4a16-ct
+Q1220013,Opening of the Fifth Seal,El Greco,flat,full,147,google/gemma-4-31B-it-qat-w4a16-ct
+Q1220013,Opening of the Fifth Seal,El Greco,professional_hobbyist,full_rep,224,google/gemma-4-31B-it-qat-w4a16-ct
+Q1220013,Opening of the Fifth Seal,El Greco,recharger,full_rep,213,google/gemma-4-31B-it-qat-w4a16-ct
+Q123935,The Triumph of Bacchus,Diego Velázquez,experience_seeker,full_rep,208,google/gemma-4-31B-it-qat-w4a16-ct
+Q123935,The Triumph of Bacchus,Diego Velázquez,explorer,full_rep,225,google/gemma-4-31B-it-qat-w4a16-ct
+Q123935,The Triumph of Bacchus,Diego Velázquez,facilitator,full_rep,212,google/gemma-4-31B-it-qat-w4a16-ct
+Q123935,The Triumph of Bacchus,Diego Velázquez,flat,full,158,google/gemma-4-31B-it-qat-w4a16-ct
+Q123935,The Triumph of Bacchus,Diego Velázquez,professional_hobbyist,full_rep,203,google/gemma-4-31B-it-qat-w4a16-ct
+Q123935,The Triumph of Bacchus,Diego Velázquez,recharger,full_rep,224,google/gemma-4-31B-it-qat-w4a16-ct
+Q1239950,L'Absinthe,Edgar Degas,experience_seeker,full_rep,202,google/gemma-4-31B-it-qat-w4a16-ct
+Q1239950,L'Absinthe,Edgar Degas,explorer,full_rep,215,google/gemma-4-31B-it-qat-w4a16-ct
+Q1239950,L'Absinthe,Edgar Degas,facilitator,full_rep,194,google/gemma-4-31B-it-qat-w4a16-ct
+Q1239950,L'Absinthe,Edgar Degas,flat,full,151,google/gemma-4-31B-it-qat-w4a16-ct
+Q1239950,L'Absinthe,Edgar Degas,professional_hobbyist,full_rep,217,google/gemma-4-31B-it-qat-w4a16-ct
+Q1239950,L'Absinthe,Edgar Degas,recharger,full_rep,200,google/gemma-4-31B-it-qat-w4a16-ct
+Q1267893,Ginevra de' Benci,Leonardo da Vinci,experience_seeker,full_rep,192,google/gemma-4-31B-it-qat-w4a16-ct
+Q1267893,Ginevra de' Benci,Leonardo da Vinci,explorer,full_rep,206,google/gemma-4-31B-it-qat-w4a16-ct
+Q1267893,Ginevra de' Benci,Leonardo da Vinci,facilitator,full_rep,190,google/gemma-4-31B-it-qat-w4a16-ct
+Q1267893,Ginevra de' Benci,Leonardo da Vinci,flat,full,121,google/gemma-4-31B-it-qat-w4a16-ct
+Q1267893,Ginevra de' Benci,Leonardo da Vinci,professional_hobbyist,full_rep,219,google/gemma-4-31B-it-qat-w4a16-ct
+Q1267893,Ginevra de' Benci,Leonardo da Vinci,recharger,full_rep,196,google/gemma-4-31B-it-qat-w4a16-ct
+Q1283024,The Birth of Venus,William-Adolphe Bouguereau,experience_seeker,full_rep,202,google/gemma-4-31B-it-qat-w4a16-ct
+Q1283024,The Birth of Venus,William-Adolphe Bouguereau,explorer,full_rep,218,google/gemma-4-31B-it-qat-w4a16-ct
+Q1283024,The Birth of Venus,William-Adolphe Bouguereau,facilitator,full_rep,206,google/gemma-4-31B-it-qat-w4a16-ct
+Q1283024,The Birth of Venus,William-Adolphe Bouguereau,flat,full,167,google/gemma-4-31B-it-qat-w4a16-ct
+Q1283024,The Birth of Venus,William-Adolphe Bouguereau,professional_hobbyist,full_rep,211,google/gemma-4-31B-it-qat-w4a16-ct
+Q1283024,The Birth of Venus,William-Adolphe Bouguereau,recharger,full_rep,214,google/gemma-4-31B-it-qat-w4a16-ct
+Q1313605,The Emperor Napoleon in His Study at the Tuileries,Jacques-Louis David,experience_seeker,full_rep,201,google/gemma-4-31B-it-qat-w4a16-ct
+Q1313605,The Emperor Napoleon in His Study at the Tuileries,Jacques-Louis David,explorer,full_rep,212,google/gemma-4-31B-it-qat-w4a16-ct
+Q1313605,The Emperor Napoleon in His Study at the Tuileries,Jacques-Louis David,facilitator,full_rep,220,google/gemma-4-31B-it-qat-w4a16-ct
+Q1313605,The Emperor Napoleon in His Study at the Tuileries,Jacques-Louis David,flat,full,167,google/gemma-4-31B-it-qat-w4a16-ct
+Q1313605,The Emperor Napoleon in His Study at the Tuileries,Jacques-Louis David,professional_hobbyist,full_rep,234,google/gemma-4-31B-it-qat-w4a16-ct
+Q1313605,The Emperor Napoleon in His Study at the Tuileries,Jacques-Louis David,recharger,full_rep,216,google/gemma-4-31B-it-qat-w4a16-ct
+Q1464531,Starry Night Over the Rhone,Vincent van Gogh,experience_seeker,full_rep,208,google/gemma-4-31B-it-qat-w4a16-ct
+Q1464531,Starry Night Over the Rhone,Vincent van Gogh,explorer,full_rep,249,google/gemma-4-31B-it-qat-w4a16-ct
+Q1464531,Starry Night Over the Rhone,Vincent van Gogh,facilitator,full_rep,235,google/gemma-4-31B-it-qat-w4a16-ct
+Q1464531,Starry Night Over the Rhone,Vincent van Gogh,flat,full,174,google/gemma-4-31B-it-qat-w4a16-ct
+Q1464531,Starry Night Over the Rhone,Vincent van Gogh,professional_hobbyist,full_rep,190,google/gemma-4-31B-it-qat-w4a16-ct
+Q1464531,Starry Night Over the Rhone,Vincent van Gogh,recharger,full_rep,228,google/gemma-4-31B-it-qat-w4a16-ct
+Q15008032,The Feast of the Gods,Giovanni Bellini,experience_seeker,full_rep,221,google/gemma-4-31B-it-qat-w4a16-ct
+Q15008032,The Feast of the Gods,Giovanni Bellini,explorer,full_rep,225,google/gemma-4-31B-it-qat-w4a16-ct
+Q15008032,The Feast of the Gods,Giovanni Bellini,facilitator,full_rep,204,google/gemma-4-31B-it-qat-w4a16-ct
+Q15008032,The Feast of the Gods,Giovanni Bellini,flat,full,190,google/gemma-4-31B-it-qat-w4a16-ct
+Q15008032,The Feast of the Gods,Giovanni Bellini,professional_hobbyist,full_rep,223,google/gemma-4-31B-it-qat-w4a16-ct
+Q15008032,The Feast of the Gods,Giovanni Bellini,recharger,full_rep,231,google/gemma-4-31B-it-qat-w4a16-ct
+Q152509,Luncheon on the Grass,Édouard Manet,experience_seeker,full_rep,227,google/gemma-4-31B-it-qat-w4a16-ct
+Q152509,Luncheon on the Grass,Édouard Manet,explorer,full_rep,217,google/gemma-4-31B-it-qat-w4a16-ct
+Q152509,Luncheon on the Grass,Édouard Manet,facilitator,full_rep,225,google/gemma-4-31B-it-qat-w4a16-ct
+Q152509,Luncheon on the Grass,Édouard Manet,flat,full,174,google/gemma-4-31B-it-qat-w4a16-ct
+Q152509,Luncheon on the Grass,Édouard Manet,professional_hobbyist,full_rep,229,google/gemma-4-31B-it-qat-w4a16-ct
+Q152509,Luncheon on the Grass,Édouard Manet,recharger,full_rep,211,google/gemma-4-31B-it-qat-w4a16-ct
+Q152867,La maja desnuda,Francisco Goya,experience_seeker,full_rep,196,google/gemma-4-31B-it-qat-w4a16-ct
+Q152867,La maja desnuda,Francisco Goya,explorer,full_rep,225,google/gemma-4-31B-it-qat-w4a16-ct
+Q152867,La maja desnuda,Francisco Goya,facilitator,full_rep,210,google/gemma-4-31B-it-qat-w4a16-ct
+Q152867,La maja desnuda,Francisco Goya,flat,full,164,google/gemma-4-31B-it-qat-w4a16-ct
+Q152867,La maja desnuda,Francisco Goya,professional_hobbyist,full_rep,220,google/gemma-4-31B-it-qat-w4a16-ct
+Q152867,La maja desnuda,Francisco Goya,recharger,full_rep,211,google/gemma-4-31B-it-qat-w4a16-ct
+Q16950902,Beauty Revealed,Sarah Goodridge,experience_seeker,full_rep,230,google/gemma-4-31B-it-qat-w4a16-ct
+Q16950902,Beauty Revealed,Sarah Goodridge,explorer,full_rep,227,google/gemma-4-31B-it-qat-w4a16-ct
+Q16950902,Beauty Revealed,Sarah Goodridge,facilitator,full_rep,241,google/gemma-4-31B-it-qat-w4a16-ct
+Q16950902,Beauty Revealed,Sarah Goodridge,flat,full,208,google/gemma-4-31B-it-qat-w4a16-ct
+Q16950902,Beauty Revealed,Sarah Goodridge,professional_hobbyist,full_rep,242,google/gemma-4-31B-it-qat-w4a16-ct
+Q16950902,Beauty Revealed,Sarah Goodridge,recharger,full_rep,228,google/gemma-4-31B-it-qat-w4a16-ct
+Q1752990,The Death of Socrates,Jacques-Louis David,experience_seeker,full_rep,217,google/gemma-4-31B-it-qat-w4a16-ct
+Q1752990,The Death of Socrates,Jacques-Louis David,explorer,full_rep,235,google/gemma-4-31B-it-qat-w4a16-ct
+Q1752990,The Death of Socrates,Jacques-Louis David,facilitator,full_rep,230,google/gemma-4-31B-it-qat-w4a16-ct
+Q1752990,The Death of Socrates,Jacques-Louis David,flat,full,167,google/gemma-4-31B-it-qat-w4a16-ct
+Q1752990,The Death of Socrates,Jacques-Louis David,professional_hobbyist,full_rep,204,google/gemma-4-31B-it-qat-w4a16-ct
+Q1752990,The Death of Socrates,Jacques-Louis David,recharger,full_rep,235,google/gemma-4-31B-it-qat-w4a16-ct
+Q1766454,Les raboteurs de parquet,Gustave Caillebotte,experience_seeker,full_rep,217,google/gemma-4-31B-it-qat-w4a16-ct
+Q1766454,Les raboteurs de parquet,Gustave Caillebotte,explorer,full_rep,243,google/gemma-4-31B-it-qat-w4a16-ct
+Q1766454,Les raboteurs de parquet,Gustave Caillebotte,facilitator,full_rep,196,google/gemma-4-31B-it-qat-w4a16-ct
+Q1766454,Les raboteurs de parquet,Gustave Caillebotte,flat,full,151,google/gemma-4-31B-it-qat-w4a16-ct
+Q1766454,Les raboteurs de parquet,Gustave Caillebotte,professional_hobbyist,full_rep,222,google/gemma-4-31B-it-qat-w4a16-ct
+Q1766454,Les raboteurs de parquet,Gustave Caillebotte,recharger,full_rep,200,google/gemma-4-31B-it-qat-w4a16-ct
+Q208758,Las Meninas,Diego Velázquez,experience_seeker,full_rep,223,google/gemma-4-31B-it-qat-w4a16-ct
+Q208758,Las Meninas,Diego Velázquez,explorer,full_rep,224,google/gemma-4-31B-it-qat-w4a16-ct
+Q208758,Las Meninas,Diego Velázquez,facilitator,full_rep,228,google/gemma-4-31B-it-qat-w4a16-ct
+Q208758,Las Meninas,Diego Velázquez,flat,full,191,google/gemma-4-31B-it-qat-w4a16-ct
+Q208758,Las Meninas,Diego Velázquez,professional_hobbyist,full_rep,232,google/gemma-4-31B-it-qat-w4a16-ct
+Q208758,Las Meninas,Diego Velázquez,recharger,full_rep,232,google/gemma-4-31B-it-qat-w4a16-ct
+Q2203011,Death and the Miser,Hieronymus Bosch,experience_seeker,full_rep,220,google/gemma-4-31B-it-qat-w4a16-ct
+Q2203011,Death and the Miser,Hieronymus Bosch,explorer,full_rep,208,google/gemma-4-31B-it-qat-w4a16-ct
+Q2203011,Death and the Miser,Hieronymus Bosch,facilitator,full_rep,225,google/gemma-4-31B-it-qat-w4a16-ct
+Q2203011,Death and the Miser,Hieronymus Bosch,flat,full,217,google/gemma-4-31B-it-qat-w4a16-ct
+Q2203011,Death and the Miser,Hieronymus Bosch,professional_hobbyist,full_rep,229,google/gemma-4-31B-it-qat-w4a16-ct
+Q2203011,Death and the Miser,Hieronymus Bosch,recharger,full_rep,214,google/gemma-4-31B-it-qat-w4a16-ct
+Q2213811,The Haywain Triptych,Hieronymus Bosch,experience_seeker,full_rep,187,google/gemma-4-31B-it-qat-w4a16-ct
+Q2213811,The Haywain Triptych,Hieronymus Bosch,explorer,full_rep,218,google/gemma-4-31B-it-qat-w4a16-ct
+Q2213811,The Haywain Triptych,Hieronymus Bosch,facilitator,full_rep,199,google/gemma-4-31B-it-qat-w4a16-ct
+Q2213811,The Haywain Triptych,Hieronymus Bosch,flat,full,175,google/gemma-4-31B-it-qat-w4a16-ct
+Q2213811,The Haywain Triptych,Hieronymus Bosch,professional_hobbyist,full_rep,186,google/gemma-4-31B-it-qat-w4a16-ct
+Q2213811,The Haywain Triptych,Hieronymus Bosch,recharger,full_rep,196,google/gemma-4-31B-it-qat-w4a16-ct
+Q2268524,The Three Graces,Peter Paul Rubens,experience_seeker,full_rep,199,google/gemma-4-31B-it-qat-w4a16-ct
+Q2268524,The Three Graces,Peter Paul Rubens,explorer,full_rep,221,google/gemma-4-31B-it-qat-w4a16-ct
+Q2268524,The Three Graces,Peter Paul Rubens,facilitator,full_rep,219,google/gemma-4-31B-it-qat-w4a16-ct
+Q2268524,The Three Graces,Peter Paul Rubens,flat,full,150,google/gemma-4-31B-it-qat-w4a16-ct
+Q2268524,The Three Graces,Peter Paul Rubens,professional_hobbyist,full_rep,200,google/gemma-4-31B-it-qat-w4a16-ct
+Q2268524,The Three Graces,Peter Paul Rubens,recharger,full_rep,223,google/gemma-4-31B-it-qat-w4a16-ct
+Q2270768,Cutting the Stone,Hieronymus Bosch,experience_seeker,full_rep,221,google/gemma-4-31B-it-qat-w4a16-ct
+Q2270768,Cutting the Stone,Hieronymus Bosch,explorer,full_rep,225,google/gemma-4-31B-it-qat-w4a16-ct
+Q2270768,Cutting the Stone,Hieronymus Bosch,facilitator,full_rep,238,google/gemma-4-31B-it-qat-w4a16-ct
+Q2270768,Cutting the Stone,Hieronymus Bosch,flat,full,180,google/gemma-4-31B-it-qat-w4a16-ct
+Q2270768,Cutting the Stone,Hieronymus Bosch,professional_hobbyist,full_rep,242,google/gemma-4-31B-it-qat-w4a16-ct
+Q2270768,Cutting the Stone,Hieronymus Bosch,recharger,full_rep,210,google/gemma-4-31B-it-qat-w4a16-ct
+Q2270938,Les Grandes Baigneuses,Paul Cézanne,experience_seeker,full_rep,213,google/gemma-4-31B-it-qat-w4a16-ct
+Q2270938,Les Grandes Baigneuses,Paul Cézanne,explorer,full_rep,216,google/gemma-4-31B-it-qat-w4a16-ct
+Q2270938,Les Grandes Baigneuses,Paul Cézanne,facilitator,full_rep,224,google/gemma-4-31B-it-qat-w4a16-ct
+Q2270938,Les Grandes Baigneuses,Paul Cézanne,flat,full,229,google/gemma-4-31B-it-qat-w4a16-ct
+Q2270938,Les Grandes Baigneuses,Paul Cézanne,professional_hobbyist,full_rep,235,google/gemma-4-31B-it-qat-w4a16-ct
+Q2270938,Les Grandes Baigneuses,Paul Cézanne,recharger,full_rep,212,google/gemma-4-31B-it-qat-w4a16-ct
+Q2270955,David and Goliath,Caravaggio,experience_seeker,full_rep,221,google/gemma-4-31B-it-qat-w4a16-ct
+Q2270955,David and Goliath,Caravaggio,explorer,full_rep,199,google/gemma-4-31B-it-qat-w4a16-ct
+Q2270955,David and Goliath,Caravaggio,facilitator,full_rep,200,google/gemma-4-31B-it-qat-w4a16-ct
+Q2270955,David and Goliath,Caravaggio,flat,full,127,google/gemma-4-31B-it-qat-w4a16-ct
+Q2270955,David and Goliath,Caravaggio,professional_hobbyist,full_rep,182,google/gemma-4-31B-it-qat-w4a16-ct
+Q2270955,David and Goliath,Caravaggio,recharger,full_rep,200,google/gemma-4-31B-it-qat-w4a16-ct
+Q2273943,Adoration of the Magi,Diego Velázquez,experience_seeker,full_rep,211,google/gemma-4-31B-it-qat-w4a16-ct
+Q2273943,Adoration of the Magi,Diego Velázquez,explorer,full_rep,223,google/gemma-4-31B-it-qat-w4a16-ct
+Q2273943,Adoration of the Magi,Diego Velázquez,facilitator,full_rep,204,google/gemma-4-31B-it-qat-w4a16-ct
+Q2273943,Adoration of the Magi,Diego Velázquez,flat,full,183,google/gemma-4-31B-it-qat-w4a16-ct
+Q2273943,Adoration of the Magi,Diego Velázquez,professional_hobbyist,full_rep,224,google/gemma-4-31B-it-qat-w4a16-ct
+Q2273943,Adoration of the Magi,Diego Velázquez,recharger,full_rep,212,google/gemma-4-31B-it-qat-w4a16-ct
+Q2304870,The Seven Deadly Sins and the Four Last Things,Hieronymus Bosch,experience_seeker,full_rep,229,google/gemma-4-31B-it-qat-w4a16-ct
+Q2304870,The Seven Deadly Sins and the Four Last Things,Hieronymus Bosch,explorer,full_rep,228,google/gemma-4-31B-it-qat-w4a16-ct
+Q2304870,The Seven Deadly Sins and the Four Last Things,Hieronymus Bosch,facilitator,full_rep,225,google/gemma-4-31B-it-qat-w4a16-ct
+Q2304870,The Seven Deadly Sins and the Four Last Things,Hieronymus Bosch,flat,full,199,google/gemma-4-31B-it-qat-w4a16-ct
+Q2304870,The Seven Deadly Sins and the Four Last Things,Hieronymus Bosch,professional_hobbyist,full_rep,213,google/gemma-4-31B-it-qat-w4a16-ct
+Q2304870,The Seven Deadly Sins and the Four Last Things,Hieronymus Bosch,recharger,full_rep,232,google/gemma-4-31B-it-qat-w4a16-ct
+Q2395218,Woman with a Parasol – Madame Monet and Her Son,Claude Monet,experience_seeker,full_rep,227,google/gemma-4-31B-it-qat-w4a16-ct
+Q2395218,Woman with a Parasol – Madame Monet and Her Son,Claude Monet,explorer,full_rep,228,google/gemma-4-31B-it-qat-w4a16-ct
+Q2395218,Woman with a Parasol – Madame Monet and Her Son,Claude Monet,facilitator,full_rep,219,google/gemma-4-31B-it-qat-w4a16-ct
+Q2395218,Woman with a Parasol – Madame Monet and Her Son,Claude Monet,flat,full,152,google/gemma-4-31B-it-qat-w4a16-ct
+Q2395218,Woman with a Parasol – Madame Monet and Her Son,Claude Monet,professional_hobbyist,full_rep,192,google/gemma-4-31B-it-qat-w4a16-ct
+Q2395218,Woman with a Parasol – Madame Monet and Her Son,Claude Monet,recharger,full_rep,219,google/gemma-4-31B-it-qat-w4a16-ct
+Q2404992,Aristotle with a Bust of Homer,Rembrandt,experience_seeker,full_rep,214,google/gemma-4-31B-it-qat-w4a16-ct
+Q2404992,Aristotle with a Bust of Homer,Rembrandt,explorer,full_rep,204,google/gemma-4-31B-it-qat-w4a16-ct
+Q2404992,Aristotle with a Bust of Homer,Rembrandt,facilitator,full_rep,188,google/gemma-4-31B-it-qat-w4a16-ct
+Q2404992,Aristotle with a Bust of Homer,Rembrandt,flat,full,158,google/gemma-4-31B-it-qat-w4a16-ct
+Q2404992,Aristotle with a Bust of Homer,Rembrandt,professional_hobbyist,full_rep,199,google/gemma-4-31B-it-qat-w4a16-ct
+Q2404992,Aristotle with a Bust of Homer,Rembrandt,recharger,full_rep,220,google/gemma-4-31B-it-qat-w4a16-ct
+Q2413468,The Colossus,Francisco Goya,experience_seeker,full_rep,202,google/gemma-4-31B-it-qat-w4a16-ct
+Q2413468,The Colossus,Francisco Goya,explorer,full_rep,233,google/gemma-4-31B-it-qat-w4a16-ct
+Q2413468,The Colossus,Francisco Goya,facilitator,full_rep,229,google/gemma-4-31B-it-qat-w4a16-ct
+Q2413468,The Colossus,Francisco Goya,flat,full,199,google/gemma-4-31B-it-qat-w4a16-ct
+Q2413468,The Colossus,Francisco Goya,professional_hobbyist,full_rep,211,google/gemma-4-31B-it-qat-w4a16-ct
+Q2413468,The Colossus,Francisco Goya,recharger,full_rep,229,google/gemma-4-31B-it-qat-w4a16-ct
+Q2420918,Madonna of the Rose,Raphael,experience_seeker,full_rep,236,google/gemma-4-31B-it-qat-w4a16-ct
+Q2420918,Madonna of the Rose,Raphael,explorer,full_rep,233,google/gemma-4-31B-it-qat-w4a16-ct
+Q2420918,Madonna of the Rose,Raphael,facilitator,full_rep,231,google/gemma-4-31B-it-qat-w4a16-ct
+Q2420918,Madonna of the Rose,Raphael,flat,full,189,google/gemma-4-31B-it-qat-w4a16-ct
+Q2420918,Madonna of the Rose,Raphael,professional_hobbyist,full_rep,217,google/gemma-4-31B-it-qat-w4a16-ct
+Q2420918,Madonna of the Rose,Raphael,recharger,full_rep,215,google/gemma-4-31B-it-qat-w4a16-ct
+Q2439462,Portrait of a Lady,Rogier van der Weyden,experience_seeker,full_rep,234,google/gemma-4-31B-it-qat-w4a16-ct
+Q2439462,Portrait of a Lady,Rogier van der Weyden,explorer,full_rep,213,google/gemma-4-31B-it-qat-w4a16-ct
+Q2439462,Portrait of a Lady,Rogier van der Weyden,facilitator,full_rep,213,google/gemma-4-31B-it-qat-w4a16-ct
+Q2439462,Portrait of a Lady,Rogier van der Weyden,flat,full,217,google/gemma-4-31B-it-qat-w4a16-ct
+Q2439462,Portrait of a Lady,Rogier van der Weyden,professional_hobbyist,full_rep,231,google/gemma-4-31B-it-qat-w4a16-ct
+Q2439462,Portrait of a Lady,Rogier van der Weyden,recharger,full_rep,220,google/gemma-4-31B-it-qat-w4a16-ct
+Q2465911,Christina's World,Andrew Wyeth,experience_seeker,full_rep,192,google/gemma-4-31B-it-qat-w4a16-ct
+Q2465911,Christina's World,Andrew Wyeth,explorer,full_rep,224,google/gemma-4-31B-it-qat-w4a16-ct
+Q2465911,Christina's World,Andrew Wyeth,facilitator,full_rep,202,google/gemma-4-31B-it-qat-w4a16-ct
+Q2465911,Christina's World,Andrew Wyeth,flat,full,185,google/gemma-4-31B-it-qat-w4a16-ct
+Q2465911,Christina's World,Andrew Wyeth,professional_hobbyist,full_rep,183,google/gemma-4-31B-it-qat-w4a16-ct
+Q2465911,Christina's World,Andrew Wyeth,recharger,full_rep,218,google/gemma-4-31B-it-qat-w4a16-ct
+Q247282,Apollo in the Forge of Vulcan,Diego Velázquez,experience_seeker,full_rep,225,google/gemma-4-31B-it-qat-w4a16-ct
+Q247282,Apollo in the Forge of Vulcan,Diego Velázquez,explorer,full_rep,231,google/gemma-4-31B-it-qat-w4a16-ct
+Q247282,Apollo in the Forge of Vulcan,Diego Velázquez,facilitator,full_rep,201,google/gemma-4-31B-it-qat-w4a16-ct
+Q247282,Apollo in the Forge of Vulcan,Diego Velázquez,flat,full,153,google/gemma-4-31B-it-qat-w4a16-ct
+Q247282,Apollo in the Forge of Vulcan,Diego Velázquez,professional_hobbyist,full_rep,213,google/gemma-4-31B-it-qat-w4a16-ct
+Q247282,Apollo in the Forge of Vulcan,Diego Velázquez,recharger,full_rep,212,google/gemma-4-31B-it-qat-w4a16-ct
+Q2501284,The Great Bathers,Pierre-Auguste Renoir,experience_seeker,full_rep,195,google/gemma-4-31B-it-qat-w4a16-ct
+Q2501284,The Great Bathers,Pierre-Auguste Renoir,explorer,full_rep,213,google/gemma-4-31B-it-qat-w4a16-ct
+Q2501284,The Great Bathers,Pierre-Auguste Renoir,facilitator,full_rep,220,google/gemma-4-31B-it-qat-w4a16-ct
+Q2501284,The Great Bathers,Pierre-Auguste Renoir,flat,full,168,google/gemma-4-31B-it-qat-w4a16-ct
+Q2501284,The Great Bathers,Pierre-Auguste Renoir,professional_hobbyist,full_rep,228,google/gemma-4-31B-it-qat-w4a16-ct
+Q2501284,The Great Bathers,Pierre-Auguste Renoir,recharger,full_rep,206,google/gemma-4-31B-it-qat-w4a16-ct
+Q2528106,Portrait of Bindo Altoviti,Raphael,experience_seeker,full_rep,235,google/gemma-4-31B-it-qat-w4a16-ct
+Q2528106,Portrait of Bindo Altoviti,Raphael,explorer,full_rep,236,google/gemma-4-31B-it-qat-w4a16-ct
+Q2528106,Portrait of Bindo Altoviti,Raphael,facilitator,full_rep,239,google/gemma-4-31B-it-qat-w4a16-ct
+Q2528106,Portrait of Bindo Altoviti,Raphael,flat,full,169,google/gemma-4-31B-it-qat-w4a16-ct
+Q2528106,Portrait of Bindo Altoviti,Raphael,professional_hobbyist,full_rep,217,google/gemma-4-31B-it-qat-w4a16-ct
+Q2528106,Portrait of Bindo Altoviti,Raphael,recharger,full_rep,222,google/gemma-4-31B-it-qat-w4a16-ct
+Q2528477,Witches' Sabbath,Francisco Goya,experience_seeker,full_rep,229,google/gemma-4-31B-it-qat-w4a16-ct
+Q2528477,Witches' Sabbath,Francisco Goya,explorer,full_rep,237,google/gemma-4-31B-it-qat-w4a16-ct
+Q2528477,Witches' Sabbath,Francisco Goya,facilitator,full_rep,232,google/gemma-4-31B-it-qat-w4a16-ct
+Q2528477,Witches' Sabbath,Francisco Goya,flat,full,216,google/gemma-4-31B-it-qat-w4a16-ct
+Q2528477,Witches' Sabbath,Francisco Goya,professional_hobbyist,full_rep,228,google/gemma-4-31B-it-qat-w4a16-ct
+Q2528477,Witches' Sabbath,Francisco Goya,recharger,full_rep,237,google/gemma-4-31B-it-qat-w4a16-ct
+Q2528741,Christ Crucified,Diego Velázquez,experience_seeker,full_rep,192,google/gemma-4-31B-it-qat-w4a16-ct
+Q2528741,Christ Crucified,Diego Velázquez,explorer,full_rep,221,google/gemma-4-31B-it-qat-w4a16-ct
+Q2528741,Christ Crucified,Diego Velázquez,facilitator,full_rep,192,google/gemma-4-31B-it-qat-w4a16-ct
+Q2528741,Christ Crucified,Diego Velázquez,flat,full,135,google/gemma-4-31B-it-qat-w4a16-ct
+Q2528741,Christ Crucified,Diego Velázquez,professional_hobbyist,full_rep,221,google/gemma-4-31B-it-qat-w4a16-ct
+Q2528741,Christ Crucified,Diego Velázquez,recharger,full_rep,213,google/gemma-4-31B-it-qat-w4a16-ct
+Q2529703,Portrait of Emile Zola,Édouard Manet,experience_seeker,full_rep,220,google/gemma-4-31B-it-qat-w4a16-ct
+Q2529703,Portrait of Emile Zola,Édouard Manet,explorer,full_rep,227,google/gemma-4-31B-it-qat-w4a16-ct
+Q2529703,Portrait of Emile Zola,Édouard Manet,facilitator,full_rep,220,google/gemma-4-31B-it-qat-w4a16-ct
+Q2529703,Portrait of Emile Zola,Édouard Manet,flat,full,224,google/gemma-4-31B-it-qat-w4a16-ct
+Q2529703,Portrait of Emile Zola,Édouard Manet,professional_hobbyist,full_rep,232,google/gemma-4-31B-it-qat-w4a16-ct
+Q2529703,Portrait of Emile Zola,Édouard Manet,recharger,full_rep,232,google/gemma-4-31B-it-qat-w4a16-ct
+Q254923,Alba Madonna,Raphael,experience_seeker,full_rep,208,google/gemma-4-31B-it-qat-w4a16-ct
+Q254923,Alba Madonna,Raphael,explorer,full_rep,243,google/gemma-4-31B-it-qat-w4a16-ct
+Q254923,Alba Madonna,Raphael,facilitator,full_rep,218,google/gemma-4-31B-it-qat-w4a16-ct
+Q254923,Alba Madonna,Raphael,flat,full,145,google/gemma-4-31B-it-qat-w4a16-ct
+Q254923,Alba Madonna,Raphael,professional_hobbyist,full_rep,230,google/gemma-4-31B-it-qat-w4a16-ct
+Q254923,Alba Madonna,Raphael,recharger,full_rep,215,google/gemma-4-31B-it-qat-w4a16-ct
+Q2571560,The Angelus,Jean-François Millet,experience_seeker,full_rep,213,google/gemma-4-31B-it-qat-w4a16-ct
+Q2571560,The Angelus,Jean-François Millet,explorer,full_rep,224,google/gemma-4-31B-it-qat-w4a16-ct
+Q2571560,The Angelus,Jean-François Millet,facilitator,full_rep,203,google/gemma-4-31B-it-qat-w4a16-ct
+Q2571560,The Angelus,Jean-François Millet,flat,full,179,google/gemma-4-31B-it-qat-w4a16-ct
+Q2571560,The Angelus,Jean-François Millet,professional_hobbyist,full_rep,206,google/gemma-4-31B-it-qat-w4a16-ct
+Q2571560,The Angelus,Jean-François Millet,recharger,full_rep,223,google/gemma-4-31B-it-qat-w4a16-ct
+Q25729,The Persistence of Memory,Salvador Dalí,experience_seeker,full_rep,208,google/gemma-4-31B-it-qat-w4a16-ct
+Q25729,The Persistence of Memory,Salvador Dalí,explorer,full_rep,191,google/gemma-4-31B-it-qat-w4a16-ct
+Q25729,The Persistence of Memory,Salvador Dalí,facilitator,full_rep,201,google/gemma-4-31B-it-qat-w4a16-ct
+Q25729,The Persistence of Memory,Salvador Dalí,flat,full,168,google/gemma-4-31B-it-qat-w4a16-ct
+Q25729,The Persistence of Memory,Salvador Dalí,professional_hobbyist,full_rep,221,google/gemma-4-31B-it-qat-w4a16-ct
+Q25729,The Persistence of Memory,Salvador Dalí,recharger,full_rep,205,google/gemma-4-31B-it-qat-w4a16-ct
+Q2622172,The Bellelli Family,Edgar Degas,experience_seeker,full_rep,219,google/gemma-4-31B-it-qat-w4a16-ct
+Q2622172,The Bellelli Family,Edgar Degas,explorer,full_rep,210,google/gemma-4-31B-it-qat-w4a16-ct
+Q2622172,The Bellelli Family,Edgar Degas,facilitator,full_rep,218,google/gemma-4-31B-it-qat-w4a16-ct
+Q2622172,The Bellelli Family,Edgar Degas,flat,full,196,google/gemma-4-31B-it-qat-w4a16-ct
+Q2622172,The Bellelli Family,Edgar Degas,professional_hobbyist,full_rep,226,google/gemma-4-31B-it-qat-w4a16-ct
+Q2622172,The Bellelli Family,Edgar Degas,recharger,full_rep,235,google/gemma-4-31B-it-qat-w4a16-ct
+Q2653851,The Elevation of the Cross,Peter Paul Rubens,experience_seeker,full_rep,225,google/gemma-4-31B-it-qat-w4a16-ct
+Q2653851,The Elevation of the Cross,Peter Paul Rubens,explorer,full_rep,224,google/gemma-4-31B-it-qat-w4a16-ct
+Q2653851,The Elevation of the Cross,Peter Paul Rubens,facilitator,full_rep,227,google/gemma-4-31B-it-qat-w4a16-ct
+Q2653851,The Elevation of the Cross,Peter Paul Rubens,flat,full,174,google/gemma-4-31B-it-qat-w4a16-ct
+Q2653851,The Elevation of the Cross,Peter Paul Rubens,professional_hobbyist,full_rep,239,google/gemma-4-31B-it-qat-w4a16-ct
+Q2653851,The Elevation of the Cross,Peter Paul Rubens,recharger,full_rep,233,google/gemma-4-31B-it-qat-w4a16-ct
+Q2664039,Madame X (Virginie Amélie Avegno Gautreau),Q155626,experience_seeker,full_rep,216,google/gemma-4-31B-it-qat-w4a16-ct
+Q2664039,Madame X (Virginie Amélie Avegno Gautreau),Q155626,explorer,full_rep,235,google/gemma-4-31B-it-qat-w4a16-ct
+Q2664039,Madame X (Virginie Amélie Avegno Gautreau),Q155626,facilitator,full_rep,229,google/gemma-4-31B-it-qat-w4a16-ct
+Q2664039,Madame X (Virginie Amélie Avegno Gautreau),Q155626,flat,full,213,google/gemma-4-31B-it-qat-w4a16-ct
+Q2664039,Madame X (Virginie Amélie Avegno Gautreau),Q155626,professional_hobbyist,full_rep,230,google/gemma-4-31B-it-qat-w4a16-ct
+Q2664039,Madame X (Virginie Amélie Avegno Gautreau),Q155626,recharger,full_rep,233,google/gemma-4-31B-it-qat-w4a16-ct
+Q2665048,Dante and Virgil in Hell,William-Adolphe Bouguereau,experience_seeker,full_rep,221,google/gemma-4-31B-it-qat-w4a16-ct
+Q2665048,Dante and Virgil in Hell,William-Adolphe Bouguereau,explorer,full_rep,243,google/gemma-4-31B-it-qat-w4a16-ct
+Q2665048,Dante and Virgil in Hell,William-Adolphe Bouguereau,facilitator,full_rep,232,google/gemma-4-31B-it-qat-w4a16-ct
+Q2665048,Dante and Virgil in Hell,William-Adolphe Bouguereau,flat,full,155,google/gemma-4-31B-it-qat-w4a16-ct
+Q2665048,Dante and Virgil in Hell,William-Adolphe Bouguereau,professional_hobbyist,full_rep,228,google/gemma-4-31B-it-qat-w4a16-ct
+Q2665048,Dante and Virgil in Hell,William-Adolphe Bouguereau,recharger,full_rep,242,google/gemma-4-31B-it-qat-w4a16-ct
+Q2697937,Campbell's Soup Cans,Andy Warhol,experience_seeker,full_rep,199,google/gemma-4-31B-it-qat-w4a16-ct
+Q2697937,Campbell's Soup Cans,Andy Warhol,explorer,full_rep,232,google/gemma-4-31B-it-qat-w4a16-ct
+Q2697937,Campbell's Soup Cans,Andy Warhol,facilitator,full_rep,204,google/gemma-4-31B-it-qat-w4a16-ct
+Q2697937,Campbell's Soup Cans,Andy Warhol,flat,full,165,google/gemma-4-31B-it-qat-w4a16-ct
+Q2697937,Campbell's Soup Cans,Andy Warhol,professional_hobbyist,full_rep,231,google/gemma-4-31B-it-qat-w4a16-ct
+Q2697937,Campbell's Soup Cans,Andy Warhol,recharger,full_rep,230,google/gemma-4-31B-it-qat-w4a16-ct
+Q2734881,Annunciation,Jan van Eyck,experience_seeker,full_rep,225,google/gemma-4-31B-it-qat-w4a16-ct
+Q2734881,Annunciation,Jan van Eyck,explorer,full_rep,230,google/gemma-4-31B-it-qat-w4a16-ct
+Q2734881,Annunciation,Jan van Eyck,facilitator,full_rep,228,google/gemma-4-31B-it-qat-w4a16-ct
+Q2734881,Annunciation,Jan van Eyck,flat,full,191,google/gemma-4-31B-it-qat-w4a16-ct
+Q2734881,Annunciation,Jan van Eyck,professional_hobbyist,full_rep,213,google/gemma-4-31B-it-qat-w4a16-ct
+Q2734881,Annunciation,Jan van Eyck,recharger,full_rep,231,google/gemma-4-31B-it-qat-w4a16-ct
+Q2734892,Women in the Garden,Claude Monet,experience_seeker,full_rep,222,google/gemma-4-31B-it-qat-w4a16-ct
+Q2734892,Women in the Garden,Claude Monet,explorer,full_rep,229,google/gemma-4-31B-it-qat-w4a16-ct
+Q2734892,Women in the Garden,Claude Monet,facilitator,full_rep,242,google/gemma-4-31B-it-qat-w4a16-ct
+Q2734892,Women in the Garden,Claude Monet,flat,full,239,google/gemma-4-31B-it-qat-w4a16-ct
+Q2734892,Women in the Garden,Claude Monet,professional_hobbyist,full_rep,227,google/gemma-4-31B-it-qat-w4a16-ct
+Q2734892,Women in the Garden,Claude Monet,recharger,full_rep,236,google/gemma-4-31B-it-qat-w4a16-ct
+Q2735507,The Clothed Maja,Francisco Goya,experience_seeker,full_rep,231,google/gemma-4-31B-it-qat-w4a16-ct
+Q2735507,The Clothed Maja,Francisco Goya,explorer,full_rep,232,google/gemma-4-31B-it-qat-w4a16-ct
+Q2735507,The Clothed Maja,Francisco Goya,facilitator,full_rep,233,google/gemma-4-31B-it-qat-w4a16-ct
+Q2735507,The Clothed Maja,Francisco Goya,flat,full,197,google/gemma-4-31B-it-qat-w4a16-ct
+Q2735507,The Clothed Maja,Francisco Goya,professional_hobbyist,full_rep,234,google/gemma-4-31B-it-qat-w4a16-ct
+Q2735507,The Clothed Maja,Francisco Goya,recharger,full_rep,215,google/gemma-4-31B-it-qat-w4a16-ct
+Q2899286,Berthe Morisot with a Bouquet of Violets,Édouard Manet,experience_seeker,full_rep,199,google/gemma-4-31B-it-qat-w4a16-ct
+Q2899286,Berthe Morisot with a Bouquet of Violets,Édouard Manet,explorer,full_rep,212,google/gemma-4-31B-it-qat-w4a16-ct
+Q2899286,Berthe Morisot with a Bouquet of Violets,Édouard Manet,facilitator,full_rep,195,google/gemma-4-31B-it-qat-w4a16-ct
+Q2899286,Berthe Morisot with a Bouquet of Violets,Édouard Manet,flat,full,153,google/gemma-4-31B-it-qat-w4a16-ct
+Q2899286,Berthe Morisot with a Bouquet of Violets,Édouard Manet,professional_hobbyist,full_rep,219,google/gemma-4-31B-it-qat-w4a16-ct
+Q2899286,Berthe Morisot with a Bouquet of Violets,Édouard Manet,recharger,full_rep,202,google/gemma-4-31B-it-qat-w4a16-ct
+Q2983399,The Second of May 1808,Francisco Goya,experience_seeker,full_rep,223,google/gemma-4-31B-it-qat-w4a16-ct
+Q2983399,The Second of May 1808,Francisco Goya,explorer,full_rep,234,google/gemma-4-31B-it-qat-w4a16-ct
+Q2983399,The Second of May 1808,Francisco Goya,facilitator,full_rep,229,google/gemma-4-31B-it-qat-w4a16-ct
+Q2983399,The Second of May 1808,Francisco Goya,flat,full,196,google/gemma-4-31B-it-qat-w4a16-ct
+Q2983399,The Second of May 1808,Francisco Goya,professional_hobbyist,full_rep,223,google/gemma-4-31B-it-qat-w4a16-ct
+Q2983399,The Second of May 1808,Francisco Goya,recharger,full_rep,228,google/gemma-4-31B-it-qat-w4a16-ct
+Q321303,The Garden of Earthly Delights,Hieronymus Bosch,experience_seeker,full_rep,224,google/gemma-4-31B-it-qat-w4a16-ct
+Q321303,The Garden of Earthly Delights,Hieronymus Bosch,explorer,full_rep,225,google/gemma-4-31B-it-qat-w4a16-ct
+Q321303,The Garden of Earthly Delights,Hieronymus Bosch,facilitator,full_rep,219,google/gemma-4-31B-it-qat-w4a16-ct
+Q321303,The Garden of Earthly Delights,Hieronymus Bosch,flat,full,182,google/gemma-4-31B-it-qat-w4a16-ct
+Q321303,The Garden of Earthly Delights,Hieronymus Bosch,professional_hobbyist,full_rep,216,google/gemma-4-31B-it-qat-w4a16-ct
+Q321303,The Garden of Earthly Delights,Hieronymus Bosch,recharger,full_rep,229,google/gemma-4-31B-it-qat-w4a16-ct
+Q334604,Heart of the Andes,Frederic Edwin Church,experience_seeker,full_rep,223,google/gemma-4-31B-it-qat-w4a16-ct
+Q334604,Heart of the Andes,Frederic Edwin Church,explorer,full_rep,240,google/gemma-4-31B-it-qat-w4a16-ct
+Q334604,Heart of the Andes,Frederic Edwin Church,facilitator,full_rep,239,google/gemma-4-31B-it-qat-w4a16-ct
+Q334604,Heart of the Andes,Frederic Edwin Church,flat,full,213,google/gemma-4-31B-it-qat-w4a16-ct
+Q334604,Heart of the Andes,Frederic Edwin Church,professional_hobbyist,full_rep,231,google/gemma-4-31B-it-qat-w4a16-ct
+Q334604,Heart of the Andes,Frederic Edwin Church,recharger,full_rep,233,google/gemma-4-31B-it-qat-w4a16-ct
+Q3630735,Self-portrait,Vincent van Gogh,experience_seeker,full_rep,222,google/gemma-4-31B-it-qat-w4a16-ct
+Q3630735,Self-portrait,Vincent van Gogh,explorer,full_rep,220,google/gemma-4-31B-it-qat-w4a16-ct
+Q3630735,Self-portrait,Vincent van Gogh,facilitator,full_rep,224,google/gemma-4-31B-it-qat-w4a16-ct
+Q3630735,Self-portrait,Vincent van Gogh,flat,full,177,google/gemma-4-31B-it-qat-w4a16-ct
+Q3630735,Self-portrait,Vincent van Gogh,professional_hobbyist,full_rep,237,google/gemma-4-31B-it-qat-w4a16-ct
+Q3630735,Self-portrait,Vincent van Gogh,recharger,full_rep,220,google/gemma-4-31B-it-qat-w4a16-ct
+Q3633456,Dance in the City,Pierre-Auguste Renoir,experience_seeker,full_rep,208,google/gemma-4-31B-it-qat-w4a16-ct
+Q3633456,Dance in the City,Pierre-Auguste Renoir,explorer,full_rep,224,google/gemma-4-31B-it-qat-w4a16-ct
+Q3633456,Dance in the City,Pierre-Auguste Renoir,facilitator,full_rep,228,google/gemma-4-31B-it-qat-w4a16-ct
+Q3633456,Dance in the City,Pierre-Auguste Renoir,flat,full,200,google/gemma-4-31B-it-qat-w4a16-ct
+Q3633456,Dance in the City,Pierre-Auguste Renoir,professional_hobbyist,full_rep,234,google/gemma-4-31B-it-qat-w4a16-ct
+Q3633456,Dance in the City,Pierre-Auguste Renoir,recharger,full_rep,211,google/gemma-4-31B-it-qat-w4a16-ct
+Q3751961,The Wounded Man,Gustave Courbet,experience_seeker,full_rep,211,google/gemma-4-31B-it-qat-w4a16-ct
+Q3751961,The Wounded Man,Gustave Courbet,explorer,full_rep,215,google/gemma-4-31B-it-qat-w4a16-ct
+Q3751961,The Wounded Man,Gustave Courbet,facilitator,full_rep,197,google/gemma-4-31B-it-qat-w4a16-ct
+Q3751961,The Wounded Man,Gustave Courbet,flat,full,179,google/gemma-4-31B-it-qat-w4a16-ct
+Q3751961,The Wounded Man,Gustave Courbet,professional_hobbyist,full_rep,190,google/gemma-4-31B-it-qat-w4a16-ct
+Q3751961,The Wounded Man,Gustave Courbet,recharger,full_rep,212,google/gemma-4-31B-it-qat-w4a16-ct
+Q3808227,Girls at the Piano,Pierre-Auguste Renoir,experience_seeker,full_rep,209,google/gemma-4-31B-it-qat-w4a16-ct
+Q3808227,Girls at the Piano,Pierre-Auguste Renoir,explorer,full_rep,230,google/gemma-4-31B-it-qat-w4a16-ct
+Q3808227,Girls at the Piano,Pierre-Auguste Renoir,facilitator,full_rep,207,google/gemma-4-31B-it-qat-w4a16-ct
+Q3808227,Girls at the Piano,Pierre-Auguste Renoir,flat,full,179,google/gemma-4-31B-it-qat-w4a16-ct
+Q3808227,Girls at the Piano,Pierre-Auguste Renoir,professional_hobbyist,full_rep,189,google/gemma-4-31B-it-qat-w4a16-ct
+Q3808227,Girls at the Piano,Pierre-Auguste Renoir,recharger,full_rep,208,google/gemma-4-31B-it-qat-w4a16-ct
+Q421716,"Nude Descending a Staircase, No. 2",Marcel Duchamp,experience_seeker,full_rep,215,google/gemma-4-31B-it-qat-w4a16-ct
+Q421716,"Nude Descending a Staircase, No. 2",Marcel Duchamp,explorer,full_rep,228,google/gemma-4-31B-it-qat-w4a16-ct
+Q421716,"Nude Descending a Staircase, No. 2",Marcel Duchamp,facilitator,full_rep,225,google/gemma-4-31B-it-qat-w4a16-ct
+Q421716,"Nude Descending a Staircase, No. 2",Marcel Duchamp,flat,full,216,google/gemma-4-31B-it-qat-w4a16-ct
+Q421716,"Nude Descending a Staircase, No. 2",Marcel Duchamp,professional_hobbyist,full_rep,224,google/gemma-4-31B-it-qat-w4a16-ct
+Q421716,"Nude Descending a Staircase, No. 2",Marcel Duchamp,recharger,full_rep,212,google/gemma-4-31B-it-qat-w4a16-ct
+Q432253,Garden at Sainte-Adresse,Claude Monet,experience_seeker,full_rep,220,google/gemma-4-31B-it-qat-w4a16-ct
+Q432253,Garden at Sainte-Adresse,Claude Monet,explorer,full_rep,235,google/gemma-4-31B-it-qat-w4a16-ct
+Q432253,Garden at Sainte-Adresse,Claude Monet,facilitator,full_rep,213,google/gemma-4-31B-it-qat-w4a16-ct
+Q432253,Garden at Sainte-Adresse,Claude Monet,flat,full,146,google/gemma-4-31B-it-qat-w4a16-ct
+Q432253,Garden at Sainte-Adresse,Claude Monet,professional_hobbyist,full_rep,186,google/gemma-4-31B-it-qat-w4a16-ct
+Q432253,Garden at Sainte-Adresse,Claude Monet,recharger,full_rep,211,google/gemma-4-31B-it-qat-w4a16-ct
+Q4429116,The Magpie,Claude Monet,experience_seeker,full_rep,219,google/gemma-4-31B-it-qat-w4a16-ct
+Q4429116,The Magpie,Claude Monet,explorer,full_rep,246,google/gemma-4-31B-it-qat-w4a16-ct
+Q4429116,The Magpie,Claude Monet,facilitator,full_rep,227,google/gemma-4-31B-it-qat-w4a16-ct
+Q4429116,The Magpie,Claude Monet,flat,full,217,google/gemma-4-31B-it-qat-w4a16-ct
+Q4429116,The Magpie,Claude Monet,professional_hobbyist,full_rep,222,google/gemma-4-31B-it-qat-w4a16-ct
+Q4429116,The Magpie,Claude Monet,recharger,full_rep,208,google/gemma-4-31B-it-qat-w4a16-ct
+Q45585,The Starry Night,Vincent van Gogh,experience_seeker,full_rep,210,google/gemma-4-31B-it-qat-w4a16-ct
+Q45585,The Starry Night,Vincent van Gogh,explorer,full_rep,234,google/gemma-4-31B-it-qat-w4a16-ct
+Q45585,The Starry Night,Vincent van Gogh,facilitator,full_rep,217,google/gemma-4-31B-it-qat-w4a16-ct
+Q45585,The Starry Night,Vincent van Gogh,flat,full,197,google/gemma-4-31B-it-qat-w4a16-ct
+Q45585,The Starry Night,Vincent van Gogh,professional_hobbyist,full_rep,231,google/gemma-4-31B-it-qat-w4a16-ct
+Q45585,The Starry Night,Vincent van Gogh,recharger,full_rep,221,google/gemma-4-31B-it-qat-w4a16-ct
+Q467359,Allegory of the Catholic Faith,Johannes Vermeer,experience_seeker,full_rep,224,google/gemma-4-31B-it-qat-w4a16-ct
+Q467359,Allegory of the Catholic Faith,Johannes Vermeer,explorer,full_rep,224,google/gemma-4-31B-it-qat-w4a16-ct
+Q467359,Allegory of the Catholic Faith,Johannes Vermeer,facilitator,full_rep,234,google/gemma-4-31B-it-qat-w4a16-ct
+Q467359,Allegory of the Catholic Faith,Johannes Vermeer,flat,full,193,google/gemma-4-31B-it-qat-w4a16-ct
+Q467359,Allegory of the Catholic Faith,Johannes Vermeer,professional_hobbyist,full_rep,212,google/gemma-4-31B-it-qat-w4a16-ct
+Q467359,Allegory of the Catholic Faith,Johannes Vermeer,recharger,full_rep,209,google/gemma-4-31B-it-qat-w4a16-ct
+Q4717953,Portrait of Juan de Pareja,Diego Velázquez,experience_seeker,full_rep,194,google/gemma-4-31B-it-qat-w4a16-ct
+Q4717953,Portrait of Juan de Pareja,Diego Velázquez,explorer,full_rep,241,google/gemma-4-31B-it-qat-w4a16-ct
+Q4717953,Portrait of Juan de Pareja,Diego Velázquez,facilitator,full_rep,205,google/gemma-4-31B-it-qat-w4a16-ct
+Q4717953,Portrait of Juan de Pareja,Diego Velázquez,flat,full,162,google/gemma-4-31B-it-qat-w4a16-ct
+Q4717953,Portrait of Juan de Pareja,Diego Velázquez,professional_hobbyist,full_rep,199,google/gemma-4-31B-it-qat-w4a16-ct
+Q4717953,Portrait of Juan de Pareja,Diego Velázquez,recharger,full_rep,221,google/gemma-4-31B-it-qat-w4a16-ct
+Q500936,The Dog,Francisco Goya,experience_seeker,full_rep,223,google/gemma-4-31B-it-qat-w4a16-ct
+Q500936,The Dog,Francisco Goya,explorer,full_rep,226,google/gemma-4-31B-it-qat-w4a16-ct
+Q500936,The Dog,Francisco Goya,facilitator,full_rep,216,google/gemma-4-31B-it-qat-w4a16-ct
+Q500936,The Dog,Francisco Goya,flat,full,178,google/gemma-4-31B-it-qat-w4a16-ct
+Q500936,The Dog,Francisco Goya,professional_hobbyist,full_rep,232,google/gemma-4-31B-it-qat-w4a16-ct
+Q500936,The Dog,Francisco Goya,recharger,full_rep,225,google/gemma-4-31B-it-qat-w4a16-ct
+Q500985,The Hunters in the Snow,Pieter Brueghel the Elder,experience_seeker,full_rep,209,google/gemma-4-31B-it-qat-w4a16-ct
+Q500985,The Hunters in the Snow,Pieter Brueghel the Elder,explorer,full_rep,213,google/gemma-4-31B-it-qat-w4a16-ct
+Q500985,The Hunters in the Snow,Pieter Brueghel the Elder,facilitator,full_rep,198,google/gemma-4-31B-it-qat-w4a16-ct
+Q500985,The Hunters in the Snow,Pieter Brueghel the Elder,flat,full,181,google/gemma-4-31B-it-qat-w4a16-ct
+Q500985,The Hunters in the Snow,Pieter Brueghel the Elder,professional_hobbyist,full_rep,210,google/gemma-4-31B-it-qat-w4a16-ct
+Q500985,The Hunters in the Snow,Pieter Brueghel the Elder,recharger,full_rep,215,google/gemma-4-31B-it-qat-w4a16-ct
+Q509806,Washington Crossing the Delaware,Emanuel Leutze,experience_seeker,full_rep,217,google/gemma-4-31B-it-qat-w4a16-ct
+Q509806,Washington Crossing the Delaware,Emanuel Leutze,explorer,full_rep,238,google/gemma-4-31B-it-qat-w4a16-ct
+Q509806,Washington Crossing the Delaware,Emanuel Leutze,facilitator,full_rep,235,google/gemma-4-31B-it-qat-w4a16-ct
+Q509806,Washington Crossing the Delaware,Emanuel Leutze,flat,full,226,google/gemma-4-31B-it-qat-w4a16-ct
+Q509806,Washington Crossing the Delaware,Emanuel Leutze,professional_hobbyist,full_rep,238,google/gemma-4-31B-it-qat-w4a16-ct
+Q509806,Washington Crossing the Delaware,Emanuel Leutze,recharger,full_rep,236,google/gemma-4-31B-it-qat-w4a16-ct
+Q540488,A Burial at Ornans,Gustave Courbet,experience_seeker,full_rep,203,google/gemma-4-31B-it-qat-w4a16-ct
+Q540488,A Burial at Ornans,Gustave Courbet,explorer,full_rep,219,google/gemma-4-31B-it-qat-w4a16-ct
+Q540488,A Burial at Ornans,Gustave Courbet,facilitator,full_rep,231,google/gemma-4-31B-it-qat-w4a16-ct
+Q540488,A Burial at Ornans,Gustave Courbet,flat,full,202,google/gemma-4-31B-it-qat-w4a16-ct
+Q540488,A Burial at Ornans,Gustave Courbet,professional_hobbyist,full_rep,226,google/gemma-4-31B-it-qat-w4a16-ct
+Q540488,A Burial at Ornans,Gustave Courbet,recharger,full_rep,221,google/gemma-4-31B-it-qat-w4a16-ct
+Q568847,The Descent from the Cross,Rogier van der Weyden,experience_seeker,full_rep,219,google/gemma-4-31B-it-qat-w4a16-ct
+Q568847,The Descent from the Cross,Rogier van der Weyden,explorer,full_rep,227,google/gemma-4-31B-it-qat-w4a16-ct
+Q568847,The Descent from the Cross,Rogier van der Weyden,facilitator,full_rep,238,google/gemma-4-31B-it-qat-w4a16-ct
+Q568847,The Descent from the Cross,Rogier van der Weyden,flat,full,210,google/gemma-4-31B-it-qat-w4a16-ct
+Q568847,The Descent from the Cross,Rogier van der Weyden,professional_hobbyist,full_rep,230,google/gemma-4-31B-it-qat-w4a16-ct
+Q568847,The Descent from the Cross,Rogier van der Weyden,recharger,full_rep,227,google/gemma-4-31B-it-qat-w4a16-ct
+Q588695,The Art of Painting,Johannes Vermeer,experience_seeker,full_rep,213,google/gemma-4-31B-it-qat-w4a16-ct
+Q588695,The Art of Painting,Johannes Vermeer,explorer,full_rep,225,google/gemma-4-31B-it-qat-w4a16-ct
+Q588695,The Art of Painting,Johannes Vermeer,facilitator,full_rep,232,google/gemma-4-31B-it-qat-w4a16-ct
+Q588695,The Art of Painting,Johannes Vermeer,flat,full,182,google/gemma-4-31B-it-qat-w4a16-ct
+Q588695,The Art of Painting,Johannes Vermeer,professional_hobbyist,full_rep,212,google/gemma-4-31B-it-qat-w4a16-ct
+Q588695,The Art of Painting,Johannes Vermeer,recharger,full_rep,230,google/gemma-4-31B-it-qat-w4a16-ct
+Q603751,The Peasant Wedding,Pieter Brueghel the Elder,experience_seeker,full_rep,183,google/gemma-4-31B-it-qat-w4a16-ct
+Q603751,The Peasant Wedding,Pieter Brueghel the Elder,explorer,full_rep,211,google/gemma-4-31B-it-qat-w4a16-ct
+Q603751,The Peasant Wedding,Pieter Brueghel the Elder,facilitator,full_rep,205,google/gemma-4-31B-it-qat-w4a16-ct
+Q603751,The Peasant Wedding,Pieter Brueghel the Elder,flat,full,175,google/gemma-4-31B-it-qat-w4a16-ct
+Q603751,The Peasant Wedding,Pieter Brueghel the Elder,professional_hobbyist,full_rep,222,google/gemma-4-31B-it-qat-w4a16-ct
+Q603751,The Peasant Wedding,Pieter Brueghel the Elder,recharger,full_rep,205,google/gemma-4-31B-it-qat-w4a16-ct
+Q614047,Girl with a Red Hat,Johannes Vermeer,experience_seeker,full_rep,223,google/gemma-4-31B-it-qat-w4a16-ct
+Q614047,Girl with a Red Hat,Johannes Vermeer,explorer,full_rep,228,google/gemma-4-31B-it-qat-w4a16-ct
+Q614047,Girl with a Red Hat,Johannes Vermeer,facilitator,full_rep,233,google/gemma-4-31B-it-qat-w4a16-ct
+Q614047,Girl with a Red Hat,Johannes Vermeer,flat,full,181,google/gemma-4-31B-it-qat-w4a16-ct
+Q614047,Girl with a Red Hat,Johannes Vermeer,professional_hobbyist,full_rep,229,google/gemma-4-31B-it-qat-w4a16-ct
+Q614047,Girl with a Red Hat,Johannes Vermeer,recharger,full_rep,210,google/gemma-4-31B-it-qat-w4a16-ct
+Q6402081,The Nobleman with his Hand on his Chest,El Greco,experience_seeker,full_rep,216,google/gemma-4-31B-it-qat-w4a16-ct
+Q6402081,The Nobleman with his Hand on his Chest,El Greco,explorer,full_rep,228,google/gemma-4-31B-it-qat-w4a16-ct
+Q6402081,The Nobleman with his Hand on his Chest,El Greco,facilitator,full_rep,223,google/gemma-4-31B-it-qat-w4a16-ct
+Q6402081,The Nobleman with his Hand on his Chest,El Greco,flat,full,193,google/gemma-4-31B-it-qat-w4a16-ct
+Q6402081,The Nobleman with his Hand on his Chest,El Greco,professional_hobbyist,full_rep,228,google/gemma-4-31B-it-qat-w4a16-ct
+Q6402081,The Nobleman with his Hand on his Chest,El Greco,recharger,full_rep,197,google/gemma-4-31B-it-qat-w4a16-ct
+Q650635,"A Militiaman Holding a Berkemeyer, Known as the ‘Merry Drinker’",Frans Hals,experience_seeker,full_rep,216,google/gemma-4-31B-it-qat-w4a16-ct
+Q650635,"A Militiaman Holding a Berkemeyer, Known as the ‘Merry Drinker’",Frans Hals,explorer,full_rep,209,google/gemma-4-31B-it-qat-w4a16-ct
+Q650635,"A Militiaman Holding a Berkemeyer, Known as the ‘Merry Drinker’",Frans Hals,facilitator,full_rep,216,google/gemma-4-31B-it-qat-w4a16-ct
+Q650635,"A Militiaman Holding a Berkemeyer, Known as the ‘Merry Drinker’",Frans Hals,flat,full,170,google/gemma-4-31B-it-qat-w4a16-ct
+Q650635,"A Militiaman Holding a Berkemeyer, Known as the ‘Merry Drinker’",Frans Hals,professional_hobbyist,full_rep,207,google/gemma-4-31B-it-qat-w4a16-ct
+Q650635,"A Militiaman Holding a Berkemeyer, Known as the ‘Merry Drinker’",Frans Hals,recharger,full_rep,201,google/gemma-4-31B-it-qat-w4a16-ct
+Q683274,Bal du moulin de la Galette,Pierre-Auguste Renoir,experience_seeker,full_rep,203,google/gemma-4-31B-it-qat-w4a16-ct
+Q683274,Bal du moulin de la Galette,Pierre-Auguste Renoir,explorer,full_rep,230,google/gemma-4-31B-it-qat-w4a16-ct
+Q683274,Bal du moulin de la Galette,Pierre-Auguste Renoir,facilitator,full_rep,237,google/gemma-4-31B-it-qat-w4a16-ct
+Q683274,Bal du moulin de la Galette,Pierre-Auguste Renoir,flat,full,187,google/gemma-4-31B-it-qat-w4a16-ct
+Q683274,Bal du moulin de la Galette,Pierre-Auguste Renoir,professional_hobbyist,full_rep,216,google/gemma-4-31B-it-qat-w4a16-ct
+Q683274,Bal du moulin de la Galette,Pierre-Auguste Renoir,recharger,full_rep,210,google/gemma-4-31B-it-qat-w4a16-ct
+Q687182,Whistler's Mother,James McNeill Whistler,experience_seeker,full_rep,184,google/gemma-4-31B-it-qat-w4a16-ct
+Q687182,Whistler's Mother,James McNeill Whistler,explorer,full_rep,238,google/gemma-4-31B-it-qat-w4a16-ct
+Q687182,Whistler's Mother,James McNeill Whistler,facilitator,full_rep,202,google/gemma-4-31B-it-qat-w4a16-ct
+Q687182,Whistler's Mother,James McNeill Whistler,flat,full,159,google/gemma-4-31B-it-qat-w4a16-ct
+Q687182,Whistler's Mother,James McNeill Whistler,professional_hobbyist,full_rep,210,google/gemma-4-31B-it-qat-w4a16-ct
+Q687182,Whistler's Mother,James McNeill Whistler,recharger,full_rep,214,google/gemma-4-31B-it-qat-w4a16-ct
+Q689236,The Fight Between Carnival and Lent,Pieter Brueghel the Elder,experience_seeker,full_rep,199,google/gemma-4-31B-it-qat-w4a16-ct
+Q689236,The Fight Between Carnival and Lent,Pieter Brueghel the Elder,explorer,full_rep,222,google/gemma-4-31B-it-qat-w4a16-ct
+Q689236,The Fight Between Carnival and Lent,Pieter Brueghel the Elder,facilitator,full_rep,210,google/gemma-4-31B-it-qat-w4a16-ct
+Q689236,The Fight Between Carnival and Lent,Pieter Brueghel the Elder,flat,full,149,google/gemma-4-31B-it-qat-w4a16-ct
+Q689236,The Fight Between Carnival and Lent,Pieter Brueghel the Elder,professional_hobbyist,full_rep,200,google/gemma-4-31B-it-qat-w4a16-ct
+Q689236,The Fight Between Carnival and Lent,Pieter Brueghel the Elder,recharger,full_rep,225,google/gemma-4-31B-it-qat-w4a16-ct
+Q698228,Madonna of the Rosary,Caravaggio,experience_seeker,full_rep,220,google/gemma-4-31B-it-qat-w4a16-ct
+Q698228,Madonna of the Rosary,Caravaggio,explorer,full_rep,231,google/gemma-4-31B-it-qat-w4a16-ct
+Q698228,Madonna of the Rosary,Caravaggio,facilitator,full_rep,228,google/gemma-4-31B-it-qat-w4a16-ct
+Q698228,Madonna of the Rosary,Caravaggio,flat,full,215,google/gemma-4-31B-it-qat-w4a16-ct
+Q698228,Madonna of the Rosary,Caravaggio,professional_hobbyist,full_rep,242,google/gemma-4-31B-it-qat-w4a16-ct
+Q698228,Madonna of the Rosary,Caravaggio,recharger,full_rep,235,google/gemma-4-31B-it-qat-w4a16-ct
+Q698254,The Return of the Herd,Pieter Brueghel the Elder,experience_seeker,full_rep,202,google/gemma-4-31B-it-qat-w4a16-ct
+Q698254,The Return of the Herd,Pieter Brueghel the Elder,explorer,full_rep,234,google/gemma-4-31B-it-qat-w4a16-ct
+Q698254,The Return of the Herd,Pieter Brueghel the Elder,facilitator,full_rep,195,google/gemma-4-31B-it-qat-w4a16-ct
+Q698254,The Return of the Herd,Pieter Brueghel the Elder,flat,full,141,google/gemma-4-31B-it-qat-w4a16-ct
+Q698254,The Return of the Herd,Pieter Brueghel the Elder,professional_hobbyist,full_rep,219,google/gemma-4-31B-it-qat-w4a16-ct
+Q698254,The Return of the Herd,Pieter Brueghel the Elder,recharger,full_rep,207,google/gemma-4-31B-it-qat-w4a16-ct
+Q731639,The Plum,Édouard Manet,experience_seeker,full_rep,209,google/gemma-4-31B-it-qat-w4a16-ct
+Q731639,The Plum,Édouard Manet,explorer,full_rep,202,google/gemma-4-31B-it-qat-w4a16-ct
+Q731639,The Plum,Édouard Manet,facilitator,full_rep,183,google/gemma-4-31B-it-qat-w4a16-ct
+Q731639,The Plum,Édouard Manet,flat,full,129,google/gemma-4-31B-it-qat-w4a16-ct
+Q731639,The Plum,Édouard Manet,professional_hobbyist,full_rep,210,google/gemma-4-31B-it-qat-w4a16-ct
+Q731639,The Plum,Édouard Manet,recharger,full_rep,206,google/gemma-4-31B-it-qat-w4a16-ct
+Q737062,Olympia,Édouard Manet,experience_seeker,full_rep,214,google/gemma-4-31B-it-qat-w4a16-ct
+Q737062,Olympia,Édouard Manet,explorer,full_rep,217,google/gemma-4-31B-it-qat-w4a16-ct
+Q737062,Olympia,Édouard Manet,facilitator,full_rep,219,google/gemma-4-31B-it-qat-w4a16-ct
+Q737062,Olympia,Édouard Manet,flat,full,166,google/gemma-4-31B-it-qat-w4a16-ct
+Q737062,Olympia,Édouard Manet,professional_hobbyist,full_rep,224,google/gemma-4-31B-it-qat-w4a16-ct
+Q737062,Olympia,Édouard Manet,recharger,full_rep,217,google/gemma-4-31B-it-qat-w4a16-ct
+Q766782,The Jewish Bride,Rembrandt,experience_seeker,full_rep,221,google/gemma-4-31B-it-qat-w4a16-ct
+Q766782,The Jewish Bride,Rembrandt,explorer,full_rep,217,google/gemma-4-31B-it-qat-w4a16-ct
+Q766782,The Jewish Bride,Rembrandt,facilitator,full_rep,226,google/gemma-4-31B-it-qat-w4a16-ct
+Q766782,The Jewish Bride,Rembrandt,flat,full,217,google/gemma-4-31B-it-qat-w4a16-ct
+Q766782,The Jewish Bride,Rembrandt,professional_hobbyist,full_rep,231,google/gemma-4-31B-it-qat-w4a16-ct
+Q766782,The Jewish Bride,Rembrandt,recharger,full_rep,235,google/gemma-4-31B-it-qat-w4a16-ct
+Q775407,The Balcony,Édouard Manet,experience_seeker,full_rep,208,google/gemma-4-31B-it-qat-w4a16-ct
+Q775407,The Balcony,Édouard Manet,explorer,full_rep,220,google/gemma-4-31B-it-qat-w4a16-ct
+Q775407,The Balcony,Édouard Manet,facilitator,full_rep,225,google/gemma-4-31B-it-qat-w4a16-ct
+Q775407,The Balcony,Édouard Manet,flat,full,174,google/gemma-4-31B-it-qat-w4a16-ct
+Q775407,The Balcony,Édouard Manet,professional_hobbyist,full_rep,198,google/gemma-4-31B-it-qat-w4a16-ct
+Q775407,The Balcony,Édouard Manet,recharger,full_rep,217,google/gemma-4-31B-it-qat-w4a16-ct
+Q776175,The Harvesters,Pieter Brueghel the Elder,experience_seeker,full_rep,202,google/gemma-4-31B-it-qat-w4a16-ct
+Q776175,The Harvesters,Pieter Brueghel the Elder,explorer,full_rep,230,google/gemma-4-31B-it-qat-w4a16-ct
+Q776175,The Harvesters,Pieter Brueghel the Elder,facilitator,full_rep,180,google/gemma-4-31B-it-qat-w4a16-ct
+Q776175,The Harvesters,Pieter Brueghel the Elder,flat,full,121,google/gemma-4-31B-it-qat-w4a16-ct
+Q776175,The Harvesters,Pieter Brueghel the Elder,professional_hobbyist,full_rep,191,google/gemma-4-31B-it-qat-w4a16-ct
+Q776175,The Harvesters,Pieter Brueghel the Elder,recharger,full_rep,200,google/gemma-4-31B-it-qat-w4a16-ct
+Q783215,Saint John the Baptist,Leonardo da Vinci,experience_seeker,full_rep,193,google/gemma-4-31B-it-qat-w4a16-ct
+Q783215,Saint John the Baptist,Leonardo da Vinci,explorer,full_rep,193,google/gemma-4-31B-it-qat-w4a16-ct
+Q783215,Saint John the Baptist,Leonardo da Vinci,facilitator,full_rep,190,google/gemma-4-31B-it-qat-w4a16-ct
+Q783215,Saint John the Baptist,Leonardo da Vinci,flat,full,106,google/gemma-4-31B-it-qat-w4a16-ct
+Q783215,Saint John the Baptist,Leonardo da Vinci,professional_hobbyist,full_rep,224,google/gemma-4-31B-it-qat-w4a16-ct
+Q783215,Saint John the Baptist,Leonardo da Vinci,recharger,full_rep,198,google/gemma-4-31B-it-qat-w4a16-ct
+Q877191,The Three Philosophers,Giorgione,experience_seeker,full_rep,223,google/gemma-4-31B-it-qat-w4a16-ct
+Q877191,The Three Philosophers,Giorgione,explorer,full_rep,215,google/gemma-4-31B-it-qat-w4a16-ct
+Q877191,The Three Philosophers,Giorgione,facilitator,full_rep,233,google/gemma-4-31B-it-qat-w4a16-ct
+Q877191,The Three Philosophers,Giorgione,flat,full,163,google/gemma-4-31B-it-qat-w4a16-ct
+Q877191,The Three Philosophers,Giorgione,professional_hobbyist,full_rep,223,google/gemma-4-31B-it-qat-w4a16-ct
+Q877191,The Three Philosophers,Giorgione,recharger,full_rep,232,google/gemma-4-31B-it-qat-w4a16-ct
+Q883994,View of Toledo,El Greco,experience_seeker,full_rep,183,google/gemma-4-31B-it-qat-w4a16-ct
+Q883994,View of Toledo,El Greco,explorer,full_rep,210,google/gemma-4-31B-it-qat-w4a16-ct
+Q883994,View of Toledo,El Greco,facilitator,full_rep,219,google/gemma-4-31B-it-qat-w4a16-ct
+Q883994,View of Toledo,El Greco,flat,full,167,google/gemma-4-31B-it-qat-w4a16-ct
+Q883994,View of Toledo,El Greco,professional_hobbyist,full_rep,229,google/gemma-4-31B-it-qat-w4a16-ct
+Q883994,View of Toledo,El Greco,recharger,full_rep,193,google/gemma-4-31B-it-qat-w4a16-ct
+Q910199,Les Demoiselles d'Avignon,Pablo Picasso,experience_seeker,full_rep,217,google/gemma-4-31B-it-qat-w4a16-ct
+Q910199,Les Demoiselles d'Avignon,Pablo Picasso,explorer,full_rep,218,google/gemma-4-31B-it-qat-w4a16-ct
+Q910199,Les Demoiselles d'Avignon,Pablo Picasso,facilitator,full_rep,208,google/gemma-4-31B-it-qat-w4a16-ct
+Q910199,Les Demoiselles d'Avignon,Pablo Picasso,flat,full,178,google/gemma-4-31B-it-qat-w4a16-ct
+Q910199,Les Demoiselles d'Avignon,Pablo Picasso,professional_hobbyist,full_rep,228,google/gemma-4-31B-it-qat-w4a16-ct
+Q910199,Les Demoiselles d'Avignon,Pablo Picasso,recharger,full_rep,218,google/gemma-4-31B-it-qat-w4a16-ct
+Q920030,Charles IV of Spain and His Family,Francisco Goya,experience_seeker,full_rep,229,google/gemma-4-31B-it-qat-w4a16-ct
+Q920030,Charles IV of Spain and His Family,Francisco Goya,explorer,full_rep,236,google/gemma-4-31B-it-qat-w4a16-ct
+Q920030,Charles IV of Spain and His Family,Francisco Goya,facilitator,full_rep,236,google/gemma-4-31B-it-qat-w4a16-ct
+Q920030,Charles IV of Spain and His Family,Francisco Goya,flat,full,167,google/gemma-4-31B-it-qat-w4a16-ct
+Q920030,Charles IV of Spain and His Family,Francisco Goya,professional_hobbyist,full_rep,212,google/gemma-4-31B-it-qat-w4a16-ct
+Q920030,Charles IV of Spain and His Family,Francisco Goya,recharger,full_rep,218,google/gemma-4-31B-it-qat-w4a16-ct
+Q930535,Tahitian Women on the Beach,Paul Gauguin,experience_seeker,full_rep,211,google/gemma-4-31B-it-qat-w4a16-ct
+Q930535,Tahitian Women on the Beach,Paul Gauguin,explorer,full_rep,226,google/gemma-4-31B-it-qat-w4a16-ct
+Q930535,Tahitian Women on the Beach,Paul Gauguin,facilitator,full_rep,191,google/gemma-4-31B-it-qat-w4a16-ct
+Q930535,Tahitian Women on the Beach,Paul Gauguin,flat,full,131,google/gemma-4-31B-it-qat-w4a16-ct
+Q930535,Tahitian Women on the Beach,Paul Gauguin,professional_hobbyist,full_rep,217,google/gemma-4-31B-it-qat-w4a16-ct
+Q930535,Tahitian Women on the Beach,Paul Gauguin,recharger,full_rep,221,google/gemma-4-31B-it-qat-w4a16-ct
+Q958088,Portrait of a Young Woman,Johannes Vermeer,experience_seeker,full_rep,212,google/gemma-4-31B-it-qat-w4a16-ct
+Q958088,Portrait of a Young Woman,Johannes Vermeer,explorer,full_rep,219,google/gemma-4-31B-it-qat-w4a16-ct
+Q958088,Portrait of a Young Woman,Johannes Vermeer,facilitator,full_rep,229,google/gemma-4-31B-it-qat-w4a16-ct
+Q958088,Portrait of a Young Woman,Johannes Vermeer,flat,full,205,google/gemma-4-31B-it-qat-w4a16-ct
+Q958088,Portrait of a Young Woman,Johannes Vermeer,professional_hobbyist,full_rep,214,google/gemma-4-31B-it-qat-w4a16-ct
+Q958088,Portrait of a Young Woman,Johannes Vermeer,recharger,full_rep,230,google/gemma-4-31B-it-qat-w4a16-ct
+Q969367,Woman Holding a Balance,Johannes Vermeer,experience_seeker,full_rep,206,google/gemma-4-31B-it-qat-w4a16-ct
+Q969367,Woman Holding a Balance,Johannes Vermeer,explorer,full_rep,210,google/gemma-4-31B-it-qat-w4a16-ct
+Q969367,Woman Holding a Balance,Johannes Vermeer,facilitator,full_rep,196,google/gemma-4-31B-it-qat-w4a16-ct
+Q969367,Woman Holding a Balance,Johannes Vermeer,flat,full,166,google/gemma-4-31B-it-qat-w4a16-ct
+Q969367,Woman Holding a Balance,Johannes Vermeer,professional_hobbyist,full_rep,183,google/gemma-4-31B-it-qat-w4a16-ct
+Q969367,Woman Holding a Balance,Johannes Vermeer,recharger,full_rep,202,google/gemma-4-31B-it-qat-w4a16-ct
+Q970968,"Symphony in White, No. 1: The White Girl",James McNeill Whistler,experience_seeker,full_rep,219,google/gemma-4-31B-it-qat-w4a16-ct
+Q970968,"Symphony in White, No. 1: The White Girl",James McNeill Whistler,explorer,full_rep,240,google/gemma-4-31B-it-qat-w4a16-ct
+Q970968,"Symphony in White, No. 1: The White Girl",James McNeill Whistler,facilitator,full_rep,222,google/gemma-4-31B-it-qat-w4a16-ct
+Q970968,"Symphony in White, No. 1: The White Girl",James McNeill Whistler,flat,full,183,google/gemma-4-31B-it-qat-w4a16-ct
+Q970968,"Symphony in White, No. 1: The White Girl",James McNeill Whistler,professional_hobbyist,full_rep,235,google/gemma-4-31B-it-qat-w4a16-ct
+Q970968,"Symphony in White, No. 1: The White Girl",James McNeill Whistler,recharger,full_rep,232,google/gemma-4-31B-it-qat-w4a16-ct
+Q984058,Las Hilanderas,Diego Velázquez,experience_seeker,full_rep,220,google/gemma-4-31B-it-qat-w4a16-ct
+Q984058,Las Hilanderas,Diego Velázquez,explorer,full_rep,230,google/gemma-4-31B-it-qat-w4a16-ct
+Q984058,Las Hilanderas,Diego Velázquez,facilitator,full_rep,220,google/gemma-4-31B-it-qat-w4a16-ct
+Q984058,Las Hilanderas,Diego Velázquez,flat,full,208,google/gemma-4-31B-it-qat-w4a16-ct
+Q984058,Las Hilanderas,Diego Velázquez,professional_hobbyist,full_rep,226,google/gemma-4-31B-it-qat-w4a16-ct
+Q984058,Las Hilanderas,Diego Velázquez,recharger,full_rep,216,google/gemma-4-31B-it-qat-w4a16-ct

@@ -1,0 +1,36 @@
+{
+  "model": "qwen",
+  "corpora": [
+    "main",
+    "local"
+  ],
+  "n_artworks": 100,
+  "cos": {
+    "explorer": 0.773,
+    "facilitator": 0.874,
+    "experience_seeker": 0.872,
+    "professional_hobbyist": 0.865,
+    "recharger": 0.89
+  },
+  "ceiling_main": {
+    "explorer": 0.957,
+    "facilitator": 0.958,
+    "experience_seeker": 0.98,
+    "professional_hobbyist": 0.985,
+    "recharger": 0.99
+  },
+  "ceiling_local": {
+    "explorer": 0.987,
+    "facilitator": 0.991,
+    "experience_seeker": 0.992,
+    "professional_hobbyist": 0.989,
+    "recharger": 0.996
+  },
+  "ratio": {
+    "explorer": 0.795,
+    "facilitator": 0.897,
+    "experience_seeker": 0.885,
+    "professional_hobbyist": 0.877,
+    "recharger": 0.896
+  }
+}

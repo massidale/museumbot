@@ -1,0 +1,398 @@
+{
+  "model": "bge-m3",
+  "corpus": "local",
+  "variant": "full",
+  "n_artworks": 100,
+  "n_conditions": 6,
+  "dim": 1024,
+  "variance": {
+    "artwork_share": 0.8183172345161438,
+    "condition_share": 0.04487529769539833
+  },
+  "probe": {
+    "accuracy": 0.975,
+    "chance": 0.16666666666666666,
+    "per_class_recall": {
+      "Explorer": 0.98,
+      "Facilitator": 0.97,
+      "Experience Seeker": 1.0,
+      "Professional/Hobbyist": 1.0,
+      "Recharger": 1.0,
+      "Flat (baseline)": 0.9
+    }
+  },
+  "split_half_cosine": {
+    "Explorer": {
+      "mean": 0.8700292706489563,
+      "std": 0.0173723716288805
+    },
+    "Facilitator": {
+      "mean": 0.8562124371528625,
+      "std": 0.023190895095467567
+    },
+    "Experience Seeker": {
+      "mean": 0.9148892760276794,
+      "std": 0.01440226100385189
+    },
+    "Professional/Hobbyist": {
+      "mean": 0.8938046097755432,
+      "std": 0.015074805356562138
+    },
+    "Recharger": {
+      "mean": 0.9599344730377197,
+      "std": 0.006202686112374067
+    }
+  },
+  "split_half_cosine_mean_ref": {
+    "Explorer": {
+      "mean": 0.8518595695495605,
+      "std": 0.012545434758067131
+    },
+    "Facilitator": {
+      "mean": 0.8861498832702637,
+      "std": 0.010470066219568253
+    },
+    "Experience Seeker": {
+      "mean": 0.9524132609367371,
+      "std": 0.0048538316041231155
+    },
+    "Professional/Hobbyist": {
+      "mean": 0.9436150193214417,
+      "std": 0.005530372727662325
+    },
+    "Recharger": {
+      "mean": 0.9732515811920166,
+      "std": 0.0026437141932547092
+    },
+    "Flat (baseline)": {
+      "mean": 0.8724740743637085,
+      "std": 0.031359683722257614
+    }
+  },
+  "crossval_distance": {
+    "Explorer": {
+      "Explorer": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "Facilitator": {
+        "mean": 0.011396875604987144,
+        "std": 0.00012969961971975863
+      },
+      "Experience Seeker": {
+        "mean": 0.038781750947237015,
+        "std": 0.00015376594092231244
+      },
+      "Professional/Hobbyist": {
+        "mean": 0.041921671479940414,
+        "std": 0.0001841587945818901
+      },
+      "Recharger": {
+        "mean": 0.059127893298864365,
+        "std": 0.0001571469911141321
+      },
+      "Flat (baseline)": {
+        "mean": 0.021540170535445213,
+        "std": 0.00025943637592718005
+      }
+    },
+    "Facilitator": {
+      "Explorer": {
+        "mean": 0.011396875604987144,
+        "std": 0.00012969961971975863
+      },
+      "Facilitator": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "Experience Seeker": {
+        "mean": 0.038739629089832306,
+        "std": 0.00014972218195907772
+      },
+      "Professional/Hobbyist": {
+        "mean": 0.039756543934345245,
+        "std": 0.0001583230623509735
+      },
+      "Recharger": {
+        "mean": 0.06981135904788971,
+        "std": 0.00015737468493171036
+      },
+      "Flat (baseline)": {
+        "mean": 0.015864117071032524,
+        "std": 0.0002978036645799875
+      }
+    },
+    "Experience Seeker": {
+      "Explorer": {
+        "mean": 0.038781750947237015,
+        "std": 0.00015376594092231244
+      },
+      "Facilitator": {
+        "mean": 0.038739629089832306,
+        "std": 0.00014972218195907772
+      },
+      "Experience Seeker": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "Professional/Hobbyist": {
+        "mean": 0.05425281077623367,
+        "std": 0.000139839161420241
+      },
+      "Recharger": {
+        "mean": 0.1066577360033989,
+        "std": 0.00017864308028947562
+      },
+      "Flat (baseline)": {
+        "mean": 0.0326467864215374,
+        "std": 0.0003094787534791976
+      }
+    },
+    "Professional/Hobbyist": {
+      "Explorer": {
+        "mean": 0.041921671479940414,
+        "std": 0.0001841587945818901
+      },
+      "Facilitator": {
+        "mean": 0.039756543934345245,
+        "std": 0.0001583230623509735
+      },
+      "Experience Seeker": {
+        "mean": 0.05425281077623367,
+        "std": 0.000139839161420241
+      },
+      "Professional/Hobbyist": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "Recharger": {
+        "mean": 0.11463367193937302,
+        "std": 0.00016575411427766085
+      },
+      "Flat (baseline)": {
+        "mean": 0.02677524834871292,
+        "std": 0.00028831299277953804
+      }
+    },
+    "Recharger": {
+      "Explorer": {
+        "mean": 0.059127893298864365,
+        "std": 0.0001571469911141321
+      },
+      "Facilitator": {
+        "mean": 0.06981135904788971,
+        "std": 0.00015737468493171036
+      },
+      "Experience Seeker": {
+        "mean": 0.1066577360033989,
+        "std": 0.00017864308028947562
+      },
+      "Professional/Hobbyist": {
+        "mean": 0.11463367193937302,
+        "std": 0.00016575411427766085
+      },
+      "Recharger": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "Flat (baseline)": {
+        "mean": 0.08216281235218048,
+        "std": 0.0002733742876444012
+      }
+    },
+    "Flat (baseline)": {
+      "Explorer": {
+        "mean": 0.021540170535445213,
+        "std": 0.00025943637592718005
+      },
+      "Facilitator": {
+        "mean": 0.015864117071032524,
+        "std": 0.0002978036645799875
+      },
+      "Experience Seeker": {
+        "mean": 0.0326467864215374,
+        "std": 0.0003094787534791976
+      },
+      "Professional/Hobbyist": {
+        "mean": 0.02677524834871292,
+        "std": 0.00028831299277953804
+      },
+      "Recharger": {
+        "mean": 0.08216281235218048,
+        "std": 0.0002733742876444012
+      },
+      "Flat (baseline)": {
+        "mean": 0.0,
+        "std": 0.0
+      }
+    }
+  },
+  "cosine_matrix": {
+    "Explorer": {
+      "Explorer": 0.9999999403953552,
+      "Facilitator": 0.6920191645622253,
+      "Experience Seeker": 0.302530974149704,
+      "Professional/Hobbyist": 0.1536131203174591,
+      "Recharger": 0.5249437689781189
+    },
+    "Facilitator": {
+      "Explorer": 0.6920191645622253,
+      "Facilitator": 1.0,
+      "Experience Seeker": 0.23404742777347565,
+      "Professional/Hobbyist": 0.09798800200223923,
+      "Recharger": 0.392800897359848
+    },
+    "Experience Seeker": {
+      "Explorer": 0.302530974149704,
+      "Facilitator": 0.23404742777347565,
+      "Experience Seeker": 0.9999999403953552,
+      "Professional/Hobbyist": 0.1101604551076889,
+      "Recharger": 0.0924176424741745
+    },
+    "Professional/Hobbyist": {
+      "Explorer": 0.1536131203174591,
+      "Facilitator": 0.09798800200223923,
+      "Experience Seeker": 0.1101604551076889,
+      "Professional/Hobbyist": 1.0,
+      "Recharger": -0.04243254289031029
+    },
+    "Recharger": {
+      "Explorer": 0.5249437689781189,
+      "Facilitator": 0.392800897359848,
+      "Experience Seeker": 0.0924176424741745,
+      "Professional/Hobbyist": -0.04243254289031029,
+      "Recharger": 0.9999999403953552
+    }
+  },
+  "steering_norms": {
+    "Explorer": 0.15235428512096405,
+    "Facilitator": 0.13143248856067657,
+    "Experience Seeker": 0.18497993052005768,
+    "Professional/Hobbyist": 0.16862954199314117,
+    "Recharger": 0.2896786034107208
+  },
+  "ceiling": {
+    "Explorer": 0.9777808785438538,
+    "Facilitator": 0.9658700823783875,
+    "Experience Seeker": 0.9896705150604248,
+    "Professional/Hobbyist": 0.9861128330230713,
+    "Recharger": 0.9926506280899048
+  },
+  "permutation": {
+    "observed_mean_norm": 0.13848944008350372,
+    "null_mean": 0.029385110805742444,
+    "p_value": 0.0004997501249375312
+  },
+  "words": {
+    "Explorer": 224.97,
+    "Facilitator": 218.13,
+    "Experience Seeker": 213.21,
+    "Professional/Hobbyist": 219.7,
+    "Recharger": 219.65,
+    "Flat (baseline)": 178.82
+  },
+  "top_words": {
+    "Explorer": [
+      "keep",
+      "lead",
+      "curiosity",
+      "secrets",
+      "catch",
+      "glance",
+      "tell",
+      "wonder",
+      "trying",
+      "discover",
+      "move",
+      "spark",
+      "hidden",
+      "puzzle",
+      "examine"
+    ],
+    "Facilitator": [
+      "impressions",
+      "wonderful",
+      "discuss",
+      "companions",
+      "gather",
+      "help",
+      "sharing",
+      "perspectives",
+      "conversation",
+      "changes",
+      "group",
+      "uncover",
+      "mood",
+      "together",
+      "might"
+    ],
+    "Experience Seeker": [
+      "sure",
+      "must",
+      "jewel",
+      "redefined",
+      "powerhouse",
+      "highlight",
+      "cementing",
+      "genius",
+      "legendary",
+      "landmark",
+      "crown",
+      "iconic",
+      "cultural",
+      "impact",
+      "global"
+    ],
+    "Professional/Hobbyist": [
+      "spatial",
+      "examining",
+      "should",
+      "analyzing",
+      "broader",
+      "wish",
+      "technically",
+      "noting",
+      "thematic",
+      "utilizes",
+      "student",
+      "oeuvre",
+      "executed",
+      "trajectory",
+      "employs"
+    ],
+    "Recharger": [
+      "fade",
+      "breathe",
+      "gentle",
+      "arise",
+      "need",
+      "letting",
+      "steady",
+      "drift",
+      "slowly",
+      "hold",
+      "quietude",
+      "breathing",
+      "restore",
+      "feelings",
+      "rush"
+    ],
+    "Flat (baseline)": [
+      "welcome",
+      "secure",
+      "highly",
+      "various",
+      "official",
+      "along",
+      "generations",
+      "detailed",
+      "signature",
+      "positioned",
+      "resides",
+      "note",
+      "centerpiece",
+      "sweeping",
+      "transforms"
+    ]
+  }
+}

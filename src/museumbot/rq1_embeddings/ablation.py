@@ -17,20 +17,24 @@ Corpus: `ablation` (common.corpus), cioe' il corpus di settembre a routing liber
 senza le opere con testi troncati. I numeri non si confrontano direttamente con quelli del
 corpus principale, generato su provider fisso.
 
-Calibrazione: ogni variante viene riportata anche come rapporto col tetto di rumore della
-generazione; ~1 vuol dire indistinguibile dal full, non soltanto "vicino". Due tetti
-racchiudono quello vero (due run del full con la miscela di provider di settembre, non
-piu' riproducibile):
-  `cos_rel`        tetto = cos(v_full, v_full_rep): routing libero, settembre vs ottobre.
-                   Include anche la deriva di provider: tetto basso, rapporto indulgente.
-  `cos_rel_strict` tetto = cos(v_full, v_full_rep) del corpus principale
-                   (results/metrics_<model>.json, sezione `ceiling`): stesso provider e
-                   stessa sessione. Solo rumore di generazione: tetto alto, rapporto severo.
+Calibrazione (`cos_rel`): il coseno con il full diviso per il tetto di rumore della
+generazione; ~1 vuol dire indistinguibile dal full, non soltanto "vicino". Il tetto e'
+cos(v_full, v_full_rep) del corpus principale (results/metrics_<model>.json, sezione
+`ceiling`): due run dello stesso prompt sullo stesso provider e nella stessa sessione. Il
+corpus di ablazione ha anche la deriva di provider, quindi il suo tetto vero e' un po' piu'
+basso e il rapporto e' conservativo.
+
+Deriva di routing: quanto il routing libero allontana due run dello stesso prompt, sui
+singoli testi. D = mean(1 - cos(full, full_rep)) del corpus di ablazione diviso lo stesso
+valore del corpus principale (provider fisso), sulle celle (opera, categoria) comuni; IC al
+95% con bootstrap sulle opere. Del corpus principale si usano solo i propri coseni: i testi
+dei due corpus non vengono mai confrontati fra loro.
 """
 
 import argparse
 import itertools
 import json
+from collections import defaultdict
 from pathlib import Path
 
 import matplotlib
@@ -38,10 +42,11 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 from museumbot.rq1_embeddings.analyze import COLORS, center, load, probe, split_half, steering
-from museumbot.common.config import ROOT, emb_path
-from museumbot.common.prompts import CONDITIONS, FALK_CATEGORIES, LABELS, PARTS, REPLICATES, VARIANTS
+from museumbot.common.config import ROOT, emb_path, meta_path
+from museumbot.common.prompts import CONDITIONS, FALK_CATEGORIES, LABELS, PARTS, VARIANTS
 
 RESULTS = ROOT / "results"
 FIGS = ROOT / "figures"
@@ -132,22 +137,43 @@ def run(model: str) -> dict:
         for metric in ("norm_mean", "cos_with_full_mean", "probe5_accuracy"):
             factorial[metric] = factorial_effects({v: per_variant[v][metric] for v in VARIANTS})
 
-    replicates = {r: analyse_variant(model, r, V_full)[0]
-                  for r in REPLICATES if emb_path(model, r, CORPUS).exists()}
-    ceilings = {}
-    if "full_rep" in replicates:
-        ceilings["lenient"] = replicates["full_rep"]["cos_with_full"]
-        calibrate(per_variant, ceilings["lenient"], "cos_rel")
-    strict = strict_ceiling(model)
-    if strict:
-        ceilings["strict"] = strict
-        calibrate(per_variant, strict, "cos_rel_strict")
-
-    return {"model": model, "variants": per_variant, "replicates": replicates,
-            "ceilings": ceilings, "factorial": factorial}
+    out = {"model": model, "variants": per_variant, "factorial": factorial}
+    ceiling = main_ceiling(model)
+    if ceiling:
+        out["ceiling"] = ceiling
+        calibrate(per_variant, ceiling)
+    if all(emb_path(model, v, c).exists() for v in ("full", "full_rep") for c in ("main", CORPUS)):
+        out["routing_drift"] = drift_ratio(cell_cosines(model, CORPUS), cell_cosines(model, "main"))
+    return out
 
 
-def strict_ceiling(model: str) -> dict[str, float] | None:
+def cell_cosines(model: str, corpus: str) -> dict[tuple[str, str], float]:
+    """cos(full, full_rep) per cella (opera, categoria) di un corpus; il flat e' escluso."""
+    def by_cell(variant):
+        E = np.load(emb_path(model, variant, corpus))
+        m = pd.read_csv(meta_path(variant, corpus))
+        return {(a, c): E[i] for i, (a, c) in enumerate(zip(m["artwork_id"], m["condition"]))
+                if c != "flat"}
+    full, rep = by_cell("full"), by_cell("full_rep")
+    return {k: float(full[k] @ rep[k]) for k in full if k in rep}
+
+
+def drift_ratio(mixed: dict, fixed: dict, n_boot: int = 2000, seed: int = 0) -> dict:
+    """D = mean(1 - cos routing libero) / mean(1 - cos provider fisso) sulle celle comuni."""
+    by_art = defaultdict(lambda: [0.0, 0.0])
+    keys = sorted(set(mixed) & set(fixed))
+    for a, c in keys:
+        by_art[a][0] += 1 - mixed[(a, c)]
+        by_art[a][1] += 1 - fixed[(a, c)]
+    num, den = np.array(list(by_art.values())).T
+    idx = np.random.default_rng(seed).integers(0, len(num), size=(n_boot, len(num)))
+    boot = num[idx].sum(axis=1) / den[idx].sum(axis=1)
+    return {"D": float(num.sum() / den.sum()),
+            "ci95": [float(np.percentile(boot, 2.5)), float(np.percentile(boot, 97.5))],
+            "n_cells": len(keys)}
+
+
+def main_ceiling(model: str) -> dict[str, float] | None:
     """Tetto su provider fisso: cos(v_full, v_full_rep) per categoria nel corpus principale."""
     path = RESULTS / f"metrics_{model}.json"
     if not path.exists():
@@ -167,27 +193,23 @@ def calibrate(per_variant: dict, ceiling: dict[str, float], key: str = "cos_rel"
 
 
 def print_summary(res: dict) -> None:
-    calibrated = "full_rep" in res.get("replicates", {})
-    strict = "strict" in res.get("ceilings", {})
+    calibrated = "ceiling" in res
     head = f"\n{'variante':12} {'probe5':>7} {'||v|| media':>12} {'cos·full':>9} {'split-half':>11}"
-    print(head + (f" {'cos/tetto':>10}" if calibrated else "")
-          + (f" {'cos/tetto severo':>17}" if strict else ""))
-    rows = sorted(res["variants"].values(), key=lambda r: -r["cos_with_full_mean"])
-    for r in [*rows, *res.get("replicates", {}).values()]:
+    print(head + (f" {'cos/tetto':>10}" if calibrated else ""))
+    for r in sorted(res["variants"].values(), key=lambda r: -r["cos_with_full_mean"]):
         sh = np.mean(list(r["split_half"].values()))
         line = (f"{r['variant']:12} {r['probe5_accuracy']:7.1%} {r['norm_mean']:12.4f} "
                 f"{r['cos_with_full_mean']:9.3f} {sh:11.3f}")
         if calibrated and "cos_rel_mean" in r:
             line += f" {r['cos_rel_mean']:10.3f}"
-        if strict and "cos_rel_strict_mean" in r:
-            line += f" {r['cos_rel_strict_mean']:17.3f}"
         print(line)
     if calibrated:
-        ceil = res["replicates"]["full_rep"]["cos_with_full"]
-        print("tetto (cos full_rep·full): " + "  ".join(f"{c} {v:.3f}" for c, v in ceil.items()))
-    if strict:
-        print("tetto severo (provider fisso): "
-              + "  ".join(f"{c} {v:.3f}" for c, v in res["ceilings"]["strict"].items()))
+        print("tetto (provider fisso): "
+              + "  ".join(f"{c} {v:.3f}" for c, v in res["ceiling"].items()))
+    if "routing_drift" in res:
+        d = res["routing_drift"]
+        print(f"deriva di routing (testi): D = {d['D']:.3f} IC95 [{d['ci95'][0]:.3f}, "
+              f"{d['ci95'][1]:.3f}] su {d['n_cells']} celle")
     if res["factorial"]:
         print("\neffetti principali (con parte - senza parte):")
         for metric, eff in res["factorial"].items():
@@ -223,13 +245,13 @@ def fig_bars(res: dict, path: Path) -> None:
     a.set_title("Ablazione del prompt — separabilita' e ampiezza dello shift", fontsize=11)
 
     w = 0.8 / N_FALK
-    ceil = res.get("replicates", {}).get("full_rep", {}).get("cos_with_full")
+    ceil = res.get("ceiling")
     for i, c in enumerate(FALK_CATEGORIES):
         b.bar(x + (i - (N_FALK - 1) / 2) * w, [R[v]["cos_with_full"][LABELS[c]] for v in vs],
               w, color=COLORS[c], label=LABELS[c])
     if ceil:
         b.axhline(np.mean(list(ceil.values())), color="#444", ls="--", lw=1,
-                  label="tetto (replica del full)")
+                  label="tetto (provider fisso)")
     b.axhline(0, color="#ccc", lw=0.8)
     b.set_ylabel("cos(v_variante, v_full)")
     b.set_ylim(-0.2, 1.05)
@@ -246,7 +268,6 @@ def fig_bars(res: dict, path: Path) -> None:
 def fig_cosine_heatmap(res: dict, path: Path) -> None:
     """Heatmap variante x categoria del coseno con full, su scala sequenziale ristretta al range osservato."""
     rows = {v: res["variants"][v] for v in VARIANTS if v in res["variants"]}
-    rows |= {f"{r} (tetto)": d for r, d in res.get("replicates", {}).items()}
     vs = list(rows)
     M = np.array([[rows[v]["cos_with_full"][LABELS[c]] for c in FALK_CATEGORIES] for v in vs])
     fig, ax = plt.subplots(figsize=(7.5, 6.4))
@@ -258,8 +279,6 @@ def fig_cosine_heatmap(res: dict, path: Path) -> None:
         for j in range(N_FALK):
             ax.text(j, i, f"{M[i, j]:.2f}", ha="center", va="center", fontsize=8,
                     color="white" if M[i, j] > 0.85 else "black")
-    if len(vs) > len(VARIANTS):
-        ax.axhline(len(VARIANTS) - 0.5, color="black", lw=1.5)
     ax.set_title("Coseno fra v_variante[c] e v_full[c]", fontsize=11)
     fig.colorbar(im, shrink=0.8)
     fig.tight_layout()

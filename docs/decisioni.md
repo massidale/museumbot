@@ -288,3 +288,44 @@ attenzione 100% (soglia 95%): giudice utilizzabile, nessuna modifica al prompt.
 **Risultato.** A = 0.967 [0.953, 0.979], B = 0.991 [0.984, 0.996], C = 0.207, N = 0.432,
 A − C = 0.760 [0.718, 0.799], A − N = 0.535 [0.495, 0.573]. Consistenza fra i due ordini
 0.88, scelte "A" 53%.
+
+## 2026-10-02 — Dataset separati per scopo
+
+**Decisione.** I dati generati sono separati per scopo: `data/main/` (studio chain: corpus
+principale, chain e prefisso) e `data/ablation/` (corpus di settembre). Il corpus di
+settembre è usato solo dall'ablazione. La misura della deriva di routing (`full` contro
+`full_rep` del corpus di settembre, rispetto al rumore su provider fisso) passa da
+`chain_noise.py` ad `ablation.py` (`routing_drift`), dove calibra il tetto indulgente; dal
+corpus principale usa solo i suoi coseni interni.
+**Motivo.** Tenere il corpus a routing libero isolato nell'unica analisi che ne ha bisogno:
+lo studio chain vs singolo ora usa solo testi della stessa sessione e dello stesso provider.
+Si è valutato di rigenerare l'ablazione su provider fisso (circa $0.60) o di usare per le
+varianti di settembre il flat della sessione fissa; la seconda opzione è stata scartata
+perché il flat è l'origine degli steering vector e la differenza sistematica fra i corpus
+si sarebbe sommata a tutte le varianti, proprio dove l'ablazione ha i risultati nulli
+(no_def, no_need). Massimo ha scelto di lasciare l'ablazione sul corpus di settembre.
+**Effetto.** Nessuno sui valori: D = 1.16 (Qwen3 e BGE-M3) come prima. Gli IC bootstrap
+dello shift relativo della chain cambiano alla seconda cifra (sequenza casuale diversa).
+
+## 2026-10-02 — Ablazione calibrata con un solo tetto
+
+**Decisione.** Tolto il tetto "indulgente" (coseno fra `full` e `full_rep` del corpus di
+settembre) e la riga `full_rep` dalla tabella dell'ablazione. Resta un solo tetto, quello
+del corpus principale (due run sullo stesso provider); `cos_rel` è ora il rapporto con quel
+tetto (prima `cos_rel_strict`). La deriva di routing resta, come indicazione che il
+rapporto è conservativo.
+**Motivo.** Il tetto indulgente mescolava rumore di generazione e deriva di provider, e
+serviva solo a dare un intervallo; con il corpus di settembre isolato per l'ablazione, il
+tetto su provider fisso è l'unico riferimento pulito.
+**Effetto.** I valori del rapporto sono quelli che prima comparivano come "severi": Qwen3
+`no_def`/`no_need` 0.99, BGE-M3 0.97; nessuna conclusione cambia.
+
+## 2026-10-02 — Effetti principali e interazioni tolti dal report
+
+**Decisione.** Il report non riporta più la scomposizione dell'ablazione in effetti
+principali e interazioni a due vie (ex §5.2); la lettura usa i confronti diretti fra
+varianti (`style_only` vs `full`, `no_style`, `name_only` → `def_only`, `style_only` →
+`no_need`). `ablation.py` continua a calcolarla (`factorial` nel JSON).
+**Motivo.** Non aggiunge conclusioni rispetto alla tabella delle 8 varianti, e il nome
+"analisi fattoriale" si confonde con la factor analysis.
+**Effetto.** Nessuno sui risultati.

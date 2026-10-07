@@ -1,10 +1,10 @@
 """I due corpus di RQ1, letti e puliti sempre allo stesso modo.
 
-    main      testi a prompt singolo dello studio chain (data/chain_study.jsonl): DeepInfra
+    main      testi a prompt singolo dello studio chain (data/main/chain_study.jsonl): DeepInfra
               fp8, ragionamento attivo, stessa sessione. single_a -> variante `full`,
               single_b -> replica `full_rep`, flat -> `flat`; le righe `chain` restano fuori.
-    ablation  corpus di settembre (data/generations.jsonl, routing libero): le 8 varianti
-              del blocco di categoria piu' la replica `full_rep`.
+    ablation  corpus di settembre (data/ablation/generations.jsonl, routing libero), usato
+              solo per l'ablazione: le 8 varianti del blocco piu' la replica `full_rep`.
 
 Ogni testo passa per `clean_guide` a partire dall'originale (`usage.raw` se presente), e il
 numero di parole si ricalcola. Le opere con almeno un testo troncato vengono escluse per
@@ -18,8 +18,8 @@ from museumbot.common.clean import clean_guide, is_truncated
 from museumbot.common.config import ROOT
 
 SOURCES = {
-    "main": ROOT / "data" / "chain_study.jsonl",
-    "ablation": ROOT / "data" / "generations.jsonl",
+    "main": ROOT / "data" / "main" / "chain_study.jsonl",
+    "ablation": ROOT / "data" / "ablation" / "generations.jsonl",
 }
 CORPORA = tuple(SOURCES)
 # Metodo dello studio chain -> variante nel corpus principale.

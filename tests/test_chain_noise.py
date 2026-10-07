@@ -44,6 +44,6 @@ def test_steering_stats_rel_one_for_identical_methods():
     assert np.allclose(s["rel"], 1) and np.allclose(s["norm_ratio"], 1)
 
 
-def test_ratio_ignores_missing_mixed():
-    df = pd.DataFrame({"within": [0.9, 0.8], "mixed": [0.85, np.nan]})
-    assert ratio(df, "mixed") == pytest.approx(0.15 / 0.1)
+def test_ratio_ignores_missing_values():
+    df = pd.DataFrame({"within": [0.9, 0.8], "between": [0.85, np.nan]})
+    assert ratio(df, "between") == pytest.approx(0.15 / 0.1)

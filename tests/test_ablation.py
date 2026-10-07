@@ -74,3 +74,14 @@ def test_calibrate_custom_key():
     calibrate(per, {"A": 0.9}, "cos_rel_strict")
     assert per["no_def"]["cos_rel_strict"]["A"] == pytest.approx(0.8 / 0.9)
     assert "cos_rel" not in per["no_def"]
+
+
+def test_drift_ratio_on_common_cells():
+    from museumbot.rq1_embeddings.ablation import drift_ratio
+
+    mixed = {("Q1", "explorer"): 0.8, ("Q2", "explorer"): 0.8, ("Q3", "explorer"): 0.5}
+    fixed = {("Q1", "explorer"): 0.9, ("Q2", "explorer"): 0.9}
+    d = drift_ratio(mixed, fixed, n_boot=100)
+    assert d["n_cells"] == 2
+    assert d["D"] == pytest.approx(2.0)
+    assert d["ci95"] == pytest.approx([2.0, 2.0])

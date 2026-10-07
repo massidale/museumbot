@@ -1,6 +1,6 @@
 """Genera le audioguide: 6 condizioni (5 categorie di Falk + flat) per ogni opera.
 
-Scrive data/generations.jsonl in append-only, con chiave (artwork_id, condition). Il run
+Scrive data/ablation/generations.jsonl in append-only, con chiave (artwork_id, condition). Il run
 e' riavviabile: cio' che e' gia' presente viene saltato, quindi un'interruzione non costa
 una seconda generazione.
 
@@ -33,7 +33,7 @@ from museumbot.common.config import ROOT, openrouter_key
 from museumbot.common.prompts import CONDITIONS, REPLICATES, VARIANTS, build_messages, prompt_variant
 
 ARTWORKS = ROOT / "data" / "artworks.jsonl"
-OUT = ROOT / "data" / "generations.jsonl"
+OUT = ROOT / "data" / "ablation" / "generations.jsonl"
 API = "https://openrouter.ai/api/v1/chat/completions"
 
 # Il paper vieta i riferimenti espliciti alla categoria: se compaiono, il testo rivelerebbe

@@ -51,8 +51,8 @@ from museumbot.generation.compare_chain import (
 )
 from museumbot.generation.generate import ARTWORKS, Budget, generate_one, provider_routing
 
-OUT = ROOT / "data" / "chain_study.jsonl"
-PREFIX = ROOT / "data" / "chain_study_prefix.json"
+OUT = ROOT / "data" / "main" / "chain_study.jsonl"
+PREFIX = ROOT / "data" / "main" / "chain_study_prefix.json"
 METHODS = ("single_a", "single_b", "chain")
 
 

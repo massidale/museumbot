@@ -1,6 +1,7 @@
 """Chain vs prompt singolo: la differenza fra i due metodi e' pari al rumore di generazione?
 
-Dati: data/chain_study.jsonl (generation/chain_study.py), tutti dallo stesso provider.
+Dati: data/main/chain_study.jsonl (generation/chain_study.py), tutti dallo stesso provider e
+dalla stessa sessione. Tutti i testi passano per `clean_guide`, dal testo originale.
 
 Livello testo, per ogni cella (opera a, categoria c), su embedding L2-normalizzati:
 
@@ -21,11 +22,6 @@ Livello steering (l'effetto di categoria e' lo stesso?), riferimento flat della 
     tetto  = cos(v_Sa[c], v_Sb[c])
     chain  = 1/2 [cos(v_C[c], v_Sa[c]) + cos(v_C[c], v_Sb[c])]
     rel    = chain / tetto                      ~1 = stesso shift di categoria
-
-Deriva di routing: lo stesso `within`, calcolato fra `full` e `full_rep` del corpus
-di settembre (routing libero, settembre vs ottobre), dice quanto rumore aggiunge cambiare
-provider. Tutti i testi passano per la stessa `clean_guide`, dal testo originale; i
-full/full_rep vengono da `load_corpus("ablation")`, quindi senza le opere troncate.
 """
 
 import argparse
@@ -40,7 +36,7 @@ import pandas as pd
 
 from museumbot.common.clean import clean_guide
 from museumbot.common.config import ROOT
-from museumbot.common.corpus import load_corpus, original_text
+from museumbot.common.corpus import original_text
 from museumbot.common.prompts import CONDITIONS, FALK_CATEGORIES, LABELS
 from museumbot.generation.chain_study import OUT as STUDY
 from museumbot.rq1_embeddings.analyze import FLAT, steering
@@ -56,16 +52,12 @@ RNG = np.random.default_rng(0)
 
 
 def collect_rows() -> list[dict]:
-    """Testi dello studio + full/full_rep del corpus di settembre (per la deriva), puliti."""
+    """Testi dello studio, puliti."""
     rows = []
     for r in map(json.loads, STUDY.open()):
         t = clean_guide(original_text(r))  # regole aggiunte dopo la generazione
         rows.append({"artwork_id": r["artwork_id"], "condition": r["condition"],
                      "method": r["method"], "text": t, "words": len(t.split())})
-    for r in load_corpus("ablation", verbose=False):
-        if r["variant"] in ("full", "full_rep") and r["condition"] != "flat":
-            rows.append({"artwork_id": r["artwork_id"], "condition": r["condition"],
-                         "method": r["variant"], "text": r["text"], "words": r["words"]})
     rows.sort(key=lambda r: (r["method"], r["artwork_id"], r["condition"]))
     return rows
 
@@ -81,8 +73,14 @@ def embed(alias: str, device: str) -> tuple[pd.DataFrame, np.ndarray]:
     if emb_file.exists() and meta_file.exists():
         cached = pd.read_csv(meta_file)
         E = np.load(emb_file)
-        if len(cached) == len(meta) == len(E) and (cached["text"] == meta["text"]).all():
-            return meta, E
+        if len(cached) == len(E):
+            # riusa gli embedding per testo: basta che ogni testo sia gia' in cache
+            row_of = {t: i for i, t in enumerate(cached["text"])}
+            if all(t in row_of for t in meta["text"]):
+                E = E[[row_of[t] for t in meta["text"]]]
+                np.save(emb_file, E)
+                meta.to_csv(meta_file, index=False)
+                return meta, E
     from sentence_transformers import SentenceTransformer
 
     m = SentenceTransformer(MODELS[alias], device=device)
@@ -118,9 +116,6 @@ def text_level(E, idx) -> pd.DataFrame:
                + pair_cos(E, idx, cells, "chain", "single_b")) / 2
     df = pd.DataFrame(cells, columns=["artwork_id", "condition"])
     df["within"], df["between"] = within, between
-    mixed_cells = set(complete_cells(idx, ("full", "full_rep")))
-    df["mixed"] = [E[idx[(a, c, "full")]] @ E[idx[(a, c, "full_rep")]]
-                   if (a, c) in mixed_cells else np.nan for a, c in cells]
     return df
 
 
@@ -188,10 +183,9 @@ def steering_level(E, idx, n_boot: int = 1000) -> dict:
 
 def fig_dissimilarity(df: pd.DataFrame, path) -> None:
     fig, ax = plt.subplots(figsize=(8, 4.8))
-    bins = np.linspace(0, max(1 - df[["within", "between", "mixed"]].min().min(), 0.01), 40)
-    series = [("within", "rumore: singolo vs singolo (stesso provider)", "#1F77B4"),
-              ("between", "chain vs singolo", "#E8743B"),
-              ("mixed", "full vs full_rep (routing libero, set. vs ott.)", "#9E9E9E")]
+    bins = np.linspace(0, max(1 - df[["within", "between"]].min().min(), 0.01), 40)
+    series = [("within", "rumore: singolo vs singolo", "#1F77B4"),
+              ("between", "chain vs singolo", "#E8743B")]
     for col, lab, color in series:
         d = 1 - df[col].dropna()
         ax.hist(d, bins=bins, alpha=0.45, color=color, label=f"{lab} — media {d.mean():.3f}")
@@ -222,8 +216,6 @@ def main() -> None:
 
     R = ratio(df, "between")
     R_ci = bootstrap(df, lambda d: ratio(d, "between"))
-    D = ratio(df, "mixed")
-    D_ci = bootstrap(df.dropna(subset=["mixed"]), lambda d: ratio(d, "mixed"))
     per_cat = {LABELS[c]: ratio(g, "between") for c, g in df.groupby("condition")}
     words = meta.groupby("method")["words"].mean().round(1).to_dict()
 
@@ -238,11 +230,6 @@ def main() -> None:
             "equivalent": R_ci[1] < EQUIV_MARGIN,
             "R_per_category": per_cat,
         },
-        "routing_drift": {
-            "n_cells": int(df["mixed"].notna().sum()),
-            "mixed_mean": float(df["mixed"].mean()),
-            "D": D, "D_ci95": D_ci,
-        },
         "steering": steering_level(E, idx),
         "words": words,
     }
@@ -255,8 +242,6 @@ def main() -> None:
           f"(margine {EQUIV_MARGIN})")
     for k, v in per_cat.items():
         print(f"      {k:24} R {v:.3f}")
-    print(f"  deriva di routing: D = {D:.3f}  IC95 [{D_ci[0]:.3f}, {D_ci[1]:.3f}]  "
-          f"({out['routing_drift']['n_cells']} celle)")
     st = out["steering"]
     print(f"  steering (rif. flat, {st['n_artworks']} opere): rel medio {st['rel_mean']:.3f}")
     for c in FALK_CATEGORIES:

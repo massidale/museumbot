@@ -23,25 +23,22 @@ Uso:
 """
 
 import argparse
-import hashlib
 import json
 import math
-import re
 import statistics
 import time
 from pathlib import Path
 
 import mlx.core as mx
 
-from museumbot.common.clean import clean_guide, is_truncated
+from museumbot.common.clean import clean_guide
 from museumbot.common.config import ROOT
 from museumbot.common.prompts import REPLICATES, local_messages, prompt_variant
 from museumbot.generation.generate import ARTWORKS, BANNED, plan_jobs, read_done
+from museumbot.generation.rows import ATTEMPTS, check_pilot, row_seed  # noqa: F401
 
 MODEL = "mlx-community/gemma-4-12B-it-4bit"
 OUT = ROOT / "data" / "local" / "generations.jsonl"
-MARKDOWN = re.compile(r"\*\*|__|^\s*#|^\s*[-*] ", re.M)
-ATTEMPTS = 4
 
 
 def log_softmax(x):
@@ -81,29 +78,6 @@ def decode(model, prompts: list[list[int]], weights: list[float], *, temp: float
         diag.append({"logp": [float(lp[tok].item()) for lp in lps], "div": max(float(div.item()), 0.0)})
         logits = [model(mx.array([[tok]]), cache=c)[0, -1] for c in caches]
     return out, diag
-
-
-def row_seed(artwork_id: str, condition: str, variant: str, attempt: int = 0) -> int:
-    """Seed deterministico per testo: la replica ha un seed diverso dal full."""
-    h = hashlib.sha256(f"{artwork_id}|{condition}|{variant}|{attempt}".encode()).hexdigest()
-    return int(h[:8], 16)
-
-
-def check_pilot(rows: list[dict]) -> dict:
-    """Criteri del passo 1 (spec): troncamenti <= 1/30, violazioni <= 2/30 (Markdown nel
-    grezzo o rigenerazione per riferimento esplicito), mediana 200-300 parole, nessun
-    testo sotto 120."""
-    n = len(rows)
-    words = [r["words"] for r in rows]
-    trunc = sum(is_truncated(r["text"]) for r in rows)
-    viol = sum(bool(MARKDOWN.search(r["usage"].get("raw") or r["text"]))
-               or r["usage"].get("attempts", 1) > 1 for r in rows)
-    med = statistics.median(words)
-    rep = {"n": n, "truncated": trunc, "violations": viol, "median_words": med,
-           "min_words": min(words), "max_words": max(words)}
-    rep["passed"] = (trunc <= n / 30 and viol <= 2 * n / 30 and 200 <= med <= 300
-                     and min(words) >= 120)
-    return rep
 
 
 # ------------------------------------------------------------------ modello vero (MLX)

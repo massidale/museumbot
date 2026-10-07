@@ -10,3 +10,5 @@ CLAUDE.md
 docs/plans/
 .DS_Store
 progetto-tesi-finale.pdf
+
+data/explore.duckdb

@@ -15,9 +15,10 @@ def run(cmd: str) -> None:
     subprocess.run(cmd, shell=True, check=True)
 
 
-run("pip uninstall -y -q torchaudio; pip install -q -U vllm python-dotenv")
+run("pip uninstall -y -q torchaudio; pip install -q vllm==0.31.0 python-dotenv")
 run(f"git clone -q -b restructure-src https://github.com/massidale/museumbot {REPO}")
 run(f"git -C {REPO} log --oneline -1")
+run(f"{sys.executable} {REPO}/kaggle/patch_vllm_turing.py")
 env = f"PYTHONPATH={REPO}/src"
 limit = os.environ.get("LIMIT", "")
 for variant in ("full", "full_rep"):

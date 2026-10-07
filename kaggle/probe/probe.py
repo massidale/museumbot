@@ -55,12 +55,13 @@ def env():
 
 @step("install")
 def install():
-    out = sh("pip uninstall -y -q torchaudio; pip install -q -U vllm python-dotenv 2>&1 | tail -5")
+    out = sh("pip uninstall -y -q torchaudio; pip install -q vllm==0.31.0 python-dotenv 2>&1 | tail -5")
     clone = sh(f"git clone -q -b restructure-src https://github.com/massidale/museumbot {REPO}")
+    patch = sh(f"{sys.executable} {REPO}/kaggle/patch_vllm_turing.py")
     sys.path.insert(0, f"{REPO}/src")
     import torch
     import vllm
-    return {"pip": out, "clone": clone, "vllm": vllm.__version__, "torch": torch.__version__,
+    return {"pip": out, "clone": clone, "patch": patch, "vllm": vllm.__version__, "torch": torch.__version__,
             "cuda": torch.version.cuda, "gpus": torch.cuda.device_count()}
 
 

@@ -194,6 +194,20 @@ def build_messages(
     ]
 
 
+# Modelli in locale (parte 2): una riga in piu' in coda al system prompt, uguale per tutte
+# le condizioni, contro Markdown e preamboli. SYSTEM_TEMPLATE resta quello della parte 1.
+LOCAL_SUFFIX = ("Reply with the audio guide text only, as plain text: no Markdown, "
+                "no preamble, no closing remarks.")
+
+
+def local_messages(
+    condition: str, title: str, artist: str, source_text: str, variant: str = "full"
+) -> list[dict]:
+    """`build_messages` con LOCAL_SUFFIX in coda al system prompt."""
+    msgs = build_messages(condition, title, artist, source_text, variant)
+    msgs[0] = {**msgs[0], "content": msgs[0]["content"] + "\n\n" + LOCAL_SUFFIX}
+    return msgs
+
 if __name__ == "__main__":
     # Ispezione a occhio dei 6 prompt: `python -m museumbot.common.prompts`
     for cond in CONDITIONS:

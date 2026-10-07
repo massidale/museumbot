@@ -78,3 +78,19 @@ def test_replicates_use_prompt_of_replicated_variant():
         assert prompt_variant(rep) == base
         assert build_system("explorer", prompt_variant(rep)) == build_system("explorer", base)
     assert prompt_variant("no_style") == "no_style"
+
+
+def test_local_messages_append_suffix_and_keep_prompt():
+    from museumbot.common.prompts import LOCAL_SUFFIX, build_messages, local_messages
+
+    base = build_messages("explorer", "T", "A", "Source.")
+    msgs = local_messages("explorer", "T", "A", "Source.")
+    assert msgs[0]["content"] == base[0]["content"] + "\n\n" + LOCAL_SUFFIX
+    assert msgs[1] == base[1]
+
+
+def test_local_messages_suffix_identical_for_flat_and_categories():
+    from museumbot.common.prompts import LOCAL_SUFFIX, local_messages
+
+    for c in ("flat", "recharger"):
+        assert local_messages(c, "T", "A", "S")[0]["content"].endswith(LOCAL_SUFFIX)

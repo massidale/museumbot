@@ -11,9 +11,10 @@ decoding e' scritto a mano perche' serve l'accesso alle distribuzioni sul prossi
 Con pesi one-hot il ciclo coincide con la generazione normale a temperatura T: i testi di
 categoria puri si generano con lo stesso codice dei misti.
 
-Prompt: quelli di `prompts.py` byte per byte, piu' LOCAL_SUFFIX in coda al system prompt,
-uguale per tutte le condizioni. Pulizia e filtro dei riferimenti espliciti come in
-`generate.py`; scrive data/local/generations.jsonl, riavviabile.
+Prompt: `prompts.local_messages`, cioe' i prompt della parte 1 byte per byte piu'
+`prompts.LOCAL_SUFFIX` in coda al system prompt, uguale per tutte le condizioni. Pulizia e
+filtro dei riferimenti espliciti come in `generate.py`; scrive
+data/local/generations.jsonl, riavviabile.
 
 Uso:
     python -m museumbot.generation.local gen --limit 5            # pilota
@@ -34,22 +35,13 @@ import mlx.core as mx
 
 from museumbot.common.clean import clean_guide, is_truncated
 from museumbot.common.config import ROOT
-from museumbot.common.prompts import REPLICATES, build_messages, prompt_variant
+from museumbot.common.prompts import REPLICATES, local_messages, prompt_variant
 from museumbot.generation.generate import ARTWORKS, BANNED, plan_jobs, read_done
 
 MODEL = "mlx-community/gemma-4-12B-it-4bit"
 OUT = ROOT / "data" / "local" / "generations.jsonl"
-LOCAL_SUFFIX = ("Reply with the audio guide text only, as plain text: no Markdown, "
-                "no preamble, no closing remarks.")
 MARKDOWN = re.compile(r"\*\*|__|^\s*#|^\s*[-*] ", re.M)
 ATTEMPTS = 4
-
-
-def local_messages(condition, title, artist, source_text, variant="full") -> list[dict]:
-    """Messaggi di `prompts.build_messages` con LOCAL_SUFFIX in coda al system prompt."""
-    msgs = build_messages(condition, title, artist, source_text, variant)
-    msgs[0] = {**msgs[0], "content": msgs[0]["content"] + "\n\n" + LOCAL_SUFFIX}
-    return msgs
 
 
 def log_softmax(x):

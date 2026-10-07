@@ -4,12 +4,9 @@ import mlx.core as mx
 import numpy as np
 import pytest
 
-from museumbot.common.prompts import build_messages
 from museumbot.generation.local import (
-    LOCAL_SUFFIX,
     check_pilot,
     decode,
-    local_messages,
     log_softmax,
     mix_logprobs,
     row_seed,
@@ -43,18 +40,6 @@ class FakeModel:
 def run(prompts, weights, seed=0, max_tokens=20):
     return decode(FakeModel(), prompts, weights, temp=0.7, seed=seed,
                   max_tokens=max_tokens, eos={EOS}, make_cache=FakeCache)
-
-
-def test_local_messages_append_suffix_and_keep_prompt():
-    base = build_messages("explorer", "T", "A", "Source.")
-    msgs = local_messages("explorer", "T", "A", "Source.")
-    assert msgs[0]["content"] == base[0]["content"] + "\n\n" + LOCAL_SUFFIX
-    assert msgs[1] == base[1]
-
-
-def test_local_messages_suffix_identical_for_flat_and_categories():
-    for c in ("flat", "recharger"):
-        assert local_messages(c, "T", "A", "S")[0]["content"].endswith(LOCAL_SUFFIX)
 
 
 def test_mix_logprobs_one_hot_returns_that_expert():

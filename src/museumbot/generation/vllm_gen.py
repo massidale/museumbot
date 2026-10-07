@@ -44,10 +44,11 @@ def make_row(art, cond, variant, raw, attempt, extra=None, failed=False) -> dict
             "usage": {"raw": raw, "attempts": attempt + 1, "failed": failed, **(extra or {})}}
 
 
-def generate_rows(jobs, gen, start: int = 0, stop: int = ATTEMPTS) -> list[dict]:
+def generate_rows(jobs, gen, start: int = 0, stop: int = ATTEMPTS, make=make_row) -> list[dict]:
     """`gen(richieste)` riceve (opera, condizione, variante, tentativo) e restituisce
     (testo grezzo, extra) per ciascuna. Rigenera solo i testi da rifare, con i tentativi
-    da `start` a `stop` escluso (il recupero dei falliti riparte da ATTEMPTS)."""
+    da `start` a `stop` escluso (il recupero dei falliti riparte da ATTEMPTS). `make`
+    costruisce la riga: testi puri (`make_row`) o misti (`vllm_mix.make_mix_row`)."""
     rows, pending = [], [(a, c, v, start) for a, c, v in jobs]
     while pending:
         retry = []
@@ -56,7 +57,7 @@ def generate_rows(jobs, gen, start: int = 0, stop: int = ATTEMPTS) -> list[dict]
             if needs_retry(raw) and not last:
                 retry.append((a, c, v, k + 1))
             else:
-                rows.append(make_row(a, c, v, raw, k, extra, failed=needs_retry(raw)))
+                rows.append(make(a, c, v, raw, k, extra, failed=needs_retry(raw)))
         pending = retry
     return rows
 

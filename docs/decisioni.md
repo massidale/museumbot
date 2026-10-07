@@ -329,3 +329,20 @@ varianti (`style_only` vs `full`, `no_style`, `name_only` → `def_only`, `style
 **Motivo.** Non aggiunge conclusioni rispetto alla tabella delle 8 varianti, e il nome
 "analisi fattoriale" si confonde con la factor analysis.
 **Effetto.** Nessuno sui risultati.
+
+## 2026-10-07 — Modello aperto della parte 2: Gemma 4 31B su Kaggle
+
+**Decisione.** Il generatore della parte 2 (profilo continuo) è Gemma 4 31B QAT a 4 bit
+(`google/gemma-4-31B-it-qat-w4a16-ct`) con vLLM 0.31.0 su Kaggle (2× T4, float16, tensor
+parallel 2), invece di Gemma 4 12B a 4 bit con MLX sul Mac previsto dalla spec del 6
+ottobre. vLLM richiede sulle T4 una patch al kernel di attenzione Triton
+(`kaggle/patch_vllm_turing.py`: blocchi da 16 token, un solo stadio) e gira senza encoder
+multimodale né CUDA graph.
+**Motivo.** Sul MacBook Air M2 (16 GB) il 12B produce testi corretti ma a 2.3–3.1 token/s:
+oltre 30 ore per i 1 100 testi del passo 2. Su Kaggle (gratuito) il 31B fa 57 token/s in
+batch, ~5 secondi a testo, ed è più vicino per qualità al generatore della parte 1. La
+via sul generatore della parte 1 (miscela passo per passo su DeepInfra, stimata $4–25) è
+rinviata a dopo i risultati sul modello aperto.
+**Effetto.** Nessuno sui risultati esistenti. Il pilota del passo 1 (38 testi) supera i
+criteri fissati nella spec. Tutti i testi della parte 2 vanno generati su questa
+configurazione.

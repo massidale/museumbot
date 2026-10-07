@@ -26,7 +26,7 @@ import numpy as np
 import pandas as pd
 
 from museumbot.common.config import ROOT, emb_path
-from museumbot.common.corpus import CORPORA, load_corpus
+from museumbot.common.corpus import CORPORA, SOURCES, load_corpus
 from museumbot.common.prompts import (
     CONDITIONS, FALK_CATEGORIES, REPLICATES, VARIANTS, build_system, prompt_variant,
 )
@@ -116,6 +116,7 @@ def build(db: Path = DB, corpora: tuple[str, ...] = CORPORA,
     """Rigenera la base da zero."""
     if db.exists():
         db.unlink()
+    corpora = tuple(c for c in corpora if SOURCES[c].exists())  # salta i corpus non generati
     texts = [r for c in corpora for r in text_rows(c)]
     scores = [r for c in corpora for r in corpus_scores(c, models)]
     tables = {

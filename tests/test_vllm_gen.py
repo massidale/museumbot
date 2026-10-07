@@ -50,3 +50,27 @@ def test_generate_rows_keeps_failed_row_after_last_attempt():
     (r,) = generate_rows([(ART, "explorer", "full")], gen)
     assert r["usage"]["failed"] and r["usage"]["attempts"] == ATTEMPTS
     assert len(calls) == ATTEMPTS
+
+
+def test_generate_rows_can_start_from_a_later_attempt():
+    gen, calls = fake_backend({("Q1", "explorer"): ["for those"] * 5 + [OK]})
+    (r,) = generate_rows([(ART, "explorer", "full")], gen, start=4, stop=8)
+    assert calls[0][0][3] == 4
+    assert r["usage"]["attempts"] == 6 and not r["usage"]["failed"]
+    assert r["seed"] == row_seed("Q1", "explorer", "full", 5)
+
+
+def test_generate_rows_stop_bounds_extra_attempts():
+    gen, calls = fake_backend({("Q1", "explorer"): ["for those"] * 20})
+    (r,) = generate_rows([(ART, "explorer", "full")], gen, start=4, stop=6)
+    assert r["usage"]["failed"] and r["usage"]["attempts"] == 6 and len(calls) == 2
+
+
+def test_replace_rows_keeps_order_and_swaps_by_key():
+    from museumbot.generation.vllm_gen import replace_rows
+
+    rows = [make_row(ART, c, "full", OK, 0) for c in ("explorer", "recharger", "flat")]
+    new = make_row(ART, "recharger", "full", OK + " Again.", 5)
+    out = replace_rows(rows, [new])
+    assert [r["condition"] for r in out] == ["explorer", "recharger", "flat"]
+    assert out[1] is new and out[0] is rows[0]

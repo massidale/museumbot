@@ -9,6 +9,7 @@ Scrive in append, riavviabile come `generate.py`. vLLM si importa solo nel backe
 Uso (su Kaggle, dopo il clone del repo):
     python -m museumbot.generation.vllm_gen --variant full --out /kaggle/working/generations.jsonl
     python -m museumbot.generation.vllm_gen --variant full_rep --out ...
+    python -m museumbot.generation.vllm_gen --retry-failed 12 --in <file> --out <file>
 """
 
 import argparse
@@ -43,20 +44,31 @@ def make_row(art, cond, variant, raw, attempt, extra=None, failed=False) -> dict
             "usage": {"raw": raw, "attempts": attempt + 1, "failed": failed, **(extra or {})}}
 
 
-def generate_rows(jobs, gen) -> list[dict]:
+def generate_rows(jobs, gen, start: int = 0, stop: int = ATTEMPTS) -> list[dict]:
     """`gen(richieste)` riceve (opera, condizione, variante, tentativo) e restituisce
-    (testo grezzo, extra) per ciascuna. Rigenera solo i testi da rifare."""
-    rows, pending = [], [(a, c, v, 0) for a, c, v in jobs]
+    (testo grezzo, extra) per ciascuna. Rigenera solo i testi da rifare, con i tentativi
+    da `start` a `stop` escluso (il recupero dei falliti riparte da ATTEMPTS)."""
+    rows, pending = [], [(a, c, v, start) for a, c, v in jobs]
     while pending:
         retry = []
         for (a, c, v, k), (raw, extra) in zip(pending, gen(pending)):
-            last = k == ATTEMPTS - 1
+            last = k == stop - 1
             if needs_retry(raw) and not last:
                 retry.append((a, c, v, k + 1))
             else:
                 rows.append(make_row(a, c, v, raw, k, extra, failed=needs_retry(raw)))
         pending = retry
     return rows
+
+
+def key(r: dict) -> tuple[str, str, str]:
+    return r["artwork_id"], r["condition"], r["variant"]
+
+
+def replace_rows(rows: list[dict], new: list[dict]) -> list[dict]:
+    """Sostituisce le righe con la stessa chiave, mantenendo l'ordine del file."""
+    by = {key(r): r for r in new}
+    return [by.get(key(r), r) for r in rows]
 
 
 def vllm_backend(llm):
@@ -106,7 +118,13 @@ def main() -> None:
     ap.add_argument("--variant", default="full", choices=["full", *REPLICATES])
     ap.add_argument("--limit", type=int, help="usa solo le prime N opere (pilota)")
     ap.add_argument("--out", type=Path, default=OUT)
+    ap.add_argument("--retry-failed", type=int, metavar="FINO_A",
+                    help="rigenera i testi con `failed` nel file --in, tentativi da ATTEMPTS a "
+                         "FINO_A escluso, e scrive il file aggiornato in --out")
+    ap.add_argument("--in", dest="inp", type=Path, default=OUT)
     args = ap.parse_args()
+    if args.retry_failed:
+        return retry_failed(args.inp, args.out, args.retry_failed)
 
     artworks = [json.loads(l) for l in ARTWORKS.open()]
     if args.limit:
@@ -127,6 +145,21 @@ def main() -> None:
         done = i + len(rows)
         print(f"  {done}/{len(todo)}  {time.time() - t0:.0f}s  "
               f"falliti {sum(r['usage']['failed'] for r in rows)}", flush=True)
+
+
+def retry_failed(inp: Path, out: Path, stop: int) -> None:
+    rows = [json.loads(l) for l in inp.open()]
+    arts = {a["id"]: a for a in map(json.loads, ARTWORKS.open())}
+    jobs = [(arts[r["artwork_id"]], r["condition"], r["variant"])
+            for r in rows if r["usage"].get("failed")]
+    print(f"[{MODEL}] da rigenerare {len(jobs)} testi, tentativi {ATTEMPTS}..{stop - 1}",
+          flush=True)
+    new = generate_rows(jobs, vllm_backend(load_llm()), start=ATTEMPTS, stop=stop) if jobs else []
+    for r in new:
+        print(f"  {r['title'][:30]:30s} {r['condition']:22s} {r['variant']:8s} "
+              f"tentativi {r['usage']['attempts']} falliti {r['usage']['failed']}", flush=True)
+    out.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n"
+                           for r in replace_rows(rows, new)))
 
 
 if __name__ == "__main__":

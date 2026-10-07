@@ -32,7 +32,7 @@ senza persona, o con la persona sbagliata, preferisce invece il flat.
 | prompt | `common/prompts.py` | 6 condizioni: 5 categorie Falk + `flat` (nessun blocco categoria) |
 | generazione, corpus principale | `generation/chain_study.py` | `data/main/chain_study.jsonl` — testi a prompt singolo `single_a` e `single_b` (500 + 500) e `flat` (100), più i 500 della chain (§5); DeepSeek V4 Flash su DeepInfra fp8, T = 0.7 |
 | generazione, ablazione | `generation/generate.py` | `data/ablation/generations.jsonl` — corpus di settembre: 600 testi `full` + flat, 4 000 dell'ablazione (§6), 500 della replica `full_rep`; routing libero; usato solo per l'ablazione |
-| generazione modello aperto (sviluppo) | `generation/vllm_gen.py`, `generation/local.py`, `kaggle/` | `data/local/generations.jsonl` — Gemma 4 31B QAT a 4 bit con vLLM su Kaggle (2× T4): testi di categoria puri `full` e `full_rep` in generazione; `local.py` è il ciclo di miscela su MLX per le prove sul Mac |
+| generazione modello aperto (sviluppo) | `generation/vllm_gen.py`, `generation/local.py`, `kaggle/` | `data/local/generations.jsonl` — Gemma 4 31B QAT a 4 bit con vLLM su Kaggle (2× T4): 600 testi `full` (5 categorie + flat) e 500 `full_rep`, 100 opere, tutti validi (13 Professional/Hobbyist recuperati in una seconda sessione con la stessa configurazione, `kaggle/retry`); `local.py` è il ciclo di miscela su MLX per le prove sul Mac |
 | pulizia e corpus | `common/clean.py`, `common/corpus.py` | corpus `main` e `ablation`, testi puliti (sotto) |
 | embedding | `rq1_embeddings/embed.py` | `data/emb/<corpus>/<modello>_<variante>.npy` (Qwen3-Embedding-0.6B, BGE-M3), locali, L2-normalizzati |
 | analisi | `rq1_embeddings/analyze.py` | `results/metrics_{qwen,bge-m3}.json` + figure (corpus principale) |
@@ -680,8 +680,8 @@ Quanto queste preferenze coincidano con quelle di visitatori reali è la domanda
    dataset BIRD, compito di riconoscimento); scelta degli stimoli per RQ3.
 4. RQ3: vedi `docs/plans/piano-progetto-tesi.md`.
 5. Profilo continuo (sviluppo): testi generati *fra* due categorie con un peso α, per
-   mescolanza delle distribuzioni dei prompt di categoria, su Gemma 4 31B (Kaggle). In corso
-   il passo 2 (testi puri e replica); spec in
+   mescolanza delle distribuzioni dei prompt di categoria, su Gemma 4 31B (Kaggle). Passo 2:
+   testi puri e replica generati, da fare embedding e analisi; spec in
    `docs/plans/2026-10-06-profilo-continuo-design.md`.
 
 ## Riferimenti

@@ -346,3 +346,19 @@ rinviata a dopo i risultati sul modello aperto.
 **Effetto.** Nessuno sui risultati esistenti. Il pilota del passo 1 (38 testi) supera i
 criteri fissati nella spec. Tutti i testi della parte 2 vanno generati su questa
 configurazione.
+
+## 2026-10-07 — Recupero dei testi in violazione del corpus `local`
+
+**Decisione.** I 13 testi Professional/Hobbyist del corpus `local` (5 `full`, 8 `full_rep`,
+12 opere) rimasti in violazione del filtro dopo 4 tentativi sono stati rigenerati in una
+seconda sessione Kaggle (`kaggle/retry`, `vllm_gen --retry-failed 12`), proseguendo la
+sequenza di seed per testo dal tentativo 5 al 12, con la stessa configurazione (vLLM
+0.31.0, stessi pesi, stessa patch). Le altre 1 087 righe non cambiano.
+**Motivo.** Tutti e 13 per la formula "For those analyzing/studying…", vietata dal prompt;
+il vizio è lo stesso di DeepSeek (Professional/Hobbyist rigenerati: Gemma 80 su 200,
+DeepSeek 63 su 200), solo più ostinato. Escludere le 12 opere avrebbe tolto il 12% del
+corpus e selezionato proprio le opere su cui la categoria scrive in quel modo; la stessa
+procedura usata per DeepSeek è rigenerare finché il testo è valido.
+**Effetto.** Tutti recuperati (7 al tentativo 5, gli altri fra il 7 e il 10), 199–227 parole.
+Il corpus `local` ha 1 100 testi validi su 100 opere. Limite: 13 testi vengono da una
+sessione diversa, con configurazione identica.

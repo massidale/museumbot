@@ -27,7 +27,10 @@ from museumbot.generation.vllm_gen import LLM_ARGS, MAX_TOKENS, MODEL, TEMPERATU
 
 OUT = ROOT / "data" / "local" / "mixed.jsonl"
 TOP = 100      # log-probabilita' per esperto e per passo
-GROUP = 16     # testi generati insieme: limita la cache KV occupata
+# Testi generati insieme. Con il 31B su 2x T4 la cache KV tiene ~6 600 token: 3 testi misti
+# (6 sequenze da ~950 token) ci stanno, e a ogni passo vLLM riusa il prefisso in cache e
+# calcola solo il token nuovo. Con gruppi piu' grandi ricalcola i prompt a ogni passo.
+GROUP = 3
 
 
 def pair_name(pair) -> str:
@@ -66,7 +69,7 @@ def read_done(path: Path) -> set:
     return {(r["artwork_id"], r["condition"], r["alpha"]) for r in map(json.loads, path.open())}
 
 
-def vllm_mixer(llm):
+def vllm_mixer(llm, group: int = GROUP):
     """Backend vero: (opera, coppia, alpha, tentativo) -> (testo grezzo, extra)."""
     from transformers import GenerationConfig
     from vllm import SamplingParams
@@ -90,13 +93,13 @@ def vllm_mixer(llm):
 
     def gen(requests):
         out = []
-        for i in range(0, len(requests), GROUP):
-            group = requests[i : i + GROUP]
+        for i in range(0, len(requests), group):
+            batch = requests[i : i + group]
             t0 = time.time()
-            res = mix_generate([[ids(c, a) for c in p] for a, p, al, k in group],
-                               [[1 - al, al] for a, p, al, k in group], step, eos=eos,
+            res = mix_generate([[ids(c, a) for c in p] for a, p, al, k in batch],
+                               [[1 - al, al] for a, p, al, k in batch], step, eos=eos,
                                max_tokens=MAX_TOKENS, temp=TEMPERATURE,
-                               seeds=[mix_seed(a["id"], p, al, k) for a, p, al, k in group])
+                               seeds=[mix_seed(a["id"], p, al, k) for a, p, al, k in batch])
             secs = round(time.time() - t0, 1)
             out += [(tok.decode(toks, skip_special_tokens=True).strip(),
                      {"completion_tokens": len(toks), "group_seconds": secs, "diag": diag})
@@ -112,6 +115,7 @@ def main() -> None:
     ap.add_argument("--alphas", nargs="+", type=float, required=True)
     ap.add_argument("--limit", type=int, help="usa solo le prime N opere (pilota)")
     ap.add_argument("--out", type=Path, default=OUT)
+    ap.add_argument("--group", type=int, default=GROUP, help="testi misti generati insieme")
     args = ap.parse_args()
 
     from vllm import LLM
@@ -124,11 +128,13 @@ def main() -> None:
           flush=True)
     if not todo:
         return
-    gen = vllm_mixer(LLM(MODEL, **LLM_ARGS, max_logprobs=TOP, logprobs_mode="raw_logprobs"))
+    gen = vllm_mixer(LLM(MODEL, **LLM_ARGS, max_logprobs=TOP, logprobs_mode="raw_logprobs"),
+                     args.group)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
-    for i in range(0, len(todo), GROUP):
-        rows = generate_rows(todo[i : i + GROUP], gen, make=make_mix_row)
+    chunk = 4 * args.group  # righe scritte su disco a ogni blocco
+    for i in range(0, len(todo), chunk):
+        rows = generate_rows(todo[i : i + chunk], gen, make=make_mix_row)
         with args.out.open("a") as fh:
             for r in rows:
                 fh.write(json.dumps(r, ensure_ascii=False) + "\n")

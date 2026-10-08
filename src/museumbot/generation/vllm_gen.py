@@ -66,7 +66,7 @@ def key(r: dict) -> tuple[str, str, str]:
     return r["artwork_id"], r["condition"], r["variant"]
 
 
-def replace_rows(rows: list[dict], new: list[dict]) -> list[dict]:
+def replace_rows(rows: list[dict], new: list[dict], key=key) -> list[dict]:
     """Sostituisce le righe con la stessa chiave, mantenendo l'ordine del file."""
     by = {key(r): r for r in new}
     return [by.get(key(r), r) for r in rows]

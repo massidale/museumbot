@@ -22,8 +22,10 @@ from museumbot.common.config import ROOT
 from museumbot.common.prompts import FALK_CATEGORIES, local_messages
 from museumbot.generation.generate import ARTWORKS
 from museumbot.generation.mixing import mix_generate
-from museumbot.generation.rows import row_seed
-from museumbot.generation.vllm_gen import LLM_ARGS, MAX_TOKENS, MODEL, TEMPERATURE, generate_rows
+from museumbot.generation.rows import ATTEMPTS, row_seed
+from museumbot.generation.vllm_gen import (
+    LLM_ARGS, MAX_TOKENS, MODEL, TEMPERATURE, generate_rows, replace_rows,
+)
 
 OUT = ROOT / "data" / "local" / "mixed.jsonl"
 TOP = 100      # log-probabilita' per esperto e per passo
@@ -58,6 +60,16 @@ def make_mix_row(art, pair, alpha, raw, attempt, extra=None, failed=False) -> di
                       **extra, "diag": diag}}
 
 
+def mix_key(r: dict) -> tuple:
+    return r["artwork_id"], r["condition"], r["alpha"]
+
+
+def failed_mix_jobs(rows: list[dict], arts: dict) -> list[tuple]:
+    """(opera, coppia, alpha) dei testi rimasti in violazione del filtro."""
+    return [(arts[r["artwork_id"]], tuple(r["pair"]), r["alpha"])
+            for r in rows if r["usage"].get("failed")]
+
+
 def plan_mix_jobs(artworks, pairs, alphas, done) -> list[tuple]:
     return [(a, tuple(p), al) for p in pairs for al in alphas for a in artworks
             if (a["id"], pair_name(p), al) not in done]
@@ -66,7 +78,7 @@ def plan_mix_jobs(artworks, pairs, alphas, done) -> list[tuple]:
 def read_done(path: Path) -> set:
     if not path.exists():
         return set()
-    return {(r["artwork_id"], r["condition"], r["alpha"]) for r in map(json.loads, path.open())}
+    return {mix_key(r) for r in map(json.loads, path.open())}
 
 
 def vllm_mixer(llm, group: int = GROUP):
@@ -111,8 +123,11 @@ def vllm_mixer(llm, group: int = GROUP):
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("--pair", nargs=2, action="append", required=True, choices=FALK_CATEGORIES)
-    ap.add_argument("--alphas", nargs="+", type=float, required=True)
+    ap.add_argument("--pair", nargs=2, action="append", choices=FALK_CATEGORIES)
+    ap.add_argument("--alphas", nargs="+", type=float)
+    ap.add_argument("--retry-failed", type=int, metavar="FINO_A",
+                    help="rigenera i testi con `failed` in --out, tentativi da ATTEMPTS a "
+                         "FINO_A escluso, e riscrive il file")
     ap.add_argument("--limit", type=int, help="usa solo le prime N opere (pilota)")
     ap.add_argument("--out", type=Path, default=OUT)
     ap.add_argument("--group", type=int, default=GROUP, help="testi misti generati insieme")
@@ -120,6 +135,20 @@ def main() -> None:
 
     from vllm import LLM
 
+    if args.retry_failed:
+        rows = [json.loads(l) for l in args.out.open()]
+        jobs = failed_mix_jobs(rows, {a["id"]: a for a in map(json.loads, ARTWORKS.open())})
+        print(f"[{MODEL}] da rigenerare {len(jobs)} testi misti, tentativi "
+              f"{ATTEMPTS}..{args.retry_failed - 1}", flush=True)
+        gen = vllm_mixer(LLM(MODEL, **LLM_ARGS, max_logprobs=TOP, logprobs_mode="raw_logprobs"),
+                         args.group)
+        new = generate_rows(jobs, gen, start=ATTEMPTS, stop=args.retry_failed, make=make_mix_row)
+        for r in new:
+            print(f"  {r['title'][:30]:30s} {r['condition']} {r['alpha']} "
+                  f"tentativi {r['usage']['attempts']} falliti {r['usage']['failed']}", flush=True)
+        args.out.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n"
+                                    for r in replace_rows(rows, new, key=mix_key)))
+        return
     artworks = [json.loads(l) for l in ARTWORKS.open()]
     if args.limit:
         artworks = artworks[: args.limit]

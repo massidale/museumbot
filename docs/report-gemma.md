@@ -5,20 +5,19 @@ dei risultati; le decisioni nel tempo sono in `docs/decisioni.md`, la spec dell'
 in `docs/plans/2026-10-06-profilo-continuo-design.md`. Numeri fra parentesi: embedding
 BGE-M3 (fuori: Qwen3).*
 
-**Domanda.** Con DeepSeek V4 Flash (report principale) i testi personalizzati si separano per
-categoria di Falk. La parte 2 porta l'analisi su un modello aperto, Gemma 4 31B, di cui si
-controllano le distribuzioni sul prossimo token: questo permette di generare testi *fra* due
-categorie, con un peso α, e di chiedersi se stanno davvero in mezzo (RQ1) e se un giudice
-con persona li riconosce e li preferisce (RQ2).
+**Domanda.** Con un modello aperto, Gemma 4 31B, di cui si controllano le distribuzioni sul
+prossimo token, si possono generare testi *fra* due categorie di Falk, con un peso α. Il
+report verifica che Gemma separi le categorie, poi chiede se i testi misti stanno davvero in
+mezzo (RQ1) e se un giudice con persona li riconosce e li preferisce (RQ2).
 
 ## 1. Dati e pipeline
 
 | passo | codice | output |
 |---|---|---|
-| testi puri | `generation/vllm_gen.py`, `kaggle/gen` | `data/local/generations.jsonl`: 600 `full` (5 categorie + flat) e 500 `full_rep` sulle 100 opere del corpus principale, stessi prompt più una riga contro il Markdown |
+| testi puri | `generation/vllm_gen.py`, `kaggle/gen` | `data/local/generations.jsonl`: 600 `full` (5 categorie + flat) e 500 `full_rep` sulle 100 opere di `data/artworks.jsonl`, prompt di `common/prompts.py` più una riga contro il Markdown |
 | testi misti | `generation/mixing.py`, `generation/vllm_mix.py`, `kaggle/mix-*` | `data/local/mixed.jsonl`: 940 testi, tre coppie × α = 0.25, 0.5, 0.75 × 100 opere più 60 del pilota |
 | embedding | `rq1_embeddings/embed.py`, `mixed.py` | `data/emb/local/`, `data/emb/mixed/` |
-| RQ1 | `analyze.py --corpus local`, `cross_generator.py`, `length.py`, `separation.py`, `mixed.py`, `mixed_space.py`, `generation/mix_diag.py` | `results/metrics_*_local.json`, `cross_generator_*`, `length_*`, `separation_*`, `mixed_*`, `mixed_space_*`, `mix_diag.json` |
+| RQ1 | `analyze.py --corpus local`, `length.py`, `separation.py`, `mixed.py`, `mixed_space.py`, `generation/mix_diag.py` | `results/metrics_*_local.json`, `length_*`, `separation_*`, `mixed_*`, `mixed_space_*`, `mix_diag.json` |
 | RQ2 | `rq2_judge/judge.py --corpus local`, `analyze.py --corpus local`, `mixed_judge.py`, `mixed_analyze.py`, `combined.py` | `data/judgments_local.jsonl`, `data/judgments_mixed.jsonl`, `results/judge_glm-5.3_local.json`, `judge_mixed_glm-5.3.json`, `judge_combined_glm-5.3.json` |
 | esempi | `rq1_embeddings/mix_examples.py` | `docs/analisi/testi-misti-the-starry-night.{md,html}` |
 
@@ -31,92 +30,78 @@ configurazione.
 
 ## 2. Verifiche preliminari: Gemma separa le categorie?
 
-Batteria del report principale (§2) sui testi puri di Gemma, tutte e 6 le condizioni.
+Stessa batteria di analisi del report principale (§2) sui testi puri di Gemma, tutte e 6
+le condizioni (`analyze.py --corpus local`, `results/metrics_*_local.json`).
 
-**Lo shift c'è, ed è più netto che con DeepSeek.** Probe a 6 classi 0.98 (0.975), contro
-0.95 (0.90) del corpus principale; test di permutazione p = 0.0005 (il minimo con 2 000
-permutazioni) in entrambi gli embedding. La condizione spiega il 12.5% (4.5%) della
-varianza, contro il 6.5% (3.8%).
+**Lo shift c'è.** Probe a 6 classi 0.98 (0.975), caso 0.17; test di permutazione
+p = 0.0005 (il minimo con 2 000 permutazioni) in entrambi gli embedding. La condizione
+spiega il 12.5% (4.5%) della varianza.
 
 | Qwen3 (BGE-M3) | Explorer | Facilitator | Exp. Seeker | Prof./Hobbyist | Recharger |
 |---|---|---|---|---|---|
 | split-half | 0.95 (0.87) | 0.96 (0.86) | 0.94 (0.91) | 0.93 (0.89) | 0.98 (0.96) |
 | tetto (replica) | 0.99 (0.98) | 0.99 (0.97) | 0.99 (0.99) | 0.99 (0.99) | 1.00 (0.99) |
-| cos con DeepSeek | 0.77 (0.71) | 0.87 (0.69) | 0.87 (0.77) | 0.87 (0.78) | 0.89 (0.87) |
-| rapporto sui tetti | 0.80 (0.74) | 0.90 (0.74) | 0.89 (0.79) | 0.88 (0.79) | 0.90 (0.88) |
 
-Il rapporto è `cos / sqrt(tetto_DeepSeek · tetto_Gemma)`: lo shift di Gemma punta nella
-stessa direzione di quello di DeepSeek all'80–90% (74–88%) del massimo atteso dal rumore.
-Tutte le soglie fissate nella spec prima dei dati sono superate (probe con p < 0.01,
-split-half ≥ 0.6, rapporto ≥ 0.5).
+Le soglie della spec fissate prima dei dati sono superate (probe con p < 0.01, split-half
+≥ 0.6 per ogni categoria).
 
 ![PCA del corpus local sui dati centrati per opera, con i vettori di steering](../figures/pca_qwen_local.png)
 
-**Differenze rispetto a DeepSeek.** Gli steering vector sono più lunghi (Qwen3: Recharger
-0.50 contro 0.31, Explorer 0.31 contro 0.18) e più simili fra loro: le coppie che con
-DeepSeek erano opposte lo sono meno (Explorer–Experience Seeker −0.11 contro −0.46,
-Recharger–Professional/Hobbyist −0.07 contro −0.17 con Qwen3). Una parte comune a tutte le
-categorie è probabile: il flat di Gemma è molto più corto dei testi di categoria (mediana
-178 parole contro 215–226; con DeepSeek 222 contro 234), quindi ogni steering vector
-contiene anche "più lungo del flat". Lo shift però non è lunghezza
-(`rq1_embeddings/length.py`, `results/length_*.json`; per DeepSeek report principale §3.7):
-la lunghezza da sola dà un probe di 0.35; togliendone la
-componente dagli embedding il probe resta 0.99 (0.95), p = 0.001, ogni steering vector
-corretto ha coseno 0.97–0.99 (0.94–0.99) con l'originale e il rapporto del coseno con DeepSeek
-sui tetti, con entrambi i corpus corretti, resta 0.76–0.90 (0.73–0.89). Senza il flat il
-probe a 5 classi vale 1.00 (0.99).
+**Lunghezza.** Il flat è molto più corto dei testi di categoria (mediana 178 parole contro
+215–226), quindi ogni steering vector, preso rispetto al flat, contiene anche "più lungo
+del flat". Lo shift però non è lunghezza (`rq1_embeddings/length.py`,
+`results/length_*.json`): la lunghezza da sola, centrata per opera, dà un probe a 6 classi
+di 0.35; togliendo dagli embedding la componente lineare della lunghezza, con il
+coefficiente stimato a parità di opera e di categoria, il probe resta 0.99 (0.95),
+p = 0.001, e ogni steering vector corretto ha coseno 0.97–0.99 (0.94–0.99) con
+l'originale. Senza il flat il probe a 5 classi vale 1.00 (0.99).
 
-**Separazione o formule?** Gemma separa più di DeepSeek; può voler dire una
-personalizzazione più netta o testi più stereotipati (`rq1_embeddings/separation.py`,
+**Separazione o formule?** Una separazione così netta può voler dire una personalizzazione
+molto marcata o testi stereotipati (`rq1_embeddings/separation.py`,
 `results/separation_*.json`). *Formule*: quota media dei trigrammi di parole di un testo
 che compaiono in almeno il 10% dei testi della sua condizione. *Somiglianza sopra il flat*:
 coseno medio fra testi della stessa condizione su opere diverse, meno lo stesso valore del
 flat, che ha solo il contenuto dell'opera.
 
-| condizione | formule, DeepSeek | formule, Gemma | somiglianza sopra il flat, DeepSeek | somiglianza sopra il flat, Gemma |
-|---|---|---|---|---|
-| Explorer | 0.021 | 0.065 | +0.007 (+0.025) | +0.050 (+0.020) |
-| Facilitator | 0.033 | 0.087 | +0.016 (+0.019) | +0.081 (+0.022) |
-| Exp. Seeker | 0.051 | 0.090 | +0.058 (+0.022) | +0.056 (+0.038) |
-| Prof./Hobbyist | 0.015 | 0.044 | -0.015 (-0.014) | -0.024 (-0.002) |
-| Recharger | 0.057 | 0.157 | +0.068 (+0.084) | +0.151 (+0.096) |
-| flat | 0.020 | 0.034 | +0.000 (+0.000) | +0.000 (+0.000) |
+| condizione | formule | somiglianza sopra il flat |
+|---|---|---|
+| Explorer | 0.065 | +0.050 (+0.020) |
+| Facilitator | 0.087 | +0.081 (+0.022) |
+| Exp. Seeker | 0.090 | +0.056 (+0.038) |
+| Prof./Hobbyist | 0.044 | −0.024 (−0.002) |
+| Recharger | 0.157 | +0.151 (+0.096) |
+| flat | 0.034 | +0.000 (+0.000) |
 
-Gemma usa da 2 a 3 volte più formule di DeepSeek in ogni condizione, flat compreso; il
-Recharger è il caso estremo (0.157 contro 0.057), e con Qwen3 è anche la condizione i cui
-testi si somigliano di più fra opere diverse (+0.151 sopra il flat, contro +0.068). Parte
-delle formule è propria di Gemma, non della categoria: "take a moment" apre il 95% dei testi
-Facilitator, l'82% dei Recharger, il 76% degli Explorer e il 29% dei flat. La maggiore
-separabilità di Gemma va quindi letta anche come maggiore stereotipia del registro.
+Il Recharger è la condizione più formulaica (0.157) e quella i cui testi si somigliano di
+più fra opere diverse (+0.151 sopra il flat); il Professional/Hobbyist la meno formulaica.
+Parte delle formule è propria del generatore, non della categoria: "take a moment" apre il
+95% dei testi Facilitator, l'82% dei Recharger, il 76% degli Explorer e il 29% dei flat. La
+separazione va quindi letta anche come stereotipia del registro.
 
 ## 3. RQ1 sulle categorie combinate
 
-La separabilità per categoria è già dimostrata su DeepSeek (report principale) e verificata
-su Gemma (§2). Qui l'analisi si restringe alle quattro categorie che entrano nelle coppie
-dei testi misti: Explorer, Facilitator, Professional/Hobbyist, Recharger.
+Verificata la separazione (§2), l'analisi si restringe alle quattro categorie che entrano
+nelle coppie dei testi misti: Explorer, Facilitator, Professional/Hobbyist, Recharger.
 
 **Probe a 4 classi** sui testi puri, centrati sulla media delle quattro categorie della
 stessa opera e valutati fuori dal fold per opera (`rq1_embeddings/mixed_space.py`): 1.00
 (0.99), caso 0.25.
 
-**Coseni fra gli steering vector** (riferimento flat; `metrics_*_local.json` e
-`metrics_*.json`):
+**Coseni fra gli steering vector** (riferimento flat; `metrics_*_local.json`):
 
-| coppia | Gemma | DeepSeek |
-|---|---|---|
-| Explorer – Facilitator | +0.79 (+0.69) | +0.65 (+0.51) |
-| Explorer – Professional/Hobbyist | +0.02 (+0.15) | +0.11 (-0.06) |
-| Explorer – Recharger | +0.48 (+0.52) | +0.31 (+0.39) |
-| Facilitator – Professional/Hobbyist | -0.06 (+0.10) | -0.01 (-0.22) |
-| Facilitator – Recharger | +0.39 (+0.39) | +0.36 (+0.36) |
-| Professional/Hobbyist – Recharger | -0.07 (-0.04) | -0.17 (-0.27) |
+| coppia | coseno |
+|---|---|
+| Explorer – Facilitator | +0.79 (+0.69) |
+| Explorer – Professional/Hobbyist | +0.02 (+0.15) |
+| Explorer – Recharger | +0.48 (+0.52) |
+| Facilitator – Professional/Hobbyist | −0.06 (+0.10) |
+| Facilitator – Recharger | +0.39 (+0.39) |
+| Professional/Hobbyist – Recharger | −0.07 (−0.04) |
 
-Con Gemma le due categorie più vicine lo sono di più (Explorer–Facilitator 0.79 contro
-0.65) e quelle più lontane lo sono di meno (Professional/Hobbyist–Recharger −0.07 contro
-−0.17): con Gemma nessuna coppia è opposta, le più lontane sono quasi ortogonali. Lo
-split-half delle quattro va da 0.93 a 0.98 (0.86–0.96), il tetto dalla replica da 0.99 a 1.00
-(0.97–0.99), e la direzione di ciascuna coincide con quella di DeepSeek a 0.80–0.90
-(0.74–0.88) del massimo atteso dal rumore (§2).
+Nessuna coppia è opposta: le più lontane (Professional/Hobbyist con Recharger e con
+Facilitator) sono quasi ortogonali, la più vicina è Explorer–Facilitator. Lo split-half
+delle quattro categorie va da 0.93 a 0.98 (0.86–0.96), il tetto dalla replica da 0.99 a
+1.00 (0.97–0.99).
 
 ## 4. RQ1 sui testi misti
 
@@ -233,24 +218,23 @@ entrambi gli ordini, stesso giudice GLM-5.3 e stesse persone) sui testi puri di 
 100%, attenzione 100%, consistenza fra i due ordini
 0.91, testo in posizione A scelto nel 51.2% dei casi.
 
-| tipo | confronto | Gemma (IC 95%) | DeepSeek | Gemma per categoria: Expl. Fac. Exp.S. Prof. Rech. |
-|---|---|---|---|---|
-| A | persona k: testo k vs flat | 0.99 [0.98, 0.99] | 0.97 | 0.99 1.00 1.00 0.95 1.00 |
-| B | persona k: testo k vs testo j | 1.00 [1.00, 1.00] | 0.99 | 1.00 1.00 1.00 0.99 1.00 |
-| C | persona k: testo j vs flat | 0.21 [0.17, 0.26] | 0.21 | 0.23 0.35 0.07 0.08 0.34 |
-| N | senza persona: testo k vs flat | 0.34 [0.31, 0.37] | 0.43 | 0.90 0.39 0.09 0.17 0.17 |
-| A-C | specificità (A − C) | 0.77 [0.72, 0.82] | 0.76 | 0.77 0.65 0.94 0.87 0.66 |
-| A-N | effetto della persona (A − N) | 0.65 [0.62, 0.67] | 0.54 | 0.10 0.61 0.91 0.78 0.83 |
+| tipo | confronto | tasso (IC 95%) | per categoria: Expl. Fac. Exp.S. Prof. Rech. |
+|---|---|---|---|
+| A | persona k: testo k vs flat | 0.99 [0.98, 0.99] | 0.99 1.00 1.00 0.95 1.00 |
+| B | persona k: testo k vs testo j | 1.00 [1.00, 1.00] | 1.00 1.00 1.00 0.99 1.00 |
+| C | persona k: testo j vs flat | 0.21 [0.17, 0.26] | 0.23 0.35 0.07 0.08 0.34 |
+| N | senza persona: testo k vs flat | 0.34 [0.31, 0.37] | 0.90 0.39 0.09 0.17 0.17 |
+| A-C | specificità (A − C) | 0.77 [0.72, 0.82] | 0.77 0.65 0.94 0.87 0.66 |
+| A-N | effetto della persona (A − N) | 0.65 [0.62, 0.67] | 0.10 0.61 0.91 0.78 0.83 |
 
 ![Tassi di preferenza per tipo di coppia, testi puri di Gemma](../figures/judge_glm-5.3_local.png)
 
 - **Il giudice con persona preferisce il testo della propria categoria**: al flat nel
   98.8% dei casi, a quello di un'altra categoria nel 99.9%; con la persona sbagliata il
-  testo personalizzato batte il flat solo nel 21.4%. Il quadro è lo stesso di DeepSeek,
-  con A e B un po' più alti.
-- **Senza persona il flat vince più spesso che con DeepSeek** (N 0.34 contro
-  0.43), quindi l'effetto della persona (A − N) è più grande (0.65 contro 0.54). L'eccezione è
-  l'Explorer, preferito al flat anche dal giudice neutro (0.90).
+  testo personalizzato batte il flat solo nel 21.4%.
+- **Senza persona il testo personalizzato batte il flat nel 34% dei casi**, quindi
+  l'effetto della persona (A − N) è 0.65. L'eccezione è l'Explorer, preferito al flat
+  anche dal giudice neutro (0.90).
 - **Lunghezza**: a parità di tipo il testo più lungo è un po' favorito (logit
   +0.44 [+0.28, +0.68] per 30 parole), ma sulle coppie con lunghezze entro il 10% i
   tassi restano A 0.98, B 1.00, C 0.13, N 0.23.
@@ -341,8 +325,8 @@ giudice sui misti (§6, n = 100); in mezzo solo il giudice sui misti.
 ## 8. Limiti
 
 Un solo generatore aperto, scelto senza confronto con altri, in float16 con una patch al
-kernel di attenzione; una riga in più nel prompt rispetto a DeepSeek. Testi più formulaici
-di quelli di DeepSeek (§2). La miscela è fatta da fuori con le prime 100 log-probabilità
+kernel di attenzione; una riga in più in coda al system prompt, contro il Markdown. Testi
+molto formulaici (§2). La miscela è fatta da fuori con le prime 100 log-probabilità
 (copertura 97.7–100%). Tre coppie di categorie; con Gemma nessuna coppia è opposta. Un solo
 giudice, senza persone con bisogni misti; nei testi misti un solo ordine A/B per confronto.
 

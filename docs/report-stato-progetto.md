@@ -32,7 +32,6 @@ senza persona, o con la persona sbagliata, preferisce invece il flat.
 | prompt | `common/prompts.py` | 6 condizioni: 5 categorie Falk + `flat` (nessun blocco categoria) |
 | generazione, corpus principale | `generation/chain_study.py` | `data/main/chain_study.jsonl` — testi a prompt singolo `single_a` e `single_b` (500 + 500) e `flat` (100), più i 500 della chain (§5); DeepSeek V4 Flash su DeepInfra fp8, T = 0.7 |
 | generazione, ablazione | `generation/generate.py` | `data/ablation/generations.jsonl` — corpus di settembre: 600 testi `full` + flat, 4 000 dell'ablazione (§6), 500 della replica `full_rep`; routing libero; usato solo per l'ablazione |
-| generazione modello aperto (sviluppo) | `generation/vllm_gen.py`, `generation/local.py`, `kaggle/` | `data/local/generations.jsonl` — Gemma 4 31B QAT a 4 bit con vLLM su Kaggle (2× T4): 600 testi `full` (5 categorie + flat) e 500 `full_rep`, 100 opere, tutti validi (13 Professional/Hobbyist recuperati in una seconda sessione con la stessa configurazione, `kaggle/retry`), analisi in §8; `local.py` è il ciclo di miscela su MLX per le prove sul Mac |
 | pulizia e corpus | `common/clean.py`, `common/corpus.py` | corpus `main` e `ablation`, testi puliti (sotto) |
 | embedding | `rq1_embeddings/embed.py` | `data/emb/<corpus>/<modello>_<variante>.npy` (Qwen3-Embedding-0.6B, BGE-M3), locali, L2-normalizzati |
 | analisi | `rq1_embeddings/analyze.py` | `results/metrics_{qwen,bge-m3}.json` + figure (corpus principale) |
@@ -673,26 +672,13 @@ spesso il proprio nome ("As a Recharger…"): parte della preferenza può essere
 corrispondenza fra la definizione e il testo, che i testi a loro volta riecheggiano.
 Quanto queste preferenze coincidano con quelle di visitatori reali è la domanda di RQ3.
 
-## 8. Sviluppo: Gemma 4 31B e il profilo continuo
-
-La parte 2 ha un report a sé, `docs/report-gemma.md`, con dati, metodo e numeri. In sintesi:
-su un modello aperto (Gemma 4 31B, vLLM su Kaggle) lo shift di categoria si riproduce, più
-netto che con DeepSeek ma con testi più formulaici, e punta nella stessa direzione
-(80–90% del massimo atteso dal rumore con Qwen3); non è lunghezza. Mescolando a ogni token i
-logit di due prompt di categoria con pesi (1 − α, α) si ottengono testi *fra* due
-categorie: per coppie lontane la risposta ad α è a soglia e a metà il testo esce in parte
-verso una terza categoria; per la coppia vicina è graduale. Un giudice GLM-5.3 ordina i
-testi nel verso di α e, contro il flat, il testo a metà piace a entrambe le persone dove i
-puri ne accontentano una sola. In corso la RQ2 originale sui testi puri di Gemma.
-
-## 9. Prossimi passi
+## 8. Prossimi passi
 
 1. Chain vs singolo: decidere se generare `chain_rep` per separare il rumore della chain
    dalla differenza fra metodi (§5).
 2. RQ2: estensioni possibili (secondo giudice su un campione, persone ricavate dal
    dataset BIRD, compito di riconoscimento); scelta degli stimoli per RQ3.
 3. RQ3: vedi `docs/plans/piano-progetto-tesi.md`.
-4. Profilo continuo: vedi `docs/report-gemma.md`, §9. Spec in `docs/plans/2026-10-06-profilo-continuo-design.md`.
 
 ## Riferimenti
 

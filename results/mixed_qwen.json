@@ -1,0 +1,48 @@
+{
+  "model": "qwen",
+  "pairs": {
+    "recharger+professional_hobbyist": {
+      "by_alpha": {
+        "0": {
+          "n": 20,
+          "position_median": -0.042,
+          "position_iqr": [
+            -0.092,
+            0.042
+          ],
+          "residual_median": 0.709,
+          "covered_all_mean": 1.0,
+          "words_median": 218.0
+        },
+        "0.5": {
+          "n": 20,
+          "position_median": 0.504,
+          "position_iqr": [
+            0.409,
+            0.601
+          ],
+          "residual_median": 0.905,
+          "covered_all_mean": 0.978,
+          "words_median": 229.5
+        },
+        "1": {
+          "n": 18,
+          "position_median": 0.979,
+          "position_iqr": [
+            0.923,
+            1.083
+          ],
+          "residual_median": 0.849,
+          "covered_all_mean": 1.0,
+          "words_median": 223.5
+        }
+      },
+      "residual_pure_median": 0.787,
+      "spearman_alpha_position": 0.933,
+      "method_check_ratio": {
+        "0": 1.001,
+        "1": 1.009
+      }
+    }
+  }
+}

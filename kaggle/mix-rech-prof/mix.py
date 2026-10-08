@@ -24,4 +24,4 @@ run(f"{sys.executable} {REPO}/kaggle/patch_vllm_turing.py")
 if os.path.exists(f"{REPO}/data/local/mixed.jsonl"):
     shutil.copy(f"{REPO}/data/local/mixed.jsonl", OUT)
 run(f"PYTHONPATH={REPO}/src {sys.executable} -m museumbot.generation.vllm_mix "
-    f"--pair recharger professional_hobbyist --alphas 0.25 0.5 0.75 --out {OUT}")
+    f"--pair recharger professional_hobbyist --alphas 0.25 0.5 0.75 --group 6 --out {OUT}")

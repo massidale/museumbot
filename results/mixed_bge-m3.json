@@ -1,0 +1,48 @@
+{
+  "model": "bge-m3",
+  "pairs": {
+    "recharger+professional_hobbyist": {
+      "by_alpha": {
+        "0": {
+          "n": 20,
+          "position_median": 0.036,
+          "position_iqr": [
+            -0.05,
+            0.166
+          ],
+          "residual_median": 0.782,
+          "covered_all_mean": 1.0,
+          "words_median": 218.0
+        },
+        "0.5": {
+          "n": 20,
+          "position_median": 0.522,
+          "position_iqr": [
+            0.494,
+            0.629
+          ],
+          "residual_median": 0.911,
+          "covered_all_mean": 0.978,
+          "words_median": 229.5
+        },
+        "1": {
+          "n": 18,
+          "position_median": 0.972,
+          "position_iqr": [
+            0.843,
+            1.101
+          ],
+          "residual_median": 0.926,
+          "covered_all_mean": 1.0,
+          "words_median": 223.5
+        }
+      },
+      "residual_pure_median": 0.847,
+      "spearman_alpha_position": 0.921,
+      "method_check_ratio": {
+        "0": 0.999,
+        "1": 1.006
+      }
+    }
+  }
+}

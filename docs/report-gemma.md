@@ -19,7 +19,7 @@ con persona li riconosce e li preferisce (RQ2).
 | testi misti | `generation/mixing.py`, `generation/vllm_mix.py`, `kaggle/mix-*` | `data/local/mixed.jsonl`: 940 testi, tre coppie × α = 0.25, 0.5, 0.75 × 100 opere più 60 del pilota |
 | embedding | `rq1_embeddings/embed.py`, `mixed.py` | `data/emb/local/`, `data/emb/mixed/` |
 | RQ1 | `analyze.py --corpus local`, `cross_generator.py`, `length.py`, `separation.py`, `mixed.py`, `mixed_space.py`, `generation/mix_diag.py` | `results/metrics_*_local.json`, `cross_generator_*`, `length_*`, `separation_*`, `mixed_*`, `mixed_space_*`, `mix_diag.json` |
-| RQ2 | `rq2_judge/judge.py --corpus local`, `mixed_judge.py`, `mixed_analyze.py` | `data/judgments_local.jsonl` (in corso), `data/judgments_mixed.jsonl`, `results/judge_mixed_glm-5.3.json` |
+| RQ2 | `rq2_judge/judge.py --corpus local`, `analyze.py --corpus local`, `mixed_judge.py`, `mixed_analyze.py`, `combined.py` | `data/judgments_local.jsonl`, `data/judgments_mixed.jsonl`, `results/judge_glm-5.3_local.json`, `judge_mixed_glm-5.3.json`, `judge_combined_glm-5.3.json` |
 | esempi | `rq1_embeddings/mix_examples.py` | `docs/analisi/testi-misti-the-starry-night.{md,html}` |
 
 Generatore: Gemma 4 31B QAT a 4 bit (`google/gemma-4-31B-it-qat-w4a16-ct`), vLLM 0.31.0 su
@@ -226,10 +226,38 @@ Esempio completo per un'opera, con ogni token colorato dall'esperto che lo prefe
 
 ## 5. RQ2 sui testi puri
 
-In corso: il disegno di RQ2 del report principale (§7: persona k contro flat, contro un'altra
-categoria, persona sbagliata, giudice neutro, controllo di attenzione, entrambi gli ordini)
-sui testi puri di Gemma, GLM-5.3, ~4 200 giudizi (`rq2_judge/judge.py --corpus local`,
-`data/judgments_local.jsonl`).
+Stesso disegno di RQ2 del report principale (§7: tipi A, B, C, N e controllo di attenzione,
+entrambi gli ordini, stesso giudice GLM-5.3 e stesse persone) sui testi puri di Gemma
+(`rq2_judge/judge.py --corpus local`, `analyze.py --corpus local`;
+`data/judgments_local.jsonl`, `results/judge_glm-5.3_local.json`). 4200 giudizi, validi
+100%, attenzione 100%, consistenza fra i due ordini
+0.91, testo in posizione A scelto nel 51.2% dei casi.
+
+| tipo | confronto | Gemma (IC 95%) | DeepSeek | Gemma per categoria: Expl. Fac. Exp.S. Prof. Rech. |
+|---|---|---|---|---|
+| A | persona k: testo k vs flat | 0.99 [0.98, 0.99] | 0.97 | 0.99 1.00 1.00 0.95 1.00 |
+| B | persona k: testo k vs testo j | 1.00 [1.00, 1.00] | 0.99 | 1.00 1.00 1.00 0.99 1.00 |
+| C | persona k: testo j vs flat | 0.21 [0.17, 0.26] | 0.21 | 0.23 0.35 0.07 0.08 0.34 |
+| N | senza persona: testo k vs flat | 0.34 [0.31, 0.37] | 0.43 | 0.90 0.39 0.09 0.17 0.17 |
+| A-C | specificità (A − C) | 0.77 [0.72, 0.82] | 0.76 | 0.77 0.65 0.94 0.87 0.66 |
+| A-N | effetto della persona (A − N) | 0.65 [0.62, 0.67] | 0.54 | 0.10 0.61 0.91 0.78 0.83 |
+
+![Tassi di preferenza per tipo di coppia, testi puri di Gemma](../figures/judge_glm-5.3_local.png)
+
+- **Il giudice con persona preferisce il testo della propria categoria**: al flat nel
+  98.8% dei casi, a quello di un'altra categoria nel 99.9%; con la persona sbagliata il
+  testo personalizzato batte il flat solo nel 21.4%. Il quadro è lo stesso di DeepSeek,
+  con A e B un po' più alti.
+- **Senza persona il flat vince più spesso che con DeepSeek** (N 0.34 contro
+  0.43), quindi l'effetto della persona (A − N) è più grande (0.65 contro 0.54). L'eccezione è
+  l'Explorer, preferito al flat anche dal giudice neutro (0.90).
+- **Lunghezza**: a parità di tipo il testo più lungo è un po' favorito (logit
+  +0.44 [+0.28, +0.68] per 30 parole), ma sulle coppie con lunghezze entro il 10% i
+  tassi restano A 0.98, B 1.00, C 0.13, N 0.23.
+- **Esplorative**: i testi più accettati dalle altre persone sono gli Explorer
+  (0.57), i meno accettati i Recharger (0.015). L'accettazione dei testi altrui va con
+  la geometria di RQ1: Spearman con il coseno fra gli steering vector +0.30 (Qwen3) e
+  +0.64 (BGE-M3, p = 0.002), con la distanza -0.47 (-0.49).
 
 ## 6. RQ2 sui testi misti
 
@@ -284,9 +312,31 @@ del doppio visitatore è interno (0.25, a pari merito con 0.5) ma la curva è qu
 
 ## 7. RQ2: puri e misti insieme
 
-Da fare quando la §5 è completa: per ogni persona, la preferenza sul flat dei testi puri
-della sua categoria (RQ2 sui puri) accanto a quella dei testi misti che la contengono
-(doppio visitatore, §6), con il controllo che i due giudici concordino ai vertici.
+Per la persona k mescolata con la categoria j, il tasso con cui k preferisce un testo al
+flat in funzione della quota w della sua categoria nel testo (`rq2_judge/combined.py`,
+`results/judge_combined_glm-5.3.json`). Ai vertici ci sono due stime indipendenti dello stesso
+confronto: la RQ2 sui puri (§5; tipo A per w = 1, tipo C per w = 0, n = 200 e 50) e il
+giudice sui misti (§6, n = 100); in mezzo solo il giudice sui misti.
+
+| persona k | categoria j | w = 1 (puri / misti) | 0.75 | 0.5 | 0.25 | w = 0 (puri / misti) |
+|---|---|---|---|---|---|---|
+| Recharger | Prof./Hobbyist | 1.00 / 1.00 | 1.00 | 0.98 | 0.08 | 0.02 / 0.05 |
+| Prof./Hobbyist | Recharger | 0.95 / 0.96 | 0.94 | 0.43 | 0.00 | 0.00 / 0.00 |
+| Facilitator | Prof./Hobbyist | 1.00 / 1.00 | 1.00 | 0.86 | 0.31 | 0.10 / 0.07 |
+| Prof./Hobbyist | Facilitator | 0.95 / 0.98 | 0.94 | 0.86 | 0.26 | 0.00 / 0.03 |
+| Explorer | Facilitator | 0.99 / 1.00 | 1.00 | 0.98 | 0.87 | 0.46 / 0.43 |
+| Facilitator | Explorer | 1.00 / 1.00 | 1.00 | 1.00 | 0.98 | 0.98 / 0.97 |
+
+![Preferenza sul flat in funzione della quota della propria categoria nel testo](../figures/judge_combined_glm-5.3.png)
+
+- **I due esperimenti concordano**: ai vertici le due stime differiscono al più di 0.03.
+- **Per le coppie contrapposte la persona accetta il testo finché la sua categoria vi pesa
+  almeno metà**: il Recharger preferisce al flat il testo con w = 0.5 nel 98% dei casi e
+  quello con w = 0.25 nell'8%; il Professional/Hobbyist il testo con w = 0.5 nel 43%
+  (con il Recharger) e nell'86% (con il Facilitator). La soglia è la stessa trovata negli
+  embedding (§4).
+- **Nella coppia vicina il Facilitator accetta tutti i testi** (0.97–1.00 anche senza la
+  sua categoria), l'Explorer da w = 0.25 in su (0.87).
 
 ## 8. Limiti
 
@@ -298,7 +348,6 @@ giudice, senza persone con bisogni misti; nei testi misti un solo ordine A/B per
 
 ## 9. Prossimi passi
 
-1. Completare la RQ2 sui testi puri (§5) e la vista congiunta (§7).
-2. Estensioni possibili: persona con bisogni misti a α = 0.5; altre opere in
+1. Estensioni possibili: persona con bisogni misti a α = 0.5; altre opere in
    `docs/analisi/`; generalizzazione al generatore della parte 1 (DeepSeek, miscela passo
    per passo da fuori).

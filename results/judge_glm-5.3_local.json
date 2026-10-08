@@ -1,0 +1,593 @@
+{
+  "model": "glm-5.3",
+  "criteria": {
+    "n_judgments": 4200,
+    "valid_rate": 1.0,
+    "attention_accuracy": 1.0,
+    "order_consistency": 0.9065,
+    "position_A_rate": 0.5116666666666667,
+    "passed": {
+      "valid_rate": true,
+      "attention_accuracy": true
+    }
+  },
+  "n_pairs": {
+    "A": 500,
+    "C": 500,
+    "B": 500,
+    "N": 500,
+    "attention": 100
+  },
+  "rates": {
+    "A": {
+      "overall": {
+        "mean": 0.988,
+        "ci95": [
+          0.98,
+          0.995
+        ],
+        "n": 500
+      },
+      "Explorer": {
+        "mean": 0.99,
+        "ci95": [
+          0.975,
+          1.0
+        ],
+        "n": 100
+      },
+      "Facilitator": {
+        "mean": 1.0,
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "n": 100
+      },
+      "Experience Seeker": {
+        "mean": 1.0,
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "n": 100
+      },
+      "Professional/Hobbyist": {
+        "mean": 0.95,
+        "ci95": [
+          0.915,
+          0.98
+        ],
+        "n": 100
+      },
+      "Recharger": {
+        "mean": 1.0,
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "n": 100
+      }
+    },
+    "B": {
+      "overall": {
+        "mean": 0.999,
+        "ci95": [
+          0.997,
+          1.0
+        ],
+        "n": 500
+      },
+      "Explorer": {
+        "mean": 1.0,
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "n": 100
+      },
+      "Facilitator": {
+        "mean": 1.0,
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "n": 100
+      },
+      "Experience Seeker": {
+        "mean": 1.0,
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "n": 100
+      },
+      "Professional/Hobbyist": {
+        "mean": 0.995,
+        "ci95": [
+          0.985,
+          1.0
+        ],
+        "n": 100
+      },
+      "Recharger": {
+        "mean": 1.0,
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "n": 100
+      }
+    },
+    "C": {
+      "overall": {
+        "mean": 0.214,
+        "ci95": [
+          0.167,
+          0.263
+        ],
+        "n": 500
+      },
+      "Explorer": {
+        "mean": 0.225,
+        "ci95": [
+          0.155,
+          0.3
+        ],
+        "n": 100
+      },
+      "Facilitator": {
+        "mean": 0.355,
+        "ci95": [
+          0.265,
+          0.445
+        ],
+        "n": 100
+      },
+      "Experience Seeker": {
+        "mean": 0.065,
+        "ci95": [
+          0.03,
+          0.105
+        ],
+        "n": 100
+      },
+      "Professional/Hobbyist": {
+        "mean": 0.08,
+        "ci95": [
+          0.04,
+          0.125
+        ],
+        "n": 100
+      },
+      "Recharger": {
+        "mean": 0.345,
+        "ci95": [
+          0.26,
+          0.43
+        ],
+        "n": 100
+      }
+    },
+    "N": {
+      "overall": {
+        "mean": 0.342,
+        "ci95": [
+          0.313,
+          0.3730249999999999
+        ],
+        "n": 500
+      },
+      "Explorer": {
+        "mean": 0.895,
+        "ci95": [
+          0.85,
+          0.935
+        ],
+        "n": 100
+      },
+      "Facilitator": {
+        "mean": 0.385,
+        "ci95": [
+          0.304875,
+          0.465
+        ],
+        "n": 100
+      },
+      "Experience Seeker": {
+        "mean": 0.09,
+        "ci95": [
+          0.05,
+          0.135
+        ],
+        "n": 100
+      },
+      "Professional/Hobbyist": {
+        "mean": 0.17,
+        "ci95": [
+          0.12,
+          0.22512499999999933
+        ],
+        "n": 100
+      },
+      "Recharger": {
+        "mean": 0.17,
+        "ci95": [
+          0.12,
+          0.22
+        ],
+        "n": 100
+      }
+    },
+    "A-C": {
+      "overall": {
+        "mean": 0.774,
+        "ci95": [
+          0.722,
+          0.8240249999999998
+        ],
+        "n": 500
+      },
+      "Explorer": {
+        "mean": 0.765,
+        "ci95": [
+          0.6948749999999999,
+          0.835
+        ],
+        "n": 100
+      },
+      "Facilitator": {
+        "mean": 0.645,
+        "ci95": [
+          0.56,
+          0.73
+        ],
+        "n": 100
+      },
+      "Experience Seeker": {
+        "mean": 0.935,
+        "ci95": [
+          0.895,
+          0.97
+        ],
+        "n": 100
+      },
+      "Professional/Hobbyist": {
+        "mean": 0.87,
+        "ci95": [
+          0.81,
+          0.92
+        ],
+        "n": 100
+      },
+      "Recharger": {
+        "mean": 0.655,
+        "ci95": [
+          0.575,
+          0.745
+        ],
+        "n": 100
+      }
+    },
+    "A-N": {
+      "overall": {
+        "mean": 0.646,
+        "ci95": [
+          0.618,
+          0.673
+        ],
+        "n": 500
+      },
+      "Explorer": {
+        "mean": 0.095,
+        "ci95": [
+          0.059875000000000005,
+          0.135
+        ],
+        "n": 100
+      },
+      "Facilitator": {
+        "mean": 0.615,
+        "ci95": [
+          0.53,
+          0.695
+        ],
+        "n": 100
+      },
+      "Experience Seeker": {
+        "mean": 0.91,
+        "ci95": [
+          0.865,
+          0.95
+        ],
+        "n": 100
+      },
+      "Professional/Hobbyist": {
+        "mean": 0.78,
+        "ci95": [
+          0.715,
+          0.84
+        ],
+        "n": 100
+      },
+      "Recharger": {
+        "mean": 0.83,
+        "ci95": [
+          0.78,
+          0.88
+        ],
+        "n": 100
+      }
+    }
+  },
+  "length": {
+    "logit_per_sd_words": {
+      "coef": 0.4438454790504916,
+      "ci95": [
+        0.28490640341179185,
+        0.6818626515812336
+      ],
+      "sd_words": 29.562226641442283
+    },
+    "close_length_pairs": {
+      "A": {
+        "mean": 0.9827586206896551,
+        "ci95": [
+          0.9663794331291838,
+          0.9958333333333333
+        ],
+        "n": 116
+      },
+      "B": {
+        "mean": 0.9988207547169812,
+        "ci95": [
+          0.9963142693746142,
+          1.0
+        ],
+        "n": 424
+      },
+      "C": {
+        "mean": 0.12980769230769232,
+        "ci95": [
+          0.05555555555555555,
+          0.21875
+        ],
+        "n": 104
+      },
+      "N": {
+        "mean": 0.22844827586206898,
+        "ci95": [
+          0.1778846153846154,
+          0.282261798088411
+        ],
+        "n": 116
+      }
+    },
+    "target_longer_rate": {
+      "A": 0.95,
+      "B": 0.468,
+      "C": 0.946,
+      "N": 0.95
+    }
+  },
+  "reasons": {
+    "mentions_length": {
+      "A": 0.002,
+      "B": 0.0,
+      "C": 0.031,
+      "N": 0.052
+    },
+    "top_words": {
+      "Explorer": [
+        "curiosity",
+        "questions",
+        "invites",
+        "explorer",
+        "rather",
+        "facts",
+        "open",
+        "details",
+        "painting",
+        "prefer",
+        "looking",
+        "just"
+      ],
+      "Facilitator": [
+        "facilitator",
+        "discussion",
+        "group",
+        "shared",
+        "prompts",
+        "companions",
+        "want",
+        "questions",
+        "experience",
+        "spark",
+        "conversation",
+        "together"
+      ],
+      "Experience Seeker": [
+        "experience",
+        "seeker",
+        "must",
+        "iconic",
+        "want",
+        "status",
+        "masterpiece",
+        "emphasizes",
+        "painting's",
+        "painting",
+        "confirmation",
+        "highlight"
+      ],
+      "Professional/Hobbyist": [
+        "visitor",
+        "content",
+        "objective",
+        "related",
+        "interest",
+        "offers",
+        "professional",
+        "specific",
+        "scholarly",
+        "context",
+        "prefer",
+        "deeper"
+      ],
+      "Recharger": [
+        "restorative",
+        "contemplative",
+        "experience",
+        "recharger",
+        "seek",
+        "rather",
+        "reflection",
+        "invites",
+        "stillness",
+        "painting",
+        "slow",
+        "facts"
+      ]
+    }
+  },
+  "exploratory": {
+    "preference_matrix": {
+      "Explorer": {
+        "Explorer": 0.99,
+        "Facilitator": 0.46,
+        "Experience Seeker": 0.18,
+        "Professional/Hobbyist": 0.26,
+        "Recharger": 0.0
+      },
+      "Facilitator": {
+        "Explorer": 0.98,
+        "Facilitator": 1.0,
+        "Experience Seeker": 0.28,
+        "Professional/Hobbyist": 0.1,
+        "Recharger": 0.06
+      },
+      "Experience Seeker": {
+        "Explorer": 0.18,
+        "Facilitator": 0.04,
+        "Experience Seeker": 1.0,
+        "Professional/Hobbyist": 0.04,
+        "Recharger": 0.0
+      },
+      "Professional/Hobbyist": {
+        "Explorer": 0.28,
+        "Facilitator": 0.0,
+        "Experience Seeker": 0.04,
+        "Professional/Hobbyist": 0.95,
+        "Recharger": 0.0
+      },
+      "Recharger": {
+        "Explorer": 0.86,
+        "Facilitator": 0.34,
+        "Experience Seeker": 0.16,
+        "Professional/Hobbyist": 0.02,
+        "Recharger": 1.0
+      }
+    },
+    "preference_n": {
+      "Explorer": {
+        "Explorer": 100,
+        "Facilitator": 25,
+        "Experience Seeker": 25,
+        "Professional/Hobbyist": 25,
+        "Recharger": 25
+      },
+      "Facilitator": {
+        "Explorer": 25,
+        "Facilitator": 100,
+        "Experience Seeker": 25,
+        "Professional/Hobbyist": 25,
+        "Recharger": 25
+      },
+      "Experience Seeker": {
+        "Explorer": 25,
+        "Facilitator": 25,
+        "Experience Seeker": 100,
+        "Professional/Hobbyist": 25,
+        "Recharger": 25
+      },
+      "Professional/Hobbyist": {
+        "Explorer": 25,
+        "Facilitator": 25,
+        "Experience Seeker": 25,
+        "Professional/Hobbyist": 100,
+        "Recharger": 25
+      },
+      "Recharger": {
+        "Explorer": 25,
+        "Facilitator": 25,
+        "Experience Seeker": 25,
+        "Professional/Hobbyist": 25,
+        "Recharger": 100
+      }
+    },
+    "accepted_by_others": {
+      "Explorer": 0.575,
+      "Facilitator": 0.21000000000000002,
+      "Experience Seeker": 0.165,
+      "Professional/Hobbyist": 0.105,
+      "Recharger": 0.015
+    },
+    "b_confusions": {
+      "Professional/Hobbyist -> Explorer": {
+        "own_rate": 0.98,
+        "n": 25
+      }
+    },
+    "consistency_by_type": {
+      "A": 0.98,
+      "B": 0.998,
+      "C": 0.876,
+      "N": 0.772
+    },
+    "position_A_by_persona": {
+      "experience_seeker": 0.5183333333333333,
+      "explorer": 0.5116666666666667,
+      "facilitator": 0.5016666666666667,
+      "neutral": 0.512,
+      "professional_hobbyist": 0.5283333333333333,
+      "recharger": 0.5016666666666667
+    },
+    "reason_cites_own_category": {
+      "Explorer": 0.705,
+      "Facilitator": 0.9883333333333333,
+      "Experience Seeker": 0.9983333333333333,
+      "Professional/Hobbyist": 0.45,
+      "Recharger": 0.79
+    },
+    "rq1_link": {
+      "qwen": {
+        "distance": {
+          "rho_20": -0.4738053294813334,
+          "p_20": 0.03482706047879754,
+          "rho_10": -0.49090909090909085,
+          "p_10": 0.14965567342083683
+        },
+        "cosine": {
+          "rho_20": 0.29612833092583335,
+          "p_20": 0.20489810947336543,
+          "rho_10": 0.5636363636363636,
+          "p_10": 0.0897240283170912
+        }
+      },
+      "bge-m3": {
+        "distance": {
+          "rho_20": -0.48747279090867957,
+          "p_20": 0.029244818344094432,
+          "rho_10": -0.43030303030303024,
+          "p_10": 0.21449233253280778
+        },
+        "cosine": {
+          "rho_20": 0.6438892939105301,
+          "p_20": 0.002186428715692207,
+          "rho_10": 0.8787878787878788,
+          "p_10": 0.0008138621117322102
+        }
+      }
+    }
+  }
+}

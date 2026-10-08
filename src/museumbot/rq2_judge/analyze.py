@@ -323,7 +323,7 @@ def main() -> None:
                     help="solo i criteri di utilizzabilita' (dopo il pilota)")
     ap.add_argument("--corpus", default="main", help="corpus dei testi giudicati (main, local)")
     args = ap.parse_args()
-    t = tag(args.corpus)
+    tg = tag(args.corpus)
 
     rows = load(out_path(args.corpus))
     crit = criteria(rows)
@@ -358,7 +358,7 @@ def main() -> None:
 
     RESULTS.mkdir(exist_ok=True)
     FIGS.mkdir(exist_ok=True)
-    out = RESULTS / f"judge_{t}.json"
+    out = RESULTS / f"judge_{tg}.json"
     out.write_text(json.dumps(res, indent=2, ensure_ascii=False))
     ex = res["exploratory"]
     print("\nesplorative — accettazione dei testi altrui da parte delle altre persone:")
@@ -366,9 +366,9 @@ def main() -> None:
     for model, r in ex["rq1_link"].items():
         print(f"  legame con RQ1 [{model}]: Spearman con la distanza {r['distance']['rho_20']:+.2f} "
               f"(10 coppie {r['distance']['rho_10']:+.2f}), con il coseno {r['cosine']['rho_20']:+.2f}")
-    fig_rates(res, FIGS / f"judge_{t}.png")
-    fig_matrix(ex, FIGS / f"judge_{t}_matrix.png")
-    print(f"\n-> {out.relative_to(ROOT)}, figures/judge_{t}.png, figures/judge_{t}_matrix.png")
+    fig_rates(res, FIGS / f"judge_{tg}.png")
+    fig_matrix(ex, FIGS / f"judge_{tg}_matrix.png")
+    print(f"\n-> {out.relative_to(ROOT)}, figures/judge_{tg}.png, figures/judge_{tg}_matrix.png")
 
 
 if __name__ == "__main__":

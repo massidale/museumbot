@@ -80,7 +80,7 @@ def plot(cur) -> None:
         ax.axhline(0.5, color="grey", lw=0.5)
         ax.set_title(f"{LABELS[x]} – {LABELS[y]}", fontsize=10)
         ax.set_xlabel("quota della categoria della persona nel testo")
-        ax.legend(fontsize=7)
+        ax.legend(fontsize=7, loc="center right")
     axes[0].set_ylabel("tasso di preferenza sul flat")
     fig.tight_layout()
     FIGS.mkdir(exist_ok=True)

@@ -1,6 +1,6 @@
 # Museumbot — stato del progetto
 
-*Ultimo aggiornamento: 7 ottobre 2026. Il report descrive solo lo stato attuale del codice e
+*Ultimo aggiornamento: 8 ottobre 2026. Il report descrive solo lo stato attuale del codice e
 dei risultati; le decisioni e le correzioni nel tempo sono in `docs/decisioni.md`.*
 
 **Domanda di ricerca.** Quando un LLM genera un'audioguida "personalizzata" su una
@@ -708,6 +708,42 @@ categorie è probabile: il flat di Gemma è molto più corto dei testi di catego
 178 parole contro 215–226; con DeepSeek 222 contro 234), quindi ogni steering vector
 contiene anche "più lungo del flat". Il confondente lunghezza (§3.7) qui pesa di più.
 
+### 8.1 Testi a profilo misto: pilota
+
+Passo 3 della spec. Un testo "fra" le categorie X e Y con peso α si genera con due esperti,
+i prompt di X e di Y, e a ogni token si campiona dalla media dei loro logit con pesi
+(1 − α, α), cioè dalla media geometrica pesata delle distribuzioni
+(`generation/mixing.py`). Su vLLM la miscela si fa da fuori: a ogni passo una chiamata da
+un token per esperto con le prime 100 log-probabilità, i token assenti dalla lista di un
+esperto prendono il minimo della sua lista (`generation/vllm_mix.py`). Analisi in
+`rq1_embeddings/mixed.py` (`results/mixed_{qwen,bge-m3}.json`): ogni testo, centrato sul
+flat della sua opera, si proietta sul segmento fra gli steering vector v_X e v_Y del corpus
+`local` (posizione 0 su X, 1 su Y), con il residuo fuori dal piano (v_X, v_Y) in rapporto
+alla norma.
+
+**Pilota**: Recharger → Professional/Hobbyist, α = 0, 0.5, 1, prime 20 opere, 60 testi
+(2 testi a α = 1 restano in violazione del filtro e sono esclusi).
+
+| Qwen3 (BGE-M3) | α = 0 | α = 0.5 | α = 1 |
+|---|---|---|---|
+| posizione mediana | −0.04 (0.04) | 0.50 (0.52) | 0.98 (0.97) |
+| residuo mediano | 0.71 (0.78) | 0.91 (0.91) | 0.85 (0.93) |
+| copertura (token fra le prime 100 di entrambi) | — | 97.8% | — |
+| parole, mediana | 218 | 230 | 224 |
+
+Residuo mediano dei testi puri sulle stesse opere: 0.79 (0.85). Spearman fra α e posizione
+0.93 (0.92). **Verifica del metodo**: a α = 0 e 1 (un solo esperto) lo steering vector dei
+testi passo per passo vale 1.00 e 1.01 (1.00 e 1.01) del tetto rispetto ai testi puri sulle
+stesse opere. Tutti i criteri fissati nella spec sono superati: il metodo riproduce la
+generazione normale, e a α = 0.5 il testo sta a metà strada fra le due categorie, con un
+residuo poco sopra quello dei puri. Alla lettura i testi a α = 0.5 sono coerenti e la
+fusione è per sezioni: apertura analitica (tecnica, confronti con altre opere), chiusura
+contemplativa.
+
+In corso il giro completo: tre coppie (Recharger–Professional/Hobbyist e
+Facilitator–Professional/Hobbyist, contrapposte; Explorer–Facilitator, vicine), α = 0.25,
+0.5, 0.75, 100 opere.
+
 ## 9. Prossimi passi
 
 1. Chain vs singolo: decidere se generare `chain_rep` per separare il rumore della chain
@@ -717,9 +753,8 @@ contiene anche "più lungo del flat". Il confondente lunghezza (§3.7) qui pesa 
 3. RQ2: estensioni possibili (secondo giudice su un campione, persone ricavate dal
    dataset BIRD, compito di riconoscimento); scelta degli stimoli per RQ3.
 4. RQ3: vedi `docs/plans/piano-progetto-tesi.md`.
-5. Profilo continuo, passo 3: scegliere le coppie sulla matrice dei coseni del corpus
-   `local` e il metodo di miscela su vLLM, poi generare i testi a profilo misto (§8; spec
-   in `docs/plans/2026-10-06-profilo-continuo-design.md`).
+5. Profilo continuo, passo 3: giro completo dei testi misti in corso (§8.1); poi confondente
+   lunghezza, giudice (passo 4). Spec in `docs/plans/2026-10-06-profilo-continuo-design.md`.
 
 ## Riferimenti
 

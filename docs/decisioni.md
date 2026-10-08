@@ -362,3 +362,17 @@ procedura usata per DeepSeek è rigenerare finché il testo è valido.
 **Effetto.** Tutti recuperati (7 al tentativo 5, gli altri fra il 7 e il 10), 199–227 parole.
 Il corpus `local` ha 1 100 testi validi su 100 opere. Limite: 13 testi vengono da una
 sessione diversa, con configurazione identica.
+
+## 2026-10-08 — Miscela delle categorie passo per passo su vLLM
+
+**Decisione.** I testi a profilo misto si generano con la miscela da fuori: a ogni passo
+una chiamata a vLLM da un token per esperto con le prime 100 log-probabilità grezze, media
+pesata dei log (equivalente alla media dei logit), token assenti da una lista al minimo di
+quella lista. Gruppi di 6 testi misti per volta. Pilota con tutti e tre gli α generati con
+questo metodo.
+**Motivo.** vLLM non accoppia due sequenze a ogni passo; il ciclo esatto con
+`transformers` avrebbe richiesto un altro motore e un'altra configurazione rispetto ai
+testi puri. Con gruppi di 16 testi le sequenze non stanno nella cache KV (~6 600 token sul
+31B con 2× T4) e il pilota ha richiesto 5 ore; con 12 sequenze il passo resta in cache.
+**Effetto.** Verifica del metodo a α = 0 e 1: 1.00–1.01 del tetto rispetto ai testi puri;
+copertura 97.8% a α = 0.5. I vertici del giro completo restano i testi puri del passo 2.

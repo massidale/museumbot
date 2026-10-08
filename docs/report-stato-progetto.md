@@ -806,7 +806,7 @@ casi.
 | incrocio delle due curve | 0.50 | 0.45 | 0.66 |
 | doppio visitatore: minimo fra le persone (α = 0 … 1) | 0.00 0.00 0.43 0.08 0.05 | 0.03 0.26 0.86 0.31 0.07 | 0.97 0.98 0.98 0.87 0.43 |
 | ordinamento: Spearman mediano (ordini perfetti) | 1.00 (59%) | 1.00 (66%) | 0.90 (35%) |
-| coerenza: misto scelto come "voce sola" | 0.52 | 0.57 | 0.57 |
+| coerenza: misto scelto come "voce sola" | 0.52 | 0.57 | 0.58 |
 
 ![Curve di preferenza e doppio visitatore per le tre coppie](../figures/judge_mixed_glm-5.3.png)
 
@@ -822,7 +822,7 @@ casi.
   il testo a α = 0.5 a entrambe: minimo 0.43 (Recharger–Professional/Hobbyist) e 0.86
   (Facilitator–Professional/Hobbyist). Nella coppia vicina tutti i testi piacciono a
   entrambe le persone fino a α = 0.5 (minimo 0.97–0.98): il test non distingue.
-- **La miscela non costa coerenza**: il testo misto è scelto come "voce sola" nel 52–57%
+- **La miscela non costa coerenza**: il testo misto è scelto come "voce sola" nel 52–58%
   dei confronti con un testo puro.
 
 Soglie della spec: le due coppie contrapposte le superano tutte. La coppia vicina non

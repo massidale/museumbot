@@ -10,7 +10,9 @@ corpus `local` (tutte le opere):
 Verifica del metodo (alpha = 0 e 1, un solo esperto): lo steering vector dei testi passo per
 passo contro quello dei testi puri sulle stesse opere, diviso per il tetto full/full_rep
 sulle stesse opere. Criteri nella spec docs/plans/2026-10-06-profilo-continuo-design.md.
-Scrive results/mixed_<modello>.json e figures/mixed_<modello>.png.
+Curva per coppia: alpha interni dai testi misti, vertici (alpha = 0 e 1) dai testi puri del
+corpus `local` su tutte le opere; i vertici passo per passo del pilota servono solo alla
+verifica. Scrive results/mixed_<modello>.json e figures/mixed_<modello>_<coppia>.png.
 """
 
 import argparse
@@ -80,12 +82,13 @@ def method_check(Xm, Xp, Xr, idx_p, cond: int) -> float:
 def run(alias: str) -> dict:
     rows = [r for r in map(json.loads, MIXED.open()) if not r["usage"]["failed"]]
     E = embed_mixed(alias, rows)
-    Xp, arts, _ = load(alias, "full", "local")
+    Xp, arts, meta = load(alias, "full", "local")
     Xr, arts_r, _ = load(alias, "full_rep", "local")
     assert arts == arts_r
     V = steering(Xp)
     ai = {a: i for i, a in enumerate(arts)}
     out = {"model": alias, "pairs": {}}
+    words = meta.set_index(["artwork_id", "condition"])["words"]
     for pair in sorted({tuple(r["pair"]) for r in rows}):
         cx, cy = (CONDITIONS.index(c) for c in pair)
         vx, vy = V[cx - (cx > FLAT)], V[cy - (cy > FLAT)]
@@ -93,31 +96,41 @@ def run(alias: str) -> dict:
         a_idx = np.array([ai[rows[i]["artwork_id"]] for i in sel])
         alpha = np.array([rows[i]["alpha"] for i in sel])
         D = E[sel] - Xp[a_idx, FLAT]
-        pos, res = position(D, vx, vy), residual(D, vx, vy)
-        works = sorted(set(a_idx))
-        pure = np.concatenate([Xp[works, cx] - Xp[works, FLAT], Xp[works, cy] - Xp[works, FLAT]])
-        res_pure = float(np.median(residual(pure, vx, vy)))
-        by = {}
-        for al in sorted(set(alpha)):
-            m = alpha == al
-            cov = [rows[i]["usage"]["covered_all"] for i, k in zip(sel, m) if k]
-            by[f"{al:g}"] = {
-                "n": int(m.sum()),
-                "position_median": round(float(np.median(pos[m])), 3),
-                "position_iqr": [round(float(q), 3) for q in np.percentile(pos[m], [25, 75])],
-                "residual_median": round(float(np.median(res[m])), 3),
-                "covered_all_mean": round(float(np.mean(cov)), 4),
-                "words_median": float(np.median([rows[i]["words"] for i, k in zip(sel, m) if k]))}
+        # verifica del metodo: vertici generati passo per passo (pilota)
         checks = {}
         for al, c in ((0.0, cx), (1.0, cy)):
             m = alpha == al
             if m.any():
                 checks[f"{al:g}"] = round(method_check(D[m], Xp, Xr, a_idx[m], c), 3)
-        rho = spearmanr(alpha, pos).statistic
+        # curva: alpha interni dai testi misti, vertici dai testi puri su tutte le opere
+        inner = (alpha > 0) & (alpha < 1)
+        n = len(arts)
+        Dv = np.concatenate([Xp[:, cx] - Xp[:, FLAT], Xp[:, cy] - Xp[:, FLAT]])
+        al_all = np.concatenate([np.zeros(n), np.ones(n), alpha[inner]])
+        D_all = np.concatenate([Dv, D[inner]])
+        w_all = np.concatenate([[words[(a, pair[0])] for a in arts],
+                                [words[(a, pair[1])] for a in arts],
+                                [rows[i]["words"] for i, k in zip(sel, inner) if k]])
+        cov_all = np.concatenate([np.full(2 * n, np.nan),
+                                  [rows[i]["usage"]["covered_all"] for i, k in zip(sel, inner) if k]])
+        pos, res = position(D_all, vx, vy), residual(D_all, vx, vy)
+        res_pure = float(np.median(res[al_all != np.clip(al_all, 1e-9, 1 - 1e-9)]))
+        by = {}
+        for al in sorted(set(al_all)):
+            m = al_all == al
+            by[f"{al:g}"] = {
+                "n": int(m.sum()), "source": "puri" if al in (0, 1) else "misti",
+                "position_median": round(float(np.median(pos[m])), 3),
+                "position_iqr": [round(float(q), 3) for q in np.percentile(pos[m], [25, 75])],
+                "residual_median": round(float(np.median(res[m])), 3),
+                "residual_ratio": round(float(np.median(res[m]) / res_pure), 3),
+                "covered_all_mean": None if al in (0, 1) else round(float(np.nanmean(cov_all[m])), 4),
+                "words_median": float(np.median(w_all[m]))}
+        rho = spearmanr(al_all, pos).statistic
         out["pairs"]["+".join(pair)] = {"by_alpha": by, "residual_pure_median": round(res_pure, 3),
                                         "spearman_alpha_position": round(float(rho), 3),
                                         "method_check_ratio": checks}
-        plot(alias, pair, alpha, pos)
+        plot(alias, pair, al_all, pos)
     return out
 
 
@@ -133,7 +146,7 @@ def plot(alias, pair, alpha, pos) -> None:
     ax.set_title(f"Testi misti, {alias}: posizione per alpha (linea: mediana)")
     fig.tight_layout()
     FIGS.mkdir(exist_ok=True)
-    fig.savefig(FIGS / f"mixed_{alias}.png", dpi=150)
+    fig.savefig(FIGS / f"mixed_{alias}_{'+'.join(pair)}.png", dpi=150)
     plt.close(fig)
 
 

@@ -4,41 +4,73 @@
     "recharger+professional_hobbyist": {
       "by_alpha": {
         "0": {
-          "n": 20,
-          "position_median": 0.036,
+          "n": 100,
+          "source": "puri",
+          "position_median": -0.012,
           "position_iqr": [
-            -0.05,
-            0.166
+            -0.103,
+            0.115
           ],
-          "residual_median": 0.782,
-          "covered_all_mean": 1.0,
-          "words_median": 218.0
+          "residual_median": 0.8,
+          "residual_ratio": 0.939,
+          "covered_all_mean": null,
+          "words_median": 220.0
+        },
+        "0.25": {
+          "n": 100,
+          "source": "misti",
+          "position_median": 0.136,
+          "position_iqr": [
+            0.027,
+            0.271
+          ],
+          "residual_median": 0.832,
+          "residual_ratio": 0.976,
+          "covered_all_mean": 0.9771,
+          "words_median": 225.0
         },
         "0.5": {
-          "n": 20,
-          "position_median": 0.522,
+          "n": 100,
+          "source": "misti",
+          "position_median": 0.572,
           "position_iqr": [
-            0.494,
-            0.629
+            0.416,
+            0.711
           ],
-          "residual_median": 0.911,
-          "covered_all_mean": 0.978,
-          "words_median": 229.5
+          "residual_median": 0.937,
+          "residual_ratio": 1.1,
+          "covered_all_mean": 0.9788,
+          "words_median": 230.0
+        },
+        "0.75": {
+          "n": 100,
+          "source": "misti",
+          "position_median": 0.94,
+          "position_iqr": [
+            0.848,
+            1.046
+          ],
+          "residual_median": 0.939,
+          "residual_ratio": 1.102,
+          "covered_all_mean": 0.9773,
+          "words_median": 221.0
         },
         "1": {
-          "n": 18,
-          "position_median": 0.972,
+          "n": 100,
+          "source": "puri",
+          "position_median": 0.991,
           "position_iqr": [
-            0.843,
-            1.101
+            0.918,
+            1.113
           ],
-          "residual_median": 0.926,
-          "covered_all_mean": 1.0,
-          "words_median": 223.5
+          "residual_median": 0.925,
+          "residual_ratio": 1.085,
+          "covered_all_mean": null,
+          "words_median": 222.0
         }
       },
-      "residual_pure_median": 0.847,
-      "spearman_alpha_position": 0.921,
+      "residual_pure_median": 0.852,
+      "spearman_alpha_position": 0.899,
       "method_check_ratio": {
         "0": 0.999,
         "1": 1.006

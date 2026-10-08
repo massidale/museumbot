@@ -740,9 +740,25 @@ residuo poco sopra quello dei puri. Alla lettura i testi a α = 0.5 sono coerent
 fusione è per sezioni: apertura analitica (tecnica, confronti con altre opere), chiusura
 contemplativa.
 
-In corso il giro completo: tre coppie (Recharger–Professional/Hobbyist e
+**Giro completo** (in corso): tre coppie (Recharger–Professional/Hobbyist e
 Facilitator–Professional/Hobbyist, contrapposte; Explorer–Facilitator, vicine), α = 0.25,
-0.5, 0.75, 100 opere.
+0.5, 0.75 sulle 100 opere; i vertici α = 0 e 1 sono i testi puri del corpus `local`.
+Completata Recharger → Professional/Hobbyist (300 testi misti, nessuno in violazione,
+copertura 97.7–97.9%):
+
+| Qwen3 (BGE-M3) | α = 0 (puri) | 0.25 | 0.5 | 0.75 | α = 1 (puri) |
+|---|---|---|---|---|---|
+| posizione mediana | 0.00 (−0.01) | 0.10 (0.14) | 0.54 (0.57) | 0.92 (0.94) | 0.99 (0.99) |
+| residuo / residuo dei puri | 0.89 (0.94) | 0.94 (0.98) | 1.12 (1.10) | 1.11 (1.10) | 1.09 (1.09) |
+| parole, mediana | 220 | 225 | 230 | 221 | 222 |
+
+Spearman fra α e posizione 0.91 (0.90). La risposta ad α non è lineare ma a soglia: a 0.25
+il testo resta vicino al Recharger, a 0.75 vicino al Professional/Hobbyist, il passaggio
+avviene intorno a 0.5. Le soglie della spec sono superate (mediana a 0.5 fra 0.35 e 0.65,
+Spearman ≥ 0.8, residuo ≤ 1.5 volte i puri). In corso Facilitator–Professional/Hobbyist ed
+Explorer–Facilitator.
+
+![Posizione dei testi misti per α, Recharger → Professional/Hobbyist](../figures/mixed_qwen_recharger+professional_hobbyist.png)
 
 ## 9. Prossimi passi
 

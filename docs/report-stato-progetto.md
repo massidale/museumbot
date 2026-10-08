@@ -302,10 +302,13 @@ Identico con BGE-M3 (0.123 vs 0.031).
 
 ### 3.7 Confondenti
 
-**Lunghezza.** Professional/Hobbyist produce testi più lunghi (254 parole contro 222–235
-delle altre condizioni). Parte del suo steering vector potrebbe essere "lunghezza" e non
-registro. Va controllato, ad esempio con un probe che riceve anche la lunghezza come feature,
-o sottraendo la componente correlata con la lunghezza.
+**Lunghezza.** Professional/Hobbyist produce testi più lunghi (mediana 253 parole contro
+218–236 delle altre condizioni). Lo shift non è lunghezza (`rq1_embeddings/length.py`,
+`results/length_{qwen,bge-m3}.json`): la lunghezza da sola, centrata per opera, dà un probe
+a 6 classi di 0.28 (caso 0.17); togliendo dagli embedding la componente lineare della
+lunghezza, con il coefficiente stimato a parità di opera e di categoria, il probe resta
+0.95 (0.92), il test di permutazione p = 0.001 e ogni steering vector corretto ha coseno
+≥ 0.99 (≥ 0.98) con l'originale. Il probe senza il flat, a 5 classi, vale 0.99 (0.97).
 
 **Lessico.** Le parole discriminative sono coerenti con i blocchi di prompt: Recharger
 (*breathe, settle, slowly, breath, rest*), Facilitator (*discuss, talk, companions, group,
@@ -327,7 +330,6 @@ domanda a cui risponde il passo successivo.
   probe lo confonde solo con le categorie a esso più vicine.
 - I risultati valgono per il prompt singolo su provider fisso. La chain del paper produce
   testi diversi oltre il rumore e uno shift di categoria solo in parte uguale (§5).
-- Punto aperto: il confondente lunghezza per Professional/Hobbyist.
 
 ## 5. Chain vs prompt singolo
 
@@ -706,7 +708,12 @@ DeepSeek erano opposte lo sono meno (Explorer–Experience Seeker −0.11 contro
 Recharger–Professional/Hobbyist −0.07 contro −0.17 con Qwen3). Una parte comune a tutte le
 categorie è probabile: il flat di Gemma è molto più corto dei testi di categoria (mediana
 178 parole contro 215–226; con DeepSeek 222 contro 234), quindi ogni steering vector
-contiene anche "più lungo del flat". Il confondente lunghezza (§3.7) qui pesa di più.
+contiene anche "più lungo del flat". Lo shift però non è lunghezza (stessa analisi di
+§3.7, `results/length_*.json`): la lunghezza da sola dà un probe di 0.35; togliendone la
+componente dagli embedding il probe resta 0.99 (0.95), p = 0.001, ogni steering vector
+corretto ha coseno ≥ 0.97 (≥ 0.94) con l'originale e il rapporto del coseno con DeepSeek
+sui tetti, con entrambi i corpus corretti, resta 0.76–0.90 (0.73–0.89). Senza il flat il
+probe a 5 classi vale 1.00 (0.99).
 
 ### 8.1 Testi a profilo misto
 
@@ -776,13 +783,10 @@ solo il token scelto, non le distribuzioni intere.
 
 1. Chain vs singolo: decidere se generare `chain_rep` per separare il rumore della chain
    dalla differenza fra metodi (§5).
-2. Confondente lunghezza per Professional/Hobbyist nel corpus principale (§3.7), e per
-   tutte le categorie rispetto al flat nel corpus `local` (§8).
-3. RQ2: estensioni possibili (secondo giudice su un campione, persone ricavate dal
+2. RQ2: estensioni possibili (secondo giudice su un campione, persone ricavate dal
    dataset BIRD, compito di riconoscimento); scelta degli stimoli per RQ3.
-4. RQ3: vedi `docs/plans/piano-progetto-tesi.md`.
-5. Profilo continuo: confondente lunghezza sul corpus `local` (§8), poi giudice sui testi
-   misti (passo 4). Spec in `docs/plans/2026-10-06-profilo-continuo-design.md`.
+3. RQ3: vedi `docs/plans/piano-progetto-tesi.md`.
+4. Profilo continuo: giudice sui testi misti (passo 4). Spec in `docs/plans/2026-10-06-profilo-continuo-design.md`.
 
 ## Riferimenti
 

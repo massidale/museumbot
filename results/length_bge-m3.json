@@ -1,0 +1,94 @@
+{
+  "model": "bge-m3",
+  "main": {
+    "words_median": {
+      "explorer": 234.0,
+      "facilitator": 234.0,
+      "experience_seeker": 236.0,
+      "professional_hobbyist": 253.0,
+      "recharger": 218.0,
+      "flat": 222.0
+    },
+    "probe_length_only": 0.278,
+    "probe6": 0.903,
+    "probe6_corrected": 0.915,
+    "probe5_no_flat": 0.974,
+    "probe5_no_flat_corrected": 0.976,
+    "permutation_p_corrected": 0.001,
+    "cos_steering_corrected_vs_original": {
+      "explorer": 0.994,
+      "facilitator": 0.989,
+      "experience_seeker": 0.996,
+      "professional_hobbyist": 0.981,
+      "recharger": 1.0
+    },
+    "steering_norm": {
+      "explorer": 0.124,
+      "facilitator": 0.086,
+      "experience_seeker": 0.152,
+      "professional_hobbyist": 0.163,
+      "recharger": 0.229
+    },
+    "steering_norm_corrected": {
+      "explorer": 0.122,
+      "facilitator": 0.087,
+      "experience_seeker": 0.153,
+      "professional_hobbyist": 0.163,
+      "recharger": 0.229
+    }
+  },
+  "local": {
+    "words_median": {
+      "explorer": 227.0,
+      "facilitator": 222.0,
+      "experience_seeker": 214.5,
+      "professional_hobbyist": 222.0,
+      "recharger": 220.0,
+      "flat": 178.5
+    },
+    "probe_length_only": 0.347,
+    "probe6": 0.975,
+    "probe6_corrected": 0.953,
+    "probe5_no_flat": 0.994,
+    "probe5_no_flat_corrected": 0.994,
+    "permutation_p_corrected": 0.001,
+    "cos_steering_corrected_vs_original": {
+      "explorer": 0.939,
+      "facilitator": 0.94,
+      "experience_seeker": 0.976,
+      "professional_hobbyist": 0.961,
+      "recharger": 0.987
+    },
+    "steering_norm": {
+      "explorer": 0.152,
+      "facilitator": 0.131,
+      "experience_seeker": 0.185,
+      "professional_hobbyist": 0.169,
+      "recharger": 0.29
+    },
+    "steering_norm_corrected": {
+      "explorer": 0.145,
+      "facilitator": 0.131,
+      "experience_seeker": 0.176,
+      "professional_hobbyist": 0.154,
+      "recharger": 0.287
+    }
+  },
+  "cross_generator_corrected": {
+    "n_artworks": 100,
+    "cos": {
+      "explorer": 0.695,
+      "facilitator": 0.704,
+      "experience_seeker": 0.772,
+      "professional_hobbyist": 0.776,
+      "recharger": 0.877
+    },
+    "ratio": {
+      "explorer": 0.728,
+      "facilitator": 0.753,
+      "experience_seeker": 0.787,
+      "professional_hobbyist": 0.792,
+      "recharger": 0.887
+    }
+  }
+}

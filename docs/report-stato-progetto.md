@@ -708,7 +708,7 @@ categorie è probabile: il flat di Gemma è molto più corto dei testi di catego
 178 parole contro 215–226; con DeepSeek 222 contro 234), quindi ogni steering vector
 contiene anche "più lungo del flat". Il confondente lunghezza (§3.7) qui pesa di più.
 
-### 8.1 Testi a profilo misto: pilota
+### 8.1 Testi a profilo misto
 
 Passo 3 della spec. Un testo "fra" le categorie X e Y con peso α si genera con due esperti,
 i prompt di X e di Y, e a ogni token si campiona dalla media dei loro logit con pesi
@@ -721,44 +721,56 @@ flat della sua opera, si proietta sul segmento fra gli steering vector v_X e v_Y
 `local` (posizione 0 su X, 1 su Y), con il residuo fuori dal piano (v_X, v_Y) in rapporto
 alla norma.
 
-**Pilota**: Recharger → Professional/Hobbyist, α = 0, 0.5, 1, prime 20 opere, 60 testi
-(2 testi a α = 1 restano in violazione del filtro e sono esclusi).
+**Corpus misto** (`data/local/mixed.jsonl`, 940 testi, tutti validi): tre coppie scelte
+prima dei dati, Recharger–Professional/Hobbyist e Facilitator–Professional/Hobbyist
+(contrapposte) ed Explorer–Facilitator (vicine), α = 0.25, 0.5, 0.75 sulle 100 opere; più
+60 testi del pilota (Recharger–Professional/Hobbyist, α = 0, 0.5, 1, prime 20 opere). I
+vertici delle curve sono i testi puri del corpus `local`. 7 testi rimasti in violazione del
+filtro sono stati rigenerati in una seconda sessione con la stessa configurazione.
 
-| Qwen3 (BGE-M3) | α = 0 | α = 0.5 | α = 1 |
-|---|---|---|---|
-| posizione mediana | −0.04 (0.04) | 0.50 (0.52) | 0.98 (0.97) |
-| residuo mediano | 0.71 (0.78) | 0.91 (0.91) | 0.85 (0.93) |
-| copertura (token fra le prime 100 di entrambi) | — | 97.8% | — |
-| parole, mediana | 218 | 230 | 224 |
+**Verifica del metodo** (pilota): a α = 0 e 1, con un solo esperto, lo steering vector dei
+testi passo per passo vale 1.00 e 1.00 (1.00 e 1.01) del tetto rispetto ai testi puri sulle
+stesse opere. Il token scelto è fra le prime 100 di entrambi gli esperti nel 97.7–97.9%
+(Recharger–Professional/Hobbyist), 98.8–99.5% (Facilitator–Professional/Hobbyist) e
+99.5–100% (Explorer–Facilitator) dei passi.
 
-Residuo mediano dei testi puri sulle stesse opere: 0.79 (0.85). Spearman fra α e posizione
-0.93 (0.92). **Verifica del metodo**: a α = 0 e 1 (un solo esperto) lo steering vector dei
-testi passo per passo vale 1.00 e 1.01 (1.00 e 1.01) del tetto rispetto ai testi puri sulle
-stesse opere. Tutti i criteri fissati nella spec sono superati: il metodo riproduce la
-generazione normale, e a α = 0.5 il testo sta a metà strada fra le due categorie, con un
-residuo poco sopra quello dei puri. Alla lettura i testi a α = 0.5 sono coerenti e la
-fusione è per sezioni: apertura analitica (tecnica, confronti con altre opere), chiusura
-contemplativa.
+**Posizione mediana per α**, Qwen3 (BGE-M3); α = 0 e 1 sono i testi puri:
 
-**Giro completo** (in corso): tre coppie (Recharger–Professional/Hobbyist e
-Facilitator–Professional/Hobbyist, contrapposte; Explorer–Facilitator, vicine), α = 0.25,
-0.5, 0.75 sulle 100 opere; i vertici α = 0 e 1 sono i testi puri del corpus `local`.
-Completata Recharger → Professional/Hobbyist (300 testi misti, nessuno in violazione,
-copertura 97.7–97.9%):
+| coppia | 0 | 0.25 | 0.5 | 0.75 | 1 | Spearman | segmento |
+|---|---|---|---|---|---|---|---|
+| Recharger → Prof./Hobbyist | 0.00 (−0.01) | 0.10 (0.14) | 0.54 (0.57) | 0.92 (0.94) | 0.99 (0.99) | 0.91 (0.90) | 0.59 (0.34) |
+| Facilitator → Prof./Hobbyist | −0.02 (0.00) | 0.10 (0.25) | 0.57 (0.62) | 0.88 (0.86) | 0.99 (0.99) | 0.88 (0.88) | 0.46 (0.20) |
+| Explorer → Facilitator | −0.01 (0.02) | 0.16 (0.25) | 0.30 (0.47) | 0.66 (0.75) | 0.98 (1.01) | 0.82 (0.77) | 0.22 (0.11) |
 
-| Qwen3 (BGE-M3) | α = 0 (puri) | 0.25 | 0.5 | 0.75 | α = 1 (puri) |
-|---|---|---|---|---|---|
-| posizione mediana | 0.00 (−0.01) | 0.10 (0.14) | 0.54 (0.57) | 0.92 (0.94) | 0.99 (0.99) |
-| residuo / residuo dei puri | 0.89 (0.94) | 0.94 (0.98) | 1.12 (1.10) | 1.11 (1.10) | 1.09 (1.09) |
-| parole, mediana | 220 | 225 | 230 | 221 | 222 |
+"Segmento" è |v_Y − v_X|. Il residuo resta fra 0.89 e 1.12 volte quello dei puri in tutte
+le celle; le parole mediane fra 220 e 230.
 
-Spearman fra α e posizione 0.91 (0.90). La risposta ad α non è lineare ma a soglia: a 0.25
-il testo resta vicino al Recharger, a 0.75 vicino al Professional/Hobbyist, il passaggio
-avviene intorno a 0.5. Le soglie della spec sono superate (mediana a 0.5 fra 0.35 e 0.65,
-Spearman ≥ 0.8, residuo ≤ 1.5 volte i puri). In corso Facilitator–Professional/Hobbyist ed
-Explorer–Facilitator.
+- **Coppie contrapposte: risposta a soglia.** A α = 0.25 il testo resta vicino alla prima
+  categoria, a 0.75 vicino alla seconda, il passaggio avviene intorno a 0.5. Tutte le
+  soglie della spec sono superate in entrambi gli embedding.
+- **Coppia vicina: risposta più graduale**, più vicina alla diagonale (con BGE-M3 0.25,
+  0.47, 0.75), ma più rumorosa: il segmento è circa tre volte più corto, quindi la
+  posizione dei singoli testi pesa più rumore (intervallo interquartile a α = 0.5:
+  0.13–0.43 con Qwen3). Due soglie della spec non sono superate: la mediana a 0.5 con Qwen3
+  (0.30, sotto 0.35) e lo Spearman con BGE-M3 (0.77, sotto 0.8).
 
 ![Posizione dei testi misti per α, Recharger → Professional/Hobbyist](../figures/mixed_qwen_recharger+professional_hobbyist.png)
+
+**Come si alternano i due esperti nel testo** (`generation/mix_diag.py`,
+`results/mix_diag.json`, testi a α = 0.5). Per ogni token il margine log p_X − log p_Y del
+token scelto dice quale esperto lo preferiva; i token si raggruppano in frasi.
+
+| | Rech.–Prof. | Fac.–Prof. | Expl.–Fac. |
+|---|---|---|---|
+| cambi di segno fra frasi consecutive (osservati / frasi mescolate) | 4.63 / 4.73 | 4.33 / 4.60 | 5.49 / 5.54 |
+| dispersione dei margini per frase / tagli casuali | 1.08 | 1.00 | 1.12 |
+| margine medio, ultimi tre decimi del testo | +0.32, +0.19, +0.36 | +0.03, +0.03, −0.05 | +0.06, +0.08, +0.20 |
+
+Le frasi dello stesso esperto non si raggruppano in blocchi più che per caso, e i confini
+di frase contano poco: i due registri si alternano in modo fine, senza sezioni. L'unica
+tendenza di posizione è la chiusura: nel Recharger–Professional/Hobbyist la parte finale è
+più Recharger, nell'Explorer–Facilitator l'ultimo decimo è più Explorer. Il margine vede
+solo il token scelto, non le distribuzioni intere.
 
 ## 9. Prossimi passi
 
@@ -769,8 +781,8 @@ Explorer–Facilitator.
 3. RQ2: estensioni possibili (secondo giudice su un campione, persone ricavate dal
    dataset BIRD, compito di riconoscimento); scelta degli stimoli per RQ3.
 4. RQ3: vedi `docs/plans/piano-progetto-tesi.md`.
-5. Profilo continuo, passo 3: giro completo dei testi misti in corso (§8.1); poi confondente
-   lunghezza, giudice (passo 4). Spec in `docs/plans/2026-10-06-profilo-continuo-design.md`.
+5. Profilo continuo: confondente lunghezza sul corpus `local` (§8), poi giudice sui testi
+   misti (passo 4). Spec in `docs/plans/2026-10-06-profilo-continuo-design.md`.
 
 ## Riferimenti
 

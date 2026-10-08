@@ -128,6 +128,7 @@ def run(alias: str) -> dict:
                 "words_median": float(np.median(w_all[m]))}
         rho = spearmanr(al_all, pos).statistic
         out["pairs"]["+".join(pair)] = {"by_alpha": by, "residual_pure_median": round(res_pure, 3),
+                                        "segment_norm": round(float(np.linalg.norm(vy - vx)), 3),
                                         "spearman_alpha_position": round(float(rho), 3),
                                         "method_check_ratio": checks}
         plot(alias, pair, al_all, pos)

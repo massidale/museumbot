@@ -376,3 +376,24 @@ testi puri. Con gruppi di 16 testi le sequenze non stanno nella cache KV (~6 600
 31B con 2× T4) e il pilota ha richiesto 5 ore; con 12 sequenze il passo resta in cache.
 **Effetto.** Verifica del metodo a α = 0 e 1: 1.00–1.01 del tetto rispetto ai testi puri;
 copertura 97.8% a α = 0.5. I vertici del giro completo restano i testi puri del passo 2.
+
+## 2026-10-08 — Recupero dei testi misti in violazione del filtro
+
+**Decisione.** 7 testi misti rimasti in violazione del filtro dopo 4 tentativi (5
+Facilitator–Professional/Hobbyist a α = 0.75, 2 del pilota a α = 1) rigenerati in una
+seconda sessione con la stessa configurazione (`kaggle/mix-retry`, `vllm_mix
+--retry-failed 12`), tentativi 5–12.
+**Motivo.** Stessa politica dei testi puri (voce del 7 ottobre): tutti per "For those
+analyzing/examining…", con il Professional/Hobbyist prevalente.
+**Effetto.** Tutti validi; il corpus misto ha 940 testi validi.
+
+## 2026-10-08 — Ritirata la "fusione per sezioni" dei testi misti
+
+**Decisione.** Tolta dal report l'osservazione che a α = 0.5 la fusione è per sezioni
+(apertura analitica, chiusura contemplativa), sostituita dall'analisi dei margini per
+token (`generation/mix_diag.py`).
+**Motivo.** L'osservazione veniva dalla lettura di due testi. Sui ~100 testi per coppia i
+margini log p_X − log p_Y per frase non formano blocchi più che per caso e i confini di
+frase contano poco; resta solo una tendenza nella chiusura.
+**Effetto.** Il report (§8.1) descrive un'alternanza fine dei due registri, senza sezioni,
+con la chiusura più vicina al Recharger nella coppia Recharger–Professional/Hobbyist.

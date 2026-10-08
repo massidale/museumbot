@@ -1,6 +1,152 @@
 {
   "model": "bge-m3",
   "pairs": {
+    "explorer+facilitator": {
+      "by_alpha": {
+        "0": {
+          "n": 100,
+          "source": "puri",
+          "position_median": 0.02,
+          "position_iqr": [
+            -0.191,
+            0.18
+          ],
+          "residual_median": 0.94,
+          "residual_ratio": 0.998,
+          "covered_all_mean": null,
+          "words_median": 227.0
+        },
+        "0.25": {
+          "n": 100,
+          "source": "misti",
+          "position_median": 0.249,
+          "position_iqr": [
+            0.039,
+            0.449
+          ],
+          "residual_median": 0.948,
+          "residual_ratio": 1.007,
+          "covered_all_mean": 0.9996,
+          "words_median": 225.0
+        },
+        "0.5": {
+          "n": 100,
+          "source": "misti",
+          "position_median": 0.465,
+          "position_iqr": [
+            0.251,
+            0.597
+          ],
+          "residual_median": 0.952,
+          "residual_ratio": 1.011,
+          "covered_all_mean": 0.9996,
+          "words_median": 227.0
+        },
+        "0.75": {
+          "n": 100,
+          "source": "misti",
+          "position_median": 0.75,
+          "position_iqr": [
+            0.48,
+            0.912
+          ],
+          "residual_median": 0.953,
+          "residual_ratio": 1.012,
+          "covered_all_mean": 0.9953,
+          "words_median": 222.0
+        },
+        "1": {
+          "n": 100,
+          "source": "puri",
+          "position_median": 1.014,
+          "position_iqr": [
+            0.785,
+            1.212
+          ],
+          "residual_median": 0.943,
+          "residual_ratio": 1.001,
+          "covered_all_mean": null,
+          "words_median": 222.0
+        }
+      },
+      "residual_pure_median": 0.942,
+      "segment_norm": 0.113,
+      "spearman_alpha_position": 0.769,
+      "method_check_ratio": {}
+    },
+    "facilitator+professional_hobbyist": {
+      "by_alpha": {
+        "0": {
+          "n": 100,
+          "source": "puri",
+          "position_median": -0.003,
+          "position_iqr": [
+            -0.109,
+            0.133
+          ],
+          "residual_median": 0.931,
+          "residual_ratio": 1.004,
+          "covered_all_mean": null,
+          "words_median": 222.0
+        },
+        "0.25": {
+          "n": 100,
+          "source": "misti",
+          "position_median": 0.251,
+          "position_iqr": [
+            0.134,
+            0.348
+          ],
+          "residual_median": 0.963,
+          "residual_ratio": 1.038,
+          "covered_all_mean": 0.988,
+          "words_median": 223.5
+        },
+        "0.5": {
+          "n": 100,
+          "source": "misti",
+          "position_median": 0.616,
+          "position_iqr": [
+            0.499,
+            0.754
+          ],
+          "residual_median": 0.968,
+          "residual_ratio": 1.044,
+          "covered_all_mean": 0.9952,
+          "words_median": 223.0
+        },
+        "0.75": {
+          "n": 100,
+          "source": "misti",
+          "position_median": 0.858,
+          "position_iqr": [
+            0.706,
+            1.02
+          ],
+          "residual_median": 0.936,
+          "residual_ratio": 1.009,
+          "covered_all_mean": 0.9937,
+          "words_median": 221.0
+        },
+        "1": {
+          "n": 100,
+          "source": "puri",
+          "position_median": 0.985,
+          "position_iqr": [
+            0.872,
+            1.133
+          ],
+          "residual_median": 0.926,
+          "residual_ratio": 0.998,
+          "covered_all_mean": null,
+          "words_median": 222.0
+        }
+      },
+      "residual_pure_median": 0.928,
+      "segment_norm": 0.203,
+      "spearman_alpha_position": 0.88,
+      "method_check_ratio": {}
+    },
     "recharger+professional_hobbyist": {
       "by_alpha": {
         "0": {
@@ -70,10 +216,11 @@
         }
       },
       "residual_pure_median": 0.852,
+      "segment_norm": 0.341,
       "spearman_alpha_position": 0.899,
       "method_check_ratio": {
         "0": 0.999,
-        "1": 1.006
+        "1": 1.008
       }
     }
   }

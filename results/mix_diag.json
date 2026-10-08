@@ -1,0 +1,71 @@
+{
+  "alpha": 0.5,
+  "pairs": {
+    "explorer+facilitator": {
+      "n": 100,
+      "skipped": 0,
+      "sign_changes_observed": 5.49,
+      "sign_changes_shuffled": 5.54,
+      "share_below_chance": 0.45,
+      "ownership_ratio_median": 1.121,
+      "ownership_share_above_1": 0.71,
+      "profile_by_decile": [
+        -0.031,
+        -0.033,
+        -0.015,
+        -0.009,
+        -0.008,
+        0.037,
+        0.033,
+        0.061,
+        0.075,
+        0.202
+      ],
+      "mean_margin": 0.031
+    },
+    "facilitator+professional_hobbyist": {
+      "n": 100,
+      "skipped": 0,
+      "sign_changes_observed": 4.33,
+      "sign_changes_shuffled": 4.6,
+      "share_below_chance": 0.62,
+      "ownership_ratio_median": 1.005,
+      "ownership_share_above_1": 0.51,
+      "profile_by_decile": [
+        -0.165,
+        0.007,
+        0.082,
+        0.053,
+        0.038,
+        0.018,
+        0.081,
+        0.03,
+        0.029,
+        -0.05
+      ],
+      "mean_margin": 0.012
+    },
+    "recharger+professional_hobbyist": {
+      "n": 99,
+      "skipped": 1,
+      "sign_changes_observed": 4.63,
+      "sign_changes_shuffled": 4.73,
+      "share_below_chance": 0.455,
+      "ownership_ratio_median": 1.078,
+      "ownership_share_above_1": 0.626,
+      "profile_by_decile": [
+        0.233,
+        0.014,
+        0.078,
+        -0.012,
+        0.07,
+        -0.035,
+        0.052,
+        0.322,
+        0.187,
+        0.36
+      ],
+      "mean_margin": 0.126
+    }
+  }
+}

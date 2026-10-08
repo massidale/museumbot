@@ -395,5 +395,5 @@ token (`generation/mix_diag.py`).
 **Motivo.** L'osservazione veniva dalla lettura di due testi. Sui ~100 testi per coppia i
 margini log p_X − log p_Y per frase non formano blocchi più che per caso e i confini di
 frase contano poco; resta solo una tendenza nella chiusura.
-**Effetto.** Il report (§8.1) descrive un'alternanza fine dei due registri, senza sezioni,
+**Effetto.** Il report della parte 2 (`docs/report-gemma.md`, §4) descrive un'alternanza fine dei due registri, senza sezioni,
 con la chiusura più vicina al Recharger nella coppia Recharger–Professional/Hobbyist.

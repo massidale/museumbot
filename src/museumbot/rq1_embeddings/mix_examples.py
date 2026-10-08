@@ -122,7 +122,7 @@ INTRO = (
     "0 su X e 1 su Y. <b>Token</b>: quota di token preferiti da X, da Y (|margine| ≥ 0.5) "
     "o da nessuno dei due.")
 SOURCE = ("Generato da <code>rq1_embeddings/mix_examples.py</code> sui dati di "
-          "<code>data/local/</code> (Gemma 4 31B). Metodo e risultati aggregati nel report, §8.1.")
+          "<code>data/local/</code> (Gemma 4 31B). Metodo e risultati aggregati in <code>docs/report-gemma.md</code>, §4.")
 COLS = ["α", "parole", "posizione", "copertura", "token X / Y / accordo"]
 
 

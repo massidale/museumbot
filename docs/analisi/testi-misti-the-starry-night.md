@@ -1,6 +1,6 @@
 # Testi misti su *The Starry Night* (Vincent van Gogh)
 
-*Generato da <code>rq1_embeddings/mix_examples.py</code> sui dati di <code>data/local/</code> (Gemma 4 31B). Metodo e risultati aggregati nel report, §8.1.*
+*Generato da <code>rq1_embeddings/mix_examples.py</code> sui dati di <code>data/local/</code> (Gemma 4 31B). Metodo e risultati aggregati in <code>docs/report-gemma.md</code>, §4.*
 
 Per ogni coppia di categorie, i testi da α = 0 (prima categoria, X) a α = 1 (seconda, Y); i vertici sono i testi puri. Ogni testo misto è generato token per token dalla media dei logit dei due prompt di categoria, con pesi (1 − α, α). Nei testi misti ogni token ha uno sfondo <b>blu</b> se lo preferiva X, <b>rosso</b> se lo preferiva Y; l'intensità è il margine |log p_X − log p_Y| del token scelto (satura a 5, ~150 volte più probabile). Senza sfondo: i due esperti erano d'accordo. Passando sopra un token si leggono le due log-probabilità. <b>Posizione</b>: proiezione dell'embedding (Qwen3, centrato sul flat dell'opera) sul segmento fra gli steering vector delle due categorie, 0 su X e 1 su Y. <b>Token</b>: quota di token preferiti da X, da Y (|margine| ≥ 0.5) o da nessuno dei due.
 

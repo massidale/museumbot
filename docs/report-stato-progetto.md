@@ -308,7 +308,7 @@ Identico con BGE-M3 (0.123 vs 0.031).
 a 6 classi di 0.28 (caso 0.17); togliendo dagli embedding la componente lineare della
 lunghezza, con il coefficiente stimato a parità di opera e di categoria, il probe resta
 0.95 (0.92), il test di permutazione p = 0.001 e ogni steering vector corretto ha coseno
-≥ 0.99 (≥ 0.98) con l'originale. Il probe senza il flat, a 5 classi, vale 0.99 (0.97).
+0.99–1.00 (0.98–1.00) con l'originale. Il probe senza il flat, a 5 classi, vale 0.99 (0.97).
 
 **Lessico.** Le parole discriminative sono coerenti con i blocchi di prompt: Recharger
 (*breathe, settle, slowly, breath, rest*), Facilitator (*discuss, talk, companions, group,
@@ -711,7 +711,7 @@ categorie è probabile: il flat di Gemma è molto più corto dei testi di catego
 contiene anche "più lungo del flat". Lo shift però non è lunghezza (stessa analisi di
 §3.7, `results/length_*.json`): la lunghezza da sola dà un probe di 0.35; togliendone la
 componente dagli embedding il probe resta 0.99 (0.95), p = 0.001, ogni steering vector
-corretto ha coseno ≥ 0.97 (≥ 0.94) con l'originale e il rapporto del coseno con DeepSeek
+corretto ha coseno 0.97–0.99 (0.94–0.99) con l'originale e il rapporto del coseno con DeepSeek
 sui tetti, con entrambi i corpus corretti, resta 0.76–0.90 (0.73–0.89). Senza il flat il
 probe a 5 classi vale 1.00 (0.99).
 

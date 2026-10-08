@@ -34,7 +34,7 @@ from sklearn.linear_model import LogisticRegression
 
 from museumbot.common.config import ROOT
 from museumbot.common.prompts import FALK_CATEGORIES, LABELS
-from museumbot.rq2_judge.judge import MODEL, OUT, corpus_index
+from museumbot.rq2_judge.judge import MODEL, OUT, corpus_index, out_path
 
 RESULTS = ROOT / "results"
 FIGS = ROOT / "figures"
@@ -42,6 +42,11 @@ TYPES = ("A", "B", "C", "N")
 THRESHOLDS = {"valid_rate": 0.98, "attention_accuracy": 0.95}
 LENGTH_WORDS = re.compile(r"\b(long|longer|lengthy|short|shorter|concise|brief|succinct)\b", re.I)
 RNG = np.random.default_rng(0)
+
+
+def tag(corpus: str = "main") -> str:
+    """Suffisso di risultati e figure: nessuno per il corpus principale."""
+    return MODEL if corpus == "main" else f"{MODEL}_{corpus}"
 
 
 def load(path=OUT) -> list[dict]:
@@ -217,7 +222,7 @@ def confusions_b(scores) -> dict:
             for (k, j), v in sorted(acc.items()) if np.mean(v) < 1}
 
 
-def rq1_link(M: np.ndarray) -> dict:
+def rq1_link(M: np.ndarray, corpus: str = "main") -> dict:
     """Spearman fra l'accettazione dei testi altrui (C, fuori diagonale) e la geometria di RQ1."""
     cells = [(i, j) for i in range(len(FALK_CATEGORIES)) for j in range(len(FALK_CATEGORIES)) if i != j]
     c = [M[i, j] for i, j in cells]
@@ -226,7 +231,7 @@ def rq1_link(M: np.ndarray) -> dict:
     c_sym = [(M[i, j] + M[j, i]) / 2 for i, j in pairs]
     out = {}
     for model in ("qwen", "bge-m3"):
-        path = RESULTS / f"metrics_{model}.json"
+        path = RESULTS / f"metrics_{model}{'' if corpus == 'main' else '_' + corpus}.json"
         if not path.exists():
             continue
         r = json.loads(path.read_text())
@@ -242,7 +247,7 @@ def rq1_link(M: np.ndarray) -> dict:
     return out
 
 
-def exploratory(rows, scores) -> dict:
+def exploratory(rows, scores, corpus: str = "main") -> dict:
     M, n = preference_matrix(scores)
     valid = [r for r in rows if r["valid"] and r["type"] in TYPES]
     lab = [LABELS[k] for k in FALK_CATEGORIES]
@@ -261,7 +266,7 @@ def exploratory(rows, scores) -> dict:
             LABELS[k]: float(np.mean([bool(re.search(SELF_NAME[k], r["reason"] or "", re.I))
                                       for r in valid if r["persona"] == k]))
             for k in FALK_CATEGORIES},
-        "rq1_link": rq1_link(M),
+        "rq1_link": rq1_link(M, corpus),
     }
 
 
@@ -316,9 +321,11 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--criteria-only", action="store_true",
                     help="solo i criteri di utilizzabilita' (dopo il pilota)")
+    ap.add_argument("--corpus", default="main", help="corpus dei testi giudicati (main, local)")
     args = ap.parse_args()
+    t = tag(args.corpus)
 
-    rows = load()
+    rows = load(out_path(args.corpus))
     crit = criteria(rows)
     crit["passed"] = {k: crit[k] >= v for k, v in THRESHOLDS.items()}
     print(f"[{MODEL}] {crit['n_judgments']} giudizi")
@@ -329,7 +336,7 @@ def main() -> None:
     if args.criteria_only:
         return
 
-    texts, _ = corpus_index()
+    texts, _ = corpus_index(args.corpus)
     words = {k: len(t.split()) for k, t in texts.items()}
     scores = pair_scores(rows)
     res = {"model": MODEL, "criteria": crit,
@@ -337,7 +344,7 @@ def main() -> None:
            "rates": rates(scores),
            "length": length_analysis(rows, scores, words),
            "reasons": reasons_summary(rows),
-           "exploratory": exploratory(rows, scores)}
+           "exploratory": exploratory(rows, scores, args.corpus)}
 
     print("\ntassi (media dei due ordini, IC 95%):")
     for t in (*TYPES, "A-C", "A-N"):
@@ -351,7 +358,7 @@ def main() -> None:
 
     RESULTS.mkdir(exist_ok=True)
     FIGS.mkdir(exist_ok=True)
-    out = RESULTS / f"judge_{MODEL}.json"
+    out = RESULTS / f"judge_{t}.json"
     out.write_text(json.dumps(res, indent=2, ensure_ascii=False))
     ex = res["exploratory"]
     print("\nesplorative — accettazione dei testi altrui da parte delle altre persone:")
@@ -359,9 +366,9 @@ def main() -> None:
     for model, r in ex["rq1_link"].items():
         print(f"  legame con RQ1 [{model}]: Spearman con la distanza {r['distance']['rho_20']:+.2f} "
               f"(10 coppie {r['distance']['rho_10']:+.2f}), con il coseno {r['cosine']['rho_20']:+.2f}")
-    fig_rates(res, FIGS / f"judge_{MODEL}.png")
-    fig_matrix(ex, FIGS / f"judge_{MODEL}_matrix.png")
-    print(f"\n-> {out.relative_to(ROOT)}, figures/judge_{MODEL}.png, figures/judge_{MODEL}_matrix.png")
+    fig_rates(res, FIGS / f"judge_{t}.png")
+    fig_matrix(ex, FIGS / f"judge_{t}_matrix.png")
+    print(f"\n-> {out.relative_to(ROOT)}, figures/judge_{t}.png, figures/judge_{t}_matrix.png")
 
 
 if __name__ == "__main__":

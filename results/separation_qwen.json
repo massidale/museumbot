@@ -1,0 +1,476 @@
+{
+  "model": "qwen",
+  "min_df": 0.1,
+  "main": {
+    "explorer": {
+      "cross_artwork_similarity": 0.4087,
+      "formula_coverage": 0.0207,
+      "top_formulas": [
+        [
+          "look closely at",
+          0.63
+        ],
+        [
+          "closely at this",
+          0.43
+        ],
+        [
+          "look at the",
+          0.4
+        ],
+        [
+          "what do you",
+          0.39
+        ],
+        [
+          "at this painting",
+          0.37
+        ],
+        [
+          "do you think",
+          0.35
+        ],
+        [
+          "notice how the",
+          0.21
+        ],
+        [
+          "do you see",
+          0.2
+        ]
+      ],
+      "similarity_above_flat": 0.0068
+    },
+    "facilitator": {
+      "cross_artwork_similarity": 0.4182,
+      "formula_coverage": 0.0326,
+      "top_formulas": [
+        [
+          "what do you",
+          0.54
+        ],
+        [
+          "do you think",
+          0.54
+        ],
+        [
+          "take a moment",
+          0.4
+        ],
+        [
+          "with your group",
+          0.39
+        ],
+        [
+          "look at this",
+          0.35
+        ],
+        [
+          "a moment to",
+          0.33
+        ],
+        [
+          "as you look",
+          0.33
+        ],
+        [
+          "look at the",
+          0.29
+        ]
+      ],
+      "similarity_above_flat": 0.0163
+    },
+    "experience_seeker": {
+      "cross_artwork_similarity": 0.4594,
+      "formula_coverage": 0.0515,
+      "top_formulas": [
+        [
+          "one of the",
+          0.89
+        ],
+        [
+          "of the most",
+          0.81
+        ],
+        [
+          "a must see",
+          0.63
+        ],
+        [
+          "before one of",
+          0.41
+        ],
+        [
+          "standing before one",
+          0.39
+        ],
+        [
+          "you are standing",
+          0.36
+        ],
+        [
+          "are standing before",
+          0.33
+        ],
+        [
+          "this is the",
+          0.29
+        ]
+      ],
+      "similarity_above_flat": 0.0575
+    },
+    "professional_hobbyist": {
+      "cross_artwork_similarity": 0.3873,
+      "formula_coverage": 0.0149,
+      "top_formulas": [
+        [
+          "for a deeper",
+          0.19
+        ],
+        [
+          "oil on canvas",
+          0.19
+        ],
+        [
+          "the composition is",
+          0.19
+        ],
+        [
+          "for further study",
+          0.16
+        ],
+        [
+          "compare this with",
+          0.16
+        ],
+        [
+          "the painting was",
+          0.15
+        ],
+        [
+          "such as the",
+          0.15
+        ],
+        [
+          "compare this work",
+          0.14
+        ]
+      ],
+      "similarity_above_flat": -0.0146
+    },
+    "recharger": {
+      "cross_artwork_similarity": 0.4699,
+      "formula_coverage": 0.0567,
+      "top_formulas": [
+        [
+          "let your eyes",
+          0.68
+        ],
+        [
+          "there is no",
+          0.51
+        ],
+        [
+          "let your gaze",
+          0.39
+        ],
+        [
+          "your eyes rest",
+          0.39
+        ],
+        [
+          "eyes rest on",
+          0.38
+        ],
+        [
+          "take a moment",
+          0.37
+        ],
+        [
+          "notice how the",
+          0.34
+        ],
+        [
+          "a moment to",
+          0.34
+        ]
+      ],
+      "similarity_above_flat": 0.068
+    },
+    "flat": {
+      "cross_artwork_similarity": 0.4019,
+      "formula_coverage": 0.0199,
+      "top_formulas": [
+        [
+          "look closely at",
+          0.38
+        ],
+        [
+          "a lesser known",
+          0.25
+        ],
+        [
+          "the mus e",
+          0.19
+        ],
+        [
+          "closely at the",
+          0.18
+        ],
+        [
+          "a moment of",
+          0.17
+        ],
+        [
+          "one of the",
+          0.17
+        ],
+        [
+          "hangs in the",
+          0.17
+        ],
+        [
+          "museo del prado",
+          0.15
+        ]
+      ],
+      "similarity_above_flat": 0.0
+    }
+  },
+  "local": {
+    "explorer": {
+      "cross_artwork_similarity": 0.4633,
+      "formula_coverage": 0.0653,
+      "top_formulas": [
+        [
+          "take a moment",
+          0.76
+        ],
+        [
+          "a moment to",
+          0.76
+        ],
+        [
+          "what do you",
+          0.39
+        ],
+        [
+          "do you think",
+          0.39
+        ],
+        [
+          "look closely at",
+          0.36
+        ],
+        [
+          "as you study",
+          0.36
+        ],
+        [
+          "you study the",
+          0.33
+        ],
+        [
+          "let your eyes",
+          0.32
+        ]
+      ],
+      "similarity_above_flat": 0.0498
+    },
+    "facilitator": {
+      "cross_artwork_similarity": 0.4941,
+      "formula_coverage": 0.0874,
+      "top_formulas": [
+        [
+          "take a moment",
+          0.95
+        ],
+        [
+          "a moment to",
+          0.92
+        ],
+        [
+          "moment to look",
+          0.66
+        ],
+        [
+          "to look at",
+          0.55
+        ],
+        [
+          "look at this",
+          0.5
+        ],
+        [
+          "look at the",
+          0.43
+        ],
+        [
+          "you explore the",
+          0.39
+        ],
+        [
+          "as you look",
+          0.39
+        ]
+      ],
+      "similarity_above_flat": 0.0806
+    },
+    "experience_seeker": {
+      "cross_artwork_similarity": 0.4696,
+      "formula_coverage": 0.0899,
+      "top_formulas": [
+        [
+          "one of the",
+          0.98
+        ],
+        [
+          "are standing before",
+          0.96
+        ],
+        [
+          "you are standing",
+          0.96
+        ],
+        [
+          "standing before one",
+          0.92
+        ],
+        [
+          "before one of",
+          0.92
+        ],
+        [
+          "of the most",
+          0.88
+        ],
+        [
+          "it is a",
+          0.58
+        ],
+        [
+          "this painting is",
+          0.39
+        ]
+      ],
+      "similarity_above_flat": 0.0561
+    },
+    "professional_hobbyist": {
+      "cross_artwork_similarity": 0.3892,
+      "formula_coverage": 0.0445,
+      "top_formulas": [
+        [
+          "serves as a",
+          0.44
+        ],
+        [
+          "oil on canvas",
+          0.29
+        ],
+        [
+          "stands as a",
+          0.28
+        ],
+        [
+          "of light and",
+          0.25
+        ],
+        [
+          "housed in the",
+          0.25
+        ],
+        [
+          "from a technical",
+          0.21
+        ],
+        [
+          "of particular interest",
+          0.2
+        ],
+        [
+          "mus e d'orsay",
+          0.19
+        ]
+      ],
+      "similarity_above_flat": -0.0243
+    },
+    "recharger": {
+      "cross_artwork_similarity": 0.5645,
+      "formula_coverage": 0.1572,
+      "top_formulas": [
+        [
+          "take a moment",
+          0.82
+        ],
+        [
+          "a moment to",
+          0.82
+        ],
+        [
+          "the stillness of",
+          0.58
+        ],
+        [
+          "before you is",
+          0.54
+        ],
+        [
+          "as you need",
+          0.49
+        ],
+        [
+          "as long as",
+          0.49
+        ],
+        [
+          "long as you",
+          0.49
+        ],
+        [
+          "here in the",
+          0.48
+        ]
+      ],
+      "similarity_above_flat": 0.151
+    },
+    "flat": {
+      "cross_artwork_similarity": 0.4135,
+      "formula_coverage": 0.0338,
+      "top_formulas": [
+        [
+          "take a moment",
+          0.29
+        ],
+        [
+          "a moment to",
+          0.29
+        ],
+        [
+          "one of the",
+          0.27
+        ],
+        [
+          "oil on canvas",
+          0.25
+        ],
+        [
+          "as you look",
+          0.25
+        ],
+        [
+          "this oil on",
+          0.22
+        ],
+        [
+          "before you is",
+          0.22
+        ],
+        [
+          "the mus e",
+          0.2
+        ]
+      ],
+      "similarity_above_flat": 0.0
+    }
+  }
+}

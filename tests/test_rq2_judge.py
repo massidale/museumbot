@@ -41,3 +41,17 @@ def test_messages_put_target_in_requested_position():
     assert second.index("FLAT TEXT") < second.index("CALM TEXT")
     assert "The Starry Night by Vincent van Gogh" in first
     assert "Recharger" in build_messages(p, "target_first", texts, titles)[0]["content"]
+
+
+def test_out_path_keeps_main_file_and_suffixes_other_corpora():
+    from museumbot.common.config import ROOT
+    from museumbot.rq2_judge.judge import out_path
+
+    assert out_path("main") == ROOT / "data" / "judgments.jsonl"
+    assert out_path("local") == ROOT / "data" / "judgments_local.jsonl"
+
+
+def test_rq2_tag_by_corpus():
+    from museumbot.rq2_judge.analyze import tag
+
+    assert tag("main") == "glm-5.3" and tag("local") == "glm-5.3_local"

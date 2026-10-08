@@ -2,7 +2,8 @@
 
 Ogni coppia (pairs.py) e' giudicata in entrambi gli ordini: `target_first` mette
 l'elemento di interesse come "Audio guide A", `target_second` come "B". Scrive
-data/judgments.jsonl in append-only con chiave (pair_id, order): il run e' riavviabile.
+data/judgments.jsonl (corpus principale) o data/judgments_<corpus>.jsonl in append-only
+con chiave (pair_id, order): il run e' riavviabile.
 
 Ragionamento: `reasoning_effort: "low"`. Con `none` (o `think: false`) Ollama non spegne il
 ragionamento di GLM-5.3 ma lo riversa nella risposta; `low` da' JSON pulito con un
@@ -27,6 +28,11 @@ from museumbot.rq2_judge.personas import persona_prompt
 
 API = "https://ollama.com/v1/chat/completions"
 OUT = ROOT / "data" / "judgments.jsonl"
+
+
+def out_path(corpus: str = "main"):
+    """Giudizi per corpus: il principale resta in data/judgments.jsonl."""
+    return OUT if corpus == "main" else ROOT / "data" / f"judgments_{corpus}.jsonl"
 MODEL = "glm-5.3"
 PRICE = {"glm-5.3": (1.40, 4.40)}  # dollari per milione di token (input, output)
 ORDERS = ("target_first", "target_second")
@@ -128,15 +134,15 @@ def judge_one(session, msgs: list[dict], budget: TokenBudget, model: str = MODEL
     return out
 
 
-def read_done() -> set[tuple[str, str]]:
-    if not OUT.exists():
+def read_done(path=OUT) -> set[tuple[str, str]]:
+    if not path.exists():
         return set()
-    return {(r["pair_id"], r["order"]) for r in map(json.loads, OUT.open()) if r["valid"]}
+    return {(r["pair_id"], r["order"]) for r in map(json.loads, path.open()) if r["valid"]}
 
 
-def corpus_index() -> tuple[dict, dict]:
-    """Testi puliti del corpus principale (variante full e flat) e titoli per opera."""
-    rows = [r for r in load_corpus("main", verbose=False) if r["variant"] == "full"]
+def corpus_index(corpus: str = "main") -> tuple[dict, dict]:
+    """Testi puliti di un corpus (variante full e flat) e titoli per opera."""
+    rows = [r for r in load_corpus(corpus, verbose=False) if r["variant"] == "full"]
     texts = {(r["artwork_id"], r["condition"]): r["text"] for r in rows}
     titles = {r["artwork_id"]: (r["title"], r["artist"]) for r in rows}
     return texts, titles
@@ -148,16 +154,18 @@ def main() -> None:
                     help="pilota: coppie A/B/C/N solo sulle prime N opere (attenzione su tutte)")
     ap.add_argument("--cap", type=float, default=15.0, help="tetto di spesa in dollari")
     ap.add_argument("--workers", type=int, default=4)
+    ap.add_argument("--corpus", default="main", help="corpus dei testi (main, local)")
     args = ap.parse_args()
+    out = out_path(args.corpus)
 
-    texts, titles = corpus_index()
+    texts, titles = corpus_index(args.corpus)
     pairs = build_pairs(titles)
     if args.limit:
         keep = pilot_artworks(titles, args.limit)
         pairs = [p for p in pairs if p["type"] == "attention" or p["artwork_id"] in keep]
-    done = read_done()
+    done = read_done(out)
     jobs = [(p, o) for p in pairs for o in ORDERS if (p["pair_id"], o) not in done]
-    print(f"[{MODEL}] {len(pairs)} coppie, giudizi da fare {len(jobs)}")
+    print(f"[{MODEL}] corpus {args.corpus}: {len(pairs)} coppie, giudizi da fare {len(jobs)}")
     if not jobs:
         return
 
@@ -165,7 +173,7 @@ def main() -> None:
     session = requests.Session()
     session.headers.update({"Authorization": f"Bearer {ollama_key()}"})
     lock = threading.Lock()
-    fh = OUT.open("a")
+    fh = out.open("a")
 
     def work(job):
         p, order = job

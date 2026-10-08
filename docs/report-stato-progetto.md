@@ -673,162 +673,17 @@ spesso il proprio nome ("As a Recharger…"): parte della preferenza può essere
 corrispondenza fra la definizione e il testo, che i testi a loro volta riecheggiano.
 Quanto queste preferenze coincidano con quelle di visitatori reali è la domanda di RQ3.
 
-## 8. Sviluppo: lo shift di categoria su un modello aperto (Gemma 4 31B)
+## 8. Sviluppo: Gemma 4 31B e il profilo continuo
 
-Passo 2 della spec `docs/plans/2026-10-06-profilo-continuo-design.md`: prima di generare
-testi *fra* due categorie, verificare che il modello aperto che lo permette riproduca lo
-shift di categoria. **Corpus `local`**: Gemma 4 31B QAT a 4 bit (vLLM su Kaggle, 2× T4), le
-stesse 100 opere e gli stessi prompt del corpus principale più una riga contro il Markdown,
-600 testi `full` e 500 della replica `full_rep`, tutti validi. Analisi di §2 con
-`analyze.py --corpus local` (`results/metrics_{qwen,bge-m3}_local.json`) e confronto fra
-generatori con `rq1_embeddings/cross_generator.py` (`results/cross_generator_*.json`).
-
-**Lo shift c'è, ed è più netto che con DeepSeek.** Probe a 6 classi 0.98 (0.975), contro
-0.95 (0.90) del corpus principale; test di permutazione p = 0.0005 (il minimo con 2 000
-permutazioni) in entrambi gli embedding. La condizione spiega il 12.5% (4.5%) della
-varianza, contro il 6.5% (3.8%).
-
-| Qwen3 (BGE-M3) | Explorer | Facilitator | Exp. Seeker | Prof./Hobbyist | Recharger |
-|---|---|---|---|---|---|
-| split-half | 0.95 (0.87) | 0.96 (0.86) | 0.94 (0.91) | 0.93 (0.89) | 0.98 (0.96) |
-| tetto (replica) | 0.99 (0.98) | 0.99 (0.97) | 0.99 (0.99) | 0.99 (0.99) | 1.00 (0.99) |
-| cos con DeepSeek | 0.77 (0.71) | 0.87 (0.69) | 0.87 (0.77) | 0.87 (0.78) | 0.89 (0.87) |
-| rapporto sui tetti | 0.80 (0.74) | 0.90 (0.74) | 0.89 (0.79) | 0.88 (0.79) | 0.90 (0.88) |
-
-Il rapporto è `cos / sqrt(tetto_DeepSeek · tetto_Gemma)`: lo shift di Gemma punta nella
-stessa direzione di quello di DeepSeek all'80–90% (74–88%) del massimo atteso dal rumore.
-Tutte le soglie fissate nella spec prima dei dati sono superate (probe con p < 0.01,
-split-half ≥ 0.6, rapporto ≥ 0.5).
-
-![PCA del corpus local sui dati centrati per opera, con i vettori di steering](../figures/pca_qwen_local.png)
-
-**Differenze rispetto a DeepSeek.** Gli steering vector sono più lunghi (Qwen3: Recharger
-0.50 contro 0.31, Explorer 0.31 contro 0.18) e più simili fra loro: le coppie che con
-DeepSeek erano opposte lo sono meno (Explorer–Experience Seeker −0.11 contro −0.46,
-Recharger–Professional/Hobbyist −0.07 contro −0.17 con Qwen3). Una parte comune a tutte le
-categorie è probabile: il flat di Gemma è molto più corto dei testi di categoria (mediana
-178 parole contro 215–226; con DeepSeek 222 contro 234), quindi ogni steering vector
-contiene anche "più lungo del flat". Lo shift però non è lunghezza (stessa analisi di
-§3.7, `results/length_*.json`): la lunghezza da sola dà un probe di 0.35; togliendone la
-componente dagli embedding il probe resta 0.99 (0.95), p = 0.001, ogni steering vector
-corretto ha coseno 0.97–0.99 (0.94–0.99) con l'originale e il rapporto del coseno con DeepSeek
-sui tetti, con entrambi i corpus corretti, resta 0.76–0.90 (0.73–0.89). Senza il flat il
-probe a 5 classi vale 1.00 (0.99).
-
-### 8.1 Testi a profilo misto
-
-Passo 3 della spec. Un testo "fra" le categorie X e Y con peso α si genera con due esperti,
-i prompt di X e di Y, e a ogni token si campiona dalla media dei loro logit con pesi
-(1 − α, α), cioè dalla media geometrica pesata delle distribuzioni
-(`generation/mixing.py`). Su vLLM la miscela si fa da fuori: a ogni passo una chiamata da
-un token per esperto con le prime 100 log-probabilità, i token assenti dalla lista di un
-esperto prendono il minimo della sua lista (`generation/vllm_mix.py`). Analisi in
-`rq1_embeddings/mixed.py` (`results/mixed_{qwen,bge-m3}.json`): ogni testo, centrato sul
-flat della sua opera, si proietta sul segmento fra gli steering vector v_X e v_Y del corpus
-`local` (posizione 0 su X, 1 su Y), con il residuo fuori dal piano (v_X, v_Y) in rapporto
-alla norma.
-
-**Corpus misto** (`data/local/mixed.jsonl`, 940 testi, tutti validi): tre coppie scelte
-prima dei dati, Recharger–Professional/Hobbyist e Facilitator–Professional/Hobbyist
-(contrapposte) ed Explorer–Facilitator (vicine), α = 0.25, 0.5, 0.75 sulle 100 opere; più
-60 testi del pilota (Recharger–Professional/Hobbyist, α = 0, 0.5, 1, prime 20 opere). I
-vertici delle curve sono i testi puri del corpus `local`. 7 testi rimasti in violazione del
-filtro sono stati rigenerati in una seconda sessione con la stessa configurazione.
-
-**Verifica del metodo** (pilota): a α = 0 e 1, con un solo esperto, lo steering vector dei
-testi passo per passo vale 1.00 e 1.00 (1.00 e 1.01) del tetto rispetto ai testi puri sulle
-stesse opere. Il token scelto è fra le prime 100 di entrambi gli esperti nel 97.7–97.9%
-(Recharger–Professional/Hobbyist), 98.8–99.5% (Facilitator–Professional/Hobbyist) e
-99.5–100% (Explorer–Facilitator) dei passi.
-
-**Posizione mediana per α**, Qwen3 (BGE-M3); α = 0 e 1 sono i testi puri:
-
-| coppia | 0 | 0.25 | 0.5 | 0.75 | 1 | Spearman | segmento |
-|---|---|---|---|---|---|---|---|
-| Recharger → Prof./Hobbyist | 0.00 (−0.01) | 0.10 (0.14) | 0.54 (0.57) | 0.92 (0.94) | 0.99 (0.99) | 0.91 (0.90) | 0.59 (0.34) |
-| Facilitator → Prof./Hobbyist | −0.02 (0.00) | 0.10 (0.25) | 0.57 (0.62) | 0.88 (0.86) | 0.99 (0.99) | 0.88 (0.88) | 0.46 (0.20) |
-| Explorer → Facilitator | −0.01 (0.02) | 0.16 (0.25) | 0.30 (0.47) | 0.66 (0.75) | 0.98 (1.01) | 0.82 (0.77) | 0.22 (0.11) |
-
-"Segmento" è |v_Y − v_X|. Il residuo resta fra 0.89 e 1.12 volte quello dei puri in tutte
-le celle; le parole mediane fra 220 e 230.
-
-- **Coppie contrapposte: risposta a soglia.** A α = 0.25 il testo resta vicino alla prima
-  categoria, a 0.75 vicino alla seconda, il passaggio avviene intorno a 0.5. Tutte le
-  soglie della spec sono superate in entrambi gli embedding.
-- **Coppia vicina: risposta più graduale**, più vicina alla diagonale (con BGE-M3 0.25,
-  0.47, 0.75), ma più rumorosa: il segmento è circa tre volte più corto, quindi la
-  posizione dei singoli testi pesa più rumore (intervallo interquartile a α = 0.5:
-  0.13–0.43 con Qwen3). Due soglie della spec non sono superate: la mediana a 0.5 con Qwen3
-  (0.30, sotto 0.35) e lo Spearman con BGE-M3 (0.77, sotto 0.8).
-
-![Posizione dei testi misti per α, Recharger → Professional/Hobbyist](../figures/mixed_qwen_recharger+professional_hobbyist.png)
-
-**Come si alternano i due esperti nel testo** (`generation/mix_diag.py`,
-`results/mix_diag.json`, testi a α = 0.5). Per ogni token il margine log p_X − log p_Y del
-token scelto dice quale esperto lo preferiva; i token si raggruppano in frasi.
-
-| | Rech.–Prof. | Fac.–Prof. | Expl.–Fac. |
-|---|---|---|---|
-| cambi di segno fra frasi consecutive (osservati / frasi mescolate) | 4.63 / 4.73 | 4.33 / 4.60 | 5.49 / 5.54 |
-| dispersione dei margini per frase / tagli casuali | 1.08 | 1.00 | 1.12 |
-| margine medio, ultimi tre decimi del testo | +0.32, +0.19, +0.36 | +0.03, +0.03, −0.05 | +0.06, +0.08, +0.20 |
-
-Le frasi dello stesso esperto non si raggruppano in blocchi più che per caso, e i confini
-di frase contano poco: i due registri si alternano in modo fine, senza sezioni. L'unica
-tendenza di posizione è la chiusura: nel Recharger–Professional/Hobbyist la parte finale è
-più Recharger, nell'Explorer–Facilitator l'ultimo decimo è più Explorer. Il margine vede
-solo il token scelto, non le distribuzioni intere.
-
-### 8.2 Il giudice sui testi misti
-
-Passo 4 della spec. Stesso giudice di RQ2 (GLM-5.3 su Ollama Cloud, stesse persone e
-parametri), sulle tre coppie del passo 3 e le 100 opere, α = 0, 0.25, 0.5, 0.75, 1 con i
-testi puri ai vertici (`rq2_judge/mixed_pairs.py`, `mixed_judge.py`, `mixed_analyze.py`;
-`data/judgments_mixed.jsonl`, `results/judge_mixed_glm-5.3.json`). Nessuna persona mista:
-si usano le persone pure e il giudice neutro. Un solo ordine A/B per confronto, bilanciato;
-8 200 giudizi, tutti validi, attenzione 100%, testo in posizione A scelto nel 46.9% dei
-casi.
-
-- **Curva di preferenza**: la persona X sceglie fra il testo-α e il testo puro di Y (a α = 1
-  il testo-α è la replica di Y, punto atteso 0.5); la persona Y il caso speculare.
-- **Doppio visitatore**: ciascuna persona sceglie fra il testo-α e il flat; il minimo fra
-  le due misura quanto un testo va bene a entrambe.
-- **Ordinamento**: il giudice neutro riceve le definizioni di Falk delle due categorie e i
-  5 testi in ordine casuale, e li ordina da "più per X" a "più per Y".
-- **Coerenza**: il giudice neutro sceglie fra un testo misto e un testo puro quello che
-  "suona come una voce sola".
-
-| | Rech. → Prof. | Fac. → Prof. | Expl. → Fac. |
-|---|---|---|---|
-| persona X, testo-α preferito a Y puro (α = 0 … 1) | 1.00 1.00 1.00 0.75 0.56 | 1.00 1.00 0.95 0.76 0.55 | 0.98 0.97 0.94 0.80 0.49 |
-| persona Y, testo-α preferito a X puro (α = 0 … 1) | 0.45 0.85 1.00 1.00 1.00 | 0.52 0.88 0.98 1.00 1.00 | 0.47 0.50 0.64 0.96 1.00 |
-| Spearman α–preferenza (X / Y) | −0.89 / 0.89 | −0.98 / 0.98 | −1.00 / 1.00 |
-| incrocio delle due curve | 0.50 | 0.45 | 0.66 |
-| doppio visitatore: minimo fra le persone (α = 0 … 1) | 0.00 0.00 0.43 0.08 0.05 | 0.03 0.26 0.86 0.31 0.07 | 0.97 0.98 0.98 0.87 0.43 |
-| ordinamento: Spearman mediano (ordini perfetti) | 1.00 (59%) | 1.00 (66%) | 0.90 (35%) |
-| coerenza: misto scelto come "voce sola" | 0.52 | 0.57 | 0.58 |
-
-![Curve di preferenza e doppio visitatore per le tre coppie](../figures/judge_mixed_glm-5.3.png)
-
-- **Il giudice vede il gradiente.** Ordina i cinque testi quasi sempre nel verso di α
-  (mediana 1.00 sulle coppie contrapposte, 0.90 sulla vicina) e le curve di preferenza sono
-  monotone, con Spearman da 0.89 a 1.00 in valore assoluto.
-- **Basta una traccia della propria categoria.** Ogni persona preferisce il testo-α al puro
-  dell'altra categoria finché il testo contiene qualcosa della sua: la persona Recharger
-  sceglie il testo a α = 0.75 nel 75% dei casi, la Professional/Hobbyist il testo a 0.25
-  nell'85%.
-- **Il testo a metà accontenta due visitatori diversi.** Contro il flat, nelle coppie
-  contrapposte i testi puri piacciono a una sola delle due persone (minimo 0.00–0.08),
-  il testo a α = 0.5 a entrambe: minimo 0.43 (Recharger–Professional/Hobbyist) e 0.86
-  (Facilitator–Professional/Hobbyist). Nella coppia vicina tutti i testi piacciono a
-  entrambe le persone fino a α = 0.5 (minimo 0.97–0.98): il test non distingue.
-- **La miscela non costa coerenza**: il testo misto è scelto come "voce sola" nel 52–58%
-  dei confronti con un testo puro.
-
-Soglie della spec: le due coppie contrapposte le superano tutte. La coppia vicina non
-supera l'incrocio (0.66, fuori da 0.4–0.6): la persona Facilitator preferisce il testo-α
-all'Explorer puro solo da α = 0.75, quindi le due curve si incontrano tardi; il massimo
-del doppio visitatore è interno (0.25, a pari merito con 0.5) ma la curva è quasi piatta.
+La parte 2 ha un report a sé, `docs/report-gemma.md`, con dati, metodo e numeri. In sintesi:
+su un modello aperto (Gemma 4 31B, vLLM su Kaggle) lo shift di categoria si riproduce, più
+netto che con DeepSeek ma con testi più formulaici, e punta nella stessa direzione
+(80–90% del massimo atteso dal rumore con Qwen3); non è lunghezza. Mescolando a ogni token i
+logit di due prompt di categoria con pesi (1 − α, α) si ottengono testi *fra* due
+categorie: per coppie lontane la risposta ad α è a soglia e a metà il testo esce in parte
+verso una terza categoria; per la coppia vicina è graduale. Un giudice GLM-5.3 ordina i
+testi nel verso di α e, contro il flat, il testo a metà piace a entrambe le persone dove i
+puri ne accontentano una sola. In corso la RQ2 originale sui testi puri di Gemma.
 
 ## 9. Prossimi passi
 
@@ -837,9 +692,7 @@ del doppio visitatore è interno (0.25, a pari merito con 0.5) ma la curva è qu
 2. RQ2: estensioni possibili (secondo giudice su un campione, persone ricavate dal
    dataset BIRD, compito di riconoscimento); scelta degli stimoli per RQ3.
 3. RQ3: vedi `docs/plans/piano-progetto-tesi.md`.
-4. Profilo continuo: estensioni possibili (persona con bisogni misti, a α = 0.5; altre
-   opere in `docs/analisi/` con `rq1_embeddings/mix_examples.py`); generalizzazione al
-   generatore della parte 1 (DeepSeek, miscela passo per passo da fuori). Spec in `docs/plans/2026-10-06-profilo-continuo-design.md`.
+4. Profilo continuo: vedi `docs/report-gemma.md`, §9. Spec in `docs/plans/2026-10-06-profilo-continuo-design.md`.
 
 ## Riferimenti
 

@@ -779,6 +779,57 @@ tendenza di posizione è la chiusura: nel Recharger–Professional/Hobbyist la p
 più Recharger, nell'Explorer–Facilitator l'ultimo decimo è più Explorer. Il margine vede
 solo il token scelto, non le distribuzioni intere.
 
+### 8.2 Il giudice sui testi misti
+
+Passo 4 della spec. Stesso giudice di RQ2 (GLM-5.3 su Ollama Cloud, stesse persone e
+parametri), sulle tre coppie del passo 3 e le 100 opere, α = 0, 0.25, 0.5, 0.75, 1 con i
+testi puri ai vertici (`rq2_judge/mixed_pairs.py`, `mixed_judge.py`, `mixed_analyze.py`;
+`data/judgments_mixed.jsonl`, `results/judge_mixed_glm-5.3.json`). Nessuna persona mista:
+si usano le persone pure e il giudice neutro. Un solo ordine A/B per confronto, bilanciato;
+8 200 giudizi, tutti validi, attenzione 100%, testo in posizione A scelto nel 46.9% dei
+casi.
+
+- **Curva di preferenza**: la persona X sceglie fra il testo-α e il testo puro di Y (a α = 1
+  il testo-α è la replica di Y, punto atteso 0.5); la persona Y il caso speculare.
+- **Doppio visitatore**: ciascuna persona sceglie fra il testo-α e il flat; il minimo fra
+  le due misura quanto un testo va bene a entrambe.
+- **Ordinamento**: il giudice neutro riceve le definizioni di Falk delle due categorie e i
+  5 testi in ordine casuale, e li ordina da "più per X" a "più per Y".
+- **Coerenza**: il giudice neutro sceglie fra un testo misto e un testo puro quello che
+  "suona come una voce sola".
+
+| | Rech. → Prof. | Fac. → Prof. | Expl. → Fac. |
+|---|---|---|---|
+| persona X, testo-α preferito a Y puro (α = 0 … 1) | 1.00 1.00 1.00 0.75 0.56 | 1.00 1.00 0.95 0.76 0.55 | 0.98 0.97 0.94 0.80 0.49 |
+| persona Y, testo-α preferito a X puro (α = 0 … 1) | 0.45 0.85 1.00 1.00 1.00 | 0.52 0.88 0.98 1.00 1.00 | 0.47 0.50 0.64 0.96 1.00 |
+| Spearman α–preferenza (X / Y) | −0.89 / 0.89 | −0.98 / 0.98 | −1.00 / 1.00 |
+| incrocio delle due curve | 0.50 | 0.45 | 0.66 |
+| doppio visitatore: minimo fra le persone (α = 0 … 1) | 0.00 0.00 0.43 0.08 0.05 | 0.03 0.26 0.86 0.31 0.07 | 0.97 0.98 0.98 0.87 0.43 |
+| ordinamento: Spearman mediano (ordini perfetti) | 1.00 (59%) | 1.00 (66%) | 0.90 (35%) |
+| coerenza: misto scelto come "voce sola" | 0.52 | 0.57 | 0.57 |
+
+![Curve di preferenza e doppio visitatore per le tre coppie](../figures/judge_mixed_glm-5.3.png)
+
+- **Il giudice vede il gradiente.** Ordina i cinque testi quasi sempre nel verso di α
+  (mediana 1.00 sulle coppie contrapposte, 0.90 sulla vicina) e le curve di preferenza sono
+  monotone, con Spearman da 0.89 a 1.00 in valore assoluto.
+- **Basta una traccia della propria categoria.** Ogni persona preferisce il testo-α al puro
+  dell'altra categoria finché il testo contiene qualcosa della sua: la persona Recharger
+  sceglie il testo a α = 0.75 nel 75% dei casi, la Professional/Hobbyist il testo a 0.25
+  nell'85%.
+- **Il testo a metà accontenta due visitatori diversi.** Contro il flat, nelle coppie
+  contrapposte i testi puri piacciono a una sola delle due persone (minimo 0.00–0.08),
+  il testo a α = 0.5 a entrambe: minimo 0.43 (Recharger–Professional/Hobbyist) e 0.86
+  (Facilitator–Professional/Hobbyist). Nella coppia vicina tutti i testi piacciono a
+  entrambe le persone fino a α = 0.5 (minimo 0.97–0.98): il test non distingue.
+- **La miscela non costa coerenza**: il testo misto è scelto come "voce sola" nel 52–57%
+  dei confronti con un testo puro.
+
+Soglie della spec: le due coppie contrapposte le superano tutte. La coppia vicina non
+supera l'incrocio (0.66, fuori da 0.4–0.6): la persona Facilitator preferisce il testo-α
+all'Explorer puro solo da α = 0.75, quindi le due curve si incontrano tardi; il massimo
+del doppio visitatore è interno (0.25, a pari merito con 0.5) ma la curva è quasi piatta.
+
 ## 9. Prossimi passi
 
 1. Chain vs singolo: decidere se generare `chain_rep` per separare il rumore della chain
@@ -786,7 +837,9 @@ solo il token scelto, non le distribuzioni intere.
 2. RQ2: estensioni possibili (secondo giudice su un campione, persone ricavate dal
    dataset BIRD, compito di riconoscimento); scelta degli stimoli per RQ3.
 3. RQ3: vedi `docs/plans/piano-progetto-tesi.md`.
-4. Profilo continuo: giudice sui testi misti (passo 4). Spec in `docs/plans/2026-10-06-profilo-continuo-design.md`.
+4. Profilo continuo: estensioni possibili (persona con bisogni misti, a α = 0.5; altre
+   opere in `docs/analisi/` con `rq1_embeddings/mix_examples.py`); generalizzazione al
+   generatore della parte 1 (DeepSeek, miscela passo per passo da fuori). Spec in `docs/plans/2026-10-06-profilo-continuo-design.md`.
 
 ## Riferimenti
 

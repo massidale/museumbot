@@ -281,8 +281,9 @@ casi.
 
 - **Curva di preferenza**: la persona X sceglie fra il testo-α e il testo puro di Y (a α = 1
   il testo-α è la replica di Y, punto atteso 0.5); la persona Y il caso speculare.
-- **Doppio visitatore**: ciascuna persona sceglie fra il testo-α e il flat; il minimo fra
-  le due misura quanto un testo va bene a entrambe.
+- **Doppio visitatore**: ciascuna persona sceglie fra il testo-α e il flat; un testo va bene
+  a entrambe quanto la minore delle due preferenze. È lo stesso confronto dei tipi A e C
+  della RQ2 sui puri (§5), che danno una seconda stima ai vertici (§6.1).
 - **Ordinamento**: il giudice neutro riceve le definizioni di Falk delle due categorie e i
   5 testi in ordine casuale, e li ordina da "più per X" a "più per Y".
 - **Coerenza**: il giudice neutro sceglie fra un testo misto e un testo puro quello che
@@ -294,7 +295,6 @@ casi.
 | persona Y, testo-α preferito a X puro (α = 0 … 1) | 0.45 0.85 1.00 1.00 1.00 | 0.52 0.88 0.98 1.00 1.00 | 0.47 0.50 0.64 0.96 1.00 |
 | Spearman α–preferenza (X / Y) | −0.89 / 0.89 | −0.98 / 0.98 | −1.00 / 1.00 |
 | incrocio delle due curve | 0.50 | 0.45 | 0.66 |
-| doppio visitatore: minimo fra le persone (α = 0 … 1) | 0.00 0.00 0.43 0.08 0.05 | 0.03 0.26 0.86 0.31 0.07 | 0.97 0.98 0.98 0.87 0.43 |
 | ordinamento: Spearman mediano (ordini perfetti) | 1.00 (59%) | 1.00 (66%) | 0.90 (35%) |
 | coerenza: misto scelto come "voce sola" | 0.52 | 0.57 | 0.58 |
 
@@ -307,26 +307,17 @@ casi.
   dell'altra categoria finché il testo contiene qualcosa della sua: la persona Recharger
   sceglie il testo a α = 0.75 nel 75% dei casi, la Professional/Hobbyist il testo a 0.25
   nell'85%.
-- **Il testo a metà accontenta due visitatori diversi.** Contro il flat, nelle coppie
-  contrapposte i testi puri piacciono a una sola delle due persone (minimo 0.00–0.08),
-  il testo a α = 0.5 a entrambe: minimo 0.43 (Recharger–Professional/Hobbyist) e 0.86
-  (Facilitator–Professional/Hobbyist). Nella coppia vicina tutti i testi piacciono a
-  entrambe le persone fino a α = 0.5 (minimo 0.97–0.98): il test non distingue.
 - **La miscela non costa coerenza**: il testo misto è scelto come "voce sola" nel 52–58%
   dei confronti con un testo puro.
 
-Soglie della spec: le due coppie contrapposte le superano tutte. La coppia vicina non
-supera l'incrocio (0.66, fuori da 0.4–0.6): la persona Facilitator preferisce il testo-α
-all'Explorer puro solo da α = 0.75, quindi le due curve si incontrano tardi; il massimo
-del doppio visitatore è interno (0.25, a pari merito con 0.5) ma la curva è quasi piatta.
+### 6.1 Doppio visitatore, con i puri ai vertici
 
-## 7. RQ2: puri e misti insieme
-
-Per la persona k mescolata con la categoria j, il tasso con cui k preferisce un testo al
-flat in funzione della quota w della sua categoria nel testo (`rq2_judge/combined.py`,
-`results/judge_combined_glm-5.3.json`). Ai vertici ci sono due stime indipendenti dello stesso
-confronto: la RQ2 sui puri (§5; tipo A per w = 1, tipo C per w = 0, n = 200 e 50) e il
-giudice sui misti (§6, n = 100); in mezzo solo il giudice sui misti.
+Per la persona k mescolata con la categoria j, il tasso con cui k preferisce il testo al
+flat in funzione della quota w della sua categoria nel testo (w = 1 − α se k è la prima
+categoria della coppia, w = α se è la seconda; `rq2_judge/combined.py`,
+`results/judge_combined_glm-5.3.json`). Ai vertici ci sono due stime indipendenti dello
+stesso confronto: la RQ2 sui puri (§5; tipo A per w = 1, tipo C per w = 0, n = 200 e 50) e
+il giudice sui misti (n = 100); in mezzo solo il giudice sui misti.
 
 | persona k | categoria j | w = 1 (puri / misti) | 0.75 | 0.5 | 0.25 | w = 0 (puri / misti) |
 |---|---|---|---|---|---|---|
@@ -339,16 +330,24 @@ giudice sui misti (§6, n = 100); in mezzo solo il giudice sui misti.
 
 ![Preferenza sul flat in funzione della quota della propria categoria nel testo](../figures/judge_combined_glm-5.3.png)
 
-- **I due esperimenti concordano**: ai vertici le due stime differiscono al più di 0.03.
-- **Per le coppie contrapposte la persona accetta il testo finché la sua categoria vi pesa
-  almeno metà**: il Recharger preferisce al flat il testo con w = 0.5 nel 98% dei casi e
-  quello con w = 0.25 nell'8%; il Professional/Hobbyist il testo con w = 0.5 nel 43%
-  (con il Recharger) e nell'86% (con il Facilitator). La soglia è la stessa trovata negli
-  embedding (§4).
-- **Nella coppia vicina il Facilitator accetta tutti i testi** (0.97–1.00 anche senza la
-  sua categoria), l'Explorer da w = 0.25 in su (0.87).
+- **I vertici coincidono con la RQ2 sui puri**: le due stime differiscono al più di 0.03.
+- **Nelle coppie contrapposte il testo a metà accontenta due visitatori diversi.** I testi
+  puri piacciono a una sola delle due persone (la minore delle due preferenze è 0.00–0.07
+  nel giudice sui misti), il testo con w = 0.5 a entrambe: il Recharger lo preferisce al
+  flat nel 98% dei casi e il Professional/Hobbyist nel 43%; Facilitator e
+  Professional/Hobbyist entrambi nell'86%. La persona accetta il testo finché la sua
+  categoria vi pesa almeno metà: con w = 0.25 il tasso scende a 0.00–0.31. La soglia è la
+  stessa trovata negli embedding (§4).
+- **Nella coppia vicina il test non distingue.** Il Facilitator accetta tutti i testi
+  (0.97–1.00 anche senza la sua categoria), l'Explorer da w = 0.25 in su (0.87): i testi da
+  α = 0 a 0.5 piacciono a entrambe le persone (0.97–0.98).
 
-## 8. Limiti
+Soglie della spec: le due coppie contrapposte le superano tutte. La coppia vicina non
+supera l'incrocio (0.66, fuori da 0.4–0.6): la persona Facilitator preferisce il testo-α
+all'Explorer puro solo da α = 0.75, quindi le due curve si incontrano tardi; il massimo
+del doppio visitatore è interno (0.25, a pari merito con 0.5) ma la curva è quasi piatta.
+
+## 7. Limiti
 
 Un solo generatore aperto, scelto senza confronto con altri, in float16 con una patch al
 kernel di attenzione; una riga in più in coda al system prompt, contro il Markdown. Testi
@@ -356,7 +355,7 @@ molto formulaici (§2). La miscela è fatta da fuori con le prime 100 log-probab
 (copertura 97.7–100%). Tre coppie di categorie; con Gemma nessuna coppia è opposta. Un solo
 giudice, senza persone con bisogni misti; nei testi misti un solo ordine A/B per confronto.
 
-## 9. Prossimi passi
+## 8. Prossimi passi
 
 1. Estensioni possibili: persona con bisogni misti a α = 0.5; altre opere in
    `docs/analisi/`; generalizzazione al generatore della parte 1 (DeepSeek, miscela passo

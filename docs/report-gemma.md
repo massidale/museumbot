@@ -1,6 +1,6 @@
 # Museumbot — parte 2: Gemma 4 31B e il profilo continuo
 
-*Ultimo aggiornamento: 8 ottobre 2026. Il report descrive solo lo stato attuale del codice e
+*Ultimo aggiornamento: 13 ottobre 2026. Il report descrive solo lo stato attuale del codice e
 dei risultati; le decisioni nel tempo sono in `docs/decisioni.md`, la spec dell'esperimento
 in `docs/plans/2026-10-06-profilo-continuo-design.md`. Numeri fra parentesi: embedding
 BGE-M3 (fuori: Qwen3).*
@@ -87,21 +87,26 @@ nelle coppie dei testi misti: Explorer, Facilitator, Professional/Hobbyist, Rech
 stessa opera e valutati fuori dal fold per opera (`rq1_embeddings/mixed_space.py`): 1.00
 (0.99), caso 0.25.
 
-**Coseni fra gli steering vector** (riferimento flat; `metrics_*_local.json`):
+**Direzione e distanza** (`metrics_*_local.json`). Il coseno fra gli steering vector
+(riferimento flat) dice se due categorie spostano il testo nella stessa direzione (+1), in
+direzioni indipendenti (0) o opposte (−1); la distanza cross-validata (report principale
+§2) tiene conto anche di quanto lo spostano.
 
-| coppia | coseno |
-|---|---|
-| Explorer – Facilitator | +0.79 (+0.69) |
-| Explorer – Professional/Hobbyist | +0.02 (+0.15) |
-| Explorer – Recharger | +0.48 (+0.52) |
-| Facilitator – Professional/Hobbyist | −0.06 (+0.10) |
-| Facilitator – Recharger | +0.39 (+0.39) |
-| Professional/Hobbyist – Recharger | −0.07 (−0.04) |
+| coppia | coseno | distanza |
+|---|---|---|
+| Explorer – Facilitator | +0.79 (+0.69) | 0.045 (0.011) |
+| Explorer – Professional/Hobbyist | +0.02 (+0.15) | 0.166 (0.042) |
+| Explorer – Recharger | +0.48 (+0.52) | 0.197 (0.059) |
+| Facilitator – Professional/Hobbyist | −0.06 (+0.10) | 0.205 (0.040) |
+| Facilitator – Recharger | +0.39 (+0.39) | 0.237 (0.070) |
+| Professional/Hobbyist – Recharger | −0.07 (−0.04) | 0.345 (0.115) |
 
-Nessuna coppia è opposta: le più lontane (Professional/Hobbyist con Recharger e con
-Facilitator) sono quasi ortogonali, la più vicina è Explorer–Facilitator. Lo split-half
-delle quattro categorie va da 0.93 a 0.98 (0.86–0.96), il tetto dalla replica da 0.99 a
-1.00 (0.97–0.99).
+Nessuna coppia ha direzioni opposte. Professional/Hobbyist–Recharger è la coppia più
+distante in entrambi gli embedding: direzioni quasi indipendenti (coseno −0.07, −0.04) e lo
+spostamento più ampio, quello del Recharger. Facilitator–Professional/Hobbyist ha direzioni
+quasi indipendenti solo con Qwen3 (−0.06; +0.10 con BGE-M3) e una distanza intermedia; la
+coppia più vicina è Explorer–Facilitator. Lo split-half delle quattro categorie va da 0.93
+a 0.98 (0.86–0.96), il tetto dalla replica da 0.99 a 1.00 (0.97–0.99).
 
 ## 4. RQ1 sui testi misti
 
@@ -117,8 +122,10 @@ flat della sua opera, si proietta sul segmento fra gli steering vector v_X e v_Y
 alla norma.
 
 **Corpus misto** (`data/local/mixed.jsonl`, 940 testi, tutti validi): tre coppie scelte
-prima dei dati, Recharger–Professional/Hobbyist e Facilitator–Professional/Hobbyist
-(contrapposte) ed Explorer–Facilitator (vicine), α = 0.25, 0.5, 0.75 sulle 100 opere; più
+prima dei dati con il coseno fra gli steering vector (§3), Recharger–Professional/Hobbyist e
+Facilitator–Professional/Hobbyist, dette qui **contrapposte** (coseno più basso: direzioni
+quasi indipendenti, non opposte), ed Explorer–Facilitator, **vicine** (coseno più alto),
+α = 0.25, 0.5, 0.75 sulle 100 opere; più
 60 testi del pilota (Recharger–Professional/Hobbyist, α = 0, 0.5, 1, prime 20 opere). I
 vertici delle curve sono i testi puri del corpus `local`. 7 testi rimasti in violazione del
 filtro sono stati rigenerati in una seconda sessione con la stessa configurazione.

@@ -38,3 +38,22 @@ def test_ownership_ratio_high_for_blocks_and_near_one_for_noise():
     noise = [rng.normal(0, 1, 10) for _ in range(6)]
     assert ownership_ratio(blocks, np.random.default_rng(1)) > 1.5
     assert 0.7 < ownership_ratio(noise, np.random.default_rng(1)) < 1.3
+
+
+def test_decile_means_one_row_per_text():
+    from museumbot.generation.mix_diag import decile_means
+
+    M = decile_means([np.array([1.0, 1.0, 3.0, 3.0]), np.array([0.0, 2.0])], bins=2)
+    assert M.tolist() == [[1.0, 3.0], [0.0, 2.0]]
+
+
+def test_profile_ci_brackets_the_mean_and_collapses_without_variation():
+    from museumbot.generation.mix_diag import profile_ci
+
+    same = [np.array([1.0, 1.0, -1.0, -1.0])] * 20
+    mean, lo, hi = profile_ci(same, bins=2, n_boot=200, rng=np.random.default_rng(0))
+    assert mean.tolist() == [1.0, -1.0] and lo.tolist() == [1.0, -1.0] and hi.tolist() == [1.0, -1.0]
+    rng = np.random.default_rng(1)
+    noisy = [rng.normal(0, 1, 50) for _ in range(40)]
+    mean, lo, hi = profile_ci(noisy, bins=5, n_boot=500, rng=np.random.default_rng(2))
+    assert np.all(lo <= mean) and np.all(mean <= hi) and np.all(hi - lo > 0)

@@ -160,19 +160,33 @@ le celle; le parole mediane fra 220 e 230.
 
 **Come si alternano i due esperti nel testo** (`generation/mix_diag.py`,
 `results/mix_diag.json`, testi a α = 0.5). Per ogni token il margine log p_X − log p_Y del
-token scelto dice quale esperto lo preferiva; i token si raggruppano in frasi.
+token scelto dice quale esperto lo preferiva (positivo: X, negativo: Y); i token si
+raggruppano in frasi chiuse dalla punteggiatura di fine frase.
 
 | | Rech.–Prof. | Fac.–Prof. | Expl.–Fac. |
 |---|---|---|---|
 | cambi di segno fra frasi consecutive (osservati / frasi mescolate) | 4.63 / 4.73 | 4.33 / 4.60 | 5.49 / 5.54 |
 | dispersione dei margini per frase / tagli casuali | 1.08 | 1.00 | 1.12 |
-| margine medio, ultimi tre decimi del testo | +0.32, +0.19, +0.36 | +0.03, +0.03, −0.05 | +0.06, +0.08, +0.20 |
 
 Le frasi dello stesso esperto non si raggruppano in blocchi più che per caso, e i confini
-di frase contano poco: i due registri si alternano in modo fine, senza sezioni. L'unica
-tendenza di posizione è la chiusura: nel Recharger–Professional/Hobbyist la parte finale è
-più Recharger, nell'Explorer–Facilitator l'ultimo decimo è più Explorer. Il margine vede
-solo il token scelto, non le distribuzioni intere.
+di frase contano poco: i due registri si alternano in modo fine, senza sezioni.
+
+*Profilo per posizione (esplorativo, non fra i criteri della spec).* Margine medio per
+decimo del testo, con intervallo di confidenza al 95% (bootstrap sui testi):
+
+![Margine medio per decimo del testo a α = 0.5, con IC 95%](../figures/mix_diag_profile.png)
+
+- Recharger–Professional/Hobbyist: apertura e chiusura tendono al Recharger (primo decimo
+  +0.23 [+0.04, +0.42]; ultimi tre +0.32 [+0.19, +0.47], +0.19 [+0.01, +0.36] e
+  +0.36 [+0.22, +0.50]); la parte centrale è intorno a zero.
+- Facilitator–Professional/Hobbyist: l'apertura tende al Professional/Hobbyist (primo decimo
+  −0.17 [−0.23, −0.09]); nessuna tendenza alla fine.
+- Explorer–Facilitator: crescita graduale verso l'Explorer, netta solo nell'ultimo decimo
+  (+0.20 [+0.12, +0.29]).
+
+Con 30 intervalli è atteso che uno o due escludano lo zero per caso: contano le tendenze
+nette di apertura e chiusura, non i singoli decimi intermedi. Il margine vede solo il
+token scelto, non le distribuzioni intere.
 
 **I testi misti nello spazio delle quattro categorie** (`rq1_embeddings/mixed_space.py`,
 `results/mixed_space_*.json`). Il probe a 4 classi addestrato sui puri (§3) classifica i

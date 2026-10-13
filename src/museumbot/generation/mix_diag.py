@@ -14,6 +14,9 @@ frasi (tokenizer del generatore) e si misura, sui testi a alpha = 0.5:
     di tagli in punti casuali con le stesse lunghezze (1 = i confini di frase non contano);
   - profilo del margine per decimi del testo: tendenze di posizione (apertura, chiusura).
 
+Il profilo per posizione e' esplorativo (non fra i criteri della spec), con IC 95% bootstrap
+sui testi; figura in figures/mix_diag_profile.png.
+
 Limiti: solo il token scelto, non le distribuzioni intere; nei token assenti dalle prime
 100 di un esperto il valore e' il minimo della sua lista. Scrive results/mix_diag.json.
 """
@@ -22,13 +25,19 @@ import argparse
 import json
 import re
 
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 import numpy as np
 
 from museumbot.common.config import ROOT
+from museumbot.common.prompts import LABELS
 from museumbot.generation.vllm_gen import MODEL
 
 MIXED = ROOT / "data" / "local" / "mixed.jsonl"
 RESULTS = ROOT / "results"
+FIGS = ROOT / "figures"
 END = re.compile(r"[.!?…][\"”’)\]]*\s*$")
 
 
@@ -49,13 +58,26 @@ def sign_changes(v) -> int:
     return int((s[1:] != s[:-1]).sum())
 
 
-def positional_profile(texts: list[np.ndarray], bins: int = 10) -> np.ndarray:
-    """Margine medio per intervallo di posizione relativa, mediato sui testi."""
-    acc = np.zeros(bins)
+def decile_means(texts: list[np.ndarray], bins: int = 10) -> np.ndarray:
+    """(testi, bins): margine medio di ogni testo per intervallo di posizione relativa."""
+    out = []
     for m in texts:
         pos = np.minimum((np.arange(len(m)) * bins) // len(m), bins - 1)
-        acc += np.array([m[pos == b].mean() for b in range(bins)])
-    return acc / len(texts)
+        out.append([m[pos == b].mean() for b in range(bins)])
+    return np.array(out)
+
+
+def positional_profile(texts: list[np.ndarray], bins: int = 10) -> np.ndarray:
+    """Margine medio per intervallo di posizione relativa, mediato sui testi."""
+    return decile_means(texts, bins).mean(axis=0)
+
+
+def profile_ci(texts, bins: int = 10, n_boot: int = 2000, rng=None):
+    """Profilo medio e intervallo bootstrap al 95% ricampionando i testi."""
+    rng = rng or np.random.default_rng(0)
+    M = decile_means(texts, bins)
+    boots = np.array([M[rng.integers(len(M), size=len(M))].mean(axis=0) for _ in range(n_boot)])
+    return M.mean(axis=0), np.percentile(boots, 2.5, axis=0), np.percentile(boots, 97.5, axis=0)
 
 
 def ownership_ratio(sents: list[np.ndarray], rng, n: int = 100) -> float:
@@ -96,7 +118,7 @@ def run(alpha: float = 0.5, seed: int = 0) -> dict:
             null.append(np.mean([sign_changes(rng.permutation(sm)) for _ in range(200)]))
             own.append(ownership_ratio(sents, rng))
             texts.append(m)
-        prof = positional_profile(texts)
+        prof, lo, hi = profile_ci(texts, rng=np.random.default_rng(seed))  # non tocca rng
         out["pairs"][pair] = {
             "n": len(obs), "skipped": skipped,
             "sign_changes_observed": round(float(np.mean(obs)), 2),
@@ -105,8 +127,32 @@ def run(alpha: float = 0.5, seed: int = 0) -> dict:
             "ownership_ratio_median": round(float(np.median(own)), 3),
             "ownership_share_above_1": round(float(np.mean(np.array(own) > 1)), 3),
             "profile_by_decile": [round(float(v), 3) for v in prof],
+            "profile_ci95": [[round(float(a), 3), round(float(b), 3)] for a, b in zip(lo, hi)],
             "mean_margin": round(float(np.mean([m.mean() for m in texts])), 3)}
     return out
+
+
+def plot_profiles(out) -> None:
+    pairs = list(out["pairs"])
+    fig, axes = plt.subplots(1, len(pairs), figsize=(4.4 * len(pairs), 3.6), sharey=True)
+    x = np.arange(1, 11)
+    for ax, name in zip(np.atleast_1d(axes), pairs):
+        p = out["pairs"][name]
+        lo, hi = np.array(p["profile_ci95"]).T
+        ax.fill_between(x, lo, hi, alpha=0.25, color="#2a78d6", lw=0)
+        ax.plot(x, p["profile_by_decile"], "o-", color="#2a78d6", ms=4)
+        ax.axhline(0, color="grey", lw=0.6)
+        a, b = name.split("+")
+        ax.set_title(f"{LABELS[a]} (+) / {LABELS[b]} (−)", fontsize=10)
+        ax.set_xlabel("decimo del testo")
+        ax.set_xticks(x)
+    np.atleast_1d(axes)[0].set_ylabel("margine medio log p_X − log p_Y")
+    fig.suptitle(f"Margine per posizione nel testo, alpha = {out['alpha']:g} (banda: IC 95% bootstrap sui testi)",
+                 fontsize=10)
+    fig.tight_layout()
+    FIGS.mkdir(exist_ok=True)
+    fig.savefig(FIGS / "mix_diag_profile.png", dpi=150)
+    plt.close(fig)
 
 
 def main() -> None:
@@ -116,6 +162,7 @@ def main() -> None:
     out = run(args.alpha)
     RESULTS.mkdir(exist_ok=True)
     (RESULTS / "mix_diag.json").write_text(json.dumps(out, indent=2))
+    plot_profiles(out)
     print(json.dumps(out, indent=2))
 
 

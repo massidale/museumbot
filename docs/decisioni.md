@@ -396,4 +396,18 @@ token (`generation/mix_diag.py`).
 margini log p_X − log p_Y per frase non formano blocchi più che per caso e i confini di
 frase contano poco; resta solo una tendenza nella chiusura.
 **Effetto.** Il report della parte 2 (`docs/report-gemma.md`, §4) descrive un'alternanza fine dei due registri, senza sezioni,
-con la chiusura più vicina al Recharger nella coppia Recharger–Professional/Hobbyist.
+con il profilo per posizione riportato per intero (vedi la voce del 13 ottobre).
+
+## 2026-10-13 — Profilo per posizione dei testi misti riportato per intero
+
+**Decisione.** Nel report di Gemma il profilo del margine per posizione (§4) è riportato per
+tutti e dieci i decimi del testo, con un intervallo di confidenza bootstrap sui testi, e
+marcato come esplorativo; prima il report ne mostrava solo gli ultimi tre decimi.
+**Motivo.** Gli ultimi tre decimi erano stati scelti dopo aver visto i dati, dove c'era una
+tendenza: una selezione che nascondeva l'apertura (Recharger nel Recharger–Professional/
+Hobbyist, Professional/Hobbyist nel Facilitator–Professional/Hobbyist) e non diceva quali
+differenze superano il rumore.
+**Effetto.** Nessun numero cambia; si aggiungono gli intervalli. La lettura diventa:
+apertura e chiusura tendono al Recharger nella coppia Recharger–Professional/Hobbyist,
+l'apertura al Professional/Hobbyist nella coppia con il Facilitator, la chiusura
+all'Explorer nella coppia vicina.

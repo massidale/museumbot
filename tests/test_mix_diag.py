@@ -57,3 +57,13 @@ def test_profile_ci_brackets_the_mean_and_collapses_without_variation():
     noisy = [rng.normal(0, 1, 50) for _ in range(40)]
     mean, lo, hi = profile_ci(noisy, bins=5, n_boot=500, rng=np.random.default_rng(2))
     assert np.all(lo <= mean) and np.all(mean <= hi) and np.all(hi - lo > 0)
+
+
+def test_mean_ci_of_per_text_values():
+    from museumbot.generation.mix_diag import mean_ci
+
+    m, lo, hi = mean_ci(np.full(30, 0.4), n_boot=100, rng=np.random.default_rng(0))
+    assert np.allclose([m, lo, hi], 0.4)
+    rng = np.random.default_rng(1)
+    m, lo, hi = mean_ci(rng.normal(0.2, 1, 200), n_boot=500, rng=np.random.default_rng(2))
+    assert lo < m < hi and lo < 0.2 < hi

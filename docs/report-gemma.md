@@ -167,9 +167,14 @@ raggruppano in frasi chiuse dalla punteggiatura di fine frase.
 |---|---|---|---|
 | cambi di segno fra frasi consecutive (osservati / frasi mescolate) | 4.63 / 4.73 | 4.33 / 4.60 | 5.49 / 5.54 |
 | dispersione dei margini per frase / tagli casuali | 1.08 | 1.00 | 1.12 |
+| margine medio sui 10 decimi del testo (IC 95%) | +0.13 [+0.07, +0.18] | +0.01 [−0.01, +0.04] | +0.03 [+0.01, +0.05] |
 
 Le frasi dello stesso esperto non si raggruppano in blocchi più che per caso, e i confini
-di frase contano poco: i due registri si alternano in modo fine, senza sezioni.
+di frase contano poco: i due registri si alternano in modo fine, senza sezioni. Il
+margine medio dice quale esperto prevale nel complesso a α = 0.5: il Recharger nella coppia
+con il Professional/Hobbyist (+0.13), coerente con la direzione dei testi negli embedding;
+nessuno dei due nella coppia Facilitator–Professional/Hobbyist (+0.01, intervallo che
+comprende lo zero); di poco l'Explorer nella coppia vicina (+0.03).
 
 *Profilo per posizione (esplorativo, non fra i criteri della spec).* Margine medio per
 decimo del testo, con intervallo di confidenza al 95% (bootstrap sui testi):

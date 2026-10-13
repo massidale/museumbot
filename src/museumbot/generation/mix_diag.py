@@ -72,6 +72,14 @@ def positional_profile(texts: list[np.ndarray], bins: int = 10) -> np.ndarray:
     return decile_means(texts, bins).mean(axis=0)
 
 
+def mean_ci(values, n_boot: int = 2000, rng=None) -> tuple[float, float, float]:
+    """Media e intervallo bootstrap al 95% di un valore per testo."""
+    rng = rng or np.random.default_rng(0)
+    v = np.asarray(values, float)
+    boots = [v[rng.integers(len(v), size=len(v))].mean() for _ in range(n_boot)]
+    return float(v.mean()), float(np.percentile(boots, 2.5)), float(np.percentile(boots, 97.5))
+
+
 def profile_ci(texts, bins: int = 10, n_boot: int = 2000, rng=None):
     """Profilo medio e intervallo bootstrap al 95% ricampionando i testi."""
     rng = rng or np.random.default_rng(0)
@@ -119,6 +127,7 @@ def run(alpha: float = 0.5, seed: int = 0) -> dict:
             own.append(ownership_ratio(sents, rng))
             texts.append(m)
         prof, lo, hi = profile_ci(texts, rng=np.random.default_rng(seed))  # non tocca rng
+        dm, dlo, dhi = mean_ci(decile_means(texts).mean(axis=1), rng=np.random.default_rng(seed))
         out["pairs"][pair] = {
             "n": len(obs), "skipped": skipped,
             "sign_changes_observed": round(float(np.mean(obs)), 2),
@@ -128,6 +137,7 @@ def run(alpha: float = 0.5, seed: int = 0) -> dict:
             "ownership_share_above_1": round(float(np.mean(np.array(own) > 1)), 3),
             "profile_by_decile": [round(float(v), 3) for v in prof],
             "profile_ci95": [[round(float(a), 3), round(float(b), 3)] for a, b in zip(lo, hi)],
+            "profile_mean": round(dm, 3), "profile_mean_ci95": [round(dlo, 3), round(dhi, 3)],
             "mean_margin": round(float(np.mean([m.mean() for m in texts])), 3)}
     return out
 

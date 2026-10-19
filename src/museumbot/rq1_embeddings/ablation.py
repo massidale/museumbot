@@ -222,27 +222,11 @@ def print_summary(res: dict) -> None:
 
 
 def fig_bars(res: dict, path: Path) -> None:
-    """Due pannelli: (a) probe a 5 classi e norma media; (b) coseno con full per categoria."""
+    """Coseno con full per variante e categoria, con il tetto di rumore."""
     vs = [v for v in VARIANTS if v in res["variants"]]
     R = res["variants"]
     x = np.arange(len(vs))
-    fig, (a, b) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
-
-    a.bar(x - 0.2, [R[v]["probe5_accuracy"] for v in vs], 0.4, color="#444", label="probe (5 classi)")
-    a.axhline(1 / N_FALK, color="#444", ls=":", lw=1)
-    a.set_ylabel("accuracy")
-    a.set_ylim(0, 1.05)
-    a2 = a.twinx()
-    a2.bar(x + 0.2, [R[v]["norm_mean"] for v in vs], 0.4, color="#9E9E9E", label="||v|| media")
-    a2.set_ylabel("norma media steering")
-    h1, l1 = a.get_legend_handles_labels()
-    h2, l2 = a2.get_legend_handles_labels()
-    a.legend(h1 + h2, l1 + l2, frameon=False, loc="lower left", fontsize=9)
-    # a2 (twinx) viene disegnata sopra a: si alza lo zorder di a per riportare la
-    # legenda in primo piano, rendendo trasparente lo sfondo di a cosi' i colori non cambiano.
-    a.set_zorder(a2.get_zorder() + 1)
-    a.patch.set_visible(False)
-    a.set_title("Ablazione del prompt — separabilita' e ampiezza dello shift", fontsize=11)
+    fig, b = plt.subplots(figsize=(10, 4.6))
 
     w = 0.8 / N_FALK
     ceil = res.get("ceiling")
@@ -258,8 +242,7 @@ def fig_bars(res: dict, path: Path) -> None:
     b.set_xticks(x, vs, rotation=30, ha="right")
     b.legend(frameon=False, fontsize=8, ncol=5, loc="lower left")
     b.set_title("Quanto ogni variante conserva la direzione del blocco completo", fontsize=11)
-    for ax in (a, b):
-        ax.spines[["top"]].set_visible(False)
+    b.spines[["top", "right"]].set_visible(False)
     fig.tight_layout()
     fig.savefig(path, dpi=160)
     plt.close(fig)

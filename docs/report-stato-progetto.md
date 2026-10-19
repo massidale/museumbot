@@ -484,7 +484,7 @@ il riferimento è quindi identico fra varianti. Con il riferimento media, invece
 riferimento include le 5 categorie della variante e si sposta con essa, contaminando il
 confronto con il full.
 
-![Ablazione: separabilità, ampiezza e direzione per variante (Qwen3)](../figures/ablation_qwen.png)
+![Ablazione: coseno con il full per variante e categoria, con il tetto (Qwen3)](../figures/ablation_qwen.png)
 
 ![Coseno con il full, varianti × categorie (Qwen3)](../figures/ablation_cosine_qwen.png)
 

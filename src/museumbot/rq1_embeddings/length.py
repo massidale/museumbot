@@ -9,8 +9,7 @@ ogni corpus (`main`, `local`) e modello di embedding:
   2. probe senza flat (5 classi);
   3. lunghezza tolta dagli embedding: per ogni dimensione si stima il coefficiente della
      lunghezza a parita' di opera e di categoria (effetti fissi di entrambe) e si
-     sottrae la componente lineare della lunghezza centrata per opera. Poi probe a 6 classi, test di
-     permutazione, coseno fra steering vector corretto e originale e, fra i due corpus,
+     sottrae la componente lineare della lunghezza centrata per opera. Poi probe a 6 classi, coseno fra steering vector corretto e originale e, fra i due corpus,
      rapporto del coseno sui tetti (`cross_generator`), con full e replica corretti.
 
 La correzione e' conservativa: toglie anche il segnale di categoria che e' davvero
@@ -26,7 +25,7 @@ import numpy as np
 from museumbot.common.config import ROOT
 from museumbot.common.prompts import CONDITIONS, FALK_CATEGORIES
 from museumbot.rq1_embeddings.analyze import (
-    FALK_IDX, center, load, permutation_test, probe, replicate_ceiling, row_cosines, steering,
+    FALK_IDX, center, load, probe, replicate_ceiling, row_cosines, steering,
 )
 from museumbot.rq1_embeddings.cross_generator import calibrate, cross_cosines
 
@@ -62,12 +61,6 @@ def length_probe(L) -> float:
     return float(probe(Lc[..., None])[0])
 
 
-def permutation_p(X, n_perm: int = 1000) -> float:
-    Xc = center(X, "mean")
-    observed = np.linalg.norm(Xc.mean(axis=0), axis=1).mean()
-    return float(permutation_test(Xc, observed, n_perm)[0])
-
-
 def corpus_report(X, L, Xr) -> dict:
     fmt = lambda v: {c: round(float(x), 3) for c, x in zip(FALK_CATEGORIES, v)}
     Xn, Xrn = X[:, FALK_IDX], Xr[:, FALK_IDX]
@@ -79,7 +72,6 @@ def corpus_report(X, L, Xr) -> dict:
         "probe6_corrected": round(float(probe(center(Xr, "mean"))[0]), 3),
         "probe5_no_flat": round(float(probe(Xn - Xn.mean(axis=1, keepdims=True))[0]), 3),
         "probe5_no_flat_corrected": round(float(probe(Xrn - Xrn.mean(axis=1, keepdims=True))[0]), 3),
-        "permutation_p_corrected": round(permutation_p(Xr), 4),
         "cos_steering_corrected_vs_original": fmt(row_cosines(steering(X), steering(Xr))),
         "steering_norm": fmt(np.linalg.norm(steering(X), axis=1)),
         "steering_norm_corrected": fmt(np.linalg.norm(steering(Xr), axis=1))}

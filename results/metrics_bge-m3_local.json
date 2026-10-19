@@ -271,11 +271,6 @@
     "Professional/Hobbyist": 0.9861128330230713,
     "Recharger": 0.9926506280899048
   },
-  "permutation": {
-    "observed_mean_norm": 0.13848944008350372,
-    "null_mean": 0.029385110805742444,
-    "p_value": 0.0004997501249375312
-  },
   "words": {
     "Explorer": 224.97,
     "Facilitator": 218.13,

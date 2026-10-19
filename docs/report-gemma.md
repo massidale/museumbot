@@ -1,6 +1,6 @@
 # Museumbot — parte 2: Gemma 4 31B e il profilo continuo
 
-*Ultimo aggiornamento: 13 ottobre 2026. Il report descrive solo lo stato attuale del codice e
+*Ultimo aggiornamento: 19 ottobre 2026. Il report descrive solo lo stato attuale del codice e
 dei risultati; le decisioni nel tempo sono in `docs/decisioni.md`, la spec dell'esperimento
 in `docs/plans/2026-10-06-profilo-continuo-design.md`. Numeri fra parentesi: embedding
 BGE-M3 (fuori: Qwen3).*
@@ -33,8 +33,8 @@ configurazione.
 Stessa batteria di analisi del report principale (§2) sui testi puri di Gemma, tutte e 6
 le condizioni (`analyze.py --corpus local`, `results/metrics_*_local.json`).
 
-**Lo shift c'è.** Probe a 6 classi 0.98 (0.975), caso 0.17; test di permutazione
-p = 0.0005 (il minimo con 2 000 permutazioni) in entrambi gli embedding. La condizione
+**Lo shift c'è.** Probe a 6 classi 0.98 (0.975), caso 0.17, valutato su opere mai viste
+(GroupKFold per opera). La condizione
 spiega il 12.5% (4.5%) della varianza.
 
 | Qwen3 (BGE-M3) | Explorer | Facilitator | Exp. Seeker | Prof./Hobbyist | Recharger |
@@ -42,8 +42,8 @@ spiega il 12.5% (4.5%) della varianza.
 | split-half | 0.95 (0.87) | 0.96 (0.86) | 0.94 (0.91) | 0.93 (0.89) | 0.98 (0.96) |
 | tetto (replica) | 0.99 (0.98) | 0.99 (0.97) | 0.99 (0.99) | 0.99 (0.99) | 1.00 (0.99) |
 
-Le soglie della spec fissate prima dei dati sono superate (probe con p < 0.01, split-half
-≥ 0.6 per ogni categoria).
+Le soglie della spec fissate prima dei dati sono superate: probe sopra il caso in entrambi
+gli embedding, split-half ≥ 0.6 per ogni categoria.
 
 ![PCA del corpus local sui dati centrati per opera, con i vettori di steering](../figures/pca_qwen_local.png)
 
@@ -52,8 +52,8 @@ Le soglie della spec fissate prima dei dati sono superate (probe con p < 0.01, s
 del flat". Lo shift però non è lunghezza (`rq1_embeddings/length.py`,
 `results/length_*.json`): la lunghezza da sola, centrata per opera, dà un probe a 6 classi
 di 0.35; togliendo dagli embedding la componente lineare della lunghezza, con il
-coefficiente stimato a parità di opera e di categoria, il probe resta 0.99 (0.95),
-p = 0.001, e ogni steering vector corretto ha coseno 0.97–0.99 (0.94–0.99) con
+coefficiente stimato a parità di opera e di categoria, il probe resta 0.99 (0.95)
+e ogni steering vector corretto ha coseno 0.97–0.99 (0.94–0.99) con
 l'originale. Senza il flat il probe a 5 classi vale 1.00 (0.99).
 
 **Separazione o formule?** Una separazione così netta può voler dire una personalizzazione

@@ -14,7 +14,6 @@
     "probe6_corrected": 0.915,
     "probe5_no_flat": 0.974,
     "probe5_no_flat_corrected": 0.976,
-    "permutation_p_corrected": 0.001,
     "cos_steering_corrected_vs_original": {
       "explorer": 0.994,
       "facilitator": 0.989,
@@ -51,7 +50,6 @@
     "probe6_corrected": 0.953,
     "probe5_no_flat": 0.994,
     "probe5_no_flat_corrected": 0.994,
-    "permutation_p_corrected": 0.001,
     "cos_steering_corrected_vs_original": {
       "explorer": 0.939,
       "facilitator": 0.94,

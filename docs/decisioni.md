@@ -421,3 +421,22 @@ della categoria e quella del flat: la stessa grandezza della distanza cross-vali
 gonfiata dal rumore di generazione (circa 0.0025 con Qwen3, fino al 9% per il Facilitator).
 **Effetto.** L'ordine delle categorie non cambia; i valori scendono di poco (Experience
 Seeker 0.21, Facilitator 0.17 con Qwen3) e si aggiungono quelli di BGE-M3.
+
+## 2026-10-19 — Test di permutazione rimosso
+
+**Decisione.** Il test di permutazione entro opera esce da `analyze.py` (sezione
+`permutation` di `results/metrics_*.json`) e da `length.py` (`permutation_p_corrected` di
+`results/length_*.json`), e dai due report.
+**Motivo.** Non aggiunge informazione al probe lineare valutato su opere mai viste
+(GroupKFold per opera): con accuracy 0.95–0.98 contro un caso di 0.17 il p era sempre al
+minimo possibile. Inoltre il test implementato non era quello fissato nella spec del
+profilo continuo ("probe sopra il caso con p < 0.01 al test di permutazione"): permutava le
+etichette entro opera e confrontava la norma media degli scostamenti delle condizioni, non
+l'accuracy del probe. Prima della rimozione dava p = 0.0005 (il minimo con 2 000
+permutazioni) su `main` e `local` con entrambi gli embedding, e p = 0.001 (minimo con 1 000)
+dopo la correzione per la lunghezza, sugli stessi corpus ed embedding.
+**Effetto.** Nessun altro numero cambia. Il criterio della spec sul probe si legge come
+"probe sopra il caso, valutato fuori dal fold per opera". Le figure LDA cambiano la metà di
+opere usata per l'addestramento, perché il test consumava il generatore casuale condiviso;
+la lettura delle figure non cambia. Il report di stato perde la sezione §3.6, i confondenti
+diventano §3.6.

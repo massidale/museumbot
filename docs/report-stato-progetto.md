@@ -14,7 +14,7 @@ descrizione neutra?
 **Risposta breve.** Sì. Con 100 opere e 6 condizioni, generate su un provider fisso, un
 probe lineare distingue la condizione di generazione con accuracy del 95.3% (chance 16.7%),
 le direzioni di shift rispetto al testo neutro sono stabili su metà disgiunte del corpus
-(coseno 0.85–0.94) e il test di permutazione entro opera dà p = 0.0005. L'effetto è piccolo
+(coseno 0.85–0.94). L'effetto è piccolo
 in termini di varianza (6.5% contro il 73% spiegato dall'opera) ma è nitido, e le cinque
 categorie non collassano fra loro.
 
@@ -139,8 +139,8 @@ v[c] sommerebbero a zero per costruzione e i coseni fra categorie sarebbero spin
 −1/(C−1) = −0.2: un artefatto del riferimento, non un'opposizione fra categorie. Il flat è
 l'origine e non ha un vettore proprio.
 
-La **media** resta per le procedure che lavorano sul singolo testo con le etichette (probe,
-permutazione, scomposizione della varianza): lì tutte le condizioni devono essere
+La **media** resta per le procedure che lavorano sul singolo testo con le etichette (probe e
+scomposizione della varianza): lì tutte le condizioni devono essere
 scambiabili, e sottrarre un solo testo flat aggiungerebbe il suo rumore a ogni opera.
 
 Le metriche, in ordine di forza probatoria:
@@ -154,9 +154,7 @@ Le metriche, in ordine di forza probatoria:
 3. **geometria**: la **distanza quadrata cross-validata** fra condizioni dice quali sono
    vicine e quali lontane, e la distanza dal flat dice di quanto ciascuna categoria sposta
    il testo; i coseni fra i v[c] (riferimento flat) dicono in che direzione.
-4. **test di permutazione entro opera** (riferimento media): si permutano le etichette
-   *dentro* ogni opera, così l'effetto-opera è preservato e il null è onesto.
-5. **lunghezza e lessico**: confondenti da sorvegliare.
+4. **lunghezza e lessico**: confondenti da sorvegliare.
 
 **Rumore di generazione e tetto.** Due generazioni dello stesso prompt danno testi diversi,
 e quindi steering vector un po' diversi. Il **tetto** è il coseno fra gli steering vector
@@ -297,19 +295,14 @@ Experience Seeker–Recharger (−0.31). Professional/Hobbyist e Recharger sono 
 distante, ma le loro direzioni sono solo moderatamente opposte (−0.17): la distanza viene
 soprattutto dal fatto che sono i due shift più ampi.
 
-### 3.6 Permutazione
-
-Norma media osservata 0.188 contro null 0.040, **p = 0.0005** (2000 permutazioni entro opera).
-Identico con BGE-M3 (0.123 vs 0.031).
-
-### 3.7 Confondenti
+### 3.6 Confondenti
 
 **Lunghezza.** Professional/Hobbyist produce testi più lunghi (mediana 253 parole contro
 218–236 delle altre condizioni). Lo shift non è lunghezza (`rq1_embeddings/length.py`,
 `results/length_{qwen,bge-m3}.json`): la lunghezza da sola, centrata per opera, dà un probe
 a 6 classi di 0.28 (caso 0.17); togliendo dagli embedding la componente lineare della
 lunghezza, con il coefficiente stimato a parità di opera e di categoria, il probe resta
-0.95 (0.92), il test di permutazione p = 0.001 e ogni steering vector corretto ha coseno
+0.95 (0.92) e ogni steering vector corretto ha coseno
 0.99–1.00 (0.98–1.00) con l'originale. Il probe senza il flat, a 5 classi, vale 0.99 (0.97).
 
 **Lessico.** Le parole discriminative sono coerenti con i blocchi di prompt: Recharger

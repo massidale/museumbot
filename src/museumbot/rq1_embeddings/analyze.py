@@ -13,14 +13,13 @@ direzione la categoria sposta il testo rispetto alla descrizione neutra") ed e' 
 tutte le varianti dell'ablazione. Con la media, invece, i 6 v[c] sommano a zero per
 costruzione e i coseni fra categorie sono spinti verso -1/(C-1): un artefatto, non
 un'opposizione. La media resta per le procedure per singola opera basate sulle etichette
-(probe, permutazione, varianza), dove sottrarre un solo testo flat aggiungerebbe il suo rumore.
+(probe, varianza), dove sottrarre un solo testo flat aggiungerebbe il suo rumore.
 
 Metriche, in ordine di forza probatoria:
   1. probe lineare cross-validata, raggruppata per opera  -> lo shift e' preciso?     [media]
   2. consistenza split-half della direzione v[c]           -> proprieta' della categoria? [flat]
   3. distanza cross-validata fra condizioni                -> quali categorie sono vicine?
      (indipendente dal riferimento), coseni fra i v[c]       -> direzione degli effetti [flat]
-  4. test di permutazione entro opera                      -> p-value              [media]
   5. ablazione lessicale                                   -> registro o solo vocabolario?
 
 Tetto: se il corpus ha la replica `full_rep` (nel corpus principale e' `single_b`), il
@@ -199,21 +198,6 @@ def cosine_matrix(V):
     return Vn @ Vn.T
 
 
-# ------------------------------------------------------------ 4. test di permutazione
-
-
-def permutation_test(Xc, observed, n_perm=2000):
-    """Permuta le etichette di condizione ENTRO ogni opera: preserva l'effetto-opera."""
-    A, C, D = Xc.shape
-    null = np.zeros(n_perm)
-    for i in range(n_perm):
-        Xp = np.stack([Xc[a][RNG.permutation(C)] for a in range(A)])
-        v = Xp.mean(axis=0)
-        null[i] = np.linalg.norm(v, axis=1).mean()
-    p = (np.sum(null >= observed) + 1) / (n_perm + 1)
-    return p, null
-
-
 # ------------------------------------------------------------ 5. ablazione lessicale
 
 
@@ -382,7 +366,7 @@ def main() -> None:
     A, C, D = X.shape
     print(f"\n{A} opere x {C} condizioni x {D} dim  [{args.model}, corpus {args.corpus}]")
 
-    Xc = center(X, "mean")  # per probe, permutazione, varianza e figure di proiezione
+    Xc = center(X, "mean")  # per probe, varianza e figure di proiezione
     Vm = Xc.mean(axis=0)    # (C, D) scostamenti dal baricentro dell'opera
     V = steering(X)         # (5, D) steering vector rispetto al flat
 
@@ -467,21 +451,10 @@ def main() -> None:
         print("    tetto (cos fra steering vector di due run dello stesso prompt):")
         print("      " + "  ".join(f"{LABELS[c]} {ceil[i]:.3f}" for i, c in enumerate(FALK_CATEGORIES)))
 
-    # --- 4. permutazione (sugli scostamenti dalla media: tutte le condizioni scambiabili) ---
-    observed = np.linalg.norm(Vm, axis=1).mean()
-    p, null = permutation_test(Xc, observed)
-    out["permutation"] = {
-        "observed_mean_norm": float(observed),
-        "null_mean": float(null.mean()),
-        "p_value": float(p),
-    }
-    print(f"\n[4] permutazione entro opera: ||v|| osservato {observed:.4f} vs "
-          f"null {null.mean():.4f}  p = {p:.4g}")
-
-    # --- 5. lunghezza (confondente) ---
+    # --- 4. lunghezza (confondente) ---
     wl = meta.groupby("condition")["words"].agg(["mean", "std"])
     out["words"] = {LABELS[c]: float(wl.loc[c, "mean"]) for c in CONDITIONS if c in wl.index}
-    print("\n[5] lunghezza media per condizione (confondente da sorvegliare):")
+    print("\n[4] lunghezza media per condizione (confondente da sorvegliare):")
     for c in CONDITIONS:
         if c in wl.index:
             print(f"      {LABELS[c]:24} {wl.loc[c, 'mean']:.0f} +/- {wl.loc[c, 'std']:.0f}")

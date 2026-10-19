@@ -10,7 +10,6 @@ Per ogni opera e coppia (X, Y), con alpha in ALPHAS (0 e 1 sono testi puri del c
                "quale suona come una voce sola"
     rank       i 5 testi S(alpha) in ordine casuale riproducibile, giudice neutro: ordinarli
                da "piu' per X" a "piu' per Y"
-    attention  una per opera: il suo flat contro il flat di un'altra opera, giudice neutro
 
 Etichette dei testi: "<categoria>" (full), "<categoria>|rep" (full_rep), "flat",
 "<X>+<Y>|<alpha>" (misto). Un solo ordine A/B per confronto, scelto dall'hash del
@@ -73,8 +72,6 @@ def build_mixed_pairs(artworks, pairs, seed: int = SEED) -> list[dict]:
             out.append({"pair_id": f"{a}|{name}|rank", "artwork_id": a, "type": "rank",
                         "persona": NEUTRAL, "pair": list(p), "alphas": alphas,
                         "texts": [[a, series(p, al)] for al in alphas]})
-        b = artworks[(i + 1) % len(artworks)]
-        out.append(item(f"{a}|attention", a, "attention", NEUTRAL, "flat", (b, "flat")))
     return out
 
 

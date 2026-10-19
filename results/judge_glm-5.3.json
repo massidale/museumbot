@@ -1,22 +1,19 @@
 {
   "model": "glm-5.3",
   "criteria": {
-    "n_judgments": 4200,
+    "n_judgments": 4000,
     "valid_rate": 1.0,
-    "attention_accuracy": 1.0,
     "order_consistency": 0.8835,
-    "position_A_rate": 0.5302380952380953,
+    "position_A_rate": 0.53175,
     "passed": {
-      "valid_rate": true,
-      "attention_accuracy": true
+      "valid_rate": true
     }
   },
   "n_pairs": {
     "A": 500,
     "B": 500,
     "N": 500,
-    "C": 500,
-    "attention": 100
+    "C": 500
   },
   "rates": {
     "A": {

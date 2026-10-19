@@ -88,6 +88,8 @@ def judgment_rows() -> list[dict]:
     out = []
     for l in path.open():
         r = json.loads(l)
+        if r["type"] == "attention":  # controlli delle prime run, non analizzati
+            continue
         out.append({"pair_id": r["pair_id"], "artwork_id": r["artwork_id"], "type": r["type"],
                     "persona": r["persona"], "target": "|".join(r["target"]),
                     "other": "|".join(r["other"]), "order": r.get("order"),

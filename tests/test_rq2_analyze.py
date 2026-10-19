@@ -24,13 +24,13 @@ def test_pair_score_averages_the_two_orders():
 
 
 def test_criteria():
-    rows = [j("a1", "attention", "neutral", "target_first", True, target=["Q1", "flat"]),
-            j("a1", "attention", "neutral", "target_second", False, "A", target=["Q1", "flat"]),
-            j("p1", "A", "explorer", "target_first", True),
-            j("p1", "A", "explorer", "target_second", True, "B")]
+    rows = [j("p1", "A", "explorer", "target_first", True),
+            j("p1", "A", "explorer", "target_second", True, "B"),
+            j("p2", "A", "recharger", "target_first", True),
+            j("p2", "A", "recharger", "target_second", False, "A")]
     c = criteria(rows)
     assert c["valid_rate"] == 1.0
-    assert c["attention_accuracy"] == 0.5
+    assert c["order_consistency"] == 0.5
     assert c["position_A_rate"] == 0.75
 
 

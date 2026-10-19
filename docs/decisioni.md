@@ -463,3 +463,19 @@ quanto.
 **Effetto.** Nuova tabella del lessico nei due report (§3.6 del report di stato, §2 di
 quello di Gemma), con la quota di eco: da 1 a 4 termini su 15 con DeepSeek, da 2 a 7 con
 Gemma. Le altre metriche di `analyze.py` non cambiano.
+
+## 2026-10-19 — Controllo di attenzione del giudice rimosso
+
+**Decisione.** Il controllo di attenzione di RQ2 (il flat dell'opera contro il flat di
+un'altra opera, giudice neutro) esce dalla generazione delle coppie (`rq2_judge/pairs.py`,
+`mixed_pairs.py`), dalle analisi (`analyze.py`, `mixed_analyze.py`), da `explore.py` e dai
+report. Le righe `attention` già raccolte restano nei `data/judgments*.jsonl` e si
+ignorano al caricamento.
+**Motivo.** Non aggiunge informazione: il giudice ha scelto il flat giusto nel 100% dei
+casi su tutti e tre i corpus (200 giudizi su DeepSeek, 200 sui puri di Gemma, 100 sui
+misti), e la qualità delle risposte è già coperta dalla quota di risposte valide, dalla
+consistenza fra i due ordini e dal bias di posizione. Era un criterio di utilizzabilità
+fissato prima dei dati nella spec di RQ2 (soglia 95%), superato prima della rimozione.
+**Effetto.** I tassi di preferenza non cambiano. Cambiano i totali: 4 000 giudizi invece di
+4 200 su DeepSeek ($5.08 invece di $5.32) e sui puri di Gemma, 8 100 invece di 8 200 sui
+misti; la quota di scelte in posizione A si sposta di meno di 0.002.

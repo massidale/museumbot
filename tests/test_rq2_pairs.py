@@ -9,9 +9,8 @@ IDS = [f"Q{i}" for i in range(100)]
 
 def test_counts_per_artwork():
     pairs = build_pairs(IDS)
-    assert len(pairs) == 100 * (5 * 4 + 1)
-    assert Counter(p["type"] for p in pairs) == {"A": 500, "B": 500, "C": 500, "N": 500,
-                                                 "attention": 100}
+    assert len(pairs) == 100 * 5 * 4
+    assert Counter(p["type"] for p in pairs) == {"A": 500, "B": 500, "C": 500, "N": 500}
 
 
 def test_j_is_balanced_and_shared_by_b_and_c():
@@ -33,8 +32,6 @@ def test_targets_and_personas():
             assert p["other"] == [a, "flat"]
         if p["type"] == "N":
             assert p["persona"] == NEUTRAL
-        if p["type"] == "attention":
-            assert p["target"] == [a, "flat"] and p["other"][0] != a
 
 
 def test_order_is_deterministic():

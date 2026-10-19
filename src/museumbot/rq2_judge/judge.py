@@ -151,7 +151,7 @@ def corpus_index(corpus: str = "main") -> tuple[dict, dict]:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int,
-                    help="pilota: coppie A/B/C/N solo sulle prime N opere (attenzione su tutte)")
+                    help="pilota: solo le prime N opere")
     ap.add_argument("--cap", type=float, default=15.0, help="tetto di spesa in dollari")
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--corpus", default="main", help="corpus dei testi (main, local)")
@@ -162,7 +162,7 @@ def main() -> None:
     pairs = build_pairs(titles)
     if args.limit:
         keep = pilot_artworks(titles, args.limit)
-        pairs = [p for p in pairs if p["type"] == "attention" or p["artwork_id"] in keep]
+        pairs = [p for p in pairs if p["artwork_id"] in keep]
     done = read_done(out)
     jobs = [(p, o) for p in pairs for o in ORDERS if (p["pair_id"], o) not in done]
     print(f"[{MODEL}] corpus {args.corpus}: {len(pairs)} coppie, giudizi da fare {len(jobs)}")

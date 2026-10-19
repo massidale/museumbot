@@ -55,13 +55,6 @@ def test_orders_are_balanced_and_ids_unique():
     assert abs(c["target_first"] - c["target_second"]) <= 0.15 * len(ps)
 
 
-def test_attention_once_per_artwork_neutral():
-    ps = [p for p in build_mixed_pairs(ARTS, [PAIR, ("explorer", "facilitator")])
-          if p["type"] == "attention"]
-    assert len(ps) == len(ARTS) and {p["persona"] for p in ps} == {NEUTRAL}
-    assert all(p["target"][0] == p["artwork_id"] != p["other"][0] for p in ps)
-
-
 def test_parse_order_accepts_permutations_only():
     assert parse_order('ok {"reason": "r", "order": [3, 1, 5, 2, 4]}', 5) == ([3, 1, 5, 2, 4], "r")
     assert parse_order('{"order": [1, 1, 2, 3, 4]}', 5) is None

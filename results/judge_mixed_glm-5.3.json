@@ -1,11 +1,10 @@
 {
   "model": "glm-5.3",
   "checks": {
-    "n": 8200,
+    "n": 8100,
     "valid_rate": 1.0,
-    "attention_accuracy": 1.0,
     "position_A_rate": 0.469,
-    "cost": 10.372
+    "cost": 10.273
   },
   "pairs": {
     "recharger+professional_hobbyist": {

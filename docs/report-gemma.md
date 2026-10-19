@@ -257,11 +257,11 @@ Esempio completo per un'opera, con ogni token colorato dall'esperto che lo prefe
 
 ## 5. RQ2 sui testi puri
 
-Stesso disegno di RQ2 del report principale (§7: tipi A, B, C, N e controllo di attenzione,
+Stesso disegno di RQ2 del report principale (§7: tipi A, B, C, N,
 entrambi gli ordini, stesso giudice GLM-5.3 e stesse persone) sui testi puri di Gemma
 (`rq2_judge/judge.py --corpus local`, `analyze.py --corpus local`;
-`data/judgments_local.jsonl`, `results/judge_glm-5.3_local.json`). 4200 giudizi, validi
-100%, attenzione 100%, consistenza fra i due ordini
+`data/judgments_local.jsonl`, `results/judge_glm-5.3_local.json`). 4000 giudizi, validi
+100%, consistenza fra i due ordini
 0.91, testo in posizione A scelto nel 51.2% dei casi.
 
 | tipo | confronto | tasso (IC 95%) | per categoria: Expl. Fac. Exp.S. Prof. Rech. |
@@ -296,7 +296,7 @@ parametri), sulle tre coppie del passo 3 e le 100 opere, α = 0, 0.25, 0.5, 0.75
 testi puri ai vertici (`rq2_judge/mixed_pairs.py`, `mixed_judge.py`, `mixed_analyze.py`;
 `data/judgments_mixed.jsonl`, `results/judge_mixed_glm-5.3.json`). Nessuna persona mista:
 si usano le persone pure e il giudice neutro. Un solo ordine A/B per confronto, bilanciato;
-8 200 giudizi, tutti validi, attenzione 100%, testo in posizione A scelto nel 46.9% dei
+8 100 giudizi, tutti validi, testo in posizione A scelto nel 46.9% dei
 casi.
 
 - **Curva di preferenza**: la persona X sceglie fra il testo-α e il testo puro di Y (a α = 1

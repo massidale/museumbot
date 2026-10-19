@@ -4,7 +4,7 @@ Confronti da `mixed_pairs.build_mixed_pairs`, testi del corpus `local` (puri e r
 di data/local/mixed.jsonl (misti validi). Stesse persone, modello e parametri di RQ2
 (`judge.py`); un solo ordine A/B per confronto. Domande:
 
-    curve, double, attention   la stessa di RQ2 (quale ascolteresti)
+    curve, double              la stessa di RQ2 (quale ascolteresti)
     coherence                  quale suona come una voce sola, coerente dall'inizio alla fine
     rank                       ordinare 5 testi da "piu' per X" a "piu' per Y" (definizioni di
                                Falk delle due categorie nel messaggio)

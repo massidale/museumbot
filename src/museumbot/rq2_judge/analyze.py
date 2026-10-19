@@ -39,7 +39,7 @@ from museumbot.rq2_judge.judge import MODEL, OUT, corpus_index, out_path
 RESULTS = ROOT / "results"
 FIGS = ROOT / "figures"
 TYPES = ("A", "B", "C", "N")
-THRESHOLDS = {"valid_rate": 0.98, "attention_accuracy": 0.95}
+THRESHOLDS = {"valid_rate": 0.98}
 LENGTH_WORDS = re.compile(r"\b(long|longer|lengthy|short|shorter|concise|brief|succinct)\b", re.I)
 RNG = np.random.default_rng(0)
 
@@ -50,7 +50,8 @@ def tag(corpus: str = "main") -> str:
 
 
 def load(path=OUT) -> list[dict]:
-    return [json.loads(l) for l in path.open()]
+    """Giudizi delle coppie A, B, C, N; le righe `attention` delle prime run si ignorano."""
+    return [r for r in map(json.loads, path.open()) if r["type"] != "attention"]
 
 
 def category(p: dict) -> str:
@@ -78,12 +79,10 @@ def pair_scores(rows: list[dict]) -> dict[str, dict]:
 
 def criteria(rows: list[dict]) -> dict:
     valid = [r for r in rows if r["valid"]]
-    att = [r for r in valid if r["type"] == "attention"]
-    scores = [s for s in pair_scores(rows).values() if s["type"] != "attention"]
+    scores = list(pair_scores(rows).values())
     return {
         "n_judgments": len(rows),
         "valid_rate": len(valid) / len(rows) if rows else float("nan"),
-        "attention_accuracy": float(np.mean([r["chose_target"] for r in att])) if att else float("nan"),
         "order_consistency": float(np.mean([s["consistent"] for s in scores])) if scores else float("nan"),
         "position_A_rate": float(np.mean([r["choice"] == "A" for r in valid])) if valid else float("nan"),
     }
@@ -329,7 +328,7 @@ def main() -> None:
     crit = criteria(rows)
     crit["passed"] = {k: crit[k] >= v for k, v in THRESHOLDS.items()}
     print(f"[{MODEL}] {crit['n_judgments']} giudizi")
-    for k in ("valid_rate", "attention_accuracy", "order_consistency", "position_A_rate"):
+    for k in ("valid_rate", "order_consistency", "position_A_rate"):
         soglia = f"  (soglia {THRESHOLDS[k]:.0%}: {'ok' if crit['passed'][k] else 'NON SUPERATA'})" \
             if k in THRESHOLDS else ""
         print(f"  {k:20} {crit[k]:.3f}{soglia}")

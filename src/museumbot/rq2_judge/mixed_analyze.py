@@ -10,7 +10,7 @@ Per ogni coppia (X, Y), dai giudizi di data/judgments_mixed.jsonl:
   rank       Spearman fra l'ordine del giudice e alpha, per testo (mediana attesa >= 0.7)
   coherence  tasso con cui il testo misto e' scelto come "una voce sola" (atteso >= 0.4)
 
-Controlli come in RQ2: giudizi validi, attenzione, posizione A. Scrive
+Controlli come in RQ2: giudizi validi, posizione A. Scrive
 results/judge_mixed_glm-5.3.json e figures/judge_mixed_glm-5.3.png.
 """
 
@@ -101,10 +101,8 @@ def criteria(s) -> dict:
 
 def checks(rows) -> dict:
     ab = [r for r in rows if r["type"] != "rank"]
-    att = [r for r in ab if r["type"] == "attention" and r["valid"]]
     valid_ab = [r for r in ab if r["valid"]]
     return {"n": len(rows), "valid_rate": round(float(np.mean([r["valid"] for r in rows])), 4),
-            "attention_accuracy": round(float(np.mean([r["chose_target"] for r in att])), 3),
             "position_A_rate": round(float(np.mean([r["choice"] == "A" for r in valid_ab])), 3),
             "cost": round(float(sum(r.get("cost") or 0 for r in rows)), 3)}
 
@@ -135,7 +133,8 @@ def plot(out) -> None:
 
 
 def main() -> None:
-    rows = [json.loads(l) for l in OUT.open()]
+    # le righe `attention` delle prime run si ignorano
+    rows = [r for r in map(json.loads, OUT.open()) if r["type"] != "attention"]
     out = {"model": TAG, "checks": checks(rows), "pairs": {}}
     for p in PAIRS:
         s = summarize_pair(rows, p)

@@ -585,16 +585,15 @@ lessicale del prompt di generazione. Testi: corpus principale (`full` e flat).
 | B | testo *k* vs testo *j* | persona *k* |
 | C | testo *j* vs flat | persona *k* |
 | N | testo *k* vs flat | senza persona |
-| attenzione | flat dell'opera vs flat di un'altra opera | senza persona |
 
 *j* ruota in modo bilanciato (ogni *j* 25 volte per ogni *k*) ed è lo stesso in B e C. In
-tutto 4 200 giudizi, $5.32. Il ragionamento del giudice è al minimo (`reasoning_effort:
+tutto 4 000 giudizi, $5.08. Il ragionamento del giudice è al minimo (`reasoning_effort:
 "low"`): con `"none"` Ollama riversa il ragionamento nella risposta invece di spegnerlo.
 Il punteggio di una coppia è la media dei due ordini (1, 0.5 o 0), che neutralizza il bias
 di posizione; IC al 95% con bootstrap sulle opere.
 
-**Criteri di utilizzabilità** (fissati prima): risposte valide 100% (soglia 98%), controllo
-di attenzione 100% (soglia 95%). Consistenza fra i due ordini 0.88; scelte "A" 53%.
+**Criterio di utilizzabilità** (fissato prima): risposte valide 100% (soglia 98%).
+Consistenza fra i due ordini 0.88; scelte "A" 53%.
 
 **Risultati** (`results/judge_glm-5.3.json`): tasso di vittoria dell'elemento di interesse.
 

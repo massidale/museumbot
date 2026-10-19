@@ -5,9 +5,7 @@ Per ogni opera e persona k (j != k):
     B  testo k vs testo j  giudice k
     C  testo j vs flat     giudice k
     N  testo k vs flat     giudice neutro (baseline)
-piu' un controllo di attenzione per opera: il suo flat contro il flat di un'altra opera,
-giudice neutro. In ogni coppia `target` e' l'elemento di interesse (k in A, B, N; j in C;
-il flat giusto nel controllo).
+In ogni coppia `target` e' l'elemento di interesse (k in A, B, N; j in C).
 
 Le opere sono mescolate con un seed; l'opera in posizione i riceve j = altre(k)[i mod 4],
 cosi' su 100 opere ogni j compare 25 volte per ogni k.
@@ -50,8 +48,6 @@ def build_pairs(ids, seed: int = SEED) -> list[dict]:
                 pair(f"{a}|{k}|C", a, "C", k, (a, j), (a, "flat")),
                 pair(f"{a}|{k}|N", a, "N", NEUTRAL, (a, k), (a, "flat")),
             ]
-        b = order[(i + 1) % len(order)]
-        out.append(pair(f"{a}|attention", a, "attention", NEUTRAL, (a, "flat"), (b, "flat")))
     return out
 
 

@@ -1,6 +1,6 @@
 # Museumbot — stato del progetto
 
-*Ultimo aggiornamento: 8 ottobre 2026. Il report descrive solo lo stato attuale del codice e
+*Ultimo aggiornamento: 19 ottobre 2026. Il report descrive solo lo stato attuale del codice e
 dei risultati; le decisioni e le correzioni nel tempo sono in `docs/decisioni.md`.*
 
 **Domanda di ricerca.** Quando un LLM genera un'audioguida "personalizzata" su una
@@ -152,8 +152,8 @@ Le metriche, in ordine di forza probatoria:
    Le opere si dividono a caso in due metà da 50 per 200 volte; si riporta la media dei
    200 coseni.
 3. **geometria**: la **distanza quadrata cross-validata** fra condizioni dice quali sono
-   vicine e quali lontane; coseni e norme dei v[c] (riferimento flat) dicono in che
-   direzione e di quanto ciascuna categoria sposta il testo.
+   vicine e quali lontane, e la distanza dal flat dice di quanto ciascuna categoria sposta
+   il testo; i coseni fra i v[c] (riferimento flat) dicono in che direzione.
 4. **test di permutazione entro opera** (riferimento media): si permutano le etichette
    *dentro* ogni opera, così l'effetto-opera è preservato e il null è onesto.
 5. **lunghezza e lessico**: confondenti da sorvegliare.
@@ -280,9 +280,12 @@ cinque categorie non collassano. Su BGE-M3 Facilitator è quasi sovrapposto al f
 contro 1.0 per Explorer–Facilitator): coerente con la sua split-half bassa e con il recall
 del flat al 62%.
 
-**Ampiezza (norme dei v[c], rispetto al flat, Qwen3).** Recharger 0.31,
-Professional/Hobbyist 0.27, Experience Seeker 0.22, Explorer 0.18, Facilitator 0.18. Lo
-shift più forte è quello di Recharger e Professional/Hobbyist.
+**Ampiezza (radice della distanza cross-validata dal flat).** Recharger 0.31 (0.23),
+Professional/Hobbyist 0.27 (0.16), Experience Seeker 0.21 (0.15), Explorer 0.18 (0.12),
+Facilitator 0.17 (0.08). Lo shift più forte è quello di Recharger e Professional/Hobbyist.
+La norma di v[c] è la stessa distanza senza cross-validazione, quindi gonfiata dal rumore
+di generazione (di circa 0.0025 sulla distanza quadrata con Qwen3, una quota più grande
+per le categorie con lo shift più corto).
 
 **Direzione (coseno fra i v[c], rispetto al flat).** Explorer e Facilitator spostano il
 testo nella stessa direzione (+0.65; +0.51 su BGE-M3), e nella LDA e nella PCA i loro

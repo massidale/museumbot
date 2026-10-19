@@ -411,3 +411,13 @@ differenze superano il rumore.
 apertura e chiusura tendono al Recharger nella coppia Recharger–Professional/Hobbyist,
 l'apertura al Professional/Hobbyist nella coppia con il Facilitator, la chiusura
 all'Explorer nella coppia vicina.
+
+## 2026-10-19 — Ampiezza dello shift dalla distanza cross-validata
+
+**Decisione.** Nel report di stato (§3.5) l'ampiezza dello shift di ogni categoria è la
+radice della distanza quadrata cross-validata dal flat, non più la norma di v[c].
+**Motivo.** Con il disegno bilanciato ‖v[c]‖² è la distanza quadrata semplice fra la media
+della categoria e quella del flat: la stessa grandezza della distanza cross-validata, ma
+gonfiata dal rumore di generazione (circa 0.0025 con Qwen3, fino al 9% per il Facilitator).
+**Effetto.** L'ordine delle categorie non cambia; i valori scendono di poco (Experience
+Seeker 0.21, Facilitator 0.17 con Qwen3) e si aggiungono quelli di BGE-M3.

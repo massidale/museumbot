@@ -19,7 +19,7 @@ Metriche, in ordine di forza probatoria:
   1. probe lineare cross-validata, raggruppata per opera  -> lo shift e' preciso?     [media]
   2. consistenza split-half della direzione v[c]           -> proprieta' della categoria? [flat]
   3. distanza cross-validata fra condizioni                -> quali categorie sono vicine?
-     (indipendente dal riferimento), coseni e norme dei v[c] -> direzione degli effetti [flat]
+     (indipendente dal riferimento), coseni fra i v[c]       -> direzione degli effetti [flat]
   4. test di permutazione entro opera                      -> p-value              [media]
   5. ablazione lessicale                                   -> registro o solo vocabolario?
 
@@ -446,9 +446,6 @@ def main() -> None:
     out["cosine_matrix"] = {
         LABELS[a]: {LABELS[b]: float(M[i, j]) for j, b in enumerate(FALK_CATEGORIES)}
         for i, a in enumerate(FALK_CATEGORIES)
-    }
-    out["steering_norms"] = {
-        LABELS[c]: float(np.linalg.norm(V[i])) for i, c in enumerate(FALK_CATEGORIES)
     }
     K = len(FALK_CATEGORIES)
     cpairs = sorted(

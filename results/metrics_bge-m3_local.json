@@ -264,13 +264,6 @@
       "Recharger": 0.9999999403953552
     }
   },
-  "steering_norms": {
-    "Explorer": 0.15235428512096405,
-    "Facilitator": 0.13143248856067657,
-    "Experience Seeker": 0.18497993052005768,
-    "Professional/Hobbyist": 0.16862954199314117,
-    "Recharger": 0.2896786034107208
-  },
   "ceiling": {
     "Explorer": 0.9777808785438538,
     "Facilitator": 0.9658700823783875,

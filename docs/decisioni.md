@@ -440,3 +440,26 @@ dopo la correzione per la lunghezza, sugli stessi corpus ed embedding.
 opere usata per l'addestramento, perché il test consumava il generatore casuale condiviso;
 la lettura delle figure non cambia. Il report di stato perde la sezione §3.6, i confondenti
 diventano §3.6.
+
+## 2026-10-19 — Lessico distintivo con log-odds ratio su n-grammi
+
+**Decisione.** Il lessico per condizione esce da `analyze.py` (`top_words` nei
+`results/metrics_*.json`) e passa a `rq1_embeddings/lexicon.py` (`results/lexicon.json`,
+corpus `main` e `local`): log-odds ratio con prior di Dirichlet informativo (Monroe et al.
+2008) contro il resto del corpus, su unigrammi, bigrammi e trigrammi, con la quota di testi
+che contengono il termine e il segno di eco del blocco di categoria del prompt. Fissati
+prima: 15 termini per condizione, presenza in almeno il 5% dei testi, unigrammi senza
+parole funzionali. Dopo la prima uscita sono cambiate due regole: l'eco si riconosce per
+parola piena a meno della flessione (prefisso di 5 lettere) invece che per n-gramma
+identico, che non vedeva *your companions* o *discuss* (il blocco dice *companions*,
+*discussion*); un termine si salta se condivide una parola piena con uno già scelto,
+invece che solo se lo contiene, che lasciava catene come *you are standing* / *are
+standing before*.
+**Motivo.** `top_words` dava solo parole singole, con un rapporto di frequenze lisciato che
+la docstring chiamava log-odds con prior informativo senza esserlo; il report nominava
+l'eco del prompt solo come rischio. Il tf-idf con la condizione come documento è stato
+scartato: con 6 documenti l'idf guarda solo in quante condizioni compare un termine, non
+quanto.
+**Effetto.** Nuova tabella del lessico nei due report (§3.6 del report di stato, §2 di
+quello di Gemma), con la quota di eco: da 1 a 4 termini su 15 con DeepSeek, da 2 a 7 con
+Gemma. Le altre metriche di `analyze.py` non cambiano.

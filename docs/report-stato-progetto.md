@@ -35,6 +35,7 @@ senza persona, o con la persona sbagliata, preferisce invece il flat.
 | pulizia e corpus | `common/clean.py`, `common/corpus.py` | corpus `main` e `ablation`, testi puliti (sotto) |
 | embedding | `rq1_embeddings/embed.py` | `data/emb/<corpus>/<modello>_<variante>.npy` (Qwen3-Embedding-0.6B, BGE-M3), locali, L2-normalizzati |
 | analisi | `rq1_embeddings/analyze.py` | `results/metrics_{qwen,bge-m3}.json` + figure (corpus principale) |
+| lessico | `rq1_embeddings/lexicon.py` | `results/lexicon.json`: termini distintivi per condizione, corpus `main` e `local` (§3.6) |
 | ablazione | `rq1_embeddings/ablation.py` | `results/ablation_{qwen,bge-m3}.json` + figure |
 | chain vs singolo | `rq1_embeddings/chain_noise.py` | `results/chain_noise_{qwen,bge-m3}.json` (§5) |
 | RQ2 | `rq2_judge/judge.py`, `rq2_judge/analyze.py` | `data/judgments.jsonl`, `results/judge_glm-5.3.json` + figura (§7) |
@@ -305,14 +306,32 @@ lunghezza, con il coefficiente stimato a parità di opera e di categoria, il pro
 0.95 (0.92) e ogni steering vector corretto ha coseno
 0.99–1.00 (0.98–1.00) con l'originale. Il probe senza il flat, a 5 classi, vale 0.99 (0.97).
 
-**Lessico.** Le parole discriminative sono coerenti con i blocchi di prompt: Recharger
-(*breathe, settle, slowly, breath, rest*), Facilitator (*discuss, talk, companions, group,
-conversation*), Experience Seeker (*must, unforgettable, cornerstone, iconic*),
-Professional/Hobbyist (*spatial, technically, compositional, glazes, scholarly*), Explorer
-(*twist, discover, clue, closer*).
-È una conferma, ma anche un avvertimento: parte dello shift potrebbe essere puro eco
-lessicale delle istruzioni di stile, più che un cambio di registro. È esattamente la
-domanda a cui risponde il passo successivo.
+**Lessico** (`rq1_embeddings/lexicon.py`, `results/lexicon.json`). Per ogni condizione,
+i termini (parole, bigrammi, trigrammi) che usa più del resto del corpus: log-odds ratio
+con prior di Dirichlet informativo (Monroe et al. 2008), ordinato per z-score; 15 termini
+per condizione, solo quelli presenti in almeno il 5% dei suoi testi, senza ripetere una
+stessa parola piena. Fra parentesi la quota dei testi della condizione che contengono il
+termine; *eco* è un termine con una parola piena del blocco di categoria del prompt, a
+meno della flessione.
+
+| condizione | termini più distintivi | eco |
+|---|---|---|
+| Recharger | *let* (1.00), *rest* (0.67), *quiet* (0.87), *your eyes* (0.71), *settle* (0.55), *stillness* (0.69), *pause* (0.55), *breathe* (0.29) | 1/15 |
+| Facilitator | *your group* (0.60), *think* (0.69), *talk* (0.32), *moment to look* (0.27), *people* (0.38), *discuss* (0.16), *share* (0.32), *conversation* (0.21) | 3/15 |
+| Experience Seeker | *iconic* (0.56), *standing before* (0.48), *unforgettable* (0.39), *masterpiece* (0.65), *must know* (0.25), *most celebrated* (0.27), *landmark* (0.22) | 4/15 |
+| Prof./Hobbyist | *scholarly* (0.49), *compare* (0.64), *debate* (0.68), *handling* (0.40), *deeper* (0.34), *study* (0.51), *compositional* (0.21), *executed* (0.21) | 4/15 |
+| Explorer | *look* (1.00), *closely at this* (0.43), *ask yourself* (0.16), *choose* (0.19), *here's the twist* (0.12), *what story* (0.10), *do you think* (0.35) | 3/15 |
+
+Il lessico distintivo segue le istruzioni di stile, ma per lo più non le copia: solo da 1
+(Recharger) a 4 (Experience Seeker, Professional/Hobbyist) dei 15 termini riprendono una
+parola del blocco. Il Recharger è l'esempio più chiaro: il blocco chiede un'atmosfera
+"tranquil and contemplative" e "quiet observation", i testi rispondono con *let*, *rest*,
+*settle*, *your gaze*, *breathe*, quasi tutti assenti dal prompt. Alcuni termini sono
+formule del registro, presenti in quasi tutti i testi della categoria (*let* e *quiet* nel
+Recharger, *look* nell'Explorer); altri sono tic di pochi testi (*here's the twist*, 12%).
+Il flat non ha un lessico proprio: il suo termine più distintivo ha z = 2.1, quello delle
+categorie da 4.6 (Explorer) a 13.1 (Recharger). Quanto
+dello shift venga dalle singole parti del blocco è la domanda dell'ablazione (§6).
 
 ## 4. Conclusioni
 

@@ -17,7 +17,7 @@ mezzo (RQ1) e se un giudice con persona li riconosce e li preferisce (RQ2).
 | testi puri | `generation/vllm_gen.py`, `kaggle/gen` | `data/local/generations.jsonl`: 600 `full` (5 categorie + flat) e 500 `full_rep` sulle 100 opere di `data/artworks.jsonl`, prompt di `common/prompts.py` più una riga contro il Markdown |
 | testi misti | `generation/mixing.py`, `generation/vllm_mix.py`, `kaggle/mix-*` | `data/local/mixed.jsonl`: 940 testi, tre coppie × α = 0.25, 0.5, 0.75 × 100 opere più 60 del pilota |
 | embedding | `rq1_embeddings/embed.py`, `mixed.py` | `data/emb/local/`, `data/emb/mixed/` |
-| RQ1 | `analyze.py --corpus local`, `length.py`, `separation.py`, `mixed.py`, `mixed_space.py`, `generation/mix_diag.py` | `results/metrics_*_local.json`, `length_*`, `separation_*`, `mixed_*`, `mixed_space_*`, `mix_diag.json` |
+| RQ1 | `analyze.py --corpus local`, `length.py`, `separation.py`, `lexicon.py`, `mixed.py`, `mixed_space.py`, `generation/mix_diag.py` | `results/metrics_*_local.json`, `length_*`, `separation_*`, `lexicon.json`, `mixed_*`, `mixed_space_*`, `mix_diag.json` |
 | RQ2 | `rq2_judge/judge.py --corpus local`, `analyze.py --corpus local`, `mixed_judge.py`, `mixed_analyze.py`, `combined.py` | `data/judgments_local.jsonl`, `data/judgments_mixed.jsonl`, `results/judge_glm-5.3_local.json`, `judge_mixed_glm-5.3.json`, `judge_combined_glm-5.3.json` |
 | esempi | `rq1_embeddings/mix_examples.py` | `docs/analisi/testi-misti-the-starry-night.{md,html}` |
 
@@ -77,6 +77,26 @@ più fra opere diverse (+0.151 sopra il flat); il Professional/Hobbyist la meno 
 Parte delle formule è propria del generatore, non della categoria: "take a moment" apre il
 95% dei testi Facilitator, l'82% dei Recharger, il 76% degli Explorer e il 29% dei flat. La
 separazione va quindi letta anche come stereotipia del registro.
+
+**Lessico** (`rq1_embeddings/lexicon.py`, `results/lexicon.json`; metodo nel report
+principale, §3.6). Termini più distintivi per condizione, con la quota dei testi che li
+contengono; *eco*: termini con una parola piena del blocco di categoria del prompt, sui 15
+riportati.
+
+| condizione | termini più distintivi | eco |
+|---|---|---|
+| Recharger | *let the* (0.92), *allow* (1.00), *stillness* (0.95), *quiet* (0.93), *fade* (0.80), *silence* (0.70), *away* (0.88), *peace* (0.61) | 2/15 |
+| Facilitator | *your companions* (0.67), *your group* (0.56), *discuss* (0.59), *ask your* (0.34), *might notice* (0.33), *gather* (0.27), *painting together* (0.20) | 3/15 |
+| Experience Seeker | *standing before one* (0.92), *iconic* (0.68), *legendary* (0.51), *definitive* (0.68), *cultural* (0.38), *art history* (0.45), *highlight of* (0.23) | 7/15 |
+| Prof./Hobbyist | *scholarly* (0.49), *approach to* (0.42), *technical* (0.50), *executed* (0.37), *compare* (0.35), *critical* (0.30), *analyzing* (0.24) | 3/15 |
+| Explorer | *you study* (0.36), *look closer* (0.40), *let your eyes* (0.32), *do you think* (0.39), *curiosity* (0.26), *hidden* (0.29), *you spot* (0.14) | 3/15 |
+
+I termini distintivi sono in gran parte formule presenti in molti testi della categoria
+(*allow* in tutti i Recharger, *standing before one* nel 92% degli Experience Seeker),
+coerenti con la stereotipia misurata sopra. L'Experience Seeker è la condizione che
+riprende di più il prompt (7 termini su 15: *iconic*, *cultural*, *impact*, …); le altre
+da 2 a 3. Il flat non ha un lessico proprio: il suo termine più distintivo ha z = 3.5, quello delle
+categorie da 5.5 (Explorer) a 11.5 (Recharger).
 
 ## 3. RQ1 sulle categorie combinate
 

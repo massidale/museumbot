@@ -20,7 +20,6 @@ Metriche, in ordine di forza probatoria:
   2. consistenza split-half della direzione v[c]           -> proprieta' della categoria? [flat]
   3. distanza cross-validata fra condizioni                -> quali categorie sono vicine?
      (indipendente dal riferimento), coseni fra i v[c]       -> direzione degli effetti [flat]
-  5. ablazione lessicale                                   -> registro o solo vocabolario?
 
 Tetto: se il corpus ha la replica `full_rep` (nel corpus principale e' `single_b`), il
 coseno fra gli steering vector delle due run, per categoria, e' il massimo che un confronto
@@ -29,8 +28,6 @@ fra coseni puo' raggiungere (sezione `ceiling` del JSON; la usa anche ablation.p
 
 import argparse
 import json
-import re
-from collections import Counter
 
 import matplotlib
 
@@ -45,7 +42,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.model_selection import GroupKFold
 
 from museumbot.common.config import ROOT, emb_path, meta_path
-from museumbot.common.corpus import CORPORA, load_corpus
+from museumbot.common.corpus import CORPORA
 from museumbot.common.prompts import CONDITIONS, FALK_CATEGORIES, LABELS
 
 FIGS = ROOT / "figures"
@@ -196,32 +193,6 @@ def replicate_ceiling(X, arts, Xr, arts_r):
 def cosine_matrix(V):
     Vn = V / (np.linalg.norm(V, axis=1, keepdims=True) + 1e-12)
     return Vn @ Vn.T
-
-
-# ------------------------------------------------------------ 5. ablazione lessicale
-
-
-def top_words(texts_by_cond, k=40):
-    """Parole piu' discriminative per categoria, via log-odds con prior informativo."""
-    vocab = Counter()
-    counts = {}
-    for c, texts in texts_by_cond.items():
-        w = Counter(re.findall(r"[a-z']{4,}", " ".join(texts).lower()))
-        counts[c] = w
-        vocab.update(w)
-    total = sum(vocab.values())
-    out = {}
-    for c, w in counts.items():
-        n = sum(w.values())
-        scores = {}
-        for word, cnt in w.items():
-            if vocab[word] < 10:
-                continue
-            p_c = (cnt + 1) / (n + len(vocab))
-            p_all = (vocab[word] + 1) / (total + len(vocab))
-            scores[word] = np.log(p_c / p_all)
-        out[c] = [x for x, _ in sorted(scores.items(), key=lambda t: -t[1])[:k]]
-    return out
 
 
 # ------------------------------------------------------------------------- figure
@@ -466,15 +437,6 @@ def main() -> None:
     fig_distance(d2, FIGS / f"distance_{tag}.png")
     fig_confusion(cm, acc, FIGS / f"confusion_{tag}.png")
     print(f"\nfigure -> {FIGS.relative_to(ROOT)}/*_{tag}.png")
-
-    # --- parole discriminative ---
-    gens = [g for g in load_corpus(args.corpus, verbose=False)
-            if g["variant"] == args.variant or (g["condition"] == "flat" and g["variant"] == "full")]
-    by_cond = {c: [g["text"] for g in gens if g["condition"] == c] for c in CONDITIONS}
-    out["top_words"] = {LABELS[c]: w[:15] for c, w in top_words(by_cond).items()}
-    print("\nparole piu' discriminative per categoria:")
-    for c in CONDITIONS:
-        print(f"      {LABELS[c]:24} {', '.join(out['top_words'][LABELS[c]][:8])}")
 
     (RESULTS / f"metrics_{tag}.json").write_text(json.dumps(out, indent=2, ensure_ascii=False))
     print(f"\nmetriche -> results/metrics_{tag}.json")

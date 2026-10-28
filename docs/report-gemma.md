@@ -202,7 +202,7 @@ alle altre due insieme. I testi puri (α = 0 e 1) sono assegnati alla propria ca
 
 *Qwen3*
 
-| coppia (X → Y) | α = 0.25 | α = 0.5 | α = 0.75 |
+| coppia (X → Y) | α = 0.25 (X / Y / altre) | α = 0.5 (X / Y / altre) | α = 0.75 (X / Y / altre) |
 |---|---|---|---|
 | Recharger → Prof./Hobbyist | 0.99 / 0.00 / 0.01 | 0.32 / 0.22 / **0.46** | 0.00 / 0.99 / 0.01 |
 | Facilitator → Prof./Hobbyist | 0.88 / 0.01 / 0.11 | 0.15 / 0.71 / 0.14 | 0.00 / 0.99 / 0.01 |
@@ -210,7 +210,7 @@ alle altre due insieme. I testi puri (α = 0 e 1) sono assegnati alla propria ca
 
 *BGE-M3*
 
-| coppia (X → Y) | α = 0.25 | α = 0.5 | α = 0.75 |
+| coppia (X → Y) | α = 0.25 (X / Y / altre) | α = 0.5 (X / Y / altre) | α = 0.75 (X / Y / altre) |
 |---|---|---|---|
 | Recharger → Prof./Hobbyist | 1.00 / 0.00 / 0.00 | 0.32 / 0.48 / **0.20** | 0.00 / 1.00 / 0.00 |
 | Facilitator → Prof./Hobbyist | 0.81 / 0.09 / 0.10 | 0.09 / 0.90 / 0.01 | 0.00 / 1.00 / 0.00 |

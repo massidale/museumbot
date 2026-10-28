@@ -196,36 +196,36 @@ solo il token scelto, non le distribuzioni intere.
 **I testi misti nello spazio delle quattro categorie** (`rq1_embeddings/mixed_space.py`,
 `results/mixed_space_*.json`). Il probe a 4 classi addestrato sui puri (§3) classifica i
 misti delle opere fuori dal suo fold; i misti si centrano con la media dei puri della loro
-opera. Quota di testi assegnati alla prima categoria (X), alla seconda (Y) e alle altre due;
-α = 0 e 1 sono i testi puri.
+opera. In ogni cella la quota di testi assegnati alla prima categoria (X), alla seconda (Y) e
+alle altre due insieme. I testi puri (α = 0 e 1) sono assegnati alla propria categoria nel
+98–100% dei casi con entrambi gli embedding.
 
-| coppia | α | X | Y | altra categoria |
-|---|---|---|---|---|
-| Recharger → Prof./Hobbyist | 0 | 1.00 (1.00) | 0.00 (0.00) | 0.00 / 0.00 |
-| Recharger → Prof./Hobbyist | 0.25 | 0.99 (1.00) | 0.00 (0.00) | 0.01 / 0.00 |
-| Recharger → Prof./Hobbyist | 0.5 | 0.32 (0.32) | 0.22 (0.48) | 0.46 (Explorer 0.45) / 0.20 (Explorer 0.11) |
-| Recharger → Prof./Hobbyist | 0.75 | 0.00 (0.00) | 0.99 (1.00) | 0.01 / 0.00 |
-| Recharger → Prof./Hobbyist | 1 | 0.00 (0.00) | 1.00 (1.00) | 0.00 / 0.00 |
-| Facilitator → Prof./Hobbyist | 0 | 1.00 (0.98) | 0.00 (0.00) | 0.00 / 0.02 |
-| Facilitator → Prof./Hobbyist | 0.25 | 0.88 (0.81) | 0.01 (0.09) | 0.11 (Explorer 0.11) / 0.10 (Explorer 0.10) |
-| Facilitator → Prof./Hobbyist | 0.5 | 0.15 (0.09) | 0.71 (0.90) | 0.14 (Explorer 0.14) / 0.01 |
-| Facilitator → Prof./Hobbyist | 0.75 | 0.00 (0.00) | 0.99 (1.00) | 0.01 / 0.00 |
-| Facilitator → Prof./Hobbyist | 1 | 0.00 (0.00) | 1.00 (1.00) | 0.00 / 0.00 |
-| Explorer → Facilitator | 0 | 1.00 (0.99) | 0.00 (0.01) | 0.00 / 0.00 |
-| Explorer → Facilitator | 0.25 | 0.97 (0.81) | 0.03 (0.17) | 0.00 / 0.02 |
-| Explorer → Facilitator | 0.5 | 0.82 (0.54) | 0.18 (0.45) | 0.00 / 0.01 |
-| Explorer → Facilitator | 0.75 | 0.18 (0.19) | 0.82 (0.81) | 0.00 / 0.00 |
-| Explorer → Facilitator | 1 | 0.00 (0.02) | 1.00 (0.98) | 0.00 / 0.00 |
+*Qwen3*
 
-- Nelle coppie contrapposte la classe passa da X a Y fra 0.25 e 0.75 quasi senza
-  intermedi (0.99–1.00 da una parte o dall'altra), come la posizione sul segmento.
-- **A α = 0.5 il misto Recharger–Professional/Hobbyist esce dalla coppia**: con Qwen3 il 45%
-  dei testi è classificato Explorer, più che Recharger (32%) o Professional/Hobbyist (22%);
-  con BGE-M3 il 20% va alle altre due categorie. Il testo a metà fra due registri lontani
-  cade in una zona dello spazio che appartiene a un'altra categoria. Nel
-  Facilitator–Professional/Hobbyist a 0.5 prevale già il Professional/Hobbyist (0.71, 0.90).
-- Nella coppia vicina il passaggio è graduale (Explorer 0.97, 0.82, 0.18 con Qwen3; 0.81,
-  0.54, 0.19 con BGE-M3) e nessun testo esce dalla coppia.
+| coppia (X → Y) | α = 0.25 | α = 0.5 | α = 0.75 |
+|---|---|---|---|
+| Recharger → Prof./Hobbyist | 0.99 / 0.00 / 0.01 | 0.32 / 0.22 / **0.46** | 0.00 / 0.99 / 0.01 |
+| Facilitator → Prof./Hobbyist | 0.88 / 0.01 / 0.11 | 0.15 / 0.71 / 0.14 | 0.00 / 0.99 / 0.01 |
+| Explorer → Facilitator | 0.97 / 0.03 / 0.00 | 0.82 / 0.18 / 0.00 | 0.18 / 0.82 / 0.00 |
+
+*BGE-M3*
+
+| coppia (X → Y) | α = 0.25 | α = 0.5 | α = 0.75 |
+|---|---|---|---|
+| Recharger → Prof./Hobbyist | 1.00 / 0.00 / 0.00 | 0.32 / 0.48 / **0.20** | 0.00 / 1.00 / 0.00 |
+| Facilitator → Prof./Hobbyist | 0.81 / 0.09 / 0.10 | 0.09 / 0.90 / 0.01 | 0.00 / 1.00 / 0.00 |
+| Explorer → Facilitator | 0.81 / 0.17 / 0.02 | 0.54 / 0.45 / 0.01 | 0.19 / 0.81 / 0.00 |
+
+- **Coppie contrapposte: passaggio netto.** A α = 0.25 e 0.75 quasi tutti i testi stanno
+  nella categoria più vicina (0.81–1.00), come la posizione sul segmento.
+- **A α = 0.5 il misto Recharger–Professional/Hobbyist esce dalla coppia** (in grassetto):
+  con Qwen3 il 46% dei testi va alle altre due categorie, quasi tutto all'Explorer (45%),
+  più che al Recharger (32%) o al Professional/Hobbyist (22%); con BGE-M3 il 20%. Il testo a
+  metà fra due registri lontani cade in una zona dello spazio che appartiene a un'altra
+  categoria. Nel Facilitator–Professional/Hobbyist a 0.5 prevale già il
+  Professional/Hobbyist (0.71, 0.90).
+- **Coppia vicina: passaggio graduale** (Explorer 0.97, 0.82, 0.18 con Qwen3; 0.81, 0.54,
+  0.19 con BGE-M3), e nessun testo esce dalla coppia.
 
 ![Testi misti nello spazio delle quattro categorie: LDA e PCA dei testi puri con le traiettorie dei misti](../figures/mixed_space_qwen.png)
 

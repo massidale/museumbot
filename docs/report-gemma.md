@@ -173,7 +173,6 @@ in valore assoluto e i cambi di segno fra frasi consecutive; poi la media sui te
 
 | | Rech.–Prof. | Fac.–Prof. | Expl.–Fac. |
 |---|---|---|---|
-| testi | 99 | 100 | 100 |
 | frasi per testo | 11.2 | 10.1 | 12.4 |
 | somma massima per testo (frase più "di X") | +32.8 | +20.3 | +13.9 |
 | somma minima per testo (frase più "di Y") | −24.0 | −17.4 | −9.4 |
@@ -181,8 +180,7 @@ in valore assoluto e i cambi di segno fra frasi consecutive; poi la media sui te
 | cambi di segno fra frasi consecutive (osservati / attesi in ordine casuale) | 4.63 / 4.72 | 4.33 / 4.59 | 5.49 / 5.54 |
 
 I cambi attesi in ordine casuale sono esatti: con p frasi positive e q negative,
-2pq/(p + q). Nella coppia Recharger–Professional/Hobbyist un testo non si riallinea ai token
-della generazione (la ritokenizzazione dà un token in più) e resta fuori.
+2pq/(p + q).
 
 In ogni testo ci sono frasi che pendono nettamente verso un esperto e frasi che pendono
 verso l'altro, e la loro intensità segue la distanza fra le categorie: più forte nella

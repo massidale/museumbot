@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from museumbot.generation.mix_diag import (
-    mean_margin, sign_changes, split_sentences,
+    sentence_stats, sign_changes, split_sentences,
 )
 
 WORDS = {1: "Look", 2: " at", 3: " it", 4: ".", 5: " Now", 6: " rest", 7: " here", 8: "!"}
@@ -28,16 +28,11 @@ def test_sign_changes_ignores_zeros():
     assert sign_changes(np.array([1.0, 2.0, -1.0, 0.0, -3.0, 4.0])) == 2
 
 
-def test_mean_margin_weights_each_part_of_the_text_equally():
-    # testo 1: decimi 1 e 3; testo 2: decimi 0 e 2 -> media dei decimi (0.5, 2.5)
-    assert mean_margin([np.array([1.0, 1.0, 3.0, 3.0]), np.array([0.0, 2.0])], bins=2) == 1.5
-
-
-def test_decile_means_one_row_per_text():
-    from museumbot.generation.mix_diag import decile_means
-
-    M = decile_means([np.array([1.0, 1.0, 3.0, 3.0]), np.array([0.0, 2.0])], bins=2)
-    assert M.tolist() == [[1.0, 3.0], [0.0, 2.0]]
+def test_sentence_stats_on_sentence_sums():
+    # frasi: somme +3, -1, +2
+    st = sentence_stats([np.array([1.0, 2.0]), np.array([-1.0]), np.array([0.5, 1.5])])
+    assert st == pytest.approx({"n_sentences": 3, "max": 3.0, "min": -1.0, "abs_mean": 2.0,
+                                "changes": 2, "expected": 2 * 2 * 1 / 3})
 
 
 def test_expected_sign_changes_matches_all_orderings():

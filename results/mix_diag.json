@@ -3,21 +3,30 @@
   "pairs": {
     "explorer+facilitator": {
       "n": 100,
+      "sentences_mean": 12.38,
+      "sentence_sum_max_mean": 13.86,
+      "sentence_sum_min_mean": -9.4,
+      "sentence_sum_abs_mean": 4.32,
       "sign_changes_observed": 5.49,
-      "sign_changes_expected": 5.54,
-      "margin_mean": 0.031
+      "sign_changes_expected": 5.54
     },
     "facilitator+professional_hobbyist": {
       "n": 100,
+      "sentences_mean": 10.12,
+      "sentence_sum_max_mean": 20.31,
+      "sentence_sum_min_mean": -17.36,
+      "sentence_sum_abs_mean": 8.2,
       "sign_changes_observed": 4.33,
-      "sign_changes_expected": 4.59,
-      "margin_mean": 0.012
+      "sign_changes_expected": 4.59
     },
     "recharger+professional_hobbyist": {
       "n": 99,
+      "sentences_mean": 11.17,
+      "sentence_sum_max_mean": 32.83,
+      "sentence_sum_min_mean": -23.99,
+      "sentence_sum_abs_mean": 12.57,
       "sign_changes_observed": 4.63,
-      "sign_changes_expected": 4.72,
-      "margin_mean": 0.127
+      "sign_changes_expected": 4.72
     }
   }
 }

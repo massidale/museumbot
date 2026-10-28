@@ -6,13 +6,14 @@ token scelto. Il margine
     m(t) = log p_X(t) - log p_Y(t)
 
 e' positivo se la parola era piu' "di X", negativo se "di Y". I token si raggruppano in
-frasi (tokenizer del generatore) e si misura, sui testi a alpha = 0.5:
+frasi (tokenizer del generatore); ogni frase ha la somma dei margini dei suoi token
+(positiva: frase piu' "di X"). Per ogni testo a alpha = 0.5, poi in media sui testi:
 
-  - cambi di segno del margine medio fra frasi consecutive, contro l'atteso con le stesse
-    frasi in ordine casuale (2pq/n, esatto): meno cambi del caso = blocchi di frasi dello
-    stesso esperto;
-  - margine medio, mediato per decimi del testo (ogni parte del testo pesa uguale): quale
-    esperto prevale nel complesso.
+  - numero di frasi;
+  - somma massima, somma minima e somma media in valore assoluto fra le frasi: quanto una
+    frase arriva a pendere verso X o verso Y;
+  - cambi di segno fra frasi consecutive, contro l'atteso con le stesse frasi in ordine
+    casuale (2pq/n, esatto): meno cambi del caso = blocchi di frasi dello stesso esperto.
 
 Limiti: solo il token scelto, non le distribuzioni intere; nei token assenti dalle prime
 100 di un esperto il valore e' il minimo della sua lista. Scrive results/mix_diag.json.
@@ -56,18 +57,12 @@ def expected_sign_changes(v) -> float:
     return 2 * p * q / (p + q) if p + q else 0.0
 
 
-def decile_means(texts: list[np.ndarray], bins: int = 10) -> np.ndarray:
-    """(testi, bins): margine medio di ogni testo per intervallo di posizione relativa."""
-    out = []
-    for m in texts:
-        pos = np.minimum((np.arange(len(m)) * bins) // len(m), bins - 1)
-        out.append([m[pos == b].mean() for b in range(bins)])
-    return np.array(out)
-
-
-def mean_margin(texts: list[np.ndarray], bins: int = 10) -> float:
-    """Margine medio sui testi, mediato per intervallo di posizione relativa."""
-    return float(decile_means(texts, bins).mean())
+def sentence_stats(sents: list[np.ndarray]) -> dict:
+    """Statistiche di un testo sulle somme dei margini per frase."""
+    v = np.array([x.sum() for x in sents])
+    return {"n_sentences": len(v), "max": float(v.max()), "min": float(v.min()),
+            "abs_mean": float(np.abs(v).mean()),
+            "changes": sign_changes(v), "expected": expected_sign_changes(v)}
 
 
 def run(alpha: float = 0.5) -> dict:
@@ -78,7 +73,7 @@ def run(alpha: float = 0.5) -> dict:
     rows = [json.loads(l) for l in MIXED.open()]
     out = {"alpha": alpha, "pairs": {}}
     for pair in sorted({r["condition"] for r in rows}):
-        obs, null, texts = [], [], []
+        stats = []
         for r in rows:
             if r["condition"] != pair or r["alpha"] != alpha or r["usage"]["failed"]:
                 continue
@@ -87,16 +82,16 @@ def run(alpha: float = 0.5) -> dict:
             if len(ids) != len(d):
                 continue  # ritokenizzazione diversa dalla generazione
             m = np.array([t["logp"][0] - t["logp"][1] for t in d])
-            sents = split_sentences(ids, m, decode)
-            sm = np.array([s.mean() for s in sents])
-            obs.append(sign_changes(sm))
-            null.append(expected_sign_changes(sm))
-            texts.append(m)
+            stats.append(sentence_stats(split_sentences(ids, m, decode)))
+        mean = lambda k: float(np.mean([st[k] for st in stats]))
         out["pairs"][pair] = {
-            "n": len(obs),
-            "sign_changes_observed": round(float(np.mean(obs)), 2),
-            "sign_changes_expected": round(float(np.mean(null)), 2),
-            "margin_mean": round(mean_margin(texts), 3)}
+            "n": len(stats),
+            "sentences_mean": round(mean("n_sentences"), 2),
+            "sentence_sum_max_mean": round(mean("max"), 2),
+            "sentence_sum_min_mean": round(mean("min"), 2),
+            "sentence_sum_abs_mean": round(mean("abs_mean"), 2),
+            "sign_changes_observed": round(mean("changes"), 2),
+            "sign_changes_expected": round(mean("expected"), 2)}
     return out
 
 

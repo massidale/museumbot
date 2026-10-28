@@ -694,3 +694,16 @@ completi l'ablazione usa tutte le 100 opere, come le altre analisi.
 full (Qwen3 `style_only` 0.962 → 0.964, `no_style` 0.851 → 0.853, `name_only` 0.703 → 0.702,
 `need_only` 0.699 → 0.701) e di qualche centesimo sullo split-half (una sola divisione delle
 opere, ora su 100); nessuna conclusione cambia.
+
+## 2026-10-28 — Alternanza degli esperti: statistiche per frase al posto del margine per decimi
+
+**Decisione.** In `generation/mix_diag.py` ogni frase ha la somma dei margini dei suoi
+token (prima la media; il segno è lo stesso). Per testo si calcolano il numero di frasi,
+la somma massima e minima fra le frasi, la somma media in valore assoluto e i cambi di
+segno fra frasi consecutive contro l'atteso in ordine casuale; poi la media sui testi.
+Esce il margine medio per decimi del testo (`margin_mean`).
+**Motivo.** Descrivere l'alternanza per frase, con l'intensità con cui una frase pende
+verso un esperto, invece che con una media sul testo intero.
+**Effetto.** I cambi di segno non cambiano (4.63 / 4.72, 4.33 / 4.59, 5.49 / 5.54).
+Valore ritirato del margine medio: +0.13, +0.01, +0.03 (Rech.–Prof., Fac.–Prof.,
+Expl.–Fac.). Nuovi valori in `results/mix_diag.json` e nel §4 del report di Gemma.

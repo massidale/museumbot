@@ -165,23 +165,32 @@ le celle.
 
 **Come si alternano i due esperti nel testo** (`generation/mix_diag.py`,
 `results/mix_diag.json`, testi a α = 0.5). Per ogni token il margine log p_X − log p_Y del
-token scelto dice quale esperto lo preferiva (positivo: X, negativo: Y); i token si
-raggruppano in frasi chiuse dalla punteggiatura di fine frase.
+token scelto dice quale esperto lo preferiva (positivo: X, negativo: Y). I token si
+raggruppano in frasi chiuse dalla punteggiatura di fine frase, e ogni frase ha la somma dei
+margini dei suoi token: positiva se la frase è nel complesso più "di X", negativa se "di Y".
+Per ogni testo si prendono la somma massima e minima fra le sue frasi, la media delle somme
+in valore assoluto e i cambi di segno fra frasi consecutive; poi la media sui testi.
 
 | | Rech.–Prof. | Fac.–Prof. | Expl.–Fac. |
 |---|---|---|---|
-| # cambi di segno fra frasi consecutive, media per testo (osservati / attesi in ordine casuale) | 4.63 / 4.72 | 4.33 / 4.59 | 5.49 / 5.54 |
-| margine medio (ogni decimo del testo pesa uguale) | +0.13 | +0.01 | +0.03 |
+| testi | 99 | 100 | 100 |
+| frasi per testo | 11.2 | 10.1 | 12.4 |
+| somma massima per testo (frase più "di X") | +32.8 | +20.3 | +13.9 |
+| somma minima per testo (frase più "di Y") | −24.0 | −17.4 | −9.4 |
+| somma media in valore assoluto | 12.6 | 8.2 | 4.3 |
+| cambi di segno fra frasi consecutive (osservati / attesi in ordine casuale) | 4.63 / 4.72 | 4.33 / 4.59 | 5.49 / 5.54 |
 
-I cambi attesi in ordine casuale sono esatti: con p frasi a margine positivo e q negativo,
-2pq/(p + q).
+I cambi attesi in ordine casuale sono esatti: con p frasi positive e q negative,
+2pq/(p + q). Nella coppia Recharger–Professional/Hobbyist un testo non si riallinea ai token
+della generazione (la ritokenizzazione dà un token in più) e resta fuori.
 
-Le frasi dello stesso esperto non si raggruppano in blocchi più che per caso: i due
-registri si alternano in modo fine, senza sezioni. Il margine medio dice quale esperto
-prevale nel complesso a α = 0.5: il Recharger nella coppia con il Professional/Hobbyist
-(+0.13), coerente con la direzione dei testi negli embedding; quasi nessuno dei due nella
-coppia Facilitator–Professional/Hobbyist (+0.01); di poco l'Explorer nella coppia vicina
-(+0.03). Il margine vede solo il token scelto, non le distribuzioni intere.
+In ogni testo ci sono frasi che pendono nettamente verso un esperto e frasi che pendono
+verso l'altro, e la loro intensità segue la distanza fra le categorie: più forte nella
+coppia Recharger–Professional/Hobbyist, più debole nella coppia vicina. Nelle coppie
+contrapposte la frase più "di X" pende più della frase più "di Y" (+32.8 contro −24.0,
++20.3 contro −17.4). Le frasi dello stesso esperto però non si raggruppano in blocchi più
+che per caso: i due registri si alternano frase per frase, senza sezioni. Il margine vede
+solo il token scelto, non le distribuzioni intere.
 
 **I testi misti nello spazio delle quattro categorie** (`rq1_embeddings/mixed_space.py`,
 `results/mixed_space_*.json`). Il probe a 4 classi addestrato sui puri (§3) classifica i

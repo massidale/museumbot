@@ -1,6 +1,6 @@
 # Museumbot — parte 2: Gemma 4 31B e il profilo continuo
 
-*Ultimo aggiornamento: 19 ottobre 2026. Il report descrive solo lo stato attuale del codice e
+*Ultimo aggiornamento: 27 ottobre 2026. Il report descrive solo lo stato attuale del codice e
 dei risultati; le decisioni nel tempo sono in `docs/decisioni.md`, la spec dell'esperimento
 in `docs/plans/2026-10-06-profilo-continuo-design.md`. Numeri fra parentesi: embedding
 BGE-M3 (fuori: Qwen3).*
@@ -17,8 +17,8 @@ mezzo (RQ1) e se un giudice con persona li riconosce e li preferisce (RQ2).
 | testi puri | `generation/vllm_gen.py`, `kaggle/gen` | `data/local/generations.jsonl`: 600 `full` (5 categorie + flat) e 500 `full_rep` sulle 100 opere di `data/artworks.jsonl`, prompt di `common/prompts.py` più una riga contro il Markdown |
 | testi misti | `generation/mixing.py`, `generation/vllm_mix.py`, `kaggle/mix-*` | `data/local/mixed.jsonl`: 940 testi, tre coppie × α = 0.25, 0.5, 0.75 × 100 opere più 60 del pilota |
 | embedding | `rq1_embeddings/embed.py`, `mixed.py` | `data/emb/local/`, `data/emb/mixed/` |
-| RQ1 | `analyze.py --corpus local`, `length.py`, `separation.py`, `lexicon.py`, `mixed.py`, `mixed_space.py`, `generation/mix_diag.py` | `results/metrics_*_local.json`, `length_*`, `separation_*`, `lexicon.json`, `mixed_*`, `mixed_space_*`, `mix_diag.json` |
-| RQ2 | `rq2_judge/judge.py --corpus local`, `analyze.py --corpus local`, `mixed_judge.py`, `mixed_analyze.py`, `combined.py` | `data/judgments_local.jsonl`, `data/judgments_mixed.jsonl`, `results/judge_glm-5.3_local.json`, `judge_mixed_glm-5.3.json`, `judge_combined_glm-5.3.json` |
+| RQ1 | `analyze.py --corpus local`, `lexicon.py`, `repetition.py`, `mixed.py`, `mixed_space.py`, `generation/mix_diag.py` | `results/metrics_*_local.json`, `lexicon.json`, `repetition.json`, `mixed_*`, `mixed_space_*`, `mix_diag.json` |
+| RQ2 | `rq2_judge/judge.py --corpus local`, `analyze.py --corpus local`, `mixed_judge.py`, `mixed_analyze.py` | `data/judgments_local.jsonl`, `data/judgments_mixed.jsonl`, `results/judge_glm-5.3_local.json`, `judge_mixed_glm-5.3.json` |
 | esempi | `rq1_embeddings/mix_examples.py` | `docs/analisi/testi-misti-the-starry-night.{md,html}` |
 
 Generatore: Gemma 4 31B QAT a 4 bit (`google/gemma-4-31B-it-qat-w4a16-ct`), vLLM 0.31.0 su
@@ -39,7 +39,7 @@ spiega il 12.5% (4.5%) della varianza.
 
 | Qwen3 (BGE-M3) | Explorer | Facilitator | Exp. Seeker | Prof./Hobbyist | Recharger |
 |---|---|---|---|---|---|
-| split-half | 0.95 (0.87) | 0.96 (0.86) | 0.94 (0.91) | 0.93 (0.89) | 0.98 (0.96) |
+| split-half | 0.96 (0.89) | 0.96 (0.88) | 0.95 (0.93) | 0.94 (0.90) | 0.98 (0.96) |
 | tetto (replica) | 0.99 (0.98) | 0.99 (0.97) | 0.99 (0.99) | 0.99 (0.99) | 1.00 (0.99) |
 
 Le soglie della spec fissate prima dei dati sono superate: probe sopra il caso in entrambi
@@ -47,38 +47,24 @@ gli embedding, split-half ≥ 0.6 per ogni categoria.
 
 ![PCA del corpus local sui dati centrati per opera, con i vettori di steering](../figures/pca_qwen_local.png)
 
-**Lunghezza.** Il flat è molto più corto dei testi di categoria (mediana 178 parole contro
-215–226), quindi ogni steering vector, preso rispetto al flat, contiene anche "più lungo
-del flat". Lo shift però non è lunghezza (`rq1_embeddings/length.py`,
-`results/length_*.json`): la lunghezza da sola, centrata per opera, dà un probe a 6 classi
-di 0.35; togliendo dagli embedding la componente lineare della lunghezza, con il
-coefficiente stimato a parità di opera e di categoria, il probe resta 0.99 (0.95)
-e ogni steering vector corretto ha coseno 0.97–0.99 (0.94–0.99) con
-l'originale. Senza il flat il probe a 5 classi vale 1.00 (0.99).
+**Ripetitività** (`rq1_embeddings/repetition.py`, `results/repetition.json`; metodo nel
+report principale, §3.6). Quota media di n-grammi in comune fra due testi della stessa
+condizione su opere diverse (Jaccard), con il flat come riferimento.
 
-**Separazione o formule?** Una separazione così netta può voler dire una personalizzazione
-molto marcata o testi stereotipati (`rq1_embeddings/separation.py`,
-`results/separation_*.json`). *Formule*: quota media dei trigrammi di parole di un testo
-che compaiono in almeno il 10% dei testi della sua condizione. *Somiglianza sopra il flat*:
-coseno medio fra testi della stessa condizione su opere diverse, meno lo stesso valore del
-flat, che ha solo il contenuto dell'opera.
+| condizione | unigrammi | bigrammi | trigrammi | tutti |
+|---|---|---|---|---|
+| Recharger | 14.00% | 5.47% | 2.58% | 5.79% |
+| Facilitator | 9.03% | 3.38% | 1.64% | 3.69% |
+| Experience Seeker | 8.18% | 2.81% | 1.45% | 3.30% |
+| Explorer | 7.78% | 2.37% | 1.00% | 2.83% |
+| Prof./Hobbyist | 6.69% | 1.99% | 0.57% | 2.37% |
+| flat | 5.57% | 1.45% | 0.43% | 1.86% |
 
-| condizione | formule | somiglianza sopra il flat |
-|---|---|---|
-| Explorer | 0.065 | +0.050 (+0.020) |
-| Facilitator | 0.087 | +0.081 (+0.022) |
-| Exp. Seeker | 0.090 | +0.056 (+0.038) |
-| Prof./Hobbyist | 0.044 | −0.024 (−0.002) |
-| Recharger | 0.157 | +0.151 (+0.096) |
-| flat | 0.034 | +0.000 (+0.000) |
+Tutte le categorie ripetono più del flat. Il Recharger circa tre volte tanto, e sei volte
+sui trigrammi, dove stanno le formule; il Professional/Hobbyist è il più vicino al flat.
+Quali parole producono questa ripetizione lo dicono i termini distintivi, sotto.
 
-Il Recharger è la condizione più formulaica (0.157) e quella i cui testi si somigliano di
-più fra opere diverse (+0.151 sopra il flat); il Professional/Hobbyist la meno formulaica.
-Parte delle formule è propria del generatore, non della categoria: "take a moment" apre il
-95% dei testi Facilitator, l'82% dei Recharger, il 76% degli Explorer e il 29% dei flat. La
-separazione va quindi letta anche come stereotipia del registro.
-
-**Lessico** (`rq1_embeddings/lexicon.py`, `results/lexicon.json`; metodo nel report
+**Termini distintivi** (`rq1_embeddings/lexicon.py`, `results/lexicon.json`; metodo nel report
 principale, §3.6). Termini più distintivi per condizione, con la quota dei testi che li
 contengono; *eco*: termini con una parola piena del blocco di categoria del prompt, sui 15
 riportati.
@@ -91,9 +77,8 @@ riportati.
 | Prof./Hobbyist | *scholarly* (0.49), *approach to* (0.42), *technical* (0.50), *executed* (0.37), *compare* (0.35), *critical* (0.30), *analyzing* (0.24) | 3/15 |
 | Explorer | *you study* (0.36), *look closer* (0.40), *let your eyes* (0.32), *do you think* (0.39), *curiosity* (0.26), *hidden* (0.29), *you spot* (0.14) | 3/15 |
 
-I termini distintivi sono in gran parte formule presenti in molti testi della categoria
-(*allow* in tutti i Recharger, *standing before one* nel 92% degli Experience Seeker),
-coerenti con la stereotipia misurata sopra. L'Experience Seeker è la condizione che
+Molti termini distintivi compaiono in quasi tutti i testi della categoria (*allow* in tutti
+i Recharger, *standing before one* nel 92% degli Experience Seeker). L'Experience Seeker è la condizione che
 riprende di più il prompt (7 termini su 15: *iconic*, *cultural*, *impact*, …); le altre
 da 2 a 3. Il flat non ha un lessico proprio: il suo termine più distintivo ha z = 3.5, quello delle
 categorie da 5.5 (Explorer) a 11.5 (Recharger).
@@ -118,15 +103,15 @@ direzioni indipendenti (0) o opposte (−1); la distanza cross-validata (report 
 | Explorer – Professional/Hobbyist | +0.02 (+0.15) | 0.166 (0.042) |
 | Explorer – Recharger | +0.48 (+0.52) | 0.197 (0.059) |
 | Facilitator – Professional/Hobbyist | −0.06 (+0.10) | 0.205 (0.040) |
-| Facilitator – Recharger | +0.39 (+0.39) | 0.237 (0.070) |
+| Facilitator – Recharger | +0.39 (+0.39) | 0.236 (0.070) |
 | Professional/Hobbyist – Recharger | −0.07 (−0.04) | 0.345 (0.115) |
 
 Nessuna coppia ha direzioni opposte. Professional/Hobbyist–Recharger è la coppia più
 distante in entrambi gli embedding: direzioni quasi indipendenti (coseno −0.07, −0.04) e lo
 spostamento più ampio, quello del Recharger. Facilitator–Professional/Hobbyist ha direzioni
 quasi indipendenti solo con Qwen3 (−0.06; +0.10 con BGE-M3) e una distanza intermedia; la
-coppia più vicina è Explorer–Facilitator. Lo split-half delle quattro categorie va da 0.93
-a 0.98 (0.86–0.96), il tetto dalla replica da 0.99 a 1.00 (0.97–0.99).
+coppia più vicina è Explorer–Facilitator. Lo split-half delle quattro categorie va da 0.94
+a 0.98 (0.88–0.96), il tetto dalla replica da 0.99 a 1.00 (0.97–0.99).
 
 ## 4. RQ1 sui testi misti
 
@@ -165,7 +150,7 @@ stesse opere. Il token scelto è fra le prime 100 di entrambi gli esperti nel 97
 | Explorer → Facilitator | −0.01 (0.02) | 0.16 (0.25) | 0.30 (0.47) | 0.66 (0.75) | 0.98 (1.01) | 0.82 (0.77) | 0.22 (0.11) |
 
 "Segmento" è |v_Y − v_X|. Il residuo resta fra 0.89 e 1.12 volte quello dei puri in tutte
-le celle; le parole mediane fra 220 e 230.
+le celle.
 
 - **Coppie contrapposte: risposta a soglia.** A α = 0.25 il testo resta vicino alla prima
   categoria, a 0.75 vicino alla seconda, il passaggio avviene intorno a 0.5. Tutte le
@@ -185,33 +170,18 @@ raggruppano in frasi chiuse dalla punteggiatura di fine frase.
 
 | | Rech.–Prof. | Fac.–Prof. | Expl.–Fac. |
 |---|---|---|---|
-| cambi di segno fra frasi consecutive (osservati / frasi mescolate) | 4.63 / 4.73 | 4.33 / 4.60 | 5.49 / 5.54 |
-| dispersione dei margini per frase / tagli casuali | 1.08 | 1.00 | 1.12 |
-| margine medio sui 10 decimi del testo (IC 95%) | +0.13 [+0.07, +0.18] | +0.01 [−0.01, +0.04] | +0.03 [+0.01, +0.05] |
+| # cambi di segno fra frasi consecutive, media per testo (osservati / attesi in ordine casuale) | 4.63 / 4.72 | 4.33 / 4.59 | 5.49 / 5.54 |
+| margine medio (ogni decimo del testo pesa uguale) | +0.13 | +0.01 | +0.03 |
 
-Le frasi dello stesso esperto non si raggruppano in blocchi più che per caso, e i confini
-di frase contano poco: i due registri si alternano in modo fine, senza sezioni. Il
-margine medio dice quale esperto prevale nel complesso a α = 0.5: il Recharger nella coppia
-con il Professional/Hobbyist (+0.13), coerente con la direzione dei testi negli embedding;
-nessuno dei due nella coppia Facilitator–Professional/Hobbyist (+0.01, intervallo che
-comprende lo zero); di poco l'Explorer nella coppia vicina (+0.03).
+I cambi attesi in ordine casuale sono esatti: con p frasi a margine positivo e q negativo,
+2pq/(p + q).
 
-*Profilo per posizione (esplorativo, non fra i criteri della spec).* Margine medio per
-decimo del testo, con intervallo di confidenza al 95% (bootstrap sui testi):
-
-![Margine medio per decimo del testo a α = 0.5, con IC 95%](../figures/mix_diag_profile.png)
-
-- Recharger–Professional/Hobbyist: apertura e chiusura tendono al Recharger (primo decimo
-  +0.23 [+0.04, +0.42]; ultimi tre +0.32 [+0.19, +0.47], +0.19 [+0.01, +0.36] e
-  +0.36 [+0.22, +0.50]); la parte centrale è intorno a zero.
-- Facilitator–Professional/Hobbyist: l'apertura tende al Professional/Hobbyist (primo decimo
-  −0.17 [−0.23, −0.09]); nessuna tendenza alla fine.
-- Explorer–Facilitator: crescita graduale verso l'Explorer, netta solo nell'ultimo decimo
-  (+0.20 [+0.12, +0.29]).
-
-Con 30 intervalli è atteso che uno o due escludano lo zero per caso: contano le tendenze
-nette di apertura e chiusura, non i singoli decimi intermedi. Il margine vede solo il
-token scelto, non le distribuzioni intere.
+Le frasi dello stesso esperto non si raggruppano in blocchi più che per caso: i due
+registri si alternano in modo fine, senza sezioni. Il margine medio dice quale esperto
+prevale nel complesso a α = 0.5: il Recharger nella coppia con il Professional/Hobbyist
+(+0.13), coerente con la direzione dei testi negli embedding; quasi nessuno dei due nella
+coppia Facilitator–Professional/Hobbyist (+0.01); di poco l'Explorer nella coppia vicina
+(+0.03). Il margine vede solo il token scelto, non le distribuzioni intere.
 
 **I testi misti nello spazio delle quattro categorie** (`rq1_embeddings/mixed_space.py`,
 `results/mixed_space_*.json`). Il probe a 4 classi addestrato sui puri (§3) classifica i
@@ -264,30 +234,22 @@ entrambi gli ordini, stesso giudice GLM-5.3 e stesse persone) sui testi puri di 
 100%, consistenza fra i due ordini
 0.91, testo in posizione A scelto nel 51.2% dei casi.
 
-| tipo | confronto | tasso (IC 95%) | per categoria: Expl. Fac. Exp.S. Prof. Rech. |
+| tipo | confronto | tasso | per categoria: Expl. Fac. Exp.S. Prof. Rech. |
 |---|---|---|---|
-| A | persona k: testo k vs flat | 0.99 [0.98, 0.99] | 0.99 1.00 1.00 0.95 1.00 |
-| B | persona k: testo k vs testo j | 1.00 [1.00, 1.00] | 1.00 1.00 1.00 0.99 1.00 |
-| C | persona k: testo j vs flat | 0.21 [0.17, 0.26] | 0.23 0.35 0.07 0.08 0.34 |
-| N | senza persona: testo k vs flat | 0.34 [0.31, 0.37] | 0.90 0.39 0.09 0.17 0.17 |
-| A-C | specificità (A − C) | 0.77 [0.72, 0.82] | 0.77 0.65 0.94 0.87 0.66 |
-| A-N | effetto della persona (A − N) | 0.65 [0.62, 0.67] | 0.10 0.61 0.91 0.78 0.83 |
+| A | persona k: testo k vs flat | 0.99 | 0.99 1.00 1.00 0.95 1.00 |
+| B | persona k: testo k vs testo j | 1.00 | 1.00 1.00 1.00 0.99 1.00 |
+| C | persona k: testo j vs flat | 0.21 | 0.23 0.35 0.07 0.08 0.34 |
+| N | senza persona: testo k vs flat | 0.34 | 0.90 0.39 0.09 0.17 0.17 |
 
 ![Tassi di preferenza per tipo di coppia, testi puri di Gemma](../figures/judge_glm-5.3_local.png)
 
 - **Il giudice con persona preferisce il testo della propria categoria**: al flat nel
   98.8% dei casi, a quello di un'altra categoria nel 99.9%; con la persona sbagliata il
   testo personalizzato batte il flat solo nel 21.4%.
-- **Senza persona il testo personalizzato batte il flat nel 34% dei casi**, quindi
-  l'effetto della persona (A − N) è 0.65. L'eccezione è l'Explorer, preferito al flat
-  anche dal giudice neutro (0.90).
-- **Lunghezza**: a parità di tipo il testo più lungo è un po' favorito (logit
-  +0.44 [+0.28, +0.68] per 30 parole), ma sulle coppie con lunghezze entro il 10% i
-  tassi restano A 0.98, B 1.00, C 0.13, N 0.23.
+- **Senza persona il testo personalizzato batte il flat nel 34% dei casi.** L'eccezione è
+  l'Explorer, preferito al flat anche dal giudice neutro (0.90).
 - **Esplorative**: i testi più accettati dalle altre persone sono gli Explorer
-  (0.57), i meno accettati i Recharger (0.015). L'accettazione dei testi altrui va con
-  la geometria di RQ1: Spearman con il coseno fra gli steering vector +0.30 (Qwen3) e
-  +0.64 (BGE-M3, p = 0.002), con la distanza -0.47 (-0.49).
+  (0.57), i meno accettati i Recharger (0.015).
 
 ## 6. RQ2 sui testi misti
 
@@ -295,83 +257,39 @@ Passo 4 della spec. Stesso giudice di RQ2 (GLM-5.3 su Ollama Cloud, stesse perso
 parametri), sulle tre coppie del passo 3 e le 100 opere, α = 0, 0.25, 0.5, 0.75, 1 con i
 testi puri ai vertici (`rq2_judge/mixed_pairs.py`, `mixed_judge.py`, `mixed_analyze.py`;
 `data/judgments_mixed.jsonl`, `results/judge_mixed_glm-5.3.json`). Nessuna persona mista:
-si usano le persone pure e il giudice neutro. Un solo ordine A/B per confronto, bilanciato;
-8 100 giudizi, tutti validi, testo in posizione A scelto nel 46.9% dei
-casi.
+si usano le persone pure. Un solo ordine A/B per confronto, bilanciato; 7 800 giudizi,
+tutti validi, testo in posizione A scelto nel 46.9% dei casi.
 
 - **Curva di preferenza**: la persona X sceglie fra il testo-α e il testo puro di Y (a α = 1
   il testo-α è la replica di Y, punto atteso 0.5); la persona Y il caso speculare.
 - **Doppio visitatore**: ciascuna persona sceglie fra il testo-α e il flat; un testo va bene
   a entrambe quanto la minore delle due preferenze. È lo stesso confronto dei tipi A e C
-  della RQ2 sui puri (§5), che danno una seconda stima ai vertici (§6.1).
-- **Ordinamento**: il giudice neutro riceve le definizioni di Falk delle due categorie e i
-  5 testi in ordine casuale, e li ordina da "più per X" a "più per Y".
-- **Coerenza**: il giudice neutro sceglie fra un testo misto e un testo puro quello che
-  "suona come una voce sola".
+  della RQ2 sui puri (§5).
+- **Coerenza**: il giudice senza persona sceglie fra un testo misto (α = 0.25, 0.5, 0.75) e
+  uno dei due puri quale "suona come una voce sola, coerente dall'inizio alla fine".
 
 | | Rech. → Prof. | Fac. → Prof. | Expl. → Fac. |
 |---|---|---|---|
 | persona X, testo-α preferito a Y puro (α = 0 … 1) | 1.00 1.00 1.00 0.75 0.56 | 1.00 1.00 0.95 0.76 0.55 | 0.98 0.97 0.94 0.80 0.49 |
 | persona Y, testo-α preferito a X puro (α = 0 … 1) | 0.45 0.85 1.00 1.00 1.00 | 0.52 0.88 0.98 1.00 1.00 | 0.47 0.50 0.64 0.96 1.00 |
-| Spearman α–preferenza (X / Y) | −0.89 / 0.89 | −0.98 / 0.98 | −1.00 / 1.00 |
-| incrocio delle due curve | 0.50 | 0.45 | 0.66 |
-| ordinamento: Spearman mediano (ordini perfetti) | 1.00 (59%) | 1.00 (66%) | 0.90 (35%) |
-| coerenza: misto scelto come "voce sola" | 0.52 | 0.57 | 0.58 |
 
 ![Curve di preferenza e doppio visitatore per le tre coppie](../figures/judge_mixed_glm-5.3.png)
 
-- **Il giudice vede il gradiente.** Ordina i cinque testi quasi sempre nel verso di α
-  (mediana 1.00 sulle coppie contrapposte, 0.90 sulla vicina) e le curve di preferenza sono
-  monotone, con Spearman da 0.89 a 1.00 in valore assoluto.
+- **Il giudice vede il gradiente.** In tutte e tre le coppie la preferenza della persona X
+  per il testo-α cala con α e quella della persona Y cresce.
 - **Basta una traccia della propria categoria.** Ogni persona preferisce il testo-α al puro
   dell'altra categoria finché il testo contiene qualcosa della sua: la persona Recharger
   sceglie il testo a α = 0.75 nel 75% dei casi, la Professional/Hobbyist il testo a 0.25
   nell'85%.
-- **La miscela non costa coerenza**: il testo misto è scelto come "voce sola" nel 52–58%
-  dei confronti con un testo puro.
-
-### 6.1 Doppio visitatore, con i puri ai vertici
-
-Per la persona k mescolata con la categoria j, il tasso con cui k preferisce il testo al
-flat in funzione della quota w della sua categoria nel testo (w = 1 − α se k è la prima
-categoria della coppia, w = α se è la seconda; `rq2_judge/combined.py`,
-`results/judge_combined_glm-5.3.json`). Ai vertici ci sono due stime indipendenti dello
-stesso confronto: la RQ2 sui puri (§5; tipo A per w = 1, tipo C per w = 0, n = 200 e 50) e
-il giudice sui misti (n = 100); in mezzo solo il giudice sui misti.
-
-| persona k | categoria j | w = 1 (puri / misti) | 0.75 | 0.5 | 0.25 | w = 0 (puri / misti) |
-|---|---|---|---|---|---|---|
-| Recharger | Prof./Hobbyist | 1.00 / 1.00 | 1.00 | 0.98 | 0.08 | 0.02 / 0.05 |
-| Prof./Hobbyist | Recharger | 0.95 / 0.96 | 0.94 | 0.43 | 0.00 | 0.00 / 0.00 |
-| Facilitator | Prof./Hobbyist | 1.00 / 1.00 | 1.00 | 0.86 | 0.31 | 0.10 / 0.07 |
-| Prof./Hobbyist | Facilitator | 0.95 / 0.98 | 0.94 | 0.86 | 0.26 | 0.00 / 0.03 |
-| Explorer | Facilitator | 0.99 / 1.00 | 1.00 | 0.98 | 0.87 | 0.46 / 0.43 |
-| Facilitator | Explorer | 1.00 / 1.00 | 1.00 | 1.00 | 0.98 | 0.98 / 0.97 |
-
-![Preferenza sul flat in funzione della quota della propria categoria nel testo](../figures/judge_combined_glm-5.3.png)
-
-- **I vertici coincidono con la RQ2 sui puri**: le due stime differiscono al più di 0.03.
-- **Nelle coppie contrapposte il testo a metà accontenta due visitatori diversi.** I testi
-  puri piacciono a una sola delle due persone (la minore delle due preferenze è 0.00–0.07
-  nel giudice sui misti), il testo con w = 0.5 a entrambe: il Recharger lo preferisce al
-  flat nel 98% dei casi e il Professional/Hobbyist nel 43%; Facilitator e
-  Professional/Hobbyist entrambi nell'86%. La persona accetta il testo finché la sua
-  categoria vi pesa almeno metà: con w = 0.25 il tasso scende a 0.00–0.31. La soglia è la
-  stessa trovata negli embedding (§4).
-- **Nella coppia vicina il test non distingue.** Il Facilitator accetta tutti i testi
-  (0.97–1.00 anche senza la sua categoria), l'Explorer da w = 0.25 in su (0.87): i testi da
-  α = 0 a 0.5 piacciono a entrambe le persone (0.97–0.98).
-
-Soglie della spec: le due coppie contrapposte le superano tutte. La coppia vicina non
-supera l'incrocio (0.66, fuori da 0.4–0.6): la persona Facilitator preferisce il testo-α
-all'Explorer puro solo da α = 0.75, quindi le due curve si incontrano tardi; il massimo
-del doppio visitatore è interno (0.25, a pari merito con 0.5) ma la curva è quasi piatta.
+- **I misti non perdono coerenza.** Contro i testi puri il misto è scelto come "una voce
+  sola" nel 52%, 57% e 58% dei casi (Rech. → Prof., Fac. → Prof., Expl. → Fac.), sopra la
+  soglia della spec (0.4): la
+  miscela dei due esperti non produce testi meno coerenti di quelli di una sola categoria.
 
 ## 7. Limiti
 
 Un solo generatore aperto, scelto senza confronto con altri, in float16 con una patch al
-kernel di attenzione; una riga in più in coda al system prompt, contro il Markdown. Testi
-molto formulaici (§2). La miscela è fatta da fuori con le prime 100 log-probabilità
+kernel di attenzione; una riga in più in coda al system prompt, contro il Markdown. La miscela è fatta da fuori con le prime 100 log-probabilità
 (copertura 97.7–100%). Tre coppie di categorie; con Gemma nessuna coppia è opposta. Un solo
 giudice, senza persone con bisogni misti; nei testi misti un solo ordine A/B per confronto.
 

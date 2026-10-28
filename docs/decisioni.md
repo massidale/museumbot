@@ -479,3 +479,204 @@ fissato prima dei dati nella spec di RQ2 (soglia 95%), superato prima della rimo
 **Effetto.** I tassi di preferenza non cambiano. Cambiano i totali: 4 000 giudizi invece di
 4 200 su DeepSeek ($5.08 invece di $5.32) e sui puri di Gemma, 8 100 invece di 8 200 sui
 misti; la quota di scelte in posizione A si sposta di meno di 0.002.
+
+## 2026-10-19 — RQ2: differenze A − C, A − N e Spearman fuori dai report
+
+**Decisione.** Le righe A − C e A − N e la tabella degli Spearman fra accettazione e
+geometria di RQ1 escono dai due report; restano in `results/judge_*.json`.
+**Motivo.** Si leggono già dalle righe A, C, N e dalla matrice di preferenza; il legame con
+RQ1 si dice con la confusione Facilitator–Explorer, comune a giudice e probe.
+**Effetto.** Nessun numero cambia. A − C era l'ipotesi della spec di RQ2: IC complessivo
+[0.718, 0.799] su DeepSeek, [0.72, 0.82] sui puri di Gemma, entrambi lontani da 0.
+
+## 2026-10-19 — Analisi delle formule (`separation.py`) rimossa
+
+**Decisione.** `rq1_embeddings/separation.py`, il suo test e `results/separation_*.json`
+escono dal progetto; la tabella "formule / somiglianza sopra il flat" esce dal report di
+Gemma (§2), che non la ripete più nel commento al lessico e nei limiti.
+**Motivo.** Usava "formule" in un senso diverso dal lessico distintivo subito sotto
+(trigrammi ricorrenti dentro la condizione, senza confronto con le altre, contro termini
+distintivi rispetto al resto del corpus), e compariva solo per Gemma: la parte su `main`
+restava fuori dai report. Il lessico copre già il registro di ogni categoria.
+**Effetto.** Nessun altro risultato cambia. Ultimi valori (Qwen3) della quota di trigrammi
+ricorrenti: Gemma 0.044 (Professional/Hobbyist) – 0.157 (Recharger), flat 0.034; DeepSeek
+0.015 – 0.057, flat 0.020. Somiglianza fra opere sopra il flat, Recharger: +0.151 su Gemma,
++0.068 su DeepSeek.
+
+## 2026-10-20 — Giudice sui misti: Spearman, incrocio, ordinamento e coerenza fuori dal report (momentaneo)
+
+**Decisione.** Dal §6 del report di Gemma escono, per ora, lo Spearman fra α e preferenza,
+l'incrocio delle due curve, l'ordinamento dei cinque testi da parte del giudice neutro e la
+coerenza ("voce sola"). Restano le curve di preferenza e il doppio visitatore. Scelta
+momentanea: le misure restano nel codice (`rq2_judge/mixed_analyze.py`) e in
+`results/judge_mixed_glm-5.3.json` e possono tornare nel report.
+**Motivo.** Report più semplice; la forma delle curve si legge già dai tassi per α.
+**Effetto.** Nessun numero cambia. Valori a oggi (Recharger → Prof./Hobbyist,
+Facilitator → Prof./Hobbyist, Explorer → Facilitator): Spearman |0.89|, |0.98|, |1.00|;
+incrocio 0.50, 0.45, 0.66 (la coppia vicina fuori dalla soglia della spec 0.4–0.6);
+ordinamento, Spearman mediano 1.00, 1.00, 0.90; coerenza 0.52, 0.57, 0.58. Le soglie della
+spec su queste misure restano in `docs/plans/2026-10-06-profilo-continuo-design.md`.
+
+## 2026-10-20 — Doppio visitatore con i puri ai vertici fuori dal report (momentaneo)
+
+**Decisione.** Il §6.1 del report di Gemma (preferenza sul flat in funzione della quota w
+della propria categoria, con la RQ2 sui puri ai vertici; `rq2_judge/combined.py`) esce per
+ora dal report, con la sua figura e la soglia della spec sul doppio visitatore. Il doppio
+visitatore resta nella riga in basso della figura del §6. Scelta momentanea: codice,
+`results/judge_combined_glm-5.3.json` e `figures/judge_combined_glm-5.3.png` restano.
+**Motivo.** La figura ripeteva i giudizi della riga in basso di `judge_mixed_glm-5.3.png`,
+ordinati per w invece che per α.
+**Effetto.** Nessun numero cambia. A oggi i vertici delle due stime differiscono al più di
+0.03; la soglia della spec (massimo del doppio visitatore a un α intermedio) è superata
+nelle due coppie contrapposte, con il massimo a 0.5, e nella coppia vicina il massimo è a
+0.25 su una curva quasi piatta.
+
+## 2026-10-26 — Lunghezza: tolte la correzione lineare degli embedding e la regressione del giudice
+
+**Decisione.** Il controllo della lunghezza perde due analisi basate su un modello lineare:
+la correzione degli embedding di `rq1_embeddings/length.py` (coefficiente per dimensione
+sul log delle parole, poi probe e steering vector ricalcolati, anche nel confronto fra
+generatori) e la regressione logistica della scelta del giudice sulla differenza di parole
+in `rq2_judge/analyze.py`. Restano i controlli che non presuppongono una forma
+dell'effetto: probe a 6 classi sulla sola lunghezza e probe senza flat (RQ1); tassi sulle
+coppie con lunghezze entro il 10% e quota di coppie in cui l'elemento di interesse è il
+testo più lungo (RQ2).
+**Motivo.** Le due analisi assumevano un effetto lineare (nel log delle parole per gli
+embedding, nella differenza di parole per il logit del giudice), e la correzione assumeva
+anche che l'effetto stimato dentro le categorie valesse fra le categorie. Ipotesi difficili
+da giustificare in tesi, per controlli già coperti da quelli che restano.
+**Effetto.** Nessun valore che resta cambia, salvo gli IC bootstrap dei tassi sulle coppie
+di lunghezza simile (terza cifra decimale, per il diverso uso del generatore casuale).
+Escono da `results/length_*.json` le chiavi `*_corrected`, `steering_norm*` e
+`cross_generator_corrected`; da `results/judge_glm-5.3*.json` la chiave
+`length/logit_per_sd_words`. Valori a oggi delle analisi tolte: probe a 6 classi dopo la
+correzione 0.95 (0.92) su `main`, 0.99 (0.95) su `local`; coseno fra steering vector
+corretto e originale 0.99–1.00 (0.98–1.00) e 0.97–0.99 (0.94–0.99); logit del giudice per
+30 parole +0.36 (DeepSeek) e +0.44 (Gemma). Nella spec del profilo continuo il punto 3
+dell'analisi della lunghezza è ritirato.
+
+## 2026-10-26 — Niente intervalli di confidenza; split-half e distanza su una sola divisione
+
+**Decisione.** Tolti dal codice tutti gli intervalli di confidenza bootstrap: tassi del
+giudice (`rq2_judge/analyze.py`, anche le barre d'errore della figura), R e rapporto
+chain/tetto (`rq1_embeddings/chain_noise.py`), deriva di routing
+(`rq1_embeddings/ablation.py`), profilo e margine medio di `generation/mix_diag.py` (anche
+la banda della figura). Split-half e distanza cross-validata (`rq1_embeddings/analyze.py`)
+si calcolano su una sola divisione delle opere (seed fisso, la stessa per le due misure e
+per la LDA) invece che come media su 200 divisioni; la riproducibilità si verifica sul
+tetto dalla replica. Le ripetizioni casuali restano solo dove stimano un atteso per caso
+senza forma chiusa: i tagli casuali di `mix_diag` (100 per testo). I cambi di segno attesi
+in ordine casuale passano dalla media di 200 rimescolamenti al valore esatto 2pq/(p + q).
+**Motivo.** Analisi più semplici: gli IC non cambiavano nessuna conclusione, e la media su
+molte divisioni aggiungeva calcolo a una misura già verificata dalla replica.
+**Effetto.** I valori puntuali non cambiano (probe, tetto, R, rapporti chain/tetto, tassi
+del giudice, deriva, coseni e rapporti dell'ablazione, profilo di `mix_diag`). Cambiano le
+misure su una divisione: split-half di qualche centesimo nei corpus `main` e `local`
+(Facilitator su BGE-M3 da 0.65 a 0.67); nell'ablazione, con 45 opere per metà, la media per
+variante cambia fino a 0.08 (Qwen3 `def_only` da 0.78 a 0.70); distanze cross-validate al
+più di 0.1 ×100. I criteri fissati prima dei dati che usavano un IC si leggono sul valore
+puntuale: chain equivalente se R < 1.10 (era: limite superiore dell'IC sotto 1.10); effetto
+del giudice presente se il tasso supera il valore nullo (era: IC che lo esclude). Gli esiti
+non cambiano: R = 1.43 (1.45), A = 0.97, B = 0.99. Escono dai JSON le chiavi `ci95`,
+`R_ci95`, `rel_ci95`, `profile_ci95`, `profile_mean_ci95` e gli `std` di split-half e
+distanza; in `mix_diag.json` `sign_changes_shuffled` diventa `sign_changes_expected`.
+
+## 2026-10-26 — Analisi ridotte a ciò che citano i report
+
+**Decisione.** Tolto dal codice tutto ciò che i due report non citano, più i probe sulla
+lunghezza e lo split-half con riferimento media:
+- `rq1_embeddings/length.py` per intero (probe sulla sola lunghezza e probe senza flat); la
+  lunghezza resta come mediana delle parole per condizione (`words_median` in
+  `results/metrics_*.json`) e, per il giudice, come sensibilità sulle coppie di lunghezza
+  simile;
+- split-half con riferimento media in `analyze.py`;
+- ablazione: effetti fattoriali, recall per classe del probe a 5 classi e la heatmap
+  (`ablation_cosine_*.png`); resta una figura, `ablation_qwen.png`;
+- giudice (`rq2_judge/analyze.py`): A − C e A − N, legame con RQ1 via Spearman, parole più
+  frequenti nelle motivazioni, numerosità della matrice; la matrice persona × testo solo
+  per il corpus principale;
+- giudice sui misti: ordinamento, coerenza, Spearman, incrocio delle curve e criteri della
+  spec (`mixed_analyze.py`, `mixed_pairs.py`, `mixed_judge.py`) e `rq2_judge/combined.py`;
+  restano curva di preferenza e doppio visitatore;
+- `rq1_embeddings/cross_generator.py` (confronto DeepSeek–Gemma, fuori dai report) e
+  `generation/compare_chain.py` (prova esplorativa; i prompt della chain passano in
+  `chain_study.py`), con i loro risultati;
+- `mix_diag.py`: margine medio per token, quota sotto il caso, quota sopra 1, testi saltati;
+- figure non citate: tutte quelle con BGE-M3 e, per il corpus `local`, confusione, LDA e
+  distanza.
+**Motivo.** Ridurre il progetto al minimo che serve ai risultati riportati.
+**Effetto.** Nessun valore citato cambia, salvo i controlli del giudice sui misti, ora
+calcolati sui soli giudizi di curva e doppio visitatore: 6 000 giudizi, posizione A 49.2%
+(prima 8 100 con ordinamento e coerenza, 46.9%). Rinunce da dichiarare: senza probe la
+lunghezza non è più esclusa come spiegazione dello shift (i valori ritirati erano: sola
+lunghezza 0.28 su `main` e 0.35 su `local` contro 0.95 e 0.98 degli embedding); A − C > 0 era
+un'ipotesi fissata prima dei dati nella spec di RQ2 (valore ritirato 0.76); per i misti le
+soglie della spec su Spearman, incrocio, ordinamento e coerenza non si verificano più (valori
+a oggi nella voce del 20 ottobre). I giudizi di ordinamento e coerenza restano in
+`data/judgments_mixed.jsonl` e si ignorano.
+
+## 2026-10-26 — Lunghezza tolta del tutto
+
+**Decisione.** Esce ogni riferimento alla lunghezza come confondente: le parole mediane per
+condizione (`words_median` in `results/metrics_*.json`, `by_alpha` di `results/mixed_*.json`),
+le parole medie per variante dell'ablazione e per metodo nel confronto chain, e nel giudice
+(`rq2_judge/analyze.py`) i tassi sulle coppie con lunghezze entro il 10%, la quota di coppie
+in cui l'elemento di interesse è il più lungo e le motivazioni che citano la lunghezza. Nel
+report di stato la §3.6 diventa *Lessico*.
+**Motivo.** Completa la voce precedente: la lunghezza non entra più nelle analisi.
+**Effetto.** Nessun altro numero cambia. Valori ritirati: mediane 253 parole
+(Professional/Hobbyist) contro 218–236 su `main`, flat 178 contro 215–226 su `local`;
+chain 244 parole medie contro 236 del singolo; ablazione 229–241 parole medie per variante; giudice,
+tassi sulle coppie di lunghezza simile A 0.96, B 0.99, C 0.19, N 0.41 (DeepSeek) e A 0.98,
+B 1.00, C 0.13, N 0.23 (Gemma), elemento di interesse più lungo nel 68% e nel 95% delle
+coppie A. Da dichiarare: la lunghezza non è controllata né in RQ1 né in RQ2.
+
+## 2026-10-27 — Giudice sui misti: torna la coerenza
+
+**Decisione.** Torna nel codice (`mixed_pairs.py`, `mixed_judge.py`, `mixed_analyze.py`) e
+nel §6 del report di Gemma la coerenza: il giudice neutro sceglie fra un misto e un puro
+quale "suona come una voce sola". Spearman, incrocio e ordinamento restano fuori.
+**Motivo.** Delle misure tolte il 26 ottobre è l'unica che non si legge già dalle curve o
+dalla posizione negli embedding: dice che la miscela non degrada il testo, l'obiezione più
+ovvia al metodo.
+**Effetto.** I giudizi esistenti in `data/judgments_mixed.jsonl` bastano, nessun nuovo
+giudizio. Coerenza 0.517, 0.567, 0.575 (Rech. → Prof., Fac. → Prof., Expl. → Fac.), sopra la
+soglia della spec (0.4). I controlli si calcolano su 7 800 giudizi (curva, doppio visitatore
+e coerenza): posizione A 46.9%.
+
+## 2026-10-27 — Alternanza degli esperti: tolti dispersione per frase e profilo per posizione
+
+**Decisione.** Da `generation/mix_diag.py` e dal §4 del report di Gemma escono la
+dispersione dei margini per frase contro tagli casuali e il profilo del margine per decimo
+del testo, con la figura `mix_diag_profile.png`. Restano i cambi di segno fra frasi
+(osservati contro l'atteso esatto) e il margine medio, ora chiave `margin_mean` (era
+`profile_mean`) di `results/mix_diag.json`.
+**Motivo.** La dispersione arrivava alla stessa conclusione dei cambi di segno (niente
+blocchi di frasi) ed era l'ultima misura che richiedeva ripetizioni casuali; il profilo era
+esplorativo, fuori dai criteri della spec, e il margine medio ne è la media.
+**Effetto.** Nessun valore che resta cambia. Valori a oggi delle misure tolte (Rech.–Prof.,
+Fac.–Prof., Expl.–Fac.): dispersione 1.08, 1.01, 1.13; profilo, primo decimo +0.23, −0.17,
+−0.03 e ultimo +0.36, −0.05, +0.20.
+
+## 2026-10-28 — Corpus di ablazione rigenerato su provider fisso
+
+**Decisione.** Il corpus di ablazione di settembre (routing libero, provider non registrato)
+è sostituito da uno nuovo, generato con `generate.py --provider deepinfra/fp8 --reasoning`:
+le 8 varianti, la replica `full_rep` e il flat, 4 600 testi, $0.59. `ablation.py` prende il
+tetto dalla replica dello stesso corpus invece che dal corpus principale; la deriva di
+routing (`routing_drift`) esce dal codice, dai risultati e dal report. `generate.py`
+guadagna `--out` e `--reasoning`, e una risposta di provider occupato (429, 5xx) fa
+attendere e riprovare lo stesso testo invece di consumare i tentativi.
+**Motivo.** Il corpus di settembre era una miscela non tracciata di provider: non si
+confrontava con il corpus principale e il suo tetto andava preso in prestito, con una
+calibrazione solo conservativa.
+**Effetto.** L'esecuzione è durata dal 27 al 28 ottobre per il sovraccarico di DeepInfra
+(`engine_overloaded`, limite del pool condiviso di OpenRouter): `full` e le varianti sono
+quasi tutti del 27, la replica quasi tutta del 28. Il tetto del nuovo corpus (Qwen3
+0.969–0.989) è in linea con quello del corpus principale (0.957–0.990). 3 testi troncati
+(contro 10), 97 opere (contro 90). Le conclusioni dell'ablazione non cambiano: lo stile da
+solo conserva la direzione (coseno con il full 0.962, prima 0.951), toglierlo costa
+(0.851, prima 0.828), il solo nome conserva circa il 70% (0.703, prima 0.695). Cambia
+l'ordine in coda: con Qwen3 `need_only` (0.699) scende appena sotto `name_only` (0.703).
+Togliere definizione o bisogno resta entro il rumore (cos/tetto 0.98–1.00 con entrambi gli
+embedding; prima 0.97 con BGE-M3).

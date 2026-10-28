@@ -1,6 +1,6 @@
 # Museumbot — parte 2: Gemma 4 31B e il profilo continuo
 
-*Ultimo aggiornamento: 27 ottobre 2026. Il report descrive solo lo stato attuale del codice e
+*Ultimo aggiornamento: 28 ottobre 2026. Il report descrive solo lo stato attuale del codice e
 dei risultati; le decisioni nel tempo sono in `docs/decisioni.md`, la spec dell'esperimento
 in `docs/plans/2026-10-06-profilo-continuo-design.md`. Numeri fra parentesi: embedding
 BGE-M3 (fuori: Qwen3).*
@@ -218,6 +218,9 @@ opera. Quota di testi assegnati alla prima categoria (X), alla seconda (Y) e all
   0.54, 0.19 con BGE-M3) e nessun testo esce dalla coppia.
 
 ![Testi misti nello spazio delle quattro categorie: LDA e PCA dei testi puri con le traiettorie dei misti](../figures/mixed_space_qwen.png)
+
+Nella figura ogni coppia ha un colore; la linea unisce il centroide dei puri di X, quelli
+dei misti a α = 0.25, 0.5, 0.75 (punti, dal più piccolo) e quello dei puri di Y.
 
 Le probabilità medie del probe sono morbide anche sui testi puri (0.39–0.80 sulla classe
 giusta), per cui la quota di testi assegnati è la misura più leggibile.

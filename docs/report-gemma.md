@@ -166,18 +166,19 @@ le celle.
 **Come si alternano i due esperti nel testo** (`generation/mix_diag.py`,
 `results/mix_diag.json`, testi a α = 0.5). Per ogni token il margine log p_X − log p_Y del
 token scelto dice quale esperto lo preferiva (positivo: X, negativo: Y). I token si
-raggruppano in frasi chiuse dalla punteggiatura di fine frase, e ogni frase ha la somma dei
+raggruppano in frasi chiuse dalla punteggiatura di fine frase (non dopo iniziali,
+abbreviazioni come "St." o il punto di un decimale), e ogni frase ha la somma dei
 margini dei suoi token: positiva se la frase è nel complesso più "di X", negativa se "di Y".
 Per ogni testo si prendono la somma massima e minima fra le sue frasi, la media delle somme
 in valore assoluto e i cambi di segno fra frasi consecutive; poi la media sui testi.
 
 | | Rech.–Prof. | Fac.–Prof. | Expl.–Fac. |
 |---|---|---|---|
-| frasi per testo | 11.2 | 10.1 | 12.4 |
+| frasi per testo | 11.0 | 9.9 | 12.3 |
 | somma massima per testo (frase più "di X") | +32.8 | +20.3 | +13.9 |
 | somma minima per testo (frase più "di Y") | −24.0 | −17.4 | −9.4 |
-| somma media in valore assoluto | 12.6 | 8.2 | 4.3 |
-| cambi di segno fra frasi consecutive (osservati / attesi in ordine casuale) | 4.63 / 4.72 | 4.33 / 4.59 | 5.49 / 5.54 |
+| somma media in valore assoluto | 12.7 | 8.4 | 4.4 |
+| cambi di segno fra frasi consecutive (osservati / attesi in ordine casuale) | 4.59 / 4.65 | 4.23 / 4.48 | 5.47 / 5.49 |
 
 I cambi attesi in ordine casuale sono esatti: con p frasi positive e q negative,
 2pq/(p + q).

@@ -31,14 +31,21 @@ from museumbot.generation.vllm_gen import MODEL
 MIXED = ROOT / "data" / "local" / "mixed.jsonl"
 RESULTS = ROOT / "results"
 END = re.compile(r"[.!?…][\"”’)\]]*\s*$")
+# punto che non chiude una frase: iniziale ("W.", "D.C.") o abbreviazione comune
+ABBREV = re.compile(r"(?:\b[A-Z]|\b(?:St|Dr|Mr|Mrs|Ms|Jr|Sr|c|ca|vol|no))\.\s*$")
 
 
 def split_sentences(ids, margins, decode, min_tokens: int = 4) -> list[np.ndarray]:
-    """Margini raggruppati per frase: si chiude dopo la punteggiatura di fine frase."""
+    """Margini raggruppati per frase. Si chiude dopo la punteggiatura di fine frase solo se
+    il token seguente comincia con uno spazio o a capo (non "81.5") e il punto non segue
+    un'iniziale o un'abbreviazione."""
     out, cur = [], []
     for k, i in enumerate(ids):
         cur.append(k)
-        if len(cur) >= min_tokens and END.search(decode([ids[j] for j in cur])):
+        nxt = decode([ids[k + 1]]) if k + 1 < len(ids) else " "
+        text = decode([ids[j] for j in cur])
+        if (len(cur) >= min_tokens and END.search(text) and nxt[:1].isspace()
+                and not ABBREV.search(text)):
             out.append(np.asarray(margins)[cur]); cur = []
     if cur:
         out.append(np.asarray(margins)[cur])

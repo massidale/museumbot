@@ -44,3 +44,23 @@ def test_expected_sign_changes_matches_all_orderings():
     brute = np.mean([sign_changes(p) for p in permutations(v)])
     assert expected_sign_changes(v) == pytest.approx(brute)
     assert expected_sign_changes(np.array([1.0, 2.0])) == 0.0
+
+
+WORDS2 = {1: "It", 2: " measures", 3: " 81", 4: ".", 5: "5", 6: " cm", 7: " Then", 8: " St",
+          9: " Peter", 10: " W", 11: " Mellon", 12: " gave", 13: " it", 14: "!"}
+
+
+def decode2(ids):
+    return "".join(WORDS2[i] for i in ids)
+
+
+def test_split_sentences_keeps_decimals_together():
+    ids = [1, 2, 3, 4, 5, 6, 4, 7, 13, 14]  # "It measures 81.5 cm. Then it!"
+    out = split_sentences(ids, np.arange(10.0), decode2, min_tokens=2)
+    assert [len(s) for s in out] == [7, 3]
+
+
+def test_split_sentences_skips_abbreviations_and_initials():
+    ids = [7, 8, 4, 9, 2, 13, 4, 10, 4, 11, 12, 13, 14]  # "Then St. Peter measures it. W. Mellon gave it!"
+    out = split_sentences(ids, np.arange(13.0), decode2, min_tokens=2)
+    assert [len(s) for s in out] == [7, 6]

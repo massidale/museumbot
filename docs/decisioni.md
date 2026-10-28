@@ -707,3 +707,16 @@ verso un esperto, invece che con una media sul testo intero.
 **Effetto.** I cambi di segno non cambiano (4.63 / 4.72, 4.33 / 4.59, 5.49 / 5.54).
 Valore ritirato del margine medio: +0.13, +0.01, +0.03 (Rech.–Prof., Fac.–Prof.,
 Expl.–Fac.). Nuovi valori in `results/mix_diag.json` e nel §4 del report di Gemma.
+
+## 2026-10-28 — Alternanza degli esperti: divisione in frasi corretta
+
+**Decisione.** `split_sentences` in `generation/mix_diag.py` chiude una frase solo se il
+token seguente comincia con uno spazio o un a capo e se il punto non segue un'iniziale o
+un'abbreviazione (St, Dr, Mr, Mrs, Ms, Jr, Sr, c., ca., vol., no.).
+**Motivo.** Un controllo a campione ha trovato circa 50 frasi spezzate su 3 356: decimali
+("81." + "5 cm"), iniziali ("Andrew W."), "St.", "D.C.". Resta un caso raro: una frase che
+finisce davvero con un'iniziale (es. "Washington D.C.") si unisce alla successiva.
+**Effetto.** Frasi per testo 11.2, 10.1, 12.4 → 11.0, 9.9, 12.3 (Rech.–Prof., Fac.–Prof.,
+Expl.–Fac.); cambi di segno osservati / attesi 4.63 / 4.72, 4.33 / 4.59, 5.49 / 5.54 →
+4.59 / 4.65, 4.23 / 4.48, 5.47 / 5.49; somme massima e minima invariate al decimo, somma
+assoluta media di un decimo più alta. Conclusioni invariate.

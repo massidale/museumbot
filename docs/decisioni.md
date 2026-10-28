@@ -720,3 +720,12 @@ finisce davvero con un'iniziale (es. "Washington D.C.") si unisce alla successiv
 Expl.–Fac.); cambi di segno osservati / attesi 4.63 / 4.72, 4.33 / 4.59, 5.49 / 5.54 →
 4.59 / 4.65, 4.23 / 4.48, 5.47 / 5.49; somme massima e minima invariate al decimo, somma
 assoluta media di un decimo più alta. Conclusioni invariate.
+
+## 2026-10-28 — Alternanza degli esperti: somma media con segno
+
+**Decisione.** In `generation/mix_diag.py` la somma media delle frasi si calcola con il
+segno (`sentence_sum_mean`) invece che in valore assoluto.
+**Motivo.** Con il segno lo 0 fa da riferimento: dice verso quale esperto pende il testo; il
+valore assoluto dava solo l'intensità, positiva per costruzione.
+**Effetto.** Valori ritirati della somma assoluta media: 12.7, 8.4, 4.4 (Rech.–Prof.,
+Fac.–Prof., Expl.–Fac.); nuovi valori con segno: +3.1, +0.3, +0.7.

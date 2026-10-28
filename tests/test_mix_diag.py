@@ -31,7 +31,7 @@ def test_sign_changes_ignores_zeros():
 def test_sentence_stats_on_sentence_sums():
     # frasi: somme +3, -1, +2
     st = sentence_stats([np.array([1.0, 2.0]), np.array([-1.0]), np.array([0.5, 1.5])])
-    assert st == pytest.approx({"n_sentences": 3, "max": 3.0, "min": -1.0, "abs_mean": 2.0,
+    assert st == pytest.approx({"n_sentences": 3, "max": 3.0, "min": -1.0, "mean": 4 / 3,
                                 "changes": 2, "expected": 2 * 2 * 1 / 3})
 
 

@@ -10,8 +10,8 @@ frasi (tokenizer del generatore); ogni frase ha la somma dei margini dei suoi to
 (positiva: frase piu' "di X"). Per ogni testo a alpha = 0.5, poi in media sui testi:
 
   - numero di frasi;
-  - somma massima, somma minima e somma media in valore assoluto fra le frasi: quanto una
-    frase arriva a pendere verso X o verso Y;
+  - somma massima e somma minima fra le frasi: quanto una frase arriva a pendere verso X o
+    verso Y; somma media con segno: verso quale esperto pende il testo (0 = equilibrio);
   - cambi di segno fra frasi consecutive, contro l'atteso con le stesse frasi in ordine
     casuale (2pq/n, esatto): meno cambi del caso = blocchi di frasi dello stesso esperto.
 
@@ -68,7 +68,7 @@ def sentence_stats(sents: list[np.ndarray]) -> dict:
     """Statistiche di un testo sulle somme dei margini per frase."""
     v = np.array([x.sum() for x in sents])
     return {"n_sentences": len(v), "max": float(v.max()), "min": float(v.min()),
-            "abs_mean": float(np.abs(v).mean()),
+            "mean": float(v.mean()),
             "changes": sign_changes(v), "expected": expected_sign_changes(v)}
 
 
@@ -96,7 +96,7 @@ def run(alpha: float = 0.5) -> dict:
             "sentences_mean": round(mean("n_sentences"), 2),
             "sentence_sum_max_mean": round(mean("max"), 2),
             "sentence_sum_min_mean": round(mean("min"), 2),
-            "sentence_sum_abs_mean": round(mean("abs_mean"), 2),
+            "sentence_sum_mean": round(mean("mean"), 2),
             "sign_changes_observed": round(mean("changes"), 2),
             "sign_changes_expected": round(mean("expected"), 2)}
     return out

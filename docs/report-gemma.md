@@ -170,14 +170,15 @@ raggruppano in frasi chiuse dalla punteggiatura di fine frase (non dopo iniziali
 abbreviazioni come "St." o il punto di un decimale), e ogni frase ha la somma dei
 margini dei suoi token: positiva se la frase è nel complesso più "di X", negativa se "di Y".
 Per ogni testo si prendono la somma massima e minima fra le sue frasi, la media delle somme
-in valore assoluto e i cambi di segno fra frasi consecutive; poi la media sui testi.
+con il loro segno (0: il testo non pende verso nessuno dei due) e i cambi di segno fra frasi
+consecutive; poi la media sui testi.
 
 | | Rech.–Prof. | Fac.–Prof. | Expl.–Fac. |
 |---|---|---|---|
 | frasi per testo | 11.0 | 9.9 | 12.3 |
 | somma massima per testo (frase più "di X") | +32.8 | +20.3 | +13.9 |
 | somma minima per testo (frase più "di Y") | −24.0 | −17.4 | −9.4 |
-| somma media in valore assoluto | 12.7 | 8.4 | 4.4 |
+| somma media (positiva: il testo pende verso X) | +3.1 | +0.3 | +0.7 |
 | cambi di segno fra frasi consecutive (osservati / attesi in ordine casuale) | 4.59 / 4.65 | 4.23 / 4.48 | 5.47 / 5.49 |
 
 I cambi attesi in ordine casuale sono esatti: con p frasi positive e q negative,
@@ -185,9 +186,10 @@ I cambi attesi in ordine casuale sono esatti: con p frasi positive e q negative,
 
 In ogni testo ci sono frasi che pendono nettamente verso un esperto e frasi che pendono
 verso l'altro, e la loro intensità segue la distanza fra le categorie: più forte nella
-coppia Recharger–Professional/Hobbyist, più debole nella coppia vicina. Nelle coppie
-contrapposte la frase più "di X" pende più della frase più "di Y" (+32.8 contro −24.0,
-+20.3 contro −17.4). Le frasi dello stesso esperto però non si raggruppano in blocchi più
+coppia Recharger–Professional/Hobbyist, più debole nella coppia vicina. Nel complesso, a
+α = 0.5, il testo pende verso il Recharger nella coppia con il Professional/Hobbyist (somma
+media +3.1, con frasi che arrivano a ±25–33) e resta vicino all'equilibrio nelle altre due
+(+0.3 e +0.7). Le frasi dello stesso esperto però non si raggruppano in blocchi più
 che per caso: i due registri si alternano frase per frase, senza sezioni. Il margine vede
 solo il token scelto, non le distribuzioni intere.
 

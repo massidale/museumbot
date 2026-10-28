@@ -6,7 +6,7 @@
       "sentences_mean": 12.28,
       "sentence_sum_max_mean": 13.86,
       "sentence_sum_min_mean": -9.41,
-      "sentence_sum_abs_mean": 4.36,
+      "sentence_sum_mean": 0.66,
       "sign_changes_observed": 5.47,
       "sign_changes_expected": 5.49
     },
@@ -15,7 +15,7 @@
       "sentences_mean": 9.88,
       "sentence_sum_max_mean": 20.31,
       "sentence_sum_min_mean": -17.37,
-      "sentence_sum_abs_mean": 8.36,
+      "sentence_sum_mean": 0.33,
       "sign_changes_observed": 4.23,
       "sign_changes_expected": 4.48
     },
@@ -24,7 +24,7 @@
       "sentences_mean": 10.99,
       "sentence_sum_max_mean": 32.83,
       "sentence_sum_min_mean": -23.99,
-      "sentence_sum_abs_mean": 12.72,
+      "sentence_sum_mean": 3.11,
       "sign_changes_observed": 4.59,
       "sign_changes_expected": 4.65
     }

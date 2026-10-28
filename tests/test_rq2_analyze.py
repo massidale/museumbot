@@ -1,6 +1,6 @@
 import pytest
 
-from museumbot.rq2_judge.analyze import bootstrap_mean, criteria, paired_diff, pair_scores
+from museumbot.rq2_judge.analyze import criteria, pair_scores, rate
 
 
 def j(pid, typ, persona, order, chose, choice="A", valid=True, a="Q1", target=None):
@@ -34,22 +34,9 @@ def test_criteria():
     assert c["position_A_rate"] == 0.75
 
 
-def test_paired_diff_matches_on_artwork_and_category():
-    scores = {
-        "Q1|explorer|A": {"artwork_id": "Q1", "type": "A", "persona": "explorer",
-                          "target": ["Q1", "explorer"], "score": 1.0},
-        "Q1|explorer|C": {"artwork_id": "Q1", "type": "C", "persona": "explorer",
-                          "target": ["Q1", "recharger"], "score": 0.5},
-        "Q1|explorer|N": {"artwork_id": "Q1", "type": "N", "persona": "neutral",
-                          "target": ["Q1", "explorer"], "score": 0.0},
-    }
-    assert paired_diff(scores, "A", "C") == {"Q1": [0.5]}
-    assert paired_diff(scores, "A", "N") == {"Q1": [1.0]}
-
-
-def test_bootstrap_mean_of_constant_is_exact():
-    m, lo, hi = bootstrap_mean({"Q1": [1.0, 1.0], "Q2": [1.0]}, n=50)
-    assert m == lo == hi == pytest.approx(1.0)
+def test_rate_is_mean_over_all_pairs():
+    assert rate({"Q1": [1.0, 0.5], "Q2": [0.0]}) == {"mean": 0.5, "n": 3}
+    assert rate({}) == {"mean": None, "n": 0}
 
 
 def test_preference_matrix_uses_a_on_diagonal_and_c_off():

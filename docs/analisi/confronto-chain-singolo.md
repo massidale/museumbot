@@ -30,7 +30,7 @@ modello alla fonte; il Prompt 3 della chain, ripreso dal paper, no:
 | | istruzione sui fatti |
 |---|---|
 | prompt singolo (`common/prompts.py`) | *"drawing only on the factual material provided. Include the most important information and any lesser-known facts present in the source"*, più *"No headings, no bullet points, no stage directions"* |
-| chain, Prompt 3 (`generation/compare_chain.py`) | *"Remember to include most important information and lesser-known facts"*, senza riferimento alla fonte |
+| chain, Prompt 3 (`generation/chain_study.py`) | *"Remember to include most important information and lesser-known facts"*, senza riferimento alla fonte |
 
 La chain quindi aggiunge "dettagli poco noti" presi dalla conoscenza del modello, e
 in diversi casi li inventa. Lo si vede su tutto lo studio: percentuale di testi con

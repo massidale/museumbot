@@ -4,10 +4,8 @@ Confronti da `mixed_pairs.build_mixed_pairs`, testi del corpus `local` (puri e r
 di data/local/mixed.jsonl (misti validi). Stesse persone, modello e parametri di RQ2
 (`judge.py`); un solo ordine A/B per confronto. Domande:
 
-    curve, double              la stessa di RQ2 (quale ascolteresti)
-    coherence                  quale suona come una voce sola, coerente dall'inizio alla fine
-    rank                       ordinare 5 testi da "piu' per X" a "piu' per Y" (definizioni di
-                               Falk delle due categorie nel messaggio)
+    curve, double   la stessa di RQ2 (quale ascolteresti)
+    coherence       quale suona come una voce sola, coerente dall'inizio alla fine
 
 Scrive data/judgments_mixed.jsonl in append-only con chiave pair_id: riavviabile.
 """
@@ -21,11 +19,10 @@ import requests
 
 from museumbot.common.config import ROOT, ollama_key
 from museumbot.common.corpus import load_corpus
-from museumbot.common.prompts import CATEGORY_PARTS
 from museumbot.rq2_judge.judge import MODEL, PRICE, QUESTION, TokenBudget, judge_one
-from museumbot.rq2_judge.mixed_pairs import build_mixed_pairs, parse_order
+from museumbot.rq2_judge.mixed_pairs import build_mixed_pairs
 from museumbot.rq2_judge.pairs import pilot_artworks
-from museumbot.rq2_judge.personas import NEUTRAL, persona_prompt
+from museumbot.rq2_judge.personas import persona_prompt
 
 OUT = ROOT / "data" / "judgments_mixed.jsonl"
 MIXED = ROOT / "data" / "local" / "mixed.jsonl"
@@ -52,7 +49,7 @@ def text_index(local_rows, mixed_rows) -> tuple[dict, dict]:
     return texts, titles
 
 
-def build_ab(p: dict, order: str, texts: dict, titles: dict, question: str) -> list[dict]:
+def build_ab(p: dict, order: str, texts: dict, titles: dict, question: str = QUESTION) -> list[dict]:
     first, second = (p["target"], p["other"]) if order == "target_first" else (p["other"], p["target"])
     title, artist = titles[p["artwork_id"]]
     user = (f"You are standing in front of {title} by {artist}. "
@@ -63,33 +60,7 @@ def build_ab(p: dict, order: str, texts: dict, titles: dict, question: str) -> l
             {"role": "user", "content": user}]
 
 
-def describe(cat: str) -> str:
-    part = CATEGORY_PARTS[cat]
-    return f"{part['name'].split(' ', 1)[1]}: {part['def']}"
-
-
-def build_rank(p: dict, texts: dict, titles: dict) -> list[dict]:
-    title, artist = titles[p["artwork_id"]]
-    x, y = p["pair"]
-    guides = "\n\n".join(f"Audio guide {k}:\n{texts[tuple(t)]}"
-                         for k, t in enumerate(p["texts"], 1))
-    user = (f"You are standing in front of {title} by {artist}. The museum offers five audio "
-            "guides for it.\n\n"
-            f"Visitor type X is {describe(x)}\nVisitor type Y is {describe(y)}\n\n"
-            f"{guides}\n\n"
-            "Order the five guides from the one best suited to visitor type X to the one best "
-            "suited to visitor type Y. Answer only with a JSON object: "
-            '{"reason": "<one or two sentences>", "order": [the five guide numbers]}')
-    return [{"role": "system", "content": persona_prompt(NEUTRAL)},
-            {"role": "user", "content": user}]
-
-
 def judge_item(session, p: dict, texts, titles, budget) -> dict:
-    if p["type"] == "rank":
-        res = judge_one(session, build_rank(p, texts, titles), budget,
-                        parse=lambda c: parse_order(c, len(p["texts"])))
-        ranked = [p["alphas"][k - 1] for k in res["choice"]] if res["valid"] else None
-        return p | {"model": MODEL, "ranked_alphas": ranked} | res
     q = COHERENCE_Q if p["type"] == "coherence" else QUESTION
     res = judge_one(session, build_ab(p, p["order"], texts, titles, q), budget)
     chose = (res["choice"] == "A") == (p["order"] == "target_first") if res["valid"] else None
@@ -116,8 +87,7 @@ def main() -> None:
         keep = pilot_artworks(arts, args.limit)
         arts = [a for a in arts if a in keep]
     items = build_mixed_pairs(arts, PAIRS)
-    need = lambda p: [tuple(t) for t in p["texts"]] if p["type"] == "rank" else [
-        tuple(p["target"]), tuple(p["other"])]
+    need = lambda p: [tuple(p["target"]), tuple(p["other"])]
     missing = [p["pair_id"] for p in items if any(k not in texts for k in need(p))]
     items = [p for p in items if p["pair_id"] not in set(missing)]
     done = read_done()

@@ -6,42 +6,33 @@ neutralizza il bias di posizione. Le coppie con un ordine non valido sono esclus
     A      testo k vs flat, persona k           > 0.5: preferisce il personalizzato
     B      testo k vs testo j, persona k        > 0.5: preferenza specifica
     C      testo j vs flat, persona k           descrittiva
-    A - C  appaiata per (opera, k)              > 0: oltre l'effetto "testo elaborato"
-    A - N  appaiata per (opera, k)              effetto della persona
-
-IC al 95% con bootstrap sulle opere. Lunghezza: regressione logistica con IC bootstrap e
-sensibilita' sulle coppie con differenza di lunghezza < 10%.
+    N      testo k vs flat, senza persona       descrittiva
 
 Analisi esplorative (decise dopo aver visto i dati, sezione `exploratory` del JSON):
 matrice di preferenza persona x testo (vittoria sul flat: A in diagonale, C fuori),
 confusioni in B, consistenza per tipo, posizione per persona, quante motivazioni citano la
-propria categoria, e legame con RQ1: correlazione di Spearman fra l'accettazione dei testi
-altrui (C) e distanza e coseno fra categorie negli embedding (results/metrics_*.json).
+propria categoria.
 """
 
 import argparse
 import json
 import re
-from collections import Counter, defaultdict
+from collections import defaultdict
 
 import matplotlib
-from scipy.stats import spearmanr
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.linear_model import LogisticRegression
 
 from museumbot.common.config import ROOT
 from museumbot.common.prompts import FALK_CATEGORIES, LABELS
-from museumbot.rq2_judge.judge import MODEL, OUT, corpus_index, out_path
+from museumbot.rq2_judge.judge import MODEL, OUT, out_path
 
 RESULTS = ROOT / "results"
 FIGS = ROOT / "figures"
 TYPES = ("A", "B", "C", "N")
 THRESHOLDS = {"valid_rate": 0.98}
-LENGTH_WORDS = re.compile(r"\b(long|longer|lengthy|short|shorter|concise|brief|succinct)\b", re.I)
-RNG = np.random.default_rng(0)
 
 
 def tag(corpus: str = "main") -> str:
@@ -88,17 +79,6 @@ def criteria(rows: list[dict]) -> dict:
     }
 
 
-def bootstrap_mean(values: dict[str, list[float]], n: int = 2000) -> tuple[float, float, float]:
-    """Media dei valori e IC al 95% ricampionando le opere."""
-    arts = list(values)
-    sums = np.array([sum(values[a]) for a in arts])
-    counts = np.array([len(values[a]) for a in arts])
-    point = sums.sum() / counts.sum()
-    idx = RNG.integers(0, len(arts), size=(n, len(arts)))
-    boot = sums[idx].sum(axis=1) / counts[idx].sum(axis=1)
-    return float(point), float(np.percentile(boot, 2.5)), float(np.percentile(boot, 97.5))
-
-
 def by_artwork(scores, typ, cat=None) -> dict[str, list[float]]:
     out = defaultdict(list)
     for s in scores.values():
@@ -107,87 +87,20 @@ def by_artwork(scores, typ, cat=None) -> dict[str, list[float]]:
     return out
 
 
-def paired_diff(scores, t1, t2, cat=None) -> dict[str, list[float]]:
-    """Differenze t1 - t2 appaiate per (opera, categoria k)."""
-    key = lambda s: (s["artwork_id"], category(s))
-    s1 = {key(s): s["score"] for s in scores.values() if s["type"] == t1}
-    s2 = {key(s): s["score"] for s in scores.values() if s["type"] == t2}
-    out = defaultdict(list)
-    for (a, k), v in s1.items():
-        if (a, k) in s2 and (cat is None or k == cat):
-            out[a].append(v - s2[(a, k)])
-    return dict(out)
-
-
-def ci(values) -> dict:
-    if not values:
-        return {"mean": None, "ci95": None, "n": 0}
-    m, lo, hi = bootstrap_mean(values)
-    return {"mean": m, "ci95": [lo, hi], "n": sum(len(v) for v in values.values())}
+def rate(values) -> dict:
+    """Media su tutte le coppie e numero di coppie."""
+    n = sum(len(v) for v in values.values())
+    if not n:
+        return {"mean": None, "n": 0}
+    return {"mean": float(sum(sum(v) for v in values.values()) / n), "n": n}
 
 
 def rates(scores) -> dict:
     out = {}
     for t in TYPES:
-        out[t] = {"overall": ci(by_artwork(scores, t))}
+        out[t] = {"overall": rate(by_artwork(scores, t))}
         for k in FALK_CATEGORIES:
-            out[t][LABELS[k]] = ci(by_artwork(scores, t, k))
-    for t1, t2 in (("A", "C"), ("A", "N")):
-        name = f"{t1}-{t2}"
-        out[name] = {"overall": ci(paired_diff(scores, t1, t2))}
-        for k in FALK_CATEGORIES:
-            out[name][LABELS[k]] = ci(paired_diff(scores, t1, t2, k))
-    return out
-
-
-def length_analysis(rows, scores, words) -> dict:
-    """Effetto della differenza di lunghezza sulla scelta, a parita' di tipo di coppia."""
-    data = []
-    for r in rows:
-        if not r["valid"] or r["type"] not in TYPES:
-            continue
-        d = words[tuple(r["target"])] - words[tuple(r["other"])]
-        data.append((r["artwork_id"], TYPES.index(r["type"]), d, float(r["chose_target"])))
-    arts = sorted({a for a, *_ in data})
-    sd = np.std([d for _, _, d, _ in data]) or 1.0
-
-    def fit(sample):
-        X = np.array([[t == i for i in range(4)] + [d / sd] for _, t, d, _ in sample], float)
-        y = np.array([v for *_, v in sample])
-        return LogisticRegression(C=np.inf, fit_intercept=False, max_iter=2000).fit(X, y).coef_[0][-1]
-
-    by_art = defaultdict(list)
-    for row in data:
-        by_art[row[0]].append(row)
-    point = fit(data)
-    boot = [fit([row for a in RNG.choice(arts, len(arts)) for row in by_art[a]]) for _ in range(200)]
-    # sensibilita': coppie con lunghezze entro il 10%
-    close = {pid: s for pid, s in scores.items() if s["type"] in TYPES
-             and abs(words[tuple(s["target"])] - words[tuple(s["other"])])
-             < 0.1 * max(words[tuple(s["target"])], words[tuple(s["other"])])}
-    return {
-        "logit_per_sd_words": {"coef": float(point), "ci95": [float(np.percentile(boot, 2.5)),
-                                                             float(np.percentile(boot, 97.5))],
-                               "sd_words": float(sd)},
-        "close_length_pairs": {t: ci(by_artwork(close, t)) for t in TYPES},
-        "target_longer_rate": {t: float(np.mean([words[tuple(s["target"])] > words[tuple(s["other"])]
-                                                 for s in scores.values() if s["type"] == t]))
-                               for t in TYPES},
-    }
-
-
-def reasons_summary(rows) -> dict:
-    valid = [r for r in rows if r["valid"] and r["type"] in TYPES]
-    stop = set("the a an of and to in it is its this that for with as on by i my me more than "
-               "while guide audio b both which would be are or but me's".split())
-    out = {"mentions_length": {t: float(np.mean([bool(LENGTH_WORDS.search(r["reason"] or ""))
-                                                for r in valid if r["type"] == t])) for t in TYPES}}
-    top = {}
-    for k in FALK_CATEGORIES:
-        c = Counter(w for r in valid if r["type"] in "AB" and r["persona"] == k
-                    for w in re.findall(r"[a-z']{4,}", (r["reason"] or "").lower()) if w not in stop)
-        top[LABELS[k]] = [w for w, _ in c.most_common(12)]
-    out["top_words"] = top
+            out[t][LABELS[k]] = rate(by_artwork(scores, t, k))
     return out
 
 
@@ -221,40 +134,14 @@ def confusions_b(scores) -> dict:
             for (k, j), v in sorted(acc.items()) if np.mean(v) < 1}
 
 
-def rq1_link(M: np.ndarray, corpus: str = "main") -> dict:
-    """Spearman fra l'accettazione dei testi altrui (C, fuori diagonale) e la geometria di RQ1."""
-    cells = [(i, j) for i in range(len(FALK_CATEGORIES)) for j in range(len(FALK_CATEGORIES)) if i != j]
-    c = [M[i, j] for i, j in cells]
-    # versione simmetrica: media dei due versi per ciascuna delle 10 coppie
-    pairs = [(i, j) for i, j in cells if i < j]
-    c_sym = [(M[i, j] + M[j, i]) / 2 for i, j in pairs]
-    out = {}
-    for model in ("qwen", "bge-m3"):
-        path = RESULTS / f"metrics_{model}{'' if corpus == 'main' else '_' + corpus}.json"
-        if not path.exists():
-            continue
-        r = json.loads(path.read_text())
-        lab = [LABELS[k] for k in FALK_CATEGORIES]
-        dist = lambda i, j: r["crossval_distance"][lab[i]][lab[j]]["mean"]
-        cos = lambda i, j: r["cosine_matrix"][lab[i]][lab[j]]
-        res = {}
-        for name, f in (("distance", dist), ("cosine", cos)):
-            rho, p = spearmanr(c, [f(i, j) for i, j in cells])
-            rho_s, p_s = spearmanr(c_sym, [f(i, j) for i, j in pairs])
-            res[name] = {"rho_20": float(rho), "p_20": float(p), "rho_10": float(rho_s), "p_10": float(p_s)}
-        out[model] = res
-    return out
-
-
-def exploratory(rows, scores, corpus: str = "main") -> dict:
-    M, n = preference_matrix(scores)
+def exploratory(rows, scores) -> dict:
+    M, _ = preference_matrix(scores)
     valid = [r for r in rows if r["valid"] and r["type"] in TYPES]
     lab = [LABELS[k] for k in FALK_CATEGORIES]
     off = [float(np.nanmean(np.delete(M[:, j], j))) for j in range(len(lab))]
     return {
         "preference_matrix": {lab[i]: {lab[j]: float(M[i, j]) for j in range(len(lab))}
                               for i in range(len(lab))},
-        "preference_n": {lab[i]: {lab[j]: int(n[i, j]) for j in range(len(lab))} for i in range(len(lab))},
         "accepted_by_others": dict(zip(lab, off)),
         "b_confusions": confusions_b(scores),
         "consistency_by_type": {t: float(np.mean([s["consistent"] for s in scores.values() if s["type"] == t]))
@@ -265,7 +152,6 @@ def exploratory(rows, scores, corpus: str = "main") -> dict:
             LABELS[k]: float(np.mean([bool(re.search(SELF_NAME[k], r["reason"] or "", re.I))
                                       for r in valid if r["persona"] == k]))
             for k in FALK_CATEGORIES},
-        "rq1_link": rq1_link(M, corpus),
     }
 
 
@@ -300,15 +186,12 @@ def fig_rates(res: dict, path) -> None:
     for i, t in enumerate(TYPES):
         vals = [res["rates"][t]["overall" if g == "overall" else LABELS[g]] for g in groups]
         m = np.array([v["mean"] for v in vals])
-        lo = m - np.array([v["ci95"][0] for v in vals])
-        hi = np.array([v["ci95"][1] for v in vals]) - m
-        ax.bar(x + (i - 1.5) * w, m, w, color=colors[t], label=desc[t], yerr=[lo, hi],
-               capsize=2, error_kw={"lw": 0.8})
+        ax.bar(x + (i - 1.5) * w, m, w, color=colors[t], label=desc[t])
     ax.axhline(0.5, color="#444", ls=":", lw=1)
     ax.set_xticks(x, names, rotation=20, ha="right")
     ax.set_ylim(0, 1.05)
     ax.set_ylabel("tasso di vittoria dell'elemento di interesse")
-    ax.set_title(f"RQ2 — giudice {MODEL} con persona (IC 95% bootstrap sulle opere)", fontsize=11)
+    ax.set_title(f"RQ2 — giudice {MODEL} con persona", fontsize=11)
     ax.legend(frameon=False, fontsize=8, ncol=4, loc="upper center", bbox_to_anchor=(0.5, -0.22))
     ax.spines[["top", "right"]].set_visible(False)
     fig.tight_layout()
@@ -335,25 +218,17 @@ def main() -> None:
     if args.criteria_only:
         return
 
-    texts, _ = corpus_index(args.corpus)
-    words = {k: len(t.split()) for k, t in texts.items()}
     scores = pair_scores(rows)
     res = {"model": MODEL, "criteria": crit,
-           "n_pairs": dict(Counter(s["type"] for s in scores.values())),
            "rates": rates(scores),
-           "length": length_analysis(rows, scores, words),
-           "reasons": reasons_summary(rows),
-           "exploratory": exploratory(rows, scores, args.corpus)}
+           "exploratory": exploratory(rows, scores)}
 
-    print("\ntassi (media dei due ordini, IC 95%):")
-    for t in (*TYPES, "A-C", "A-N"):
+    print("\ntassi (media dei due ordini):")
+    for t in TYPES:
         o = res["rates"][t]["overall"]
-        print(f"  {t:4} {o['mean']:.3f} [{o['ci95'][0]:.3f}, {o['ci95'][1]:.3f}]  n={o['n']}")
+        print(f"  {t:4} {o['mean']:.3f}  n={o['n']}")
         print("       " + "  ".join(f"{LABELS[k]} {res['rates'][t][LABELS[k]]['mean']:.2f}"
                                     for k in FALK_CATEGORIES))
-    lg = res["length"]["logit_per_sd_words"]
-    print(f"\nlunghezza: logit per 1 sd di parole ({lg['sd_words']:.0f}) = {lg['coef']:+.2f} "
-          f"[{lg['ci95'][0]:+.2f}, {lg['ci95'][1]:+.2f}]")
 
     RESULTS.mkdir(exist_ok=True)
     FIGS.mkdir(exist_ok=True)
@@ -362,12 +237,10 @@ def main() -> None:
     ex = res["exploratory"]
     print("\nesplorative — accettazione dei testi altrui da parte delle altre persone:")
     print("  " + "  ".join(f"{k} {v:.2f}" for k, v in ex["accepted_by_others"].items()))
-    for model, r in ex["rq1_link"].items():
-        print(f"  legame con RQ1 [{model}]: Spearman con la distanza {r['distance']['rho_20']:+.2f} "
-              f"(10 coppie {r['distance']['rho_10']:+.2f}), con il coseno {r['cosine']['rho_20']:+.2f}")
     fig_rates(res, FIGS / f"judge_{tg}.png")
-    fig_matrix(ex, FIGS / f"judge_{tg}_matrix.png")
-    print(f"\n-> {out.relative_to(ROOT)}, figures/judge_{tg}.png, figures/judge_{tg}_matrix.png")
+    if args.corpus == "main":  # la matrice e' citata solo per il corpus principale
+        fig_matrix(ex, FIGS / f"judge_{tg}_matrix.png")
+    print(f"\n-> {out.relative_to(ROOT)}, figures/judge_{tg}*.png")
 
 
 if __name__ == "__main__":

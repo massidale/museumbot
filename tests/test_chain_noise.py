@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 
 from museumbot.common.prompts import FALK_CATEGORIES
-from museumbot.rq1_embeddings.chain_noise import bootstrap, ratio, steering_stats, text_level
+from museumbot.rq1_embeddings.chain_noise import ratio, steering_stats, text_level
 
 
 def unit(x):
@@ -28,8 +28,6 @@ def test_ratio_near_one_when_chain_is_just_noise():
     E, idx = synthetic(np.random.default_rng(0))
     df = text_level(E, idx)
     assert ratio(df, "between") == pytest.approx(1.0, abs=0.08)
-    lo, hi = bootstrap(df, lambda d: ratio(d, "between"), n=200)
-    assert lo < 1.0 < hi
 
 
 def test_ratio_above_one_when_chain_differs():

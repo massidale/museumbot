@@ -11,13 +11,11 @@ Assunzione: la chain ha lo stesso rumore del singolo. Se fosse piu' rumorosa, l'
 verrebbe contato come differenza fra metodi: un risultato "uguale al rumore" e' quindi
 conservativo, uno "maggiore del rumore" va verificato con una seconda run della chain.
 
-Tutto viene generato su un provider fisso (default deepinfra/fp8), con ragionamento al
-default del modello, e i job sono mescolati fra metodi: nessun metodo viene generato in un
-momento diverso dagli altri. Il file e' separato dal corpus principale, che e' stato
-generato con routing libero; il confronto fra i due rumori misura quanto pesa quel routing.
+Tutto viene generato su un provider fisso (default deepinfra/fp8) e i job sono mescolati
+fra metodi: nessun metodo viene generato in un momento diverso dagli altri.
 
 Ragionamento: attivato esplicitamente. Il default dipende dal provider (Venice ragiona,
-DeepInfra no), e il corpus principale e' stato generato in prevalenza con ragionamento.
+DeepInfra no).
 
 Pulizia: la chain apre con una frase di presentazione ("Here is a 250-word audio guide ...
 for the Recharger"), separata da `---`, usa markdown e spesso scrive in formato copione:
@@ -43,13 +41,30 @@ import requests
 from museumbot.common.clean import clean_guide
 from museumbot.common.config import ROOT, openrouter_key
 from museumbot.common.prompts import FALK_CATEGORIES, USER_TEMPLATE, build_messages
-from museumbot.generation.compare_chain import (
-    CHAIN_CATEGORY_NAME,
-    CHAIN_P1,
-    CHAIN_P2,
-    CHAIN_P3,
-)
 from museumbot.generation.generate import ARTWORKS, Budget, generate_one, provider_routing
+
+# Prompt 1, 2 e 3 riportati verbatim dal paper (Sez. 3.2 / Appendice A).
+CHAIN_P1 = "Do you know the five museum visitor categories by John H. Falk?"
+CHAIN_P2 = (
+    "Can you recognize the needs for each of these categories during the description "
+    "of an artwork?"
+)
+CHAIN_P3 = (
+    "Now create a 250 words audio guide for the painting {title} by {artist} that fits "
+    "the needs of the {category}. Remember to include most important information and "
+    "lesser-known facts using a proper style for the given visitor category. Don't say "
+    'something like "For those" "For who" "As" or explicitly refer to the target '
+    "category of that description."
+)
+
+# Nomi come li userebbe il paper nel Prompt 3.
+CHAIN_CATEGORY_NAME = {
+    "explorer": "Explorer",
+    "facilitator": "Facilitator",
+    "experience_seeker": "Experience Seeker",
+    "professional_hobbyist": "Professional/Hobbyist",
+    "recharger": "Recharger",
+}
 
 OUT = ROOT / "data" / "main" / "chain_study.jsonl"
 PREFIX = ROOT / "data" / "main" / "chain_study_prefix.json"

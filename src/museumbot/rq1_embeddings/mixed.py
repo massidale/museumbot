@@ -82,13 +82,12 @@ def method_check(Xm, Xp, Xr, idx_p, cond: int) -> float:
 def run(alias: str) -> dict:
     rows = [r for r in map(json.loads, MIXED.open()) if not r["usage"]["failed"]]
     E = embed_mixed(alias, rows)
-    Xp, arts, meta = load(alias, "full", "local")
+    Xp, arts, _ = load(alias, "full", "local")
     Xr, arts_r, _ = load(alias, "full_rep", "local")
     assert arts == arts_r
     V = steering(Xp)
     ai = {a: i for i, a in enumerate(arts)}
     out = {"model": alias, "pairs": {}}
-    words = meta.set_index(["artwork_id", "condition"])["words"]
     for pair in sorted({tuple(r["pair"]) for r in rows}):
         cx, cy = (CONDITIONS.index(c) for c in pair)
         vx, vy = V[cx - (cx > FLAT)], V[cy - (cy > FLAT)]
@@ -108,9 +107,6 @@ def run(alias: str) -> dict:
         Dv = np.concatenate([Xp[:, cx] - Xp[:, FLAT], Xp[:, cy] - Xp[:, FLAT]])
         al_all = np.concatenate([np.zeros(n), np.ones(n), alpha[inner]])
         D_all = np.concatenate([Dv, D[inner]])
-        w_all = np.concatenate([[words[(a, pair[0])] for a in arts],
-                                [words[(a, pair[1])] for a in arts],
-                                [rows[i]["words"] for i, k in zip(sel, inner) if k]])
         cov_all = np.concatenate([np.full(2 * n, np.nan),
                                   [rows[i]["usage"]["covered_all"] for i, k in zip(sel, inner) if k]])
         pos, res = position(D_all, vx, vy), residual(D_all, vx, vy)
@@ -124,14 +120,14 @@ def run(alias: str) -> dict:
                 "position_iqr": [round(float(q), 3) for q in np.percentile(pos[m], [25, 75])],
                 "residual_median": round(float(np.median(res[m])), 3),
                 "residual_ratio": round(float(np.median(res[m]) / res_pure), 3),
-                "covered_all_mean": None if al in (0, 1) else round(float(np.nanmean(cov_all[m])), 4),
-                "words_median": float(np.median(w_all[m]))}
+                "covered_all_mean": None if al in (0, 1) else round(float(np.nanmean(cov_all[m])), 4)}
         rho = spearmanr(al_all, pos).statistic
         out["pairs"]["+".join(pair)] = {"by_alpha": by, "residual_pure_median": round(res_pure, 3),
                                         "segment_norm": round(float(np.linalg.norm(vy - vx)), 3),
                                         "spearman_alpha_position": round(float(rho), 3),
                                         "method_check_ratio": checks}
-        plot(alias, pair, al_all, pos)
+        if alias == "qwen":  # figure citate: solo Qwen3
+            plot(alias, pair, al_all, pos)
     return out
 
 

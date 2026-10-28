@@ -48,7 +48,6 @@ from museumbot.common.prompts import CONDITIONS, FALK_CATEGORIES, LABELS
 FIGS = ROOT / "figures"
 RESULTS = ROOT / "results"
 
-RNG = np.random.default_rng(0)
 FLAT = CONDITIONS.index("flat")
 FALK_IDX = [CONDITIONS.index(c) for c in FALK_CATEGORIES]
 COLORS = {
@@ -124,56 +123,39 @@ def probe(Xc, n_splits=5):
 # --------------------------------------------------- 2. consistenza della direzione
 
 
-def halves(A, n_rep):
-    """n_rep coppie di meta' disgiunte e casuali degli indici di opera."""
-    for _ in range(n_rep):
-        p = RNG.permutation(A)
-        yield p[: A // 2], p[A // 2 :]
+def half_split(A, seed=0):
+    """Una divisione casuale (seed fisso) degli indici di opera in due meta' disgiunte."""
+    p = np.random.default_rng(seed).permutation(A)
+    return p[: A // 2], p[A // 2 :]
 
 
-def split_half(X, ref="flat", n_rep=200):
-    """Coseno fra v[c] stimato su due meta' disgiunte di opere, mediato su n_rep split.
-
-    ref="flat": 5 valori (nell'ordine di FALK_CATEGORIES), affidabilita' degli steering
-    vector riportati. ref="mean": 6 valori (tutte le CONDITIONS), include la stabilita' del
-    flat; e' piu' alta perche' la media di 6 testi e' un riferimento meno rumoroso di uno solo.
-    """
-    out = []
-    for h1, h2 in halves(len(X), n_rep):
-        # ogni meta' viene centrata per opera in modo indipendente
-        if ref == "flat":
-            v1, v2 = steering(X[h1]), steering(X[h2])
-        else:
-            v1, v2 = center(X[h1], ref).mean(axis=0), center(X[h2], ref).mean(axis=0)
-        out.append(np.sum(v1 * v2, axis=1) / (
-            np.linalg.norm(v1, axis=1) * np.linalg.norm(v2, axis=1) + 1e-12
-        ))
-    out = np.array(out)
-    return out.mean(axis=0), out.std(axis=0)
+def split_half(X):
+    """Coseno fra gli steering vector v[c] (riferimento flat) stimati su due meta' disgiunte
+    di opere, nell'ordine di FALK_CATEGORIES. Una sola divisione: la riproducibilita' si
+    verifica sulla replica (`replicate_ceiling`)."""
+    h1, h2 = half_split(len(X))
+    return row_cosines(steering(X[h1]), steering(X[h2]))
 
 
 # ------------------------------------------------ 3. distanza cross-validata e geometria
 
 
-def crossval_distance(X, n_rep=200):
-    """Distanza euclidea quadrata cross-validata fra condizioni: (C, C) media e std.
+def crossval_distance(X):
+    """Distanza euclidea quadrata cross-validata fra condizioni, (C, C):
 
         d2[a,b] = (v1[a] - v1[b]) . (v2[a] - v2[b])     v1, v2 da meta' disgiunte di opere
 
     E' la crossnobis senza normalizzazione per la covarianza del rumore. Imparziale: vale
     ~0 (anche leggermente negativa) se due condizioni non differiscono, mentre la distanza
     semplice e' sempre gonfiata dal rumore. Usa solo differenze fra condizioni, quindi non
-    dipende dal riferimento del centering.
+    dipende dal riferimento del centering. Stessa divisione di `split_half`.
     """
-    out = []
-    for h1, h2 in halves(len(X), n_rep):
-        # media per condizione senza centering: l'effetto-opera si cancella nelle differenze
-        v1, v2 = X[h1].mean(axis=0), X[h2].mean(axis=0)
-        d1 = v1[:, None] - v1[None]
-        d2 = v2[:, None] - v2[None]
-        out.append(np.sum(d1 * d2, axis=-1))
-    out = np.array(out)
-    return out.mean(axis=0), out.std(axis=0)
+    h1, h2 = half_split(len(X))
+    # media per condizione senza centering: l'effetto-opera si cancella nelle differenze
+    v1, v2 = X[h1].mean(axis=0), X[h2].mean(axis=0)
+    d1 = v1[:, None] - v1[None]
+    d2 = v2[:, None] - v2[None]
+    return np.sum(d1 * d2, axis=-1)
 
 
 def row_cosines(U, V):
@@ -203,8 +185,7 @@ def fig_lda(Xc, arts, path):
     questa separazione la figura sovrastima grossolanamente la separabilita'."""
     F, y, g = flatten(Xc)
     A = len(arts)
-    p = RNG.permutation(A)
-    tr_a, te_a = set(p[: A // 2]), set(p[A // 2 :])
+    tr_a, te_a = map(set, half_split(A))
     tr = np.array([i for i, gi in enumerate(g) if gi in tr_a])
     te = np.array([i for i, gi in enumerate(g) if gi in te_a])
 
@@ -333,7 +314,7 @@ def main() -> None:
     tag = args.model + ("" if args.corpus == "main" else f"_{args.corpus}") + (
         "" if args.variant == "full" else f"_{args.variant}")
 
-    X, arts, meta = load(args.model, args.variant, args.corpus)
+    X, arts, _ = load(args.model, args.variant, args.corpus)
     A, C, D = X.shape
     print(f"\n{A} opere x {C} condizioni x {D} dim  [{args.model}, corpus {args.corpus}]")
 
@@ -367,25 +348,16 @@ def main() -> None:
     out["probe"]["per_class_recall"] = per
 
     # --- 2. consistenza split-half ---
-    mu, sd = split_half(X, "flat")
-    out["split_half_cosine"] = {
-        LABELS[c]: {"mean": float(mu[i]), "std": float(sd[i])} for i, c in enumerate(FALK_CATEGORIES)
-    }
-    mu_m, sd_m = split_half(X, "mean")
-    out["split_half_cosine_mean_ref"] = {
-        LABELS[c]: {"mean": float(mu_m[i]), "std": float(sd_m[i])} for i, c in enumerate(CONDITIONS)
-    }
-    print("\n[2] consistenza split-half della direzione v[c]   (rif. flat | rif. media):")
-    sh = dict(zip(FALK_CATEGORIES, zip(mu, sd)))
-    for i, c in enumerate(CONDITIONS):
-        f = f"{sh[c][0]:.3f} +/- {sh[c][1]:.3f}" if c in sh else "-".center(14)
-        print(f"      {LABELS[c]:24} {f}  |  {mu_m[i]:.3f} +/- {sd_m[i]:.3f}")
+    sh = split_half(X)
+    out["split_half_cosine"] = {LABELS[c]: float(sh[i]) for i, c in enumerate(FALK_CATEGORIES)}
+    print("\n[2] consistenza split-half della direzione v[c] (rif. flat):")
+    for i, c in enumerate(FALK_CATEGORIES):
+        print(f"      {LABELS[c]:24} {sh[i]:.3f}")
 
     # --- 3. distanza cross-validata e geometria ---
-    d2, d2_sd = crossval_distance(X)
+    d2 = crossval_distance(X)
     out["crossval_distance"] = {
-        LABELS[a]: {LABELS[b]: {"mean": float(d2[i, j]), "std": float(d2_sd[i, j])}
-                    for j, b in enumerate(CONDITIONS)}
+        LABELS[a]: {LABELS[b]: float(d2[i, j]) for j, b in enumerate(CONDITIONS)}
         for i, a in enumerate(CONDITIONS)
     }
     pairs = sorted((d2[i, j], CONDITIONS[i], CONDITIONS[j])
@@ -422,21 +394,15 @@ def main() -> None:
         print("    tetto (cos fra steering vector di due run dello stesso prompt):")
         print("      " + "  ".join(f"{LABELS[c]} {ceil[i]:.3f}" for i, c in enumerate(FALK_CATEGORIES)))
 
-    # --- 4. lunghezza (confondente) ---
-    wl = meta.groupby("condition")["words"].agg(["mean", "std"])
-    out["words"] = {LABELS[c]: float(wl.loc[c, "mean"]) for c in CONDITIONS if c in wl.index}
-    print("\n[4] lunghezza media per condizione (confondente da sorvegliare):")
-    for c in CONDITIONS:
-        if c in wl.index:
-            print(f"      {LABELS[c]:24} {wl.loc[c, 'mean']:.0f} +/- {wl.loc[c, 'std']:.0f}")
-
-    # --- figure ---
-    fig_lda(Xc, arts, FIGS / f"lda_{tag}.png")
-    fig_pca(Xc, FIGS / f"pca_{tag}.png")
-    fig_cosine(M, FIGS / f"cosine_{tag}.png")
-    fig_distance(d2, FIGS / f"distance_{tag}.png")
-    fig_confusion(cm, acc, FIGS / f"confusion_{tag}.png")
-    print(f"\nfigure -> {FIGS.relative_to(ROOT)}/*_{tag}.png")
+    # --- figure: solo quelle citate nei report e nella tesi (Qwen3) ---
+    if args.model == "qwen":
+        fig_pca(Xc, FIGS / f"pca_{tag}.png")
+        fig_cosine(M, FIGS / f"cosine_{tag}.png")
+        if args.corpus == "main":
+            fig_lda(Xc, arts, FIGS / f"lda_{tag}.png")
+            fig_distance(d2, FIGS / f"distance_{tag}.png")
+            fig_confusion(cm, acc, FIGS / f"confusion_{tag}.png")
+        print(f"\nfigure -> {FIGS.relative_to(ROOT)}/*_{tag}.png")
 
     (RESULTS / f"metrics_{tag}.json").write_text(json.dumps(out, indent=2, ensure_ascii=False))
     print(f"\nmetriche -> results/metrics_{tag}.json")

@@ -2,7 +2,6 @@ import numpy as np
 import pytest
 
 from museumbot.common.prompts import CONDITIONS
-from museumbot.rq1_embeddings import analyze
 from museumbot.rq1_embeddings.analyze import FLAT, center, crossval_distance, split_half
 
 C = len(CONDITIONS)
@@ -34,10 +33,9 @@ def test_center_rejects_unknown_ref():
 
 def test_split_half_shapes_and_high_consistency():
     X = synthetic(np.random.default_rng(1))
-    mu_f, _ = split_half(X, "flat", n_rep=20)
-    mu_m, _ = split_half(X, "mean", n_rep=20)
-    assert mu_f.shape == (C - 1,) and mu_m.shape == (C,)
-    assert np.all(mu_f > 0.95) and np.all(mu_m > 0.95)
+    sh = split_half(X)
+    assert sh.shape == (C - 1,)
+    assert np.all(sh > 0.95)
 
 
 def test_crossval_distance_zero_for_identical_conditions():
@@ -45,18 +43,16 @@ def test_crossval_distance_zero_for_identical_conditions():
     shifts = rng.normal(size=(C, 16))
     shifts[1] = shifts[0]  # condizioni 0 e 1 indistinguibili
     X = synthetic(rng, noise=0.5, shifts=shifts)
-    d2, _ = crossval_distance(X, n_rep=50)
+    d2 = crossval_distance(X)
     assert np.allclose(np.diag(d2), 0)
     assert np.allclose(d2, d2.T)
-    assert abs(d2[0, 1]) < 0.05
     true = np.sum((shifts[0] - shifts[2]) ** 2)
+    assert abs(d2[0, 1]) < 0.02 * true
     assert d2[0, 2] == pytest.approx(true, rel=0.15)
 
 
-def test_crossval_distance_ignores_reference(monkeypatch):
+def test_crossval_distance_ignores_reference():
     X = synthetic(np.random.default_rng(3))
-    monkeypatch.setattr(analyze, "RNG", np.random.default_rng(7))
-    a, _ = crossval_distance(center(X, "mean"), n_rep=10)
-    monkeypatch.setattr(analyze, "RNG", np.random.default_rng(7))
-    b, _ = crossval_distance(center(X, "flat"), n_rep=10)
+    a = crossval_distance(center(X, "mean"))
+    b = crossval_distance(center(X, "flat"))
     assert np.allclose(a, b, atol=1e-9)

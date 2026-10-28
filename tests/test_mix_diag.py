@@ -1,7 +1,8 @@
 import numpy as np
+import pytest
 
 from museumbot.generation.mix_diag import (
-    ownership_ratio, positional_profile, sign_changes, split_sentences,
+    mean_margin, sign_changes, split_sentences,
 )
 
 WORDS = {1: "Look", 2: " at", 3: " it", 4: ".", 5: " Now", 6: " rest", 7: " here", 8: "!"}
@@ -27,17 +28,9 @@ def test_sign_changes_ignores_zeros():
     assert sign_changes(np.array([1.0, 2.0, -1.0, 0.0, -3.0, 4.0])) == 2
 
 
-def test_positional_profile_averages_by_relative_position():
-    prof = positional_profile([np.array([1.0, 1.0, 3.0, 3.0])], bins=2)
-    assert prof.tolist() == [1.0, 3.0]
-
-
-def test_ownership_ratio_high_for_blocks_and_near_one_for_noise():
-    rng = np.random.default_rng(0)
-    blocks = [np.full(10, s) + rng.normal(0, 0.1, 10) for s in (1, -1, 1, -1, 1, -1)]
-    noise = [rng.normal(0, 1, 10) for _ in range(6)]
-    assert ownership_ratio(blocks, np.random.default_rng(1)) > 1.5
-    assert 0.7 < ownership_ratio(noise, np.random.default_rng(1)) < 1.3
+def test_mean_margin_weights_each_part_of_the_text_equally():
+    # testo 1: decimi 1 e 3; testo 2: decimi 0 e 2 -> media dei decimi (0.5, 2.5)
+    assert mean_margin([np.array([1.0, 1.0, 3.0, 3.0]), np.array([0.0, 2.0])], bins=2) == 1.5
 
 
 def test_decile_means_one_row_per_text():
@@ -47,23 +40,12 @@ def test_decile_means_one_row_per_text():
     assert M.tolist() == [[1.0, 3.0], [0.0, 2.0]]
 
 
-def test_profile_ci_brackets_the_mean_and_collapses_without_variation():
-    from museumbot.generation.mix_diag import profile_ci
+def test_expected_sign_changes_matches_all_orderings():
+    from itertools import permutations
 
-    same = [np.array([1.0, 1.0, -1.0, -1.0])] * 20
-    mean, lo, hi = profile_ci(same, bins=2, n_boot=200, rng=np.random.default_rng(0))
-    assert mean.tolist() == [1.0, -1.0] and lo.tolist() == [1.0, -1.0] and hi.tolist() == [1.0, -1.0]
-    rng = np.random.default_rng(1)
-    noisy = [rng.normal(0, 1, 50) for _ in range(40)]
-    mean, lo, hi = profile_ci(noisy, bins=5, n_boot=500, rng=np.random.default_rng(2))
-    assert np.all(lo <= mean) and np.all(mean <= hi) and np.all(hi - lo > 0)
+    from museumbot.generation.mix_diag import expected_sign_changes, sign_changes
 
-
-def test_mean_ci_of_per_text_values():
-    from museumbot.generation.mix_diag import mean_ci
-
-    m, lo, hi = mean_ci(np.full(30, 0.4), n_boot=100, rng=np.random.default_rng(0))
-    assert np.allclose([m, lo, hi], 0.4)
-    rng = np.random.default_rng(1)
-    m, lo, hi = mean_ci(rng.normal(0.2, 1, 200), n_boot=500, rng=np.random.default_rng(2))
-    assert lo < m < hi and lo < 0.2 < hi
+    v = np.array([0.5, -1.0, 2.0, -0.3, 0.0, 1.0])
+    brute = np.mean([sign_changes(p) for p in permutations(v)])
+    assert expected_sign_changes(v) == pytest.approx(brute)
+    assert expected_sign_changes(np.array([1.0, 2.0])) == 0.0

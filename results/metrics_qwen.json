@@ -22,209 +22,60 @@
     }
   },
   "split_half_cosine": {
-    "Explorer": {
-      "mean": 0.8520410060882568,
-      "std": 0.01741795241832733
-    },
-    "Facilitator": {
-      "mean": 0.850262463092804,
-      "std": 0.022470735013484955
-    },
-    "Experience Seeker": {
-      "mean": 0.9075897336006165,
-      "std": 0.013830289244651794
-    },
-    "Professional/Hobbyist": {
-      "mean": 0.9302621483802795,
-      "std": 0.00910814106464386
-    },
-    "Recharger": {
-      "mean": 0.9418315291404724,
-      "std": 0.00793452374637127
-    }
-  },
-  "split_half_cosine_mean_ref": {
-    "Explorer": {
-      "mean": 0.8864945769309998,
-      "std": 0.01675693690776825
-    },
-    "Facilitator": {
-      "mean": 0.8939688801765442,
-      "std": 0.01885649748146534
-    },
-    "Experience Seeker": {
-      "mean": 0.9624502062797546,
-      "std": 0.005746645387262106
-    },
-    "Professional/Hobbyist": {
-      "mean": 0.9570531249046326,
-      "std": 0.00542702991515398
-    },
-    "Recharger": {
-      "mean": 0.9621140360832214,
-      "std": 0.0046460870653390884
-    },
-    "Flat (baseline)": {
-      "mean": 0.7677693367004395,
-      "std": 0.02810598351061344
-    }
+    "Explorer": 0.8513328433036804,
+    "Facilitator": 0.8414955139160156,
+    "Experience Seeker": 0.9023947715759277,
+    "Professional/Hobbyist": 0.9353968501091003,
+    "Recharger": 0.9510207176208496
   },
   "crossval_distance": {
     "Explorer": {
-      "Explorer": {
-        "mean": 0.0,
-        "std": 0.0
-      },
-      "Facilitator": {
-        "mean": 0.019527766853570938,
-        "std": 0.0004424364597070962
-      },
-      "Experience Seeker": {
-        "mean": 0.11520209908485413,
-        "std": 0.0004467674589250237
-      },
-      "Professional/Hobbyist": {
-        "mean": 0.09417320042848587,
-        "std": 0.0004423626232892275
-      },
-      "Recharger": {
-        "mean": 0.09265529364347458,
-        "std": 0.0004959860816597939
-      },
-      "Flat (baseline)": {
-        "mean": 0.031095895916223526,
-        "std": 0.000351633207174018
-      }
+      "Explorer": 0.0,
+      "Facilitator": 0.01937750168144703,
+      "Experience Seeker": 0.11444665491580963,
+      "Professional/Hobbyist": 0.09404012560844421,
+      "Recharger": 0.0928080752491951,
+      "Flat (baseline)": 0.031133197247982025
     },
     "Facilitator": {
-      "Explorer": {
-        "mean": 0.019527766853570938,
-        "std": 0.0004424364597070962
-      },
-      "Facilitator": {
-        "mean": 0.0,
-        "std": 0.0
-      },
-      "Experience Seeker": {
-        "mean": 0.10460443794727325,
-        "std": 0.000521208334248513
-      },
-      "Professional/Hobbyist": {
-        "mean": 0.1035798043012619,
-        "std": 0.00046040109009481966
-      },
-      "Recharger": {
-        "mean": 0.0856286883354187,
-        "std": 0.000468694866867736
-      },
-      "Flat (baseline)": {
-        "mean": 0.028113728389143944,
-        "std": 0.00044243174488656223
-      }
+      "Explorer": 0.01937750168144703,
+      "Facilitator": 0.0,
+      "Experience Seeker": 0.10419926047325134,
+      "Professional/Hobbyist": 0.10349500924348831,
+      "Recharger": 0.08575762063264847,
+      "Flat (baseline)": 0.02792368456721306
     },
     "Experience Seeker": {
-      "Explorer": {
-        "mean": 0.11520209908485413,
-        "std": 0.0004467674589250237
-      },
-      "Facilitator": {
-        "mean": 0.10460443794727325,
-        "std": 0.000521208334248513
-      },
-      "Experience Seeker": {
-        "mean": 0.0,
-        "std": 0.0
-      },
-      "Professional/Hobbyist": {
-        "mean": 0.12301898002624512,
-        "std": 0.0004417152376845479
-      },
-      "Recharger": {
-        "mean": 0.18300479650497437,
-        "std": 0.0004986137500964105
-      },
-      "Flat (baseline)": {
-        "mean": 0.04515218734741211,
-        "std": 0.00038301991298794746
-      }
+      "Explorer": 0.11444665491580963,
+      "Facilitator": 0.10419926047325134,
+      "Experience Seeker": 0.0,
+      "Professional/Hobbyist": 0.12275493144989014,
+      "Recharger": 0.18214008212089539,
+      "Flat (baseline)": 0.04503042995929718
     },
     "Professional/Hobbyist": {
-      "Explorer": {
-        "mean": 0.09417320042848587,
-        "std": 0.0004423626232892275
-      },
-      "Facilitator": {
-        "mean": 0.1035798043012619,
-        "std": 0.00046040109009481966
-      },
-      "Experience Seeker": {
-        "mean": 0.12301898002624512,
-        "std": 0.0004417152376845479
-      },
-      "Professional/Hobbyist": {
-        "mean": 0.0,
-        "std": 0.0
-      },
-      "Recharger": {
-        "mean": 0.1976986676454544,
-        "std": 0.0005733640282414854
-      },
-      "Flat (baseline)": {
-        "mean": 0.07236724346876144,
-        "std": 0.0003530045796651393
-      }
+      "Explorer": 0.09404012560844421,
+      "Facilitator": 0.10349500924348831,
+      "Experience Seeker": 0.12275493144989014,
+      "Professional/Hobbyist": 0.0,
+      "Recharger": 0.1978989541530609,
+      "Flat (baseline)": 0.07253764569759369
     },
     "Recharger": {
-      "Explorer": {
-        "mean": 0.09265529364347458,
-        "std": 0.0004959860816597939
-      },
-      "Facilitator": {
-        "mean": 0.0856286883354187,
-        "std": 0.000468694866867736
-      },
-      "Experience Seeker": {
-        "mean": 0.18300479650497437,
-        "std": 0.0004986137500964105
-      },
-      "Professional/Hobbyist": {
-        "mean": 0.1976986676454544,
-        "std": 0.0005733640282414854
-      },
-      "Recharger": {
-        "mean": 0.0,
-        "std": 0.0
-      },
-      "Flat (baseline)": {
-        "mean": 0.0940895825624466,
-        "std": 0.0004374734708108008
-      }
+      "Explorer": 0.0928080752491951,
+      "Facilitator": 0.08575762063264847,
+      "Experience Seeker": 0.18214008212089539,
+      "Professional/Hobbyist": 0.1978989541530609,
+      "Recharger": 0.0,
+      "Flat (baseline)": 0.09421601891517639
     },
     "Flat (baseline)": {
-      "Explorer": {
-        "mean": 0.031095895916223526,
-        "std": 0.000351633207174018
-      },
-      "Facilitator": {
-        "mean": 0.028113728389143944,
-        "std": 0.00044243174488656223
-      },
-      "Experience Seeker": {
-        "mean": 0.04515218734741211,
-        "std": 0.00038301991298794746
-      },
-      "Professional/Hobbyist": {
-        "mean": 0.07236724346876144,
-        "std": 0.0003530045796651393
-      },
-      "Recharger": {
-        "mean": 0.0940895825624466,
-        "std": 0.0004374734708108008
-      },
-      "Flat (baseline)": {
-        "mean": 0.0,
-        "std": 0.0
-      }
+      "Explorer": 0.031133197247982025,
+      "Facilitator": 0.02792368456721306,
+      "Experience Seeker": 0.04503042995929718,
+      "Professional/Hobbyist": 0.07253764569759369,
+      "Recharger": 0.09421601891517639,
+      "Flat (baseline)": 0.0
     }
   },
   "cosine_matrix": {
@@ -270,13 +121,5 @@
     "Experience Seeker": 0.9799351692199707,
     "Professional/Hobbyist": 0.9851728081703186,
     "Recharger": 0.9902877807617188
-  },
-  "words": {
-    "Explorer": 234.91,
-    "Facilitator": 233.98,
-    "Experience Seeker": 234.44,
-    "Professional/Hobbyist": 253.93,
-    "Recharger": 222.65,
-    "Flat (baseline)": 221.79
   }
 }

@@ -95,7 +95,8 @@ def run(alias: str) -> dict:
                        "p_x": round(float(p[kx]), 3), "p_y": round(float(p[ky]), 3),
                        "p_other": round(float(1 - p[kx] - p[ky]), 3)}
         out["pairs"][name] = res
-    out["figure"] = figure(alias, Xc, M, rows, mix_arts, out)
+    if alias == "qwen":  # figura citata: solo Qwen3
+        figure(alias, Xc, M, rows, mix_arts, out)
     return out
 
 

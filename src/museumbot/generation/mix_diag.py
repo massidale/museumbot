@@ -8,14 +8,11 @@ token scelto. Il margine
 e' positivo se la parola era piu' "di X", negativo se "di Y". I token si raggruppano in
 frasi (tokenizer del generatore) e si misura, sui testi a alpha = 0.5:
 
-  - cambi di segno del margine medio fra frasi consecutive, contro le stesse frasi in
-    ordine casuale: meno cambi del caso = blocchi di frasi dello stesso esperto;
-  - "appartenenza" delle frasi: dispersione dei margini medi per frase divisa per quella
-    di tagli in punti casuali con le stesse lunghezze (1 = i confini di frase non contano);
-  - profilo del margine per decimi del testo: tendenze di posizione (apertura, chiusura).
-
-Il profilo per posizione e' esplorativo (non fra i criteri della spec), con IC 95% bootstrap
-sui testi; figura in figures/mix_diag_profile.png.
+  - cambi di segno del margine medio fra frasi consecutive, contro l'atteso con le stesse
+    frasi in ordine casuale (2pq/n, esatto): meno cambi del caso = blocchi di frasi dello
+    stesso esperto;
+  - margine medio, mediato per decimi del testo (ogni parte del testo pesa uguale): quale
+    esperto prevale nel complesso.
 
 Limiti: solo il token scelto, non le distribuzioni intere; nei token assenti dalle prime
 100 di un esperto il valore e' il minimo della sua lista. Scrive results/mix_diag.json.
@@ -25,19 +22,13 @@ import argparse
 import json
 import re
 
-import matplotlib
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import numpy as np
 
 from museumbot.common.config import ROOT
-from museumbot.common.prompts import LABELS
 from museumbot.generation.vllm_gen import MODEL
 
 MIXED = ROOT / "data" / "local" / "mixed.jsonl"
 RESULTS = ROOT / "results"
-FIGS = ROOT / "figures"
 END = re.compile(r"[.!?…][\"”’)\]]*\s*$")
 
 
@@ -58,6 +49,13 @@ def sign_changes(v) -> int:
     return int((s[1:] != s[:-1]).sum())
 
 
+def expected_sign_changes(v) -> float:
+    """Cambi di segno attesi con i valori in ordine casuale: 2pq/n (p positivi, q negativi)."""
+    v = np.asarray(v)
+    p, q = int((v > 0).sum()), int((v < 0).sum())
+    return 2 * p * q / (p + q) if p + q else 0.0
+
+
 def decile_means(texts: list[np.ndarray], bins: int = 10) -> np.ndarray:
     """(testi, bins): margine medio di ogni testo per intervallo di posizione relativa."""
     out = []
@@ -67,102 +65,39 @@ def decile_means(texts: list[np.ndarray], bins: int = 10) -> np.ndarray:
     return np.array(out)
 
 
-def positional_profile(texts: list[np.ndarray], bins: int = 10) -> np.ndarray:
-    """Margine medio per intervallo di posizione relativa, mediato sui testi."""
-    return decile_means(texts, bins).mean(axis=0)
+def mean_margin(texts: list[np.ndarray], bins: int = 10) -> float:
+    """Margine medio sui testi, mediato per intervallo di posizione relativa."""
+    return float(decile_means(texts, bins).mean())
 
 
-def mean_ci(values, n_boot: int = 2000, rng=None) -> tuple[float, float, float]:
-    """Media e intervallo bootstrap al 95% di un valore per testo."""
-    rng = rng or np.random.default_rng(0)
-    v = np.asarray(values, float)
-    boots = [v[rng.integers(len(v), size=len(v))].mean() for _ in range(n_boot)]
-    return float(v.mean()), float(np.percentile(boots, 2.5)), float(np.percentile(boots, 97.5))
-
-
-def profile_ci(texts, bins: int = 10, n_boot: int = 2000, rng=None):
-    """Profilo medio e intervallo bootstrap al 95% ricampionando i testi."""
-    rng = rng or np.random.default_rng(0)
-    M = decile_means(texts, bins)
-    boots = np.array([M[rng.integers(len(M), size=len(M))].mean(axis=0) for _ in range(n_boot)])
-    return M.mean(axis=0), np.percentile(boots, 2.5, axis=0), np.percentile(boots, 97.5, axis=0)
-
-
-def ownership_ratio(sents: list[np.ndarray], rng, n: int = 100) -> float:
-    """std dei margini medi per frase / std con tagli casuali delle stesse lunghezze."""
-    allm = np.concatenate(sents)
-    lens = [len(s) for s in sents]
-    real = np.std([s.mean() for s in sents])
-    fake = []
-    for _ in range(n):
-        rolled = np.roll(allm, rng.integers(len(allm)))
-        cuts = np.cumsum(rng.permutation(lens))[:-1]
-        fake.append(np.std([c.mean() for c in np.split(rolled, cuts)]))
-    return float(real / np.mean(fake))
-
-
-def run(alpha: float = 0.5, seed: int = 0) -> dict:
+def run(alpha: float = 0.5) -> dict:
     from transformers import AutoTokenizer
 
     tok = AutoTokenizer.from_pretrained(MODEL)
     decode = lambda ids: tok.decode(ids)
-    rng = np.random.default_rng(seed)
     rows = [json.loads(l) for l in MIXED.open()]
     out = {"alpha": alpha, "pairs": {}}
     for pair in sorted({r["condition"] for r in rows}):
-        obs, null, own, texts, skipped = [], [], [], [], 0
+        obs, null, texts = [], [], []
         for r in rows:
             if r["condition"] != pair or r["alpha"] != alpha or r["usage"]["failed"]:
                 continue
             ids = tok.encode(r["usage"]["raw"], add_special_tokens=False)
             d = r["usage"]["diag"]
             if len(ids) != len(d):
-                skipped += 1  # ritokenizzazione diversa dalla generazione
-                continue
+                continue  # ritokenizzazione diversa dalla generazione
             m = np.array([t["logp"][0] - t["logp"][1] for t in d])
             sents = split_sentences(ids, m, decode)
             sm = np.array([s.mean() for s in sents])
             obs.append(sign_changes(sm))
-            null.append(np.mean([sign_changes(rng.permutation(sm)) for _ in range(200)]))
-            own.append(ownership_ratio(sents, rng))
+            null.append(expected_sign_changes(sm))
             texts.append(m)
-        prof, lo, hi = profile_ci(texts, rng=np.random.default_rng(seed))  # non tocca rng
-        dm, dlo, dhi = mean_ci(decile_means(texts).mean(axis=1), rng=np.random.default_rng(seed))
         out["pairs"][pair] = {
-            "n": len(obs), "skipped": skipped,
+            "n": len(obs),
             "sign_changes_observed": round(float(np.mean(obs)), 2),
-            "sign_changes_shuffled": round(float(np.mean(null)), 2),
-            "share_below_chance": round(float(np.mean(np.array(obs) < np.array(null))), 3),
-            "ownership_ratio_median": round(float(np.median(own)), 3),
-            "ownership_share_above_1": round(float(np.mean(np.array(own) > 1)), 3),
-            "profile_by_decile": [round(float(v), 3) for v in prof],
-            "profile_ci95": [[round(float(a), 3), round(float(b), 3)] for a, b in zip(lo, hi)],
-            "profile_mean": round(dm, 3), "profile_mean_ci95": [round(dlo, 3), round(dhi, 3)],
-            "mean_margin": round(float(np.mean([m.mean() for m in texts])), 3)}
+            "sign_changes_expected": round(float(np.mean(null)), 2),
+            "margin_mean": round(mean_margin(texts), 3)}
     return out
-
-
-def plot_profiles(out) -> None:
-    pairs = list(out["pairs"])
-    fig, axes = plt.subplots(1, len(pairs), figsize=(4.4 * len(pairs), 3.6), sharey=True)
-    x = np.arange(1, 11)
-    for ax, name in zip(np.atleast_1d(axes), pairs):
-        p = out["pairs"][name]
-        lo, hi = np.array(p["profile_ci95"]).T
-        ax.fill_between(x, lo, hi, alpha=0.25, color="#2a78d6", lw=0)
-        ax.plot(x, p["profile_by_decile"], "o-", color="#2a78d6", ms=4)
-        ax.axhline(0, color="grey", lw=0.6)
-        a, b = name.split("+")
-        ax.set_title(f"{LABELS[a]} (+) / {LABELS[b]} (−)", fontsize=10)
-        ax.set_xlabel("decimo del testo")
-        ax.set_xticks(x)
-    np.atleast_1d(axes)[0].set_ylabel("margine medio log p_X − log p_Y")
-    fig.suptitle(f"Margine per posizione nel testo, alpha = {out['alpha']:g} (banda: IC 95% bootstrap sui testi)",
-                 fontsize=10)
-    fig.tight_layout()
-    FIGS.mkdir(exist_ok=True)
-    fig.savefig(FIGS / "mix_diag_profile.png", dpi=150)
-    plt.close(fig)
 
 
 def main() -> None:
@@ -172,7 +107,6 @@ def main() -> None:
     out = run(args.alpha)
     RESULTS.mkdir(exist_ok=True)
     (RESULTS / "mix_diag.json").write_text(json.dumps(out, indent=2))
-    plot_profiles(out)
     print(json.dumps(out, indent=2))
 
 

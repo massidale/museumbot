@@ -92,10 +92,8 @@ def build_messages(p: dict, order: str, texts: dict, titles: dict) -> list[dict]
             {"role": "user", "content": user}]
 
 
-def judge_one(session, msgs: list[dict], budget: TokenBudget, model: str = MODEL,
-              parse=parse_choice) -> dict:
-    """Una chiamata con ritentativi: errori HTTP transitori e risposte senza scelta valida.
-    `parse` estrae (scelta, motivazione) dal testo: scelta A/B o, per l'ordinamento, una lista."""
+def judge_one(session, msgs: list[dict], budget: TokenBudget, model: str = MODEL) -> dict:
+    """Una chiamata con ritentativi: errori HTTP transitori e risposte senza scelta valida."""
     body = {"model": model, "messages": msgs, "temperature": 0,
             "reasoning_effort": "low", "max_tokens": 1000}
     out = {"valid": False}
@@ -117,7 +115,7 @@ def judge_one(session, msgs: list[dict], budget: TokenBudget, model: str = MODEL
         cost = budget.add(usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0))
         m = d["choices"][0]["message"]
         content = m.get("content") or ""
-        parsed = parse(content)
+        parsed = parse_choice(content)
         out = {
             "valid": parsed is not None,
             "choice": parsed[0] if parsed else None,

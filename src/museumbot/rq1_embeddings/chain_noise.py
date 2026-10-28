@@ -10,12 +10,10 @@ Livello testo, per ogni cella (opera a, categoria c), su embedding L2-normalizza
     R       = mean(1 - between) / mean(1 - within)
 
 R ~ 1: un testo della chain dista da un testo singolo quanto due testi singoli fra loro.
-La cella tiene fissi opera e categoria, quindi la loro varianza si cancella. IC al 95% con
-bootstrap sulle opere (le celle della stessa opera non sono indipendenti).
+La cella tiene fissi opera e categoria, quindi la loro varianza si cancella.
 
-Criterio, fissato prima di vedere i dati: equivalenti se il limite superiore dell'IC di R
-e' sotto EQUIV_MARGIN (1.10), cioè se la chain aggiunge al piu' il 10% di dissimilarita'
-oltre al rumore.
+Criterio: equivalenti se R e' sotto EQUIV_MARGIN (1.10), cioe' se la chain aggiunge al
+piu' il 10% di dissimilarita' oltre al rumore.
 
 Livello steering (l'effetto di categoria e' lo stesso?), riferimento flat della sessione:
 
@@ -45,7 +43,6 @@ from museumbot.rq1_embeddings.embed import MODELS
 RESULTS = ROOT / "results"
 FIGS = ROOT / "figures"
 EQUIV_MARGIN = 1.10
-RNG = np.random.default_rng(0)
 
 
 # --------------------------------------------------------------------------- dati
@@ -124,15 +121,6 @@ def ratio(df: pd.DataFrame, num: str, den: str = "within") -> float:
     return float((1 - d[num]).mean() / (1 - d[den]).mean())
 
 
-def bootstrap(df: pd.DataFrame, stat, n: int = 2000) -> tuple[float, float]:
-    """IC al 95% di `stat(df)` ricampionando le opere con reinserimento."""
-    groups = {a: g for a, g in df.groupby("artwork_id")}
-    arts = list(groups)
-    vals = [stat(pd.concat([groups[a] for a in RNG.choice(arts, len(arts))]))
-            for _ in range(n)]
-    return float(np.percentile(vals, 2.5)), float(np.percentile(vals, 97.5))
-
-
 # --------------------------------------------------------------- livello steering
 
 
@@ -158,22 +146,16 @@ def steering_stats(Xa, Xb, Xc) -> dict[str, np.ndarray]:
             "norm_ratio": np.linalg.norm(vc, axis=1) / norm_s}
 
 
-def steering_level(E, idx, n_boot: int = 1000) -> dict:
+def steering_level(E, idx) -> dict:
     full_cells = complete_cells(idx, ("single_a", "single_b", "chain"))
     arts = [a for a in sorted({a for a, _ in full_cells})
             if (a, "flat", "flat") in idx
             and sum(1 for b, _ in full_cells if b == a) == len(FALK_CATEGORIES)]
     Xs = [tensor(E, idx, arts, m) for m in ("single_a", "single_b", "chain")]
     point = steering_stats(*Xs)
-    boot = []
-    for _ in range(n_boot):
-        s = RNG.choice(len(arts), len(arts))
-        boot.append(steering_stats(*(X[s] for X in Xs))["rel"])
-    lo, hi = np.percentile(boot, [2.5, 97.5], axis=0)
     out = {"n_artworks": len(arts)}
     for i, c in enumerate(FALK_CATEGORIES):
         out[LABELS[c]] = {k: float(v[i]) for k, v in point.items()}
-        out[LABELS[c]]["rel_ci95"] = [float(lo[i]), float(hi[i])]
     out["rel_mean"] = float(point["rel"].mean())
     return out
 
@@ -215,29 +197,26 @@ def main() -> None:
     df = text_level(E, idx)
 
     R = ratio(df, "between")
-    R_ci = bootstrap(df, lambda d: ratio(d, "between"))
     per_cat = {LABELS[c]: ratio(g, "between") for c, g in df.groupby("condition")}
-    words = meta.groupby("method")["words"].mean().round(1).to_dict()
 
     out = {
         "model": args.model,
         "n_cells": len(df),
-        "criterion": f"equivalenti se IC95 superiore di R < {EQUIV_MARGIN}",
+        "criterion": f"equivalenti se R < {EQUIV_MARGIN}",
         "text": {
             "within_mean": float(df["within"].mean()),
             "between_mean": float(df["between"].mean()),
-            "R": R, "R_ci95": R_ci,
-            "equivalent": R_ci[1] < EQUIV_MARGIN,
+            "R": R,
+            "equivalent": R < EQUIV_MARGIN,
             "R_per_category": per_cat,
         },
         "steering": steering_level(E, idx),
-        "words": words,
     }
 
     print(f"\n[{args.model}] {len(df)} celle")
     print(f"  cos singolo-singolo {out['text']['within_mean']:.4f} | "
           f"chain-singolo {out['text']['between_mean']:.4f}")
-    print(f"  R = {R:.3f}  IC95 [{R_ci[0]:.3f}, {R_ci[1]:.3f}]  -> "
+    print(f"  R = {R:.3f}  -> "
           f"{'equivalenti' if out['text']['equivalent'] else 'NON equivalenti'} "
           f"(margine {EQUIV_MARGIN})")
     for k, v in per_cat.items():
@@ -247,16 +226,16 @@ def main() -> None:
     for c in FALK_CATEGORIES:
         s = st[LABELS[c]]
         print(f"      {LABELS[c]:24} tetto {s['ceiling']:.3f}  chain {s['chain']:.3f}  "
-              f"rel {s['rel']:.3f} [{s['rel_ci95'][0]:.3f}, {s['rel_ci95'][1]:.3f}]  "
+              f"rel {s['rel']:.3f}  "
               f"norma {s['norm_ratio']:.2f}x")
-    print(f"  parole medie: {words}")
 
     RESULTS.mkdir(exist_ok=True)
     FIGS.mkdir(exist_ok=True)
     (RESULTS / f"chain_noise_{args.model}.json").write_text(
         json.dumps(out, indent=2, ensure_ascii=False))
-    fig_dissimilarity(df, FIGS / f"chain_noise_{args.model}.png")
-    print(f"\n-> results/chain_noise_{args.model}.json, figures/chain_noise_{args.model}.png")
+    if args.model == "qwen":  # la figura citata nel report
+        fig_dissimilarity(df, FIGS / f"chain_noise_{args.model}.png")
+    print(f"\n-> results/chain_noise_{args.model}.json")
 
 
 if __name__ == "__main__":

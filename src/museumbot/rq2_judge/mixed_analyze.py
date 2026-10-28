@@ -3,14 +3,13 @@
 Per ogni coppia (X, Y), dai giudizi di data/judgments_mixed.jsonl:
 
   curve      tasso con cui la persona X preferisce S_x(alpha) a Y puro, e la persona Y
-             S_y(alpha) a X puro; Spearman fra alpha e tasso (atteso <= -0.8 per X,
-             >= 0.8 per Y) e alpha in cui le due curve si incrociano (atteso 0.4-0.6)
-  double     tasso con cui ciascuna persona preferisce S(alpha) al flat; minimo fra le due
-             persone per alpha e alpha del suo massimo (atteso interno, non 0 o 1)
-  rank       Spearman fra l'ordine del giudice e alpha, per testo (mediana attesa >= 0.7)
-  coherence  tasso con cui il testo misto e' scelto come "una voce sola" (atteso >= 0.4)
+             S_y(alpha) a X puro
+  double     tasso con cui ciascuna persona preferisce S(alpha) al flat, e il minimo fra le
+             due persone (doppio visitatore)
+  coherence  tasso con cui il testo misto e' scelto come "una voce sola" contro un puro
 
-Controlli come in RQ2: giudizi validi, posizione A. Scrive
+Controlli come in RQ2: giudizi validi, posizione A. Le righe di altri tipi nel file dei
+giudizi (ordinamento, attenzione delle prime run) si ignorano. Scrive
 results/judge_mixed_glm-5.3.json e figures/judge_mixed_glm-5.3.png.
 """
 
@@ -21,7 +20,6 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.stats import spearmanr
 
 from museumbot.common.config import ROOT
 from museumbot.common.prompts import LABELS
@@ -33,78 +31,34 @@ FIGS = ROOT / "figures"
 TAG = "glm-5.3"
 
 
-def crossing(alphas, rx, ry) -> float | None:
-    """Primo alpha in cui rx - ry passa da >= 0 a < 0, interpolato linearmente."""
-    d = np.asarray(rx, float) - np.asarray(ry, float)
-    for i in range(len(d) - 1):
-        if d[i] >= 0 > d[i + 1]:
-            return float(alphas[i] + (alphas[i + 1] - alphas[i]) * d[i] / (d[i] - d[i + 1]))
-    return None
-
-
-def rank_spearman(ranked_alphas) -> float:
-    """Spearman fra la posizione assegnata dal giudice e alpha."""
-    return float(spearmanr(np.arange(len(ranked_alphas)), ranked_alphas).statistic)
-
-
 def rates(rows, typ) -> dict:
-    """(persona, alpha) -> (tasso di scelta del target, n), sui giudizi validi."""
+    """(persona, alpha) -> tasso di scelta del target, sui giudizi validi."""
     acc = {}
     for r in rows:
         if r["type"] == typ and r["valid"]:
             acc.setdefault((r["persona"], r["alpha"]), []).append(bool(r["chose_target"]))
-    return {k: (float(np.mean(v)), len(v)) for k, v in acc.items()}
-
-
-def _spear(x, y) -> float | None:
-    s = spearmanr(x, y).statistic
-    return None if np.isnan(s) else round(float(s), 3)
+    return {k: float(np.mean(v)) for k, v in acc.items()}
 
 
 def summarize_pair(rows, pair) -> dict:
     x, y = pair
     rows = [r for r in rows if r.get("pair") == list(pair)]
     cur, dbl = rates(rows, "curve"), rates(rows, "double")
-    rx = [cur[(x, a)][0] for a in ALPHAS]
-    ry = [cur[(y, a)][0] for a in ALPHAS]
-    dx = [dbl[(x, a)][0] for a in ALPHAS]
-    dy = [dbl[(y, a)][0] for a in ALPHAS]
-    dmin = np.minimum(dx, dy)
+    rx = [cur[(x, a)] for a in ALPHAS]
+    ry = [cur[(y, a)] for a in ALPHAS]
+    dx = [dbl[(x, a)] for a in ALPHAS]
+    dy = [dbl[(y, a)] for a in ALPHAS]
     coh = [bool(r["chose_target"]) for r in rows if r["type"] == "coherence" and r["valid"]]
-    coh_by = {f"{a:g}": round(float(np.mean([bool(r["chose_target"]) for r in rows
-                                             if r["type"] == "coherence" and r["valid"]
-                                             and r["alpha"] == a])), 3) for a in (0.25, 0.5, 0.75)}
-    rk = [rank_spearman(r["ranked_alphas"]) for r in rows if r["type"] == "rank" and r["valid"]]
-    cross = crossing(ALPHAS, rx, ry)
     r3 = lambda v: [round(float(t), 3) for t in v]
-    return {
-        "curve": {"rate_x": r3(rx), "rate_y": r3(ry), "n_per_point": cur[(x, ALPHAS[0])][1],
-                  "spearman_x": _spear(ALPHAS, rx), "spearman_y": _spear(ALPHAS, ry),
-                  "crossing": None if cross is None else round(cross, 3)},
-        "double": {"rate_x": r3(dx), "rate_y": r3(dy), "min": r3(dmin),
-                   "argmax_min": float(ALPHAS[int(np.argmax(dmin))])},
-        "rank": {"n": len(rk), "spearman_median": round(float(np.median(rk)), 3),
-                 "spearman_mean": round(float(np.mean(rk)), 3),
-                 "share_perfect": round(float(np.mean(np.isclose(rk, 1.0))), 3)},
-        "coherence": {"n": len(coh), "rate": round(float(np.mean(coh)), 3), "by_alpha": coh_by}}
-
-
-def criteria(s) -> dict:
-    c, d = s["curve"], s["double"]
-    return {"curve_spearman_x": c["spearman_x"] is not None and c["spearman_x"] <= -0.8,
-            "curve_spearman_y": c["spearman_y"] is not None and c["spearman_y"] >= 0.8,
-            "curve_crossing": c["crossing"] is not None and 0.4 <= c["crossing"] <= 0.6,
-            "double_interior_max": d["argmax_min"] not in (0.0, 1.0),
-            "rank_median": s["rank"]["spearman_median"] >= 0.7,
-            "coherence": s["coherence"]["rate"] >= 0.4}
+    return {"curve": {"rate_x": r3(rx), "rate_y": r3(ry)},
+            "double": {"rate_x": r3(dx), "rate_y": r3(dy), "min": r3(np.minimum(dx, dy))},
+            "coherence": round(float(np.mean(coh)), 3)}
 
 
 def checks(rows) -> dict:
-    ab = [r for r in rows if r["type"] != "rank"]
-    valid_ab = [r for r in ab if r["valid"]]
+    valid = [r for r in rows if r["valid"]]
     return {"n": len(rows), "valid_rate": round(float(np.mean([r["valid"] for r in rows])), 4),
-            "position_A_rate": round(float(np.mean([r["choice"] == "A" for r in valid_ab])), 3),
-            "cost": round(float(sum(r.get("cost") or 0 for r in rows)), 3)}
+            "position_A_rate": round(float(np.mean([r["choice"] == "A" for r in valid])), 3)}
 
 
 def plot(out) -> None:
@@ -133,13 +87,9 @@ def plot(out) -> None:
 
 
 def main() -> None:
-    # le righe `attention` delle prime run si ignorano
-    rows = [r for r in map(json.loads, OUT.open()) if r["type"] != "attention"]
-    out = {"model": TAG, "checks": checks(rows), "pairs": {}}
-    for p in PAIRS:
-        s = summarize_pair(rows, p)
-        s["criteria"] = criteria(s)
-        out["pairs"]["+".join(p)] = s
+    rows = [r for r in map(json.loads, OUT.open()) if r["type"] in ("curve", "double", "coherence")]
+    out = {"model": TAG, "checks": checks(rows),
+           "pairs": {"+".join(p): summarize_pair(rows, p) for p in PAIRS}}
     RESULTS.mkdir(exist_ok=True)
     (RESULTS / f"judge_mixed_{TAG}.json").write_text(json.dumps(out, indent=2))
     plot(out)

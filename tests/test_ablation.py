@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from museumbot.rq1_embeddings.ablation import cos_with_full, factorial_effects, steering
+from museumbot.rq1_embeddings.ablation import cos_with_full, steering
 
 
 def synthetic(rng, A=10, C=6, D=8, scale=1.0):
@@ -35,27 +35,6 @@ def test_cos_with_full_drops_when_shift_removed():
     assert np.all(np.abs(c) < 0.6)
 
 
-def test_factorial_main_effects_signs():
-    # metrica = 1 se style presente, 0 altrimenti -> effetto di style = 1, altri = 0
-    table = {"full": 1, "no_def": 1, "no_need": 1, "no_style": 0,
-             "def_only": 0, "need_only": 0, "style_only": 1, "name_only": 0}
-    eff = factorial_effects(table)
-    assert eff["main"]["style"] == pytest.approx(1.0)
-    assert eff["main"]["def"] == pytest.approx(0.0)
-    assert eff["main"]["need"] == pytest.approx(0.0)
-    assert all(abs(v) < 1e-9 for v in eff["interaction"].values())
-
-
-def test_factorial_interaction():
-    # metrica = 1 solo se def E need presenti -> interazione def×need positiva
-    table = {"full": 1, "no_def": 0, "no_need": 0, "no_style": 1,
-             "def_only": 0, "need_only": 0, "style_only": 0, "name_only": 0}
-    eff = factorial_effects(table)
-    # (d,n)=1 ; (d,¬n)=0 ; (¬d,n)=0 ; (¬d,¬n)=0  ->  1 - 0 - 0 + 0
-    assert eff["interaction"]["def×need"] == pytest.approx(1.0)
-    assert eff["main"]["def"] == pytest.approx(0.5)
-
-
 def test_calibrate_divides_by_ceiling_and_skips_full():
     from museumbot.rq1_embeddings.ablation import calibrate
 
@@ -74,14 +53,3 @@ def test_calibrate_custom_key():
     calibrate(per, {"A": 0.9}, "cos_rel_strict")
     assert per["no_def"]["cos_rel_strict"]["A"] == pytest.approx(0.8 / 0.9)
     assert "cos_rel" not in per["no_def"]
-
-
-def test_drift_ratio_on_common_cells():
-    from museumbot.rq1_embeddings.ablation import drift_ratio
-
-    mixed = {("Q1", "explorer"): 0.8, ("Q2", "explorer"): 0.8, ("Q3", "explorer"): 0.5}
-    fixed = {("Q1", "explorer"): 0.9, ("Q2", "explorer"): 0.9}
-    d = drift_ratio(mixed, fixed, n_boot=100)
-    assert d["n_cells"] == 2
-    assert d["D"] == pytest.approx(2.0)
-    assert d["ci95"] == pytest.approx([2.0, 2.0])

@@ -3,7 +3,8 @@
     main      testi a prompt singolo dello studio chain (data/main/chain_study.jsonl): DeepInfra
               fp8, ragionamento attivo, stessa sessione. single_a -> variante `full`,
               single_b -> replica `full_rep`, flat -> `flat`; le righe `chain` restano fuori.
-    ablation  corpus di settembre (data/ablation/generations.jsonl, routing libero), usato
+    ablation  corpus dell'ablazione (data/ablation/generations.jsonl, DeepInfra fp8,
+              ragionamento attivo, stessa sessione), usato
               solo per l'ablazione: le 8 varianti del blocco piu' la replica `full_rep`.
     local     parte 2 (data/local/generations.jsonl): Gemma 4 31B su Kaggle, `full` piu' la
               replica `full_rep`; i testi rimasti in violazione del filtro (`usage.failed`)

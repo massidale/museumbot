@@ -11,8 +11,8 @@ Provider: OpenRouter distribuisce lo stesso modello su molti provider, con quant
 diverse (fp4, fp8, non dichiarata). Senza vincoli ogni chiamata puo' finire su un provider
 diverso, e il corpus diventa una miscela non tracciata. `--provider` fissa un provider
 senza fallback; il provider effettivo di ogni risposta viene comunque salvato nella riga.
-Il corpus di settembre 2026 (oggi usato solo per l'ablazione) e' stato generato prima di
-questa opzione, con routing libero.
+`--reasoning` attiva il ragionamento in modo esplicito (il default dipende dal provider).
+Il corpus di ablazione e' generato con `--provider deepinfra/fp8 --reasoning`.
 
 Pulizia: il testo salvato passa per `common.clean.clean_guide`; se la pulizia lo cambia,
 l'originale resta in `usage.raw`.
@@ -43,6 +43,11 @@ BANNED = re.compile(
     r"|\bexperience seeker\b|\brecharger\b|\bfacilitator\b|\bfalk\b",
     re.I,
 )
+
+
+# Risposte di provider occupato o errore temporaneo: si riprova lo stesso testo.
+BUSY = (429, 500, 502, 503, 529)
+MAX_BUSY = 30
 
 
 class Budget:
@@ -97,13 +102,20 @@ def generate_one(
     if reasoning is not None:
         body["reasoning"] = {"enabled": reasoning}
     reason = None
-    for attempt in range(4):
+    tries = content = busy = 0
+    while content < 4:
         budget.check()
+        tries += 1
         r = session.post(API, json=body, timeout=300)
-        if r.status_code in (429, 500, 502, 503, 529):
-            reason = f"http {r.status_code}"
-            time.sleep(2 ** attempt)
+        if r.status_code in BUSY:
+            # provider occupato: si aspetta e si riprova lo stesso testo, senza consumare
+            # i 4 tentativi riservati ai testi non validi
+            busy += 1
+            if busy > MAX_BUSY:
+                raise RuntimeError(f"provider occupato dopo {MAX_BUSY} attese (http {r.status_code})")
+            time.sleep(min(60, 2 ** busy))
             continue
+        content += 1
         r.raise_for_status()
         d = r.json()
         if "error" in d:
@@ -124,7 +136,7 @@ def generate_one(
                 "completion_tokens": usage.get("completion_tokens"),
                 "reasoning_tokens": (usage.get("completion_tokens_details") or {}).get("reasoning_tokens"),
                 "cost": usage.get("cost"),
-                "attempts": attempt + 1,
+                "attempts": tries,
             }
     raise RuntimeError(f"nessun testo valido dopo 4 tentativi (ultimo: {reason})")
 
@@ -166,6 +178,9 @@ def main() -> None:
     ap.add_argument("--all-variants", action="store_true",
                     help="genera tutte le varianti diverse da full in un solo run")
     ap.add_argument("--provider", help="provider fisso senza fallback, es. deepinfra/fp8")
+    ap.add_argument("--reasoning", action="store_true",
+                    help="attiva esplicitamente il ragionamento (default: quello del provider)")
+    ap.add_argument("--out", type=Path, default=OUT, help="file jsonl di uscita (append)")
     args = ap.parse_args()
     routing = provider_routing(args.provider)
 
@@ -174,7 +189,7 @@ def main() -> None:
         artworks = artworks[: args.limit]
 
     variants = [v for v in VARIANTS if v != "full"] if args.all_variants else [args.variant]
-    done = read_done(OUT)
+    done = read_done(args.out)
     todo = plan_jobs(artworks, variants, done, args.model)
     print(f"[{args.model}] {len(artworks)} opere, varianti {variants}")
     print(f"  da generare {len(todo)}")
@@ -186,15 +201,15 @@ def main() -> None:
     lock = threading.Lock()
     session = requests.Session()
     session.headers.update({"Authorization": f"Bearer {key}"})
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    fh = OUT.open("a")
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+    fh = args.out.open("a")
 
     def work(job):
         art, cond, variant = job
         msgs = build_messages(cond, art["title"], art["artist"], art["source_text"],
                               prompt_variant(variant))
         text, usage = generate_one(session, args.model, msgs, budget, args.temperature, routing,
-                                   clean=clean_guide)
+                                   reasoning=True if args.reasoning else None, clean=clean_guide)
         row = {
             "artwork_id": art["id"],
             "title": art["title"],
@@ -202,6 +217,7 @@ def main() -> None:
             "condition": cond,
             "variant": variant,
             "model": args.model,
+            "provider_requested": args.provider,
             "temperature": args.temperature,
             "text": text,
             "words": len(text.split()),

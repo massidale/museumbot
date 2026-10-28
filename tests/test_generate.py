@@ -94,3 +94,46 @@ def test_clean_guide_strips_script_headers_and_stage_directions():
            "Look at the sky (pause) and breathe. Painted in 1889 (in Saint-Rémy).\n\n(Fade out)")
     assert clean_guide(raw) == "Look at the sky and breathe. Painted in 1889 (in Saint-Rémy)."
     assert clean_guide("Audio guides were rare in 1889.") == "Audio guides were rare in 1889."
+
+
+class _Resp:
+    def __init__(self, status, text=""):
+        self.status_code = status
+        self._text = text
+
+    def raise_for_status(self):
+        pass
+
+    def json(self):
+        return {"choices": [{"message": {"content": self._text}}],
+                "usage": {"cost": 0.0, "prompt_tokens": 1, "completion_tokens": 1},
+                "provider": "DeepInfra"}
+
+
+class _Session:
+    def __init__(self, responses):
+        self.responses = list(responses)
+
+    def post(self, *a, **k):
+        return self.responses.pop(0)
+
+
+def test_generate_one_waits_on_busy_provider_without_using_attempts(monkeypatch):
+    from museumbot.generation import generate
+
+    monkeypatch.setattr(generate.time, "sleep", lambda s: None)
+    # 6 risposte 429 di fila: piu' dei 4 tentativi per testi non validi, ma non contano
+    s = _Session([_Resp(429)] * 6 + [_Resp(200, "A painting.")])
+    text, usage = generate.generate_one(s, "m", [], generate.Budget(1.0), 0.7)
+    assert text == "A painting."
+    assert usage["attempts"] == 7
+
+
+def test_generate_one_gives_up_after_max_busy(monkeypatch):
+    import pytest
+    from museumbot.generation import generate
+
+    monkeypatch.setattr(generate.time, "sleep", lambda s: None)
+    s = _Session([_Resp(429)] * (generate.MAX_BUSY + 1))
+    with pytest.raises(RuntimeError, match="occupato"):
+        generate.generate_one(s, "m", [], generate.Budget(1.0), 0.7)

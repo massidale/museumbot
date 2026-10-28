@@ -129,22 +129,24 @@ def figure(alias, Xc, M, rows, mix_arts, out) -> str:
              "PCA sui testi puri": (pca.transform(Xc.reshape(-1, D)).reshape(A, K, 2),
                                     pca.transform(M), np.ones(len(M), bool))}
     fig, axes = plt.subplots(1, 2, figsize=(13, 5.8))
-    styles = {"recharger+professional_hobbyist": "-", "facilitator+professional_hobbyist": "--",
-              "explorer+facilitator": ":"}
+    # un colore per coppia, lontano da quelli delle categorie
+    pair_colors = {"recharger+professional_hobbyist": "#C62828",
+                   "facilitator+professional_hobbyist": "#222222",
+                   "explorer+facilitator": "#B8860B"}
     for ax, (title, (Zp, Zm, keep)) in zip(axes, views.items()):
         for k, c in enumerate(CATS):
             ax.scatter(Zp[:, k, 0], Zp[:, k, 1], s=12, alpha=0.35, c=COLORS[c], label=LABELS[c],
                        edgecolors="none")
         for name, pts in trajectories(Zp, Zm, rows, keep).items():
             x, y = name.split("+")
-            ax.plot(pts[:, 0], pts[:, 1], styles[name], color="black", lw=1.6,
+            ax.plot(pts[:, 0], pts[:, 1], "-", color=pair_colors[name], lw=1.6,
                     label=f"{LABELS[x]} → {LABELS[y]}")
-            ax.scatter(pts[1:-1, 0], pts[1:-1, 1], s=[30, 55, 80], c="black", zorder=5)
+            ax.scatter(pts[1:-1, 0], pts[1:-1, 1], s=[8, 14, 22], c=pair_colors[name], zorder=5)
         ax.set_title(title, fontsize=10)
         ax.spines[["top", "right"]].set_visible(False)
     axes[0].legend(frameon=False, fontsize=8, loc="best")
     fig.suptitle(f"Testi misti nello spazio delle 4 categorie combinate ({alias}); "
-                 "punti neri: alpha 0.25, 0.5, 0.75", fontsize=11)
+                 "punti: alpha 0.25, 0.5, 0.75 (dal piu' piccolo)", fontsize=11)
     fig.tight_layout()
     FIGS.mkdir(exist_ok=True)
     path = FIGS / f"mixed_space_{alias}.png"

@@ -680,3 +680,17 @@ solo conserva la direzione (coseno con il full 0.962, prima 0.951), toglierlo co
 l'ordine in coda: con Qwen3 `need_only` (0.699) scende appena sotto `name_only` (0.703).
 Togliere definizione o bisogno resta entro il rumore (cos/tetto 0.98–1.00 con entrambi gli
 embedding; prima 0.97 con BGE-M3).
+
+## 2026-10-28 — Ablazione: rigenerati i 3 testi troncati
+
+**Decisione.** I 3 testi troncati del nuovo corpus di ablazione (Professional/Hobbyist:
+*Garden at Sainte-Adresse* in `no_def`, *Les Grandes Baigneuses* e *The Haywain Triptych* in
+`style_only`, tutti al limite di 2 000 token di output, ragionamento compreso) sono stati
+tolti e rigenerati lo stesso giorno, con lo stesso provider e le stesse impostazioni;
+embedding e ablazione ricalcolati per intero.
+**Motivo.** Il caricamento del corpus escludeva le 3 opere da tutte le varianti; con i testi
+completi l'ablazione usa tutte le 100 opere, come le altre analisi.
+**Effetto.** 97 → 100 opere. I valori cambiano al più di qualche millesimo sul coseno con il
+full (Qwen3 `style_only` 0.962 → 0.964, `no_style` 0.851 → 0.853, `name_only` 0.703 → 0.702,
+`need_only` 0.699 → 0.701) e di qualche centesimo sullo split-half (una sola divisione delle
+opere, ora su 100); nessuna conclusione cambia.

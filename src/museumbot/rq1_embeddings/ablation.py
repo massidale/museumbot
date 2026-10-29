@@ -10,14 +10,13 @@ ed e' lo stesso testo in tutte (embed.select_rows), quindi il riferimento e' ide
 varianti: con il centering sulla media, invece, il riferimento include le 5 categorie della
 variante e si sposterebbe con essa, contaminando il confronto con `full`.
 
-Corpus: `ablation` (common.corpus): tutte le varianti, la replica `full_rep` e il flat,
-generati su un provider fisso (DeepInfra fp8, ragionamento attivo) nella stessa sessione,
-puliti e senza le opere con testi troncati.
+Corpus: `ablation` (common.corpus): le varianti e il flat, generati su un provider fisso
+(DeepInfra fp8, ragionamento attivo), puliti e senza le opere con testi troncati.
 
 Calibrazione (`cos_rel`): il coseno con il full diviso per il tetto di rumore della
 generazione; ~1 vuol dire indistinguibile dal full, non soltanto "vicino". Il tetto e'
-cos(v_full, v_full_rep) dello stesso corpus: due run dello stesso prompt, stesso provider,
-stessa sessione, stesso flat.
+cos(v_full, v_full_rep) del corpus principale (results/metrics_<model>.json, sezione
+`ceiling`): due run dello stesso prompt sullo stesso provider.
 """
 
 import argparse
@@ -30,8 +29,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-from museumbot.rq1_embeddings.analyze import (COLORS, center, load, probe, replicate_ceiling,
-                                               split_half, steering)
+from museumbot.rq1_embeddings.analyze import COLORS, center, load, probe, split_half, steering
 from museumbot.common.config import ROOT, emb_path
 from museumbot.common.prompts import CONDITIONS, FALK_CATEGORIES, LABELS, VARIANTS
 
@@ -92,21 +90,19 @@ def run(model: str) -> dict:
         per_variant[v], _ = analyse_variant(model, v, V_full)
 
     out = {"model": model, "variants": per_variant}
-    ceiling = own_ceiling(model)
+    ceiling = main_ceiling(model)
     if ceiling:
         out["ceiling"] = ceiling
         calibrate(per_variant, ceiling)
     return out
 
 
-def own_ceiling(model: str) -> dict[str, float] | None:
-    """Tetto del corpus: cos(v_full, v_full_rep) per categoria, sulle opere comuni."""
-    if not emb_path(model, "full_rep", CORPUS).exists():
+def main_ceiling(model: str) -> dict[str, float] | None:
+    """Tetto del corpus principale: cos(v_full, v_full_rep) per categoria."""
+    path = RESULTS / f"metrics_{model}.json"
+    if not path.exists():
         return None
-    X, arts, _ = load(model, "full", CORPUS)
-    Xr, arts_r, _ = load(model, "full_rep", CORPUS)
-    ceil = replicate_ceiling(X, arts, Xr, arts_r)
-    return {LABELS[c]: float(ceil[i]) for i, c in enumerate(FALK_CATEGORIES)}
+    return json.loads(path.read_text()).get("ceiling")
 
 
 def calibrate(per_variant: dict, ceiling: dict[str, float], key: str = "cos_rel") -> None:
@@ -132,7 +128,7 @@ def print_summary(res: dict) -> None:
             line += f" {r['cos_rel_mean']:10.3f}"
         print(line)
     if calibrated:
-        print("tetto (replica): "
+        print("tetto (corpus principale): "
               + "  ".join(f"{c} {v:.3f}" for c, v in res["ceiling"].items()))
 
 def fig_bars(res: dict, path: Path) -> None:
@@ -149,7 +145,7 @@ def fig_bars(res: dict, path: Path) -> None:
               w, color=COLORS[c], label=LABELS[c])
     if ceil:
         b.axhline(np.mean(list(ceil.values())), color="#444", ls="--", lw=1,
-                  label="tetto (replica)")
+                  label="tetto (corpus principale)")
     b.axhline(0, color="#ccc", lw=0.8)
     b.set_ylabel("cos(v_variante, v_full)")
     b.set_ylim(-0.2, 1.05)

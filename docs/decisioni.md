@@ -729,3 +729,16 @@ segno (`sentence_sum_mean`) invece che in valore assoluto.
 valore assoluto dava solo l'intensità, positiva per costruzione.
 **Effetto.** Valori ritirati della somma assoluta media: 12.7, 8.4, 4.4 (Rech.–Prof.,
 Fac.–Prof., Expl.–Fac.); nuovi valori con segno: +3.1, +0.3, +0.7.
+
+## 2026-10-29 — Ablazione: di nuovo il tetto del corpus principale
+
+**Decisione.** `ablation.py` torna a calibrare con il tetto del corpus principale
+(`single_a` contro `single_b`, sezione `ceiling` di `results/metrics_*.json`) invece che con
+la replica `full_rep` del corpus di ablazione. I testi `full_rep` dell'ablazione restano nei
+dati, inutilizzati.
+**Motivo.** Il criterio per confrontare testi è lo stesso provider, e i due corpus sono
+entrambi su DeepInfra fp8: un solo tetto per tutta la parte 1.
+**Effetto.** Cambia solo la colonna `cos/tetto`, di al più 0.01 (Qwen3 `style_only` 0.98 →
+0.99, `no_style` 0.87 → 0.88; BGE-M3 `no_need` 1.00 → 0.99, `def_only` 0.91 → 0.90). Il
+costo di togliere lo stile passa dal 13% al 12% su Qwen3; la definizione, con lo stile
+presente, aggiunge al più l'1%.

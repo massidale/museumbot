@@ -1,6 +1,6 @@
 # Museumbot — stato del progetto
 
-*Ultimo aggiornamento: 28 ottobre 2026. Il report descrive solo lo stato attuale del codice e
+*Ultimo aggiornamento: 29 ottobre 2026. Il report descrive solo lo stato attuale del codice e
 dei risultati; le decisioni e le correzioni nel tempo sono in `docs/decisioni.md`.*
 
 **Domanda di ricerca.** Quando un LLM genera un'audioguida "personalizzata" su una
@@ -60,11 +60,10 @@ ragionamento. Per questo:
   esplicitamente, provider registrato per riga e generati nella stessa sessione.
   `single_a` è la variante `full`, `single_b` la sua replica (`full_rep`), che dà il tetto
   di rumore; 140 testi su 1 100 hanno richiesto più di un tentativo;
-- il **corpus di ablazione** (`ablation`) ha le 8 varianti del blocco (§6), la replica
+- il **corpus di ablazione** (`ablation`) ha le 8 varianti del blocco (§6), una replica
   `full_rep` e il flat: anche questo tutto su DeepInfra fp8, con ragionamento attivato
-  esplicitamente e provider registrato per riga, in un'unica esecuzione del 27–28 ottobre
-  (rallentata dai limiti di frequenza del provider). È separato dal corpus principale: ha
-  un suo `full`, un suo flat e un suo tetto.
+  esplicitamente e provider registrato per riga. Ha un suo `full` e un suo flat; per la
+  calibrazione usa il tetto del corpus principale, che viene dallo stesso provider.
 
 `generate.py` salva il provider e i token di ragionamento di ogni risposta e accetta
 `--provider` (es. `deepinfra/fp8`) per fissarlo senza fallback e `--reasoning` per attivare
@@ -257,8 +256,7 @@ rigenera tutti i testi da capo, e la direzione di ogni categoria torna quasi ide
 valori sono più alti della split-half perché ogni stima usa 100 opere invece di 50. Sono
 più bassi per Explorer e Facilitator, che hanno gli shift più corti (§3.5): a parità di
 rumore, uno shift piccolo ne è disturbato di più. Questi valori sono il tetto usato per
-calibrare il confronto con la chain (§5); l'ablazione ha un tetto suo, dalla sua replica
-(§6.3).
+calibrare il confronto con la chain (§5) e l'ablazione (§6).
 
 ### 3.5 Geometria
 
@@ -494,16 +492,16 @@ confronto con il full.
 ### 6.1 Risultati per variante (Qwen3; BGE-M3 fra parentesi)
 
 Ordinate per coseno medio con il full. `cos/tetto` è il coseno con il full diviso per il
-coseno fra `full` e la sua replica `full_rep` nello stesso corpus (§6.3).
+tetto del corpus principale (§3.4, §6.3).
 
 | variante | probe 5 classi | ‖v‖ media | cos·full | cos/tetto | split-half |
 |---|---|---|---|---|---|
 | `full` | 98.2% (97.2%) | 0.235 (0.152) | 1.000 (1.000) | — | 0.88 (0.83) |
-| `no_need` | 99.2% (97.0%) | 0.240 (0.152) | 0.975 (0.948) | 1.00 (1.00) | 0.90 (0.84) |
+| `no_need` | 99.2% (97.0%) | 0.240 (0.152) | 0.975 (0.948) | 1.00 (0.99) | 0.90 (0.84) |
 | `no_def` | 98.2% (98.2%) | 0.234 (0.147) | 0.965 (0.945) | 0.99 (0.99) | 0.90 (0.83) |
-| `style_only` | 97.2% (97.0%) | 0.230 (0.145) | 0.964 (0.926) | 0.98 (0.97) | 0.89 (0.81) |
-| `def_only` | 97.0% (96.2%) | 0.180 (0.126) | 0.861 (0.864) | 0.88 (0.91) | 0.82 (0.77) |
-| `no_style` | 94.2% (92.4%) | 0.173 (0.119) | 0.853 (0.877) | 0.87 (0.92) | 0.81 (0.78) |
+| `style_only` | 97.2% (97.0%) | 0.230 (0.145) | 0.964 (0.926) | 0.99 (0.97) | 0.89 (0.81) |
+| `def_only` | 97.0% (96.2%) | 0.180 (0.126) | 0.861 (0.864) | 0.88 (0.90) | 0.82 (0.77) |
+| `no_style` | 94.2% (92.4%) | 0.173 (0.119) | 0.853 (0.877) | 0.88 (0.92) | 0.81 (0.78) |
 | `name_only` | 87.0% (83.6%) | 0.146 (0.104) | 0.702 (0.681) | 0.72 (0.71) | 0.68 (0.63) |
 | `need_only` | 90.4% (89.8%) | 0.158 (0.111) | 0.701 (0.735) | 0.72 (0.77) | 0.76 (0.74) |
 
@@ -545,18 +543,15 @@ dal nome.
 
 ### 6.3 Calibrazione
 
-Il tetto è quello del corpus di ablazione (sezione `ceiling` di `results/ablation_*.json`):
-il coseno fra gli steering vector di `full` e della replica `full_rep`, generati con lo
-stesso provider e con lo stesso flat. Vale 0.969, 0.972, 0.980, 0.985, 0.990 per Explorer,
-Facilitator, Experience Seeker, Professional/Hobbyist, Recharger (0.934, 0.897, 0.970,
-0.974, 0.987 su BGE-M3), in linea con il tetto del corpus principale (§3.4). `full` è
-stato generato il 27 ottobre e quasi tutta la replica il 28: un'eventuale deriva fra i due
-giorni abbasserebbe il tetto e renderebbe i rapporti conservativi.
+Il tetto è quello del corpus principale (§3.4): il coseno fra gli steering vector di
+`single_a` e `single_b`, due run dello stesso prompt sullo stesso provider del corpus di
+ablazione. Vale 0.957, 0.958, 0.980, 0.985, 0.990 per Explorer, Facilitator, Experience
+Seeker, Professional/Hobbyist, Recharger (0.937, 0.905, 0.973, 0.977, 0.985 su BGE-M3).
 
 Rapportate al tetto (colonna `cos/tetto` in §6.1), `no_need` vale 1.00 e `no_def` 0.99
-(1.00 e 0.99 su BGE-M3): togliere la definizione o il bisogno **non lascia traccia misurabile oltre
-al rumore**. `style_only` è a 0.98 (0.97). Togliere lo stile costa il 13% su Qwen3 e l'8% su
-BGE-M3, `need_only` e `name_only` fra il 23% e il 29%.
+(0.99 e 0.99 su BGE-M3): togliere la definizione o il bisogno **non lascia traccia misurabile
+oltre al rumore**. `style_only` è a 0.99 (0.97). Togliere lo stile costa il 12% su Qwen3 e
+l'8% su BGE-M3, `need_only` e `name_only` fra il 23% e il 29%.
 
 ### 6.4 Implicazione per il prompt
 
@@ -566,7 +561,7 @@ cambia). Per lo studio scientifico l'ablazione dice che quello che
 il paper chiama "adattamento alla categoria di Falk" è, nel modello, in larga parte
 l'esecuzione di un'istruzione stilistica esplicita, e in misura minore l'evocazione di uno
 stereotipo associato al nome. La definizione sociologica della categoria non aggiunge
-nulla di misurabile quando lo stile è presente (al più il 2%, §6.3).
+nulla di misurabile quando lo stile è presente (al più l'1%, §6.3).
 
 ## 7. RQ2: un giudice LLM con persona preferisce il testo personalizzato?
 

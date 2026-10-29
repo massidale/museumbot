@@ -37,3 +37,14 @@ def test_select_rows_replicate_borrows_flat_from_full():
             row("Q1", "explorer", "full_rep")]
     out = select_rows(rows, "m", "full_rep")
     assert {(r["condition"], r["variant"]) for r in out} == {("flat", "full"), ("explorer", "full_rep")}
+
+
+def test_select_rows_replicas_use_the_full_flat():
+    from museumbot.rq1_embeddings.embed import select_rows
+
+    r = lambda c, v: {"artwork_id": "Q1", "condition": c, "model": "m", "variant": v}
+    rows = [r("flat", "full"), r("flat", "full_rep2"), r("explorer", "full_rep2"),
+            r("explorer", "full_rep3")]
+    pick = lambda v: [(x["condition"], x["variant"]) for x in select_rows(rows, "m", v)]
+    assert pick("full_rep3") == [("explorer", "full_rep3"), ("flat", "full")]
+    assert pick("full_rep2") == [("explorer", "full_rep2"), ("flat", "full")]

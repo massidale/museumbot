@@ -17,9 +17,11 @@ piu' il 10% di dissimilarita' oltre al rumore.
 
 Livello steering (l'effetto di categoria e' lo stesso?), riferimento flat della sessione:
 
-    tetto  = cos(v_Sa[c], v_Sb[c])
     chain  = 1/2 [cos(v_C[c], v_Sa[c]) + cos(v_C[c], v_Sb[c])]
     rel    = chain / tetto                      ~1 = stesso shift di categoria
+
+Il tetto e' quello del corpus principale (results/metrics_<modello>.json, sezione
+`ceiling`): coseno medio fra gli steering vector delle 4 repliche del prompt singolo.
 """
 
 import argparse
@@ -137,22 +139,23 @@ def cos_rows(U, V) -> np.ndarray:
     return np.sum(U * V, axis=1) / (np.linalg.norm(U, axis=1) * np.linalg.norm(V, axis=1))
 
 
-def steering_stats(Xa, Xb, Xc) -> dict[str, np.ndarray]:
+def steering_stats(Xa, Xb, Xc, ceiling=None) -> dict[str, np.ndarray]:
+    """`ceiling` (per categoria): se manca, il coseno fra le due run del singolo."""
     va, vb, vc = steering(Xa), steering(Xb), steering(Xc)
-    ceiling = cos_rows(va, vb)
+    ceiling = cos_rows(va, vb) if ceiling is None else np.asarray(ceiling)
     chain = (cos_rows(vc, va) + cos_rows(vc, vb)) / 2
     norm_s = (np.linalg.norm(va, axis=1) + np.linalg.norm(vb, axis=1)) / 2
     return {"ceiling": ceiling, "chain": chain, "rel": chain / ceiling,
             "norm_ratio": np.linalg.norm(vc, axis=1) / norm_s}
 
 
-def steering_level(E, idx) -> dict:
+def steering_level(E, idx, ceiling=None) -> dict:
     full_cells = complete_cells(idx, ("single_a", "single_b", "chain"))
     arts = [a for a in sorted({a for a, _ in full_cells})
             if (a, "flat", "flat") in idx
             and sum(1 for b, _ in full_cells if b == a) == len(FALK_CATEGORIES)]
     Xs = [tensor(E, idx, arts, m) for m in ("single_a", "single_b", "chain")]
-    point = steering_stats(*Xs)
+    point = steering_stats(*Xs, ceiling)
     out = {"n_artworks": len(arts)}
     for i, c in enumerate(FALK_CATEGORIES):
         out[LABELS[c]] = {k: float(v[i]) for k, v in point.items()}
@@ -186,6 +189,15 @@ def fig_dissimilarity(df: pd.DataFrame, path) -> None:
 # ---------------------------------------------------------------------------- main
 
 
+def main_ceiling(model: str) -> list[float] | None:
+    """Tetto del corpus principale per categoria, se analyze.py l'ha gia' calcolato."""
+    path = RESULTS / f"metrics_{model}.json"
+    if not path.exists():
+        return None
+    ceil = json.loads(path.read_text()).get("ceiling")
+    return [ceil[LABELS[c]] for c in FALK_CATEGORIES] if ceil else None
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="qwen", choices=list(MODELS))
@@ -210,7 +222,7 @@ def main() -> None:
             "equivalent": R < EQUIV_MARGIN,
             "R_per_category": per_cat,
         },
-        "steering": steering_level(E, idx),
+        "steering": steering_level(E, idx, main_ceiling(args.model)),
     }
 
     print(f"\n[{args.model}] {len(df)} celle")

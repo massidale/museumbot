@@ -129,7 +129,7 @@ PARTS = ("def", "need", "style")
 # Repliche: stesso prompt di una variante, generazione indipendente. Non entrano nel
 # disegno fattoriale. `full_rep` calibra il coseno con il full: il coseno fra due run del
 # medesimo prompt a T = 0.7 e' il tetto che nessuna variante puo' superare.
-REPLICATES = {"full_rep": "full"}
+REPLICATES = {"full_rep": "full", "full_rep2": "full", "full_rep3": "full"}
 
 
 def prompt_variant(variant: str) -> str:

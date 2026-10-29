@@ -21,13 +21,17 @@ Metriche, in ordine di forza probatoria:
   3. distanza cross-validata fra condizioni                -> quali categorie sono vicine?
      (indipendente dal riferimento), coseni fra i v[c]       -> direzione degli effetti [flat]
 
-Tetto: se il corpus ha la replica `full_rep` (nel corpus principale e' `single_b`), il
-coseno fra gli steering vector delle due run, per categoria, e' il massimo che un confronto
-fra coseni puo' raggiungere (sezione `ceiling` del JSON; la usa anche ablation.py).
+Tetto: se il corpus ha repliche di `full` (`full_rep`, e nel corpus principale anche
+`full_rep2` e `full_rep3`), il coseno fra gli steering vector di due run dello stesso
+prompt, per categoria, mediato su tutte le coppie di run, e' il massimo che un confronto
+fra coseni puo' raggiungere (sezione `ceiling` del JSON; la usano chain_noise.py e
+ablation.py). Tutte le run si misurano rispetto allo stesso flat, come i confronti che il
+tetto calibra.
 """
 
 import argparse
 import json
+from itertools import combinations
 
 import matplotlib
 
@@ -43,7 +47,7 @@ from sklearn.model_selection import GroupKFold
 
 from museumbot.common.config import ROOT, emb_path, meta_path
 from museumbot.common.corpus import CORPORA
-from museumbot.common.prompts import CONDITIONS, FALK_CATEGORIES, LABELS
+from museumbot.common.prompts import CONDITIONS, FALK_CATEGORIES, LABELS, REPLICATES
 
 FIGS = ROOT / "figures"
 RESULTS = ROOT / "results"
@@ -170,6 +174,12 @@ def replicate_ceiling(X, arts, Xr, arts_r):
     i = [arts.index(a) for a in common]
     j = [arts_r.index(a) for a in common]
     return row_cosines(steering(X[i]), steering(Xr[j]))
+
+
+def ceiling_over_replicas(runs) -> tuple[np.ndarray, int]:
+    """Media di replicate_ceiling su tutte le coppie di run [(X, arts), ...]."""
+    pairs = list(combinations(runs, 2))
+    return np.mean([replicate_ceiling(a[0], a[1], b[0], b[1]) for a, b in pairs], axis=0), len(pairs)
 
 
 def cosine_matrix(V):
@@ -386,12 +396,14 @@ def main() -> None:
     for v, a, b in cpairs[-2:]:
         print(f"      {LABELS[a]:24} ~ {LABELS[b]:24} {v:+.3f}")
 
-    # --- tetto dalla replica ---
-    if args.variant == "full" and emb_path(args.model, "full_rep", args.corpus).exists():
-        Xr, arts_r, _ = load(args.model, "full_rep", args.corpus)
-        ceil = replicate_ceiling(X, arts, Xr, arts_r)
+    # --- tetto dalle repliche ---
+    reps = [v for v in REPLICATES if emb_path(args.model, v, args.corpus).exists()]
+    if args.variant == "full" and reps:
+        runs = [(X, arts)] + [load(args.model, v, args.corpus)[:2] for v in reps]
+        ceil, n_pairs = ceiling_over_replicas(runs)
         out["ceiling"] = {LABELS[c]: float(ceil[i]) for i, c in enumerate(FALK_CATEGORIES)}
-        print("    tetto (cos fra steering vector di due run dello stesso prompt):")
+        out["ceiling_runs"] = ["full", *reps]
+        print(f"    tetto (cos fra steering vector di run dello stesso prompt, {n_pairs} coppie):")
         print("      " + "  ".join(f"{LABELS[c]} {ceil[i]:.3f}" for i, c in enumerate(FALK_CATEGORIES)))
 
     # --- figure: solo quelle citate nei report e nella tesi (Qwen3) ---

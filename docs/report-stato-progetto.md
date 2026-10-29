@@ -30,8 +30,8 @@ senza persona, o con la persona sbagliata, preferisce invece il flat.
 |---|---|---|
 | corpus | `corpus/fetch_artworks.py` | `data/artworks.jsonl` — 100 dipinti da Wikidata (15 grandi musei, filtro sui sitelink), con l'intro della voce Wikipedia inglese troncata su confine di frase (67–207 parole, mediana 135) |
 | prompt | `common/prompts.py` | 6 condizioni: 5 categorie Falk + `flat` (nessun blocco categoria) |
-| generazione, corpus principale | `generation/chain_study.py` | `data/main/chain_study.jsonl` — testi a prompt singolo `single_a` e `single_b` (500 + 500) e `flat` (100), più i 500 della chain (§5); DeepSeek V4 Flash su DeepInfra fp8, T = 0.7 |
-| generazione, ablazione | `generation/generate.py` | `data/ablation/generations.jsonl` — 600 testi `full` + flat, 3 500 delle altre varianti dell'ablazione (§6), 500 della replica `full_rep`; DeepSeek V4 Flash su DeepInfra fp8, T = 0.7 |
+| generazione, corpus principale | `generation/chain_study.py`, `generation/generate.py` | `data/main/chain_study.jsonl` — testi a prompt singolo `single_a` e `single_b` (500 + 500) e `flat` (100), più i 500 della chain (§5); `data/main/replicates.jsonl` — altre due repliche del prompt singolo (500 + 500, più un flat non usato); DeepSeek V4 Flash su DeepInfra fp8, T = 0.7 |
+| generazione, ablazione | `generation/generate.py` | `data/ablation/generations.jsonl` — 3 500 testi delle 7 varianti del blocco diverse da `full` (§6); DeepSeek V4 Flash su DeepInfra fp8, T = 0.7 |
 | pulizia e corpus | `common/clean.py`, `common/corpus.py` | corpus `main` e `ablation`, testi puliti (sotto) |
 | embedding | `rq1_embeddings/embed.py` | `data/emb/<corpus>/<modello>_<variante>.npy` (Qwen3-Embedding-0.6B, BGE-M3), locali, L2-normalizzati |
 | analisi | `rq1_embeddings/analyze.py` | `results/metrics_{qwen,bge-m3}.json` + figure (corpus principale) |
@@ -56,14 +56,14 @@ quantizzazioni diverse (fp4, fp8, non dichiarata) e comportamento diverso sul
 ragionamento. Per questo:
 
 - il **corpus principale** (`main`), su cui girano le analisi di §3 e RQ2, sono i testi a
-  prompt singolo dello studio chain: tutti su DeepInfra fp8, con ragionamento attivato
-  esplicitamente, provider registrato per riga e generati nella stessa sessione.
-  `single_a` è la variante `full`, `single_b` la sua replica (`full_rep`), che dà il tetto
-  di rumore; 140 testi su 1 100 hanno richiesto più di un tentativo;
-- il **corpus di ablazione** (`ablation`) ha le 8 varianti del blocco (§6), una replica
-  `full_rep` e il flat: anche questo tutto su DeepInfra fp8, con ragionamento attivato
-  esplicitamente e provider registrato per riga. Ha un suo `full` e un suo flat; per la
-  calibrazione usa il tetto del corpus principale, che viene dallo stesso provider.
+  prompt singolo: tutti su DeepInfra fp8, con ragionamento attivato esplicitamente e
+  provider registrato per riga. `single_a` dello studio chain è la variante `full`, con il
+  flat; `single_b` (`full_rep`) e le due repliche di `replicates.jsonl` (`full_rep2`,
+  `full_rep3`) sono altre tre generazioni dello stesso prompt, che danno il tetto di rumore
+  (§3.4);
+- il **corpus di ablazione** (`ablation`) ha le 7 varianti del blocco diverse da `full` (§6),
+  anche queste su DeepInfra fp8 con ragionamento. Come riferimento usa `full` e flat del
+  corpus principale.
 
 `generate.py` salva il provider e i token di ragionamento di ogni risposta e accetta
 `--provider` (es. `deepinfra/fp8`) per fissarlo senza fallback e `--reasoning` per attivare
@@ -75,9 +75,9 @@ il preambolo ("Here is the audio guide …"), i separatori, il markdown (anche i
 lasciati aperti), i conteggi di parole, le intestazioni da copione e le didascalie di regia.
 Il preambolo si toglie solo se è un'introduzione al testo (nomina la guida o il testo,
 finisce con `:` o è seguito da `---`): righe come "Here is a painting that rewards a second
-look." sono già descrizione e restano. Nel corpus di ablazione la pulizia toglie 17
-preamboli e il markdown di 3 671 testi su 4 600; nel corpus principale 5 preamboli e il
-markdown di 847 testi su 1 100.
+look." sono già descrizione e restano. Nel corpus principale la pulizia toglie 8
+preamboli e il markdown di 1 726 testi su 2 200; nel corpus di ablazione 14 preamboli e il
+markdown di 2 792 testi su 3 500.
 
 **Testi troncati.** Nessun testo è troncato, in nessuno dei due corpus: le analisi usano
 tutte le 100 opere. Il caricamento del corpus escluderebbe per intero un'opera con un testo
@@ -162,11 +162,12 @@ Le metriche, in ordine di forza probatoria:
 
 **Rumore di generazione e tetto.** Due generazioni dello stesso prompt danno testi diversi,
 e quindi steering vector un po' diversi. Il **tetto** è il coseno fra gli steering vector
-di due run indipendenti dello stesso prompt (nel corpus principale `single_a` e
-`single_b`, con lo stesso flat):
+di due run indipendenti dello stesso prompt, mediato su tutte le coppie di run (nel corpus
+principale 4 run, `full`, `full_rep`, `full_rep2`, `full_rep3`, quindi 6 coppie, tutte con
+lo stesso flat):
 
 ```
-tetto[c] = cos(v_A[c], v_B[c])
+tetto[c] = media sulle coppie (A, B) di cos(v_A[c], v_B[c])
 ```
 
 È il coseno massimo atteso fra due steering vector che hanno la stessa direzione vera:
@@ -243,13 +244,14 @@ modello la sua direzione rispetto al neutro è poco riproducibile.
 
 ### 3.4 Riproducibilità fra generazioni (tetto)
 
-Coseno fra gli steering vector di due generazioni indipendenti dello stesso prompt
-(`single_a` e `single_b`, 100 opere; sezione `ceiling` di `results/metrics_*.json`).
+Coseno fra gli steering vector di generazioni indipendenti dello stesso prompt, media sulle
+6 coppie delle 4 repliche (100 opere, stesso flat; sezione `ceiling` di
+`results/metrics_*.json`).
 
 | | Explorer | Facilitator | Exp. Seeker | Prof./Hobbyist | Recharger |
 |---|---|---|---|---|---|
-| Qwen3 | 0.957 | 0.958 | 0.980 | 0.985 | 0.990 |
-| BGE-M3 | 0.937 | 0.905 | 0.973 | 0.977 | 0.985 |
+| Qwen3 | 0.964 | 0.967 | 0.979 | 0.986 | 0.989 |
+| BGE-M3 | 0.937 | 0.900 | 0.973 | 0.975 | 0.985 |
 
 È la prova di stabilità più forte: non divide le stesse generazioni in due metà, ma
 rigenera tutti i testi da capo, e la direzione di ogni categoria torna quasi identica. I
@@ -389,8 +391,8 @@ come differenza, quindi un esito "equivalenti" è conservativo e un esito "non e
 va verificato con una seconda run della chain.
 
 A livello di steering si confronta lo shift di categoria: `cos(v_C[c], v_S[c])` diviso per
-il tetto `cos(v_Sa[c], v_Sb[c])` (§3.4). Tutti i testi del confronto vengono dalla stessa
-sessione e dallo stesso provider.
+il tetto delle 4 repliche del prompt singolo (§3.4). Tutti i testi del confronto vengono
+dallo stesso provider.
 
 **Risultati** (`results/chain_noise_{qwen,bge-m3}.json`; Qwen3, BGE-M3 fra parentesi).
 
@@ -408,14 +410,14 @@ circa il 45% in più di quanto distino fra loro due testi singoli. R per categor
 1.26 (Explorer) a 1.63 (Professional/Hobbyist).
 
 Anche lo shift di categoria cambia. Rapporto fra il coseno chain–singolo degli steering
-vector e il tetto singolo–singolo:
+vector e il tetto delle 4 repliche (§3.4):
 
 | | tetto | chain / tetto | ‖v_chain‖ / ‖v_singolo‖ |
 |---|---|---|---|
-| Explorer | 0.96 (0.94) | 0.82 (0.89) | 0.93 (1.07) |
-| Facilitator | 0.96 (0.91) | 0.71 (0.70) | 1.00 (1.66) |
+| Explorer | 0.96 (0.94) | 0.81 (0.89) | 0.93 (1.07) |
+| Facilitator | 0.97 (0.90) | 0.71 (0.71) | 1.00 (1.66) |
 | Experience Seeker | 0.98 (0.97) | 0.52 (0.69) | 0.74 (0.94) |
-| Professional/Hobbyist | 0.99 (0.98) | 0.73 (0.77) | 0.79 (1.14) |
+| Professional/Hobbyist | 0.99 (0.97) | 0.73 (0.77) | 0.79 (1.14) |
 | Recharger | 0.99 (0.99) | 0.88 (0.94) | 0.94 (1.16) |
 | media | | 0.73 (0.80) | |
 
@@ -460,12 +462,12 @@ visitatore), **bisogno** ("Their need is …"), **stile** (come scrivere). L'abl
 le stesse 500 audioguide (5 categorie × 100 opere) per 8 varianti del blocco: ogni parte
 presente o assente, 2 × 2 × 2 combinazioni, fino alla variante in cui resta solo il nome
 della categoria. Il flat non varia. Stesso modello, stesso provider (DeepInfra fp8, con
-ragionamento), stessa temperatura, stesso filtro sui riferimenti espliciti. Costo del
-corpus intero, replica e flat compresi: 0.59 $.
+ragionamento), stessa temperatura, stesso filtro sui riferimenti espliciti. Costo delle 7
+varianti diverse da `full`: 0.45 $.
 
-L'ablazione usa il corpus `ablation` (§1), pulito: **100 opere**. Il suo `full` è generato con le stesse impostazioni del corpus principale di §3
-ma in un'altra esecuzione; dentro l'ablazione tutte le varianti hanno lo stesso flat e le
-stesse opere. Il confronto diretto fra i testi dei due corpus non è ancora fatto.
+L'ablazione usa il corpus `ablation` (§1), pulito: **100 opere**. `full` e flat sono quelli
+del corpus principale (§3): tutte le varianti si misurano rispetto allo stesso flat e sulle
+stesse opere.
 
 | variante | def | need | style |
 |---|---|---|---|
@@ -496,44 +498,44 @@ tetto del corpus principale (§3.4, §6.3).
 
 | variante | probe 5 classi | ‖v‖ media | cos·full | cos/tetto | split-half |
 |---|---|---|---|---|---|
-| `full` | 98.2% (97.2%) | 0.235 (0.152) | 1.000 (1.000) | — | 0.88 (0.83) |
-| `no_need` | 99.2% (97.0%) | 0.240 (0.152) | 0.975 (0.948) | 1.00 (0.99) | 0.90 (0.84) |
-| `no_def` | 98.2% (98.2%) | 0.234 (0.147) | 0.965 (0.945) | 0.99 (0.99) | 0.90 (0.83) |
-| `style_only` | 97.2% (97.0%) | 0.230 (0.145) | 0.964 (0.926) | 0.99 (0.97) | 0.89 (0.81) |
-| `def_only` | 97.0% (96.2%) | 0.180 (0.126) | 0.861 (0.864) | 0.88 (0.90) | 0.82 (0.77) |
-| `no_style` | 94.2% (92.4%) | 0.173 (0.119) | 0.853 (0.877) | 0.88 (0.92) | 0.81 (0.78) |
-| `name_only` | 87.0% (83.6%) | 0.146 (0.104) | 0.702 (0.681) | 0.72 (0.71) | 0.68 (0.63) |
-| `need_only` | 90.4% (89.8%) | 0.158 (0.111) | 0.701 (0.735) | 0.72 (0.77) | 0.76 (0.74) |
+| `full` | 99.0% (96.6%) | 0.233 (0.151) | 1.000 (1.000) | — | 0.90 (0.83) |
+| `no_need` | 99.2% (96.8%) | 0.241 (0.151) | 0.974 (0.954) | 1.00 (1.00) | 0.91 (0.82) |
+| `style_only` | 98.0% (97.2%) | 0.231 (0.145) | 0.960 (0.922) | 0.98 (0.96) | 0.90 (0.80) |
+| `no_def` | 98.4% (98.6%) | 0.235 (0.146) | 0.953 (0.945) | 0.98 (0.99) | 0.90 (0.83) |
+| `def_only` | 97.2% (96.4%) | 0.180 (0.125) | 0.871 (0.874) | 0.89 (0.92) | 0.84 (0.76) |
+| `no_style` | 94.4% (91.8%) | 0.172 (0.118) | 0.854 (0.875) | 0.87 (0.92) | 0.83 (0.77) |
+| `name_only` | 87.0% (82.6%) | 0.146 (0.102) | 0.708 (0.693) | 0.72 (0.73) | 0.67 (0.61) |
+| `need_only` | 90.6% (90.4%) | 0.157 (0.110) | 0.692 (0.731) | 0.71 (0.77) | 0.78 (0.72) |
 
 Chance del probe a 5 classi: 20%.
 
 ### 6.2 Lettura
 
 **Lo stile è la discriminante.** È sufficiente: da solo riproduce la direzione del blocco
-completo (coseno 0.96 / 0.93) con la stessa ampiezza e la stessa separabilità. Ed è
+completo (coseno 0.96 / 0.92) con la stessa ampiezza e la stessa separabilità. Ed è
 necessario: toglierlo è l'unica rimozione singola con un costo netto (0.85 / 0.88, e
-la norma cala del 26% su Qwen3 e del 21% su BGE-M3).
+la norma cala del 26% su Qwen3 e del 22% su BGE-M3).
 
 **La definizione conta solo in assenza dello stile.** Aggiunta al solo nome, la definizione
-porta il coseno da 0.70 a 0.86 (`name_only` → `def_only`; 0.68 → 0.86 su BGE-M3); aggiunta
-allo stile, solo da 0.964 a 0.975 (`style_only` → `no_need`; 0.926 → 0.948). Le due parti
+porta il coseno da 0.71 a 0.87 (`name_only` → `def_only`; 0.69 → 0.87 su BGE-M3); aggiunta
+allo stile, solo da 0.960 a 0.974 (`style_only` → `no_need`; 0.922 → 0.954). Le due parti
 dicono al modello la stessa cosa e lo stile la dice in modo più operativo.
 
 **Il bisogno da solo non basta, e in un caso devia.** `need_only` è la più debole delle
-varianti a una parte, e con Qwen3 è appena sotto anche al solo nome (0.701 contro 0.702).
-Per Experience Seeker il coseno crolla a 0.16 / 0.29: la frase "Their
-need is memorable, high-impact takeaways", senza definizione né stile, spinge il testo in
-una direzione quasi scorrelata da quella del blocco completo, e più debole (norma ridotta
-del 47% / 40%). È l'unico caso in cui una parte del prompt non è un sottoinsieme
-dell'effetto totale ma un effetto diverso.
+varianti a una parte, e con Qwen3 è sotto anche al solo nome (0.692 contro 0.708). Per
+Experience Seeker il coseno crolla a 0.13 / 0.27: la frase "Their need is memorable,
+high-impact takeaways", senza definizione né stile, spinge il testo in una direzione quasi
+scorrelata da quella del blocco completo, e più debole (norma ridotta del 50% / 38%). È
+l'unico caso in cui una parte del prompt non è un sottoinsieme dell'effetto totale ma un
+effetto diverso.
 
 **Il nome da solo conserva circa il 70% dello shift.** Con "Your listener is a
-Recharger." e nient'altro, il probe resta all'87% / 84% contro il 20% di chance, e il
-coseno medio è 0.70 / 0.68. Questa è la conoscenza parametrica di Falk del modello. Ma è
+Recharger." e nient'altro, il probe resta all'87% / 83% contro il 20% di chance, e il
+coseno medio è 0.71 / 0.69. Questa è la conoscenza parametrica di Falk del modello. Ma è
 distribuita in modo molto diseguale: Recharger (0.93 / 0.96) e Professional/Hobbyist
-(0.76 / 0.85) sono nomi autoesplicativi e il modello li interpreta come il blocco
-completo; Explorer e Facilitator stanno nel mezzo (0.69 e 0.74 / 0.48 e 0.67); Experience
-Seeker no (0.39 / 0.44), ed è anche il nome più ambiguo in inglese comune.
+(0.80 / 0.86) sono nomi autoesplicativi e il modello li interpreta come il blocco
+completo; Explorer e Facilitator stanno nel mezzo (0.67 e 0.71 / 0.51 e 0.70); Experience
+Seeker no (0.43 / 0.44), ed è anche il nome più ambiguo in inglese comune.
 
 **Asimmetria fra categorie.** Recharger è robusto a ogni ablazione (coseno ≥ 0.93 in tutte
 le varianti, ≥ 0.96 su BGE-M3): la sua direzione, quella contemplativa, è così marcata che
@@ -543,15 +545,15 @@ dal nome.
 
 ### 6.3 Calibrazione
 
-Il tetto è quello del corpus principale (§3.4): il coseno fra gli steering vector di
-`single_a` e `single_b`, due run dello stesso prompt sullo stesso provider del corpus di
-ablazione. Vale 0.957, 0.958, 0.980, 0.985, 0.990 per Explorer, Facilitator, Experience
-Seeker, Professional/Hobbyist, Recharger (0.937, 0.905, 0.973, 0.977, 0.985 su BGE-M3).
+Il tetto è quello del corpus principale (§3.4): il coseno medio fra gli steering vector
+delle 4 repliche di `full`, tutte rispetto allo stesso flat delle varianti. Vale 0.964,
+0.967, 0.979, 0.986, 0.989 per Explorer, Facilitator, Experience Seeker,
+Professional/Hobbyist, Recharger (0.937, 0.900, 0.973, 0.975, 0.985 su BGE-M3).
 
-Rapportate al tetto (colonna `cos/tetto` in §6.1), `no_need` vale 1.00 e `no_def` 0.99
-(0.99 e 0.99 su BGE-M3): togliere la definizione o il bisogno **non lascia traccia misurabile
-oltre al rumore**. `style_only` è a 0.99 (0.97). Togliere lo stile costa il 12% su Qwen3 e
-l'8% su BGE-M3, `need_only` e `name_only` fra il 23% e il 29%.
+Rapportate al tetto (colonna `cos/tetto` in §6.1), `no_need` vale 1.00 e `no_def` 0.98
+(1.00 e 0.99 su BGE-M3): togliere la definizione o il bisogno **non lascia traccia
+misurabile oltre al rumore**. `style_only` è a 0.98 (0.96). Togliere lo stile costa il 13% su
+Qwen3 e l'8% su BGE-M3, `need_only` e `name_only` fra il 23% e il 29%.
 
 ### 6.4 Implicazione per il prompt
 
@@ -561,7 +563,7 @@ cambia). Per lo studio scientifico l'ablazione dice che quello che
 il paper chiama "adattamento alla categoria di Falk" è, nel modello, in larga parte
 l'esecuzione di un'istruzione stilistica esplicita, e in misura minore l'evocazione di uno
 stereotipo associato al nome. La definizione sociologica della categoria non aggiunge
-nulla di misurabile quando lo stile è presente (al più l'1%, §6.3).
+nulla di misurabile quando lo stile è presente (al più il 2%, §6.3).
 
 ## 7. RQ2: un giudice LLM con persona preferisce il testo personalizzato?
 

@@ -116,10 +116,16 @@
     }
   },
   "ceiling": {
-    "Explorer": 0.9569367170333862,
-    "Facilitator": 0.957963764667511,
-    "Experience Seeker": 0.9799351692199707,
-    "Professional/Hobbyist": 0.9851728081703186,
-    "Recharger": 0.9902877807617188
-  }
+    "Explorer": 0.9637745022773743,
+    "Facilitator": 0.9667732119560242,
+    "Experience Seeker": 0.9791143536567688,
+    "Professional/Hobbyist": 0.9857197403907776,
+    "Recharger": 0.9893152117729187
+  },
+  "ceiling_runs": [
+    "full",
+    "full_rep",
+    "full_rep2",
+    "full_rep3"
+  ]
 }

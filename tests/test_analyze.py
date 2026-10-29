@@ -56,3 +56,17 @@ def test_crossval_distance_ignores_reference():
     a = crossval_distance(center(X, "mean"))
     b = crossval_distance(center(X, "flat"))
     assert np.allclose(a, b, atol=1e-9)
+
+
+def test_ceiling_over_replicas_averages_all_pairs():
+    from itertools import combinations
+
+    from museumbot.rq1_embeddings.analyze import ceiling_over_replicas, replicate_ceiling
+
+    rng = np.random.default_rng(0)
+    runs = [(rng.normal(size=(6, 6, 4)), [f"Q{i}" for i in range(6)]) for _ in range(3)]
+    got, n_pairs = ceiling_over_replicas(runs)
+    want = np.mean([replicate_ceiling(a[0], a[1], b[0], b[1]) for a, b in combinations(runs, 2)],
+                   axis=0)
+    assert n_pairs == 3
+    assert np.allclose(got, want)

@@ -742,3 +742,24 @@ entrambi su DeepInfra fp8: un solo tetto per tutta la parte 1.
 0.99, `no_style` 0.87 → 0.88; BGE-M3 `no_need` 1.00 → 0.99, `def_only` 0.91 → 0.90). Il
 costo di togliere lo stile passa dal 13% al 12% su Qwen3; la definizione, con lo stile
 presente, aggiunge al più l'1%.
+
+## 2026-10-29 — Tetto su 4 repliche; full e flat dell'ablazione nel corpus principale
+
+**Decisione.** `full`, `full_rep` e flat del corpus di ablazione passano al corpus principale
+(`data/main/replicates.jsonl`) come repliche `full_rep2` e `full_rep3` del prompt singolo. Il
+tetto (`analyze.py`) è la media dei coseni fra gli steering vector delle 4 repliche (`full`,
+`full_rep`, `full_rep2`, `full_rep3`) su tutte le 6 coppie, tutte rispetto al flat del corpus
+principale; il flat generato con le repliche nuove resta nel file, non usato. Il corpus di
+ablazione tiene le 7 varianti diverse da `full` e usa `full` e flat del corpus principale; il
+confronto chain/singolo (`chain_noise.py`) usa il tetto a 4 repliche.
+**Motivo.** Stimare il rumore di generazione con 4 run invece di 2, e avere un solo `full` e
+un solo flat per tutta la parte 1. Le repliche si misurano tutte sullo stesso flat perché i
+confronti che il tetto calibra (varianti contro `full`, chain contro singolo) condividono il
+flat: con un flat per replica il tetto includeva anche il rumore del flat, risultava più basso
+(BGE-M3 Facilitator 0.845) e due rapporti dell'ablazione superavano 1 (1.02, 1.03).
+**Effetto.** Tetto Qwen3 0.957, 0.958, 0.980, 0.985, 0.990 → 0.964, 0.967, 0.979, 0.986,
+0.989 (BGE-M3 0.937, 0.905, 0.973, 0.977, 0.985 → 0.937, 0.900, 0.973, 0.975, 0.985). Chain:
+rapporti con il tetto invariati al centesimo salvo Explorer 0.82 → 0.81 (Qwen3) e Facilitator
+0.70 → 0.71 (BGE-M3). Ablazione, con il nuovo riferimento: coseni con il full di qualche
+centesimo diversi (`style_only` 0.964 → 0.960, `no_style` 0.853 → 0.854, `name_only` 0.702 →
+0.708, `need_only` 0.701 → 0.692 con Qwen3); conclusioni invariate.

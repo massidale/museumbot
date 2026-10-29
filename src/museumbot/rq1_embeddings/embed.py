@@ -29,8 +29,9 @@ MODELS = {
 
 def select_rows(all_rows: list[dict], generator_model: str, variant: str) -> list[dict]:
     """Righe di una variante. Le righe flat vengono sempre dalla variante `full`,
-    perche' il flat non ha blocco e quindi non ha varianti. Righe storiche senza campo
-    `variant` valgono come `full`. Ordine deterministico (opera, condizione)."""
+    perche' il flat non ha blocco e quindi non ha varianti: anche le repliche si misurano
+    rispetto allo stesso flat. Righe storiche senza campo `variant` valgono come `full`.
+    Ordine deterministico (opera, condizione)."""
     rows = []
     for r in all_rows:
         if r.get("model") != generator_model:

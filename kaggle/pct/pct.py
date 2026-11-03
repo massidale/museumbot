@@ -9,7 +9,7 @@ import shutil
 import subprocess
 import sys
 
-LIMIT = "2"  # opere del pilota; "" = tutte
+LIMIT = ""  # opere del pilota ("2"); "" = tutte
 REPO = "/tmp/museumbot"
 OUT = "/kaggle/working/prompted.jsonl"
 os.environ.setdefault("HF_HOME", "/tmp/hf")

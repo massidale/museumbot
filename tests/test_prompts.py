@@ -94,3 +94,44 @@ def test_local_messages_suffix_identical_for_flat_and_categories():
 
     for c in ("flat", "recharger"):
         assert local_messages(c, "T", "A", "S")[0]["content"].endswith(LOCAL_SUFFIX)
+
+
+def test_pct_block_weights_and_parts():
+    from museumbot.common.prompts import pct_block
+
+    b = pct_block("explorer", "facilitator", 0.25)
+    lines = b.split("\n")
+    assert lines[0] == "Your listener is 75% an Explorer and 25% a Facilitator."
+    p = CATEGORY_PARTS["explorer"]
+    assert lines[1] == f"An Explorer is {p['def']} {p['need']} {p['style']}"
+    assert lines[2].startswith("A Facilitator is " + CATEGORY_PARTS["facilitator"]["def"])
+    assert lines[3] == ("Weigh the two profiles in the guide in this proportion: "
+                        "75% Explorer, 25% Facilitator.")
+
+
+def test_pct_block_rejects_vertices():
+    from museumbot.common.prompts import pct_block
+
+    for al in (0.0, 1.0):
+        with pytest.raises(ValueError):
+            pct_block("explorer", "facilitator", al)
+
+
+def test_pct_block_rejects_unknown_or_equal_categories():
+    from museumbot.common.prompts import pct_block
+
+    with pytest.raises(ValueError):
+        pct_block("explorer", "bogus", 0.5)
+    with pytest.raises(ValueError):
+        pct_block("explorer", "explorer", 0.5)
+
+
+def test_pct_messages_only_block_changes():
+    from museumbot.common.prompts import LOCAL_SUFFIX, local_messages, pct_block, pct_messages
+
+    pure = local_messages("explorer", "T", "A", "S")
+    pct = pct_messages("explorer", "facilitator", 0.5, "T", "A", "S")
+    assert pct[1] == pure[1]
+    assert pct[0]["content"].endswith(LOCAL_SUFFIX)
+    assert pct[0]["content"].replace(pct_block("explorer", "facilitator", 0.5), "X") == \
+        pure[0]["content"].replace(build_block("explorer"), "X")

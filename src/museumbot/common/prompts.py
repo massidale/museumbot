@@ -208,6 +208,47 @@ def local_messages(
     msgs[0] = {**msgs[0], "content": msgs[0]["content"] + "\n\n" + LOCAL_SUFFIX}
     return msgs
 
+
+def _cap_first(s: str) -> str:
+    """Maiuscola solo l'iniziale: "an Explorer" -> "An Explorer"."""
+    return s[:1].upper() + s[1:]
+
+
+def pct_block(x: str, y: str, alpha: float) -> str:
+    """Blocco a percentuale: ascoltatore (1 - alpha) di x e alpha di y, con le due definizioni."""
+    if not 0 < alpha < 1:
+        raise ValueError(f"alpha must be strictly between 0 and 1, got {alpha!r}")
+    for c in (x, y):
+        if c not in CATEGORY_PARTS:
+            raise ValueError(f"unknown category {c!r}")
+    if x == y:
+        raise ValueError(f"the two categories must differ, got {x!r} twice")
+    px, py = round(100 * (1 - alpha)), round(100 * alpha)
+    nx, ny = CATEGORY_PARTS[x]["name"], CATEGORY_PARTS[y]["name"]
+
+    def riga(c: str) -> str:
+        p = CATEGORY_PARTS[c]
+        return f"{_cap_first(p['name'])} is {p['def']} {p['need']} {p['style']}"
+
+    return "\n".join([
+        f"Your listener is {px}% {nx} and {py}% {ny}.",
+        riga(x),
+        riga(y),
+        "Weigh the two profiles in the guide in this proportion: "
+        f"{px}% {LABELS[x]}, {py}% {LABELS[y]}.",
+    ])
+
+
+def pct_messages(
+    x: str, y: str, alpha: float, title: str, artist: str, source_text: str
+) -> list[dict]:
+    """Messaggi come `local_messages`, con il blocco a percentuale al posto del blocco puro."""
+    msgs = build_messages("flat", title, artist, source_text)
+    system = SYSTEM_TEMPLATE.format(category_block="\n" + pct_block(x, y, alpha) + "\n")
+    msgs[0] = {**msgs[0], "content": system + "\n\n" + LOCAL_SUFFIX}
+    return msgs
+
+
 if __name__ == "__main__":
     # Ispezione a occhio dei 6 prompt: `python -m museumbot.common.prompts`
     for cond in CONDITIONS:

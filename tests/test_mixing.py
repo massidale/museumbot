@@ -3,7 +3,9 @@ import math
 import numpy as np
 import pytest
 
-from museumbot.generation.mixing import minority, minority_q, mix_generate, mix_top, sample_token
+from museumbot.generation.mixing import (
+    extra_diag, minority, minority_q, mix_generate, mix_top, sample_token,
+)
 
 
 def lp(d):
@@ -124,6 +126,13 @@ def test_mix_generate_q_one_lets_minority_decide():
     (toks, diag), = mix_generate([[[10, 1], [20, 1]]], [[0.9, 0.1]], fake_step, eos={EOS},
                                  max_tokens=3, temp=0.7, seeds=[0], qs=[1.0])
     assert toks == [49, 48, 47] and all(d["solo"] for d in diag)
+    # la maggioranza (esperto 10) vuole salire: nella miscela il token della minoranza e' raro
+    assert all(math.exp(d["pmix"]) < 0.05 for d in diag)
+
+
+def test_extra_diag_reads_mix_logprob_of_token():
+    d = extra_diag(8, True, [7, 8], np.log(np.array([0.9, 0.1])))
+    assert d == {"solo": True, "pmix": round(math.log(0.1), 4)}
 
 
 def test_mix_generate_q_needs_two_unequal_experts():

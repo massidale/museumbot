@@ -89,13 +89,20 @@ def sample_token(toks: list[int], mixed: np.ndarray, rng: np.random.Generator) -
     return int(toks[rng.choice(len(toks), p=p / p.sum())])
 
 
+def extra_diag(tok: int, solo: bool, toks: list[int], mixed: np.ndarray) -> dict:
+    """Diagnostica in piu' con l'ingresso della minoranza: se il token l'ha scelto la sola
+    minoranza e la sua log-probabilita' nella miscela geometrica (`pmix`): con `solo`,
+    1 - exp(pmix) e' la probabilita' che senza q quel token non sarebbe uscito."""
+    return {"solo": solo, "pmix": round(float(mixed[toks.index(tok)]), 4)}
+
+
 def mix_generate(prompts, weights, step, *, eos: set[int], max_tokens: int, temp: float,
                  seeds: list[int], qs: list[float] | None = None
                  ) -> list[tuple[list[int], list[dict]]]:
     """Genera piu' testi insieme. `prompts[i]` sono i prompt (token) degli esperti del testo
     i, `weights[i]` i loro pesi; `step(sequenze)` restituisce per ogni sequenza il dizionario
     token -> log-probabilita' del prossimo token. Gli esperti a peso zero non si chiamano.
-    `qs[i]` > 0: ingresso della minoranza con probabilita' q (diagnostica `solo` per token)."""
+    `qs[i]` > 0: ingresso della minoranza con probabilita' q (diagnostica `extra_diag`)."""
     texts = []
     for i, (p, w, s) in enumerate(zip(prompts, weights, seeds)):
         _check(w)
@@ -129,6 +136,6 @@ def mix_generate(prompts, weights, step, *, eos: set[int], max_tokens: int, temp
             t["diag"].append({"logp": [round(d.get(tok, min(d.values())), 4) for d in lps],
                               "covered": cov[tok],
                               "div": round(divergence(lps, t["w"], toks, mixed, temp), 5),
-                              **({"solo": solo} if t["q"] > 0 else {})})
+                              **(extra_diag(tok, solo, toks, mixed) if t["q"] > 0 else {})})
             t["done"] = len(t["toks"]) >= max_tokens
     return [(t["toks"], t["diag"]) for t in texts]

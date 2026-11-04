@@ -8,7 +8,7 @@ import os
 import subprocess
 import sys
 
-SMOKE = True
+SMOKE = False
 REPO = "/tmp/museumbot"
 OUT = "/kaggle/working/mixed_q.jsonl"
 os.environ.setdefault("HF_HOME", "/tmp/hf")

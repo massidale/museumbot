@@ -74,3 +74,10 @@ def test_plan_mix_jobs_filters_ids_by_pair():
     arts = [ART, {**ART, "id": "Q2"}]
     jobs = plan_mix_jobs(arts, [PAIR], [0.25], set(), {"recharger+professional_hobbyist": ["Q2"]})
     assert [a["id"] for a, _, _ in jobs] == ["Q2"]
+
+
+def test_make_mix_row_mixqv_marks_veto():
+    r = make_mix_row(ART, PAIR, 0.75, OK, 0, {"diag": DIAG, "q": 0.148, "dstar": 4.0, "veto": True})
+    assert r["variant"] == "mixqv" and r["veto"] is True
+    r = make_mix_row(ART, PAIR, 0.75, OK, 0, {"diag": DIAG, "q": 0.148, "dstar": 4.0})
+    assert r["variant"] == "mixq" and r["veto"] is False

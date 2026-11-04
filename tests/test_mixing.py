@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from museumbot.generation.mixing import (
-    extra_diag, minority, minority_q, mix_generate, mix_top, sample_token,
+    extra_diag, minority, minority_q, mix_generate, mix_top, sample_token, vetoed,
 )
 
 
@@ -139,3 +139,41 @@ def test_mix_generate_q_needs_two_unequal_experts():
     with pytest.raises(ValueError):
         mix_generate([[[10, 1], [20, 1]]], [[0.5, 0.5]], fake_step, eos={EOS}, max_tokens=3,
                      temp=0.7, seeds=[0], qs=[0.2])
+
+
+def test_vetoed_keeps_only_tokens_the_majority_lists():
+    low, high = lp({1: 0.6, 2: 0.3, 3: 0.1}), lp({2: 0.5, 3: 0.4, 4: 0.1})
+    assert set(vetoed([high, low], 1)) == {2, 3}
+    assert vetoed([high, low], 1)[2] == low[2]  # valori della minoranza
+
+
+def veto_step(sequences):
+    """Maggioranza (10) e minoranza (20) hanno in comune solo il token 7; poi chiudono."""
+    out = []
+    for seq in sequences:
+        if len(seq) > 2:
+            out.append(lp({EOS: 1.0}))
+        elif seq[0] == 10:
+            out.append(lp({5: 0.9, 7: 0.1}))
+        else:
+            out.append(lp({6: 0.95, 7: 0.05}))
+    return out
+
+
+def test_mix_generate_veto_restricts_minority_to_shared_tokens():
+    # q = 1: decide sempre la minoranza; senza veto sceglie quasi sempre 6, con il veto solo 7
+    free = [mix_generate([[[10, 1], [20, 1]]], [[0.9, 0.1]], veto_step, eos={EOS},
+                         max_tokens=1, temp=1.0, seeds=[s], qs=[1.0])[0][0][0] for s in range(20)]
+    veto = [mix_generate([[[10, 1], [20, 1]]], [[0.9, 0.1]], veto_step, eos={EOS},
+                         max_tokens=1, temp=1.0, seeds=[s], qs=[1.0], veto=True)[0][0][0]
+            for s in range(20)]
+    assert 6 in free and set(veto) == {7}
+
+
+def test_mix_generate_veto_falls_back_to_mix_without_shared_tokens():
+    def disjoint(sequences):
+        return [lp({EOS: 1.0}) if len(s) > 2 else lp({5: 1.0} if s[0] == 10 else {6: 1.0})
+                for s in sequences]
+    (toks, diag), = mix_generate([[[10, 1], [20, 1]]], [[0.9, 0.1]], disjoint, eos={EOS},
+                                 max_tokens=1, temp=1.0, seeds=[0], qs=[1.0], veto=True)
+    assert not diag[0]["solo"]  # passo fatto dalla miscela

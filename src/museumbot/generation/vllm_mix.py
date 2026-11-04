@@ -7,8 +7,9 @@ le prime TOP log-probabilita' grezze, cache del prefisso attiva. Pulizia, filtro
 rigenerazione come i testi puri (`vllm_gen.generate_rows`). Ogni riga salva la diagnostica
 per token (log-probabilita' per esperto, copertura, divergenza).
 
-Con --dstar la miscela ha l'ingresso della minoranza (`mixing.minority_q`, variante `mixq`,
-spec docs/plans/2026-11-04-ingresso-minoranza-design.md); --ids limita le opere per coppia.
+Con --dstar la miscela ha l'ingresso della minoranza (`mixing.minority_q`, variante `mixq`;
+con --veto anche il veto della maggioranza, variante `mixqv`; spec
+docs/plans/2026-11-04-ingresso-minoranza-design.md); --ids limita le opere per coppia.
 
 Uso (su Kaggle, dopo il clone del repo):
     python -m museumbot.generation.vllm_mix --pair recharger professional_hobbyist \\
@@ -52,10 +53,11 @@ def make_mix_row(art, pair, alpha, raw, attempt, extra=None, failed=False) -> di
     text = clean_guide(raw)
     extra = dict(extra or {})
     diag = extra.pop("diag", [])
-    q, dstar = extra.pop("q", None), extra.pop("dstar", None)
+    q, dstar, veto = extra.pop("q", None), extra.pop("dstar", None), extra.pop("veto", False)
     n = max(len(diag), 1)
     row = {"artwork_id": art["id"], "title": art["title"], "artist": art["artist"],
-            "condition": pair_name(pair), "variant": "mix" if dstar is None else "mixq",
+            "condition": pair_name(pair),
+            "variant": "mix" if dstar is None else "mixqv" if veto else "mixq",
             "pair": list(pair),
             "alpha": alpha, "weights": {pair[0]: round(1 - alpha, 6), pair[1]: alpha},
             "model": MODEL, "temperature": TEMPERATURE,
@@ -66,7 +68,7 @@ def make_mix_row(art, pair, alpha, raw, attempt, extra=None, failed=False) -> di
                       "div_mean": round(sum(d["div"] for d in diag) / n, 5),
                       **extra, "diag": diag}}
     if dstar is not None:
-        row |= {"q": q, "dstar": dstar}
+        row |= {"q": q, "dstar": dstar, "veto": veto}
         row["usage"]["solo_share"] = round(sum(d.get("solo", False) for d in diag) / n, 4)
     return row
 
@@ -94,7 +96,7 @@ def read_done(path: Path) -> set:
     return {mix_key(r) for r in map(json.loads, path.open())}
 
 
-def vllm_mixer(llm, group: int = GROUP, dstar: float | None = None):
+def vllm_mixer(llm, group: int = GROUP, dstar: float | None = None, veto: bool = False):
     """Backend vero: (opera, coppia, alpha, tentativo) -> (testo grezzo, extra)."""
     from transformers import GenerationConfig
     from vllm import SamplingParams
@@ -126,11 +128,12 @@ def vllm_mixer(llm, group: int = GROUP, dstar: float | None = None):
                                max_tokens=MAX_TOKENS, temp=TEMPERATURE,
                                seeds=[mix_seed(a["id"], p, al, k) for a, p, al, k in batch],
                                qs=[minority_q(al, dstar) if dstar else 0.0
-                                   for a, p, al, k in batch])
+                                   for a, p, al, k in batch], veto=veto)
             secs = round(time.time() - t0, 1)
             out += [(tok.decode(toks, skip_special_tokens=True).strip(),
                      {"completion_tokens": len(toks), "group_seconds": secs, "diag": diag,
-                      **({"q": round(minority_q(al, dstar), 4), "dstar": dstar} if dstar else {})})
+                      **({"q": round(minority_q(al, dstar), 4), "dstar": dstar, "veto": veto}
+                         if dstar else {})})
                     for (toks, diag), (a, p, al, k) in zip(res, batch)]
         return out
 
@@ -149,6 +152,8 @@ def main() -> None:
     ap.add_argument("--group", type=int, default=GROUP, help="testi misti generati insieme")
     ap.add_argument("--dstar", type=float, help="ingresso della minoranza tarato a distanza d*")
     ap.add_argument("--ids", type=Path, help="JSON con 'pairs': coppia -> opere (pilota)")
+    ap.add_argument("--veto", action="store_true",
+                    help="con --dstar: la minoranza sceglie solo fra le prime K della maggioranza")
     args = ap.parse_args()
 
     from vllm import LLM
@@ -159,7 +164,7 @@ def main() -> None:
         print(f"[{MODEL}] da rigenerare {len(jobs)} testi misti, tentativi "
               f"{ATTEMPTS}..{args.retry_failed - 1}", flush=True)
         gen = vllm_mixer(LLM(MODEL, **LLM_ARGS, max_logprobs=TOP, logprobs_mode="raw_logprobs"),
-                         args.group, args.dstar)
+                         args.group, args.dstar, args.veto)
         new = generate_rows(jobs, gen, start=ATTEMPTS, stop=args.retry_failed, make=make_mix_row)
         for r in new:
             print(f"  {r['title'][:30]:30s} {r['condition']} {r['alpha']} "
@@ -177,7 +182,7 @@ def main() -> None:
     if not todo:
         return
     gen = vllm_mixer(LLM(MODEL, **LLM_ARGS, max_logprobs=TOP, logprobs_mode="raw_logprobs"),
-                     args.group, args.dstar)
+                     args.group, args.dstar, args.veto)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
     chunk = 4 * args.group  # righe scritte su disco a ogni blocco

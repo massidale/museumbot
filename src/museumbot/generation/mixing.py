@@ -15,7 +15,9 @@ divergenza sum_k w_k KL(q_k || p) degli esperti dalla miscela (zero con un esper
 
 Ingresso della minoranza (facoltativo, due esperti): a ogni passo, con probabilita' q il
 token lo sceglie da solo l'esperto a peso minore, altrimenti la miscela. q = `minority_q`
-fa vincere alla minoranza la sua quota m alla distanza d* fra i due esperti. Spec:
+fa vincere alla minoranza la sua quota m alla distanza d* fra i due esperti. Con il veto
+la minoranza sceglie solo fra i suoi token che sono anche fra le prime K della maggioranza
+(rinormalizzati); se non ce n'e' nessuno il passo lo fa la miscela. Spec:
 docs/plans/2026-11-04-ingresso-minoranza-design.md.
 """
 
@@ -84,6 +86,12 @@ def minority(weights: list[float]) -> int | None:
     return min(active)[1]
 
 
+def vetoed(lps: list[dict], low: int) -> dict:
+    """Prime K della minoranza ristrette ai token fra le prime K della maggioranza."""
+    high = 1 - low
+    return {t: lp for t, lp in lps[low].items() if t in lps[high]}
+
+
 def sample_token(toks: list[int], mixed: np.ndarray, rng: np.random.Generator) -> int:
     p = np.exp(mixed)
     return int(toks[rng.choice(len(toks), p=p / p.sum())])
@@ -97,12 +105,13 @@ def extra_diag(tok: int, solo: bool, toks: list[int], mixed: np.ndarray) -> dict
 
 
 def mix_generate(prompts, weights, step, *, eos: set[int], max_tokens: int, temp: float,
-                 seeds: list[int], qs: list[float] | None = None
+                 seeds: list[int], qs: list[float] | None = None, veto: bool = False
                  ) -> list[tuple[list[int], list[dict]]]:
     """Genera piu' testi insieme. `prompts[i]` sono i prompt (token) degli esperti del testo
     i, `weights[i]` i loro pesi; `step(sequenze)` restituisce per ogni sequenza il dizionario
     token -> log-probabilita' del prossimo token. Gli esperti a peso zero non si chiamano.
-    `qs[i]` > 0: ingresso della minoranza con probabilita' q (diagnostica `extra_diag`)."""
+    `qs[i]` > 0: ingresso della minoranza con probabilita' q (diagnostica `extra_diag`);
+    `veto`: la minoranza sceglie solo fra token che la maggioranza ha fra le sue prime K."""
     texts = []
     for i, (p, w, s) in enumerate(zip(prompts, weights, seeds)):
         _check(w)
@@ -124,8 +133,10 @@ def mix_generate(prompts, weights, step, *, eos: set[int], max_tokens: int, temp
             # con q = 0 nessuna estrazione in piu': stesso flusso del generatore di prima
             solo = t["q"] > 0 and t["rng"].random() < t["q"]
             if solo:
-                one = [float(k == t["low"]) for k in range(len(lps))]
-                stoks, smixed, _ = mix_top(lps, one, temp)
+                own = vetoed(lps, t["low"]) if veto else lps[t["low"]]
+                solo = bool(own)  # niente in comune con la maggioranza: decide la miscela
+            if solo:
+                stoks, smixed, _ = mix_top([own], [1.0], temp)
                 tok = sample_token(stoks, smixed, t["rng"])
             else:
                 tok = sample_token(toks, mixed, t["rng"])

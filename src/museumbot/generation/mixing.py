@@ -12,6 +12,11 @@ Si campiona un token con il generatore del testo e lo si aggiunge a tutti gli es
 Con un solo esperto e' il campionamento a temperatura T troncato alle prime K. Diagnostica
 per token: log-probabilita' per esperto, se il token era fra le prime K di ciascuno, e la
 divergenza sum_k w_k KL(q_k || p) degli esperti dalla miscela (zero con un esperto).
+
+Ingresso della minoranza (facoltativo, due esperti): a ogni passo, con probabilita' q il
+token lo sceglie da solo l'esperto a peso minore, altrimenti la miscela. q = `minority_q`
+fa vincere alla minoranza la sua quota m alla distanza d* fra i due esperti. Spec:
+docs/plans/2026-11-04-ingresso-minoranza-design.md.
 """
 
 import math
@@ -61,22 +66,47 @@ def divergence(lps: list[dict], weights: list[float], toks, mixed, temp: float) 
     return max(float(sum(w * k for (_, w), k in zip(active, kl))), 0.0)
 
 
+def minority_q(alpha: float, dstar: float) -> float:
+    """q tale che (1 - q) s + q = m, con s = 1 / (1 + exp((1 - 2m) d*)) la quota della
+    minoranza (peso m) nella miscela geometrica a distanza d*; zero a alpha 0, 0.5 e 1."""
+    m = min(alpha, 1 - alpha)
+    if m <= 0:
+        return 0.0
+    s = 1 / (1 + math.exp((1 - 2 * m) * dstar))
+    return max((m - s) / (1 - s), 0.0)
+
+
+def minority(weights: list[float]) -> int | None:
+    """Indice dell'esperto a peso minore fra quelli attivi; None se non ce n'e' uno solo."""
+    active = [(w, k) for k, w in enumerate(weights) if w > 0]
+    if len(active) != 2 or active[0][0] == active[1][0]:
+        return None
+    return min(active)[1]
+
+
 def sample_token(toks: list[int], mixed: np.ndarray, rng: np.random.Generator) -> int:
     p = np.exp(mixed)
     return int(toks[rng.choice(len(toks), p=p / p.sum())])
 
 
 def mix_generate(prompts, weights, step, *, eos: set[int], max_tokens: int, temp: float,
-                 seeds: list[int]) -> list[tuple[list[int], list[dict]]]:
+                 seeds: list[int], qs: list[float] | None = None
+                 ) -> list[tuple[list[int], list[dict]]]:
     """Genera piu' testi insieme. `prompts[i]` sono i prompt (token) degli esperti del testo
     i, `weights[i]` i loro pesi; `step(sequenze)` restituisce per ogni sequenza il dizionario
-    token -> log-probabilita' del prossimo token. Gli esperti a peso zero non si chiamano."""
+    token -> log-probabilita' del prossimo token. Gli esperti a peso zero non si chiamano.
+    `qs[i]` > 0: ingresso della minoranza con probabilita' q (diagnostica `solo` per token)."""
     texts = []
-    for p, w, s in zip(prompts, weights, seeds):
+    for i, (p, w, s) in enumerate(zip(prompts, weights, seeds)):
         _check(w)
         idx = [k for k, x in enumerate(w) if x > 0]
-        texts.append({"prompts": [p[k] for k in idx], "w": [w[k] for k in idx],
-                      "rng": np.random.default_rng(s), "toks": [], "diag": [], "done": False})
+        q = qs[i] if qs else 0.0
+        low = minority([w[k] for k in idx]) if q > 0 else None
+        if q > 0 and low is None:
+            raise ValueError("l'ingresso della minoranza vuole due esperti con pesi diversi")
+        texts.append({"prompts": [p[k] for k in idx], "w": [w[k] for k in idx], "q": q,
+                      "low": low, "rng": np.random.default_rng(s), "toks": [], "diag": [],
+                      "done": False})
     while not all(t["done"] for t in texts):
         live = [t for t in texts if not t["done"]]
         seqs = [pr + t["toks"] for t in live for pr in t["prompts"]]
@@ -84,13 +114,21 @@ def mix_generate(prompts, weights, step, *, eos: set[int], max_tokens: int, temp
         for t in live:
             lps = [next(res) for _ in t["prompts"]]
             toks, mixed, cov = mix_top(lps, t["w"], temp)
-            tok = sample_token(toks, mixed, t["rng"])
+            # con q = 0 nessuna estrazione in piu': stesso flusso del generatore di prima
+            solo = t["q"] > 0 and t["rng"].random() < t["q"]
+            if solo:
+                one = [float(k == t["low"]) for k in range(len(lps))]
+                stoks, smixed, _ = mix_top(lps, one, temp)
+                tok = sample_token(stoks, smixed, t["rng"])
+            else:
+                tok = sample_token(toks, mixed, t["rng"])
             if tok in eos:
                 t["done"] = True
                 continue
             t["toks"].append(tok)
             t["diag"].append({"logp": [round(d.get(tok, min(d.values())), 4) for d in lps],
                               "covered": cov[tok],
-                              "div": round(divergence(lps, t["w"], toks, mixed, temp), 5)})
+                              "div": round(divergence(lps, t["w"], toks, mixed, temp), 5),
+                              **({"solo": solo} if t["q"] > 0 else {})})
             t["done"] = len(t["toks"]) >= max_tokens
     return [(t["toks"], t["diag"]) for t in texts]

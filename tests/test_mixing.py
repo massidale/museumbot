@@ -3,7 +3,7 @@ import math
 import numpy as np
 import pytest
 
-from museumbot.generation.mixing import mix_generate, mix_top, sample_token
+from museumbot.generation.mixing import minority, minority_q, mix_generate, mix_top, sample_token
 
 
 def lp(d):
@@ -95,3 +95,38 @@ def test_mix_generate_diag_records_coverage_and_divergence():
                                  max_tokens=4, temp=0.7, seeds=[5])
     assert all(set(d) == {"logp", "covered", "div"} for d in diag)
     assert all(len(d["logp"]) == 2 and d["div"] >= 0 for d in diag)
+
+
+def test_minority_q_zero_at_ends_and_middle_and_symmetric():
+    assert minority_q(0.0, 4) == minority_q(1.0, 4) == minority_q(0.5, 4) == 0.0
+    assert minority_q(0.25, 4) == pytest.approx(minority_q(0.75, 4))
+    q = minority_q(0.25, 4)
+    s = 1 / (1 + math.exp(0.5 * 4))
+    assert (1 - q) * s + q == pytest.approx(0.25)  # la minoranza vince m a distanza d*
+    assert q == pytest.approx(0.148, abs=1e-3)
+
+
+def test_minority_index():
+    assert minority([0.75, 0.25]) == 1 and minority([0.25, 0.75]) == 0
+    assert minority([0.5, 0.5]) is None and minority([1.0, 0.0]) is None
+
+
+def test_mix_generate_q_zero_unchanged():
+    a = mix_generate([[[10, 1], [20, 1]]], [[0.7, 0.3]], fake_step, eos={EOS}, max_tokens=6,
+                     temp=0.7, seeds=[4])
+    b = mix_generate([[[10, 1], [20, 1]]], [[0.7, 0.3]], fake_step, eos={EOS}, max_tokens=6,
+                     temp=0.7, seeds=[4], qs=[0.0])
+    assert a == b and "solo" not in a[0][1][0]
+
+
+def test_mix_generate_q_one_lets_minority_decide():
+    # q = 1: decide sempre la minoranza (esperto 20, peso 0.1), che vuole scendere
+    (toks, diag), = mix_generate([[[10, 1], [20, 1]]], [[0.9, 0.1]], fake_step, eos={EOS},
+                                 max_tokens=3, temp=0.7, seeds=[0], qs=[1.0])
+    assert toks == [49, 48, 47] and all(d["solo"] for d in diag)
+
+
+def test_mix_generate_q_needs_two_unequal_experts():
+    with pytest.raises(ValueError):
+        mix_generate([[[10, 1], [20, 1]]], [[0.5, 0.5]], fake_step, eos={EOS}, max_tokens=3,
+                     temp=0.7, seeds=[0], qs=[0.2])

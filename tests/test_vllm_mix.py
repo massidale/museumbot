@@ -60,3 +60,17 @@ def test_failed_mix_jobs_lists_only_failed_rows():
     rows = [make_mix_row(ART, PAIR, 0.25, OK, 0),
             make_mix_row(ART, PAIR, 0.75, "for those", 3, failed=True)]
     assert failed_mix_jobs(rows, {"Q1": ART}) == [(ART, PAIR, 0.75)]
+
+
+def test_make_mix_row_mixq_records_q_and_solo_share():
+    diag = [{**d, "solo": s} for d, s in zip(DIAG, (True, False))]
+    r = make_mix_row(ART, PAIR, 0.25, OK, 0, {"diag": diag, "q": 0.148, "dstar": 4.0})
+    assert r["variant"] == "mixq" and r["q"] == 0.148 and r["dstar"] == 4.0
+    assert r["usage"]["solo_share"] == 0.5 and "q" not in r["usage"]
+    assert r["seed"] == mix_seed("Q1", PAIR, 0.25, 0)  # stesso seed dei misti di prima
+
+
+def test_plan_mix_jobs_filters_ids_by_pair():
+    arts = [ART, {**ART, "id": "Q2"}]
+    jobs = plan_mix_jobs(arts, [PAIR], [0.25], set(), {"recharger+professional_hobbyist": ["Q2"]})
+    assert [a["id"] for a, _, _ in jobs] == ["Q2"]

@@ -7,9 +7,14 @@ le prime TOP log-probabilita' grezze, cache del prefisso attiva. Pulizia, filtro
 rigenerazione come i testi puri (`vllm_gen.generate_rows`). Ogni riga salva la diagnostica
 per token (log-probabilita' per esperto, copertura, divergenza).
 
+Con --dstar la miscela ha l'ingresso della minoranza (`mixing.minority_q`, variante `mixq`,
+spec docs/plans/2026-11-04-ingresso-minoranza-design.md); --ids limita le opere per coppia.
+
 Uso (su Kaggle, dopo il clone del repo):
     python -m museumbot.generation.vllm_mix --pair recharger professional_hobbyist \\
         --alphas 0 0.5 1 --limit 20 --out /kaggle/working/mixed.jsonl
+    python -m museumbot.generation.vllm_mix --pair ... --alphas 0.25 0.75 --dstar 4 \\
+        --ids data/local/mixq_pilot.json --out /kaggle/working/mixed_q.jsonl
 """
 
 import argparse
@@ -21,7 +26,7 @@ from museumbot.common.clean import clean_guide
 from museumbot.common.config import ROOT
 from museumbot.common.prompts import FALK_CATEGORIES, local_messages
 from museumbot.generation.generate import ARTWORKS
-from museumbot.generation.mixing import mix_generate
+from museumbot.generation.mixing import minority_q, mix_generate
 from museumbot.generation.rows import ATTEMPTS, row_seed
 from museumbot.generation.vllm_gen import (
     LLM_ARGS, MAX_TOKENS, MODEL, TEMPERATURE, generate_rows, replace_rows,
@@ -47,9 +52,11 @@ def make_mix_row(art, pair, alpha, raw, attempt, extra=None, failed=False) -> di
     text = clean_guide(raw)
     extra = dict(extra or {})
     diag = extra.pop("diag", [])
+    q, dstar = extra.pop("q", None), extra.pop("dstar", None)
     n = max(len(diag), 1)
-    return {"artwork_id": art["id"], "title": art["title"], "artist": art["artist"],
-            "condition": pair_name(pair), "variant": "mix", "pair": list(pair),
+    row = {"artwork_id": art["id"], "title": art["title"], "artist": art["artist"],
+            "condition": pair_name(pair), "variant": "mix" if dstar is None else "mixq",
+            "pair": list(pair),
             "alpha": alpha, "weights": {pair[0]: round(1 - alpha, 6), pair[1]: alpha},
             "model": MODEL, "temperature": TEMPERATURE,
             "seed": mix_seed(art["id"], pair, alpha, attempt),
@@ -58,6 +65,10 @@ def make_mix_row(art, pair, alpha, raw, attempt, extra=None, failed=False) -> di
                       "covered_all": round(sum(all(d["covered"]) for d in diag) / n, 4),
                       "div_mean": round(sum(d["div"] for d in diag) / n, 5),
                       **extra, "diag": diag}}
+    if dstar is not None:
+        row |= {"q": q, "dstar": dstar}
+        row["usage"]["solo_share"] = round(sum(d.get("solo", False) for d in diag) / n, 4)
+    return row
 
 
 def mix_key(r: dict) -> tuple:
@@ -70,9 +81,11 @@ def failed_mix_jobs(rows: list[dict], arts: dict) -> list[tuple]:
             for r in rows if r["usage"].get("failed")]
 
 
-def plan_mix_jobs(artworks, pairs, alphas, done) -> list[tuple]:
+def plan_mix_jobs(artworks, pairs, alphas, done, ids: dict | None = None) -> list[tuple]:
+    """ids: coppia -> opere ammesse (tutte se manca)."""
     return [(a, tuple(p), al) for p in pairs for al in alphas for a in artworks
-            if (a["id"], pair_name(p), al) not in done]
+            if (a["id"], pair_name(p), al) not in done
+            and (ids is None or a["id"] in ids[pair_name(p)])]
 
 
 def read_done(path: Path) -> set:
@@ -81,7 +94,7 @@ def read_done(path: Path) -> set:
     return {mix_key(r) for r in map(json.loads, path.open())}
 
 
-def vllm_mixer(llm, group: int = GROUP):
+def vllm_mixer(llm, group: int = GROUP, dstar: float | None = None):
     """Backend vero: (opera, coppia, alpha, tentativo) -> (testo grezzo, extra)."""
     from transformers import GenerationConfig
     from vllm import SamplingParams
@@ -111,11 +124,14 @@ def vllm_mixer(llm, group: int = GROUP):
             res = mix_generate([[ids(c, a) for c in p] for a, p, al, k in batch],
                                [[1 - al, al] for a, p, al, k in batch], step, eos=eos,
                                max_tokens=MAX_TOKENS, temp=TEMPERATURE,
-                               seeds=[mix_seed(a["id"], p, al, k) for a, p, al, k in batch])
+                               seeds=[mix_seed(a["id"], p, al, k) for a, p, al, k in batch],
+                               qs=[minority_q(al, dstar) if dstar else 0.0
+                                   for a, p, al, k in batch])
             secs = round(time.time() - t0, 1)
             out += [(tok.decode(toks, skip_special_tokens=True).strip(),
-                     {"completion_tokens": len(toks), "group_seconds": secs, "diag": diag})
-                    for toks, diag in res]
+                     {"completion_tokens": len(toks), "group_seconds": secs, "diag": diag,
+                      **({"q": round(minority_q(al, dstar), 4), "dstar": dstar} if dstar else {})})
+                    for (toks, diag), (a, p, al, k) in zip(res, batch)]
         return out
 
     return gen
@@ -131,6 +147,8 @@ def main() -> None:
     ap.add_argument("--limit", type=int, help="usa solo le prime N opere (pilota)")
     ap.add_argument("--out", type=Path, default=OUT)
     ap.add_argument("--group", type=int, default=GROUP, help="testi misti generati insieme")
+    ap.add_argument("--dstar", type=float, help="ingresso della minoranza tarato a distanza d*")
+    ap.add_argument("--ids", type=Path, help="JSON con 'pairs': coppia -> opere (pilota)")
     args = ap.parse_args()
 
     from vllm import LLM
@@ -141,7 +159,7 @@ def main() -> None:
         print(f"[{MODEL}] da rigenerare {len(jobs)} testi misti, tentativi "
               f"{ATTEMPTS}..{args.retry_failed - 1}", flush=True)
         gen = vllm_mixer(LLM(MODEL, **LLM_ARGS, max_logprobs=TOP, logprobs_mode="raw_logprobs"),
-                         args.group)
+                         args.group, args.dstar)
         new = generate_rows(jobs, gen, start=ATTEMPTS, stop=args.retry_failed, make=make_mix_row)
         for r in new:
             print(f"  {r['title'][:30]:30s} {r['condition']} {r['alpha']} "
@@ -152,13 +170,14 @@ def main() -> None:
     artworks = [json.loads(l) for l in ARTWORKS.open()]
     if args.limit:
         artworks = artworks[: args.limit]
-    todo = plan_mix_jobs(artworks, args.pair, args.alphas, read_done(args.out))
+    ids = json.loads(args.ids.read_text())["pairs"] if args.ids else None
+    todo = plan_mix_jobs(artworks, args.pair, args.alphas, read_done(args.out), ids)
     print(f"[{MODEL}] coppie {args.pair}, alpha {args.alphas}: da generare {len(todo)}",
           flush=True)
     if not todo:
         return
     gen = vllm_mixer(LLM(MODEL, **LLM_ARGS, max_logprobs=TOP, logprobs_mode="raw_logprobs"),
-                     args.group)
+                     args.group, args.dstar)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
     chunk = 4 * args.group  # righe scritte su disco a ogni blocco

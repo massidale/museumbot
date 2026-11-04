@@ -30,9 +30,14 @@ MAX_TOKENS = 800
 CHUNK = 120  # testi per chiamata a vLLM: ogni blocco si scrive su disco
 
 
-def needs_retry(raw: str) -> bool:
+def violations(raw: str) -> list[str]:
+    """Motivi di rigenerazione del testo: "<vuoto>" o i riferimenti espliciti trovati."""
     text = clean_guide(raw)
-    return not text or bool(BANNED.search(text))
+    return [m.group(0) for m in BANNED.finditer(text)] if text else ["<vuoto>"]
+
+
+def needs_retry(raw: str) -> bool:
+    return bool(violations(raw))
 
 
 def make_row(art, cond, variant, raw, attempt, extra=None, failed=False) -> dict:
@@ -44,20 +49,27 @@ def make_row(art, cond, variant, raw, attempt, extra=None, failed=False) -> dict
             "usage": {"raw": raw, "attempts": attempt + 1, "failed": failed, **(extra or {})}}
 
 
-def generate_rows(jobs, gen, start: int = 0, stop: int = ATTEMPTS, make=make_row) -> list[dict]:
+def generate_rows(jobs, gen, start: int = 0, stop: int = ATTEMPTS, make=make_row,
+                  prior=None) -> list[dict]:
     """`gen(richieste)` riceve (opera, condizione, variante, tentativo) e restituisce
     (testo grezzo, extra) per ciascuna. Rigenera solo i testi da rifare, con i tentativi
     da `start` a `stop` escluso (il recupero dei falliti riparte da ATTEMPTS). `make`
-    costruisce la riga: testi puri (`make_row`) o misti (`vllm_mix.make_mix_row`)."""
-    rows, pending = [], [(a, c, v, start) for a, c, v in jobs]
+    costruisce la riga: testi puri (`make_row`) o misti (`vllm_mix.make_mix_row`).
+    In `usage.violations` ogni tentativo scartato (numerato da 1) con i suoi motivi;
+    `prior` (una lista per job) sono le violazioni gia' note dei tentativi precedenti."""
+    hist = [list(p) for p in prior] if prior else [[] for _ in jobs]
+    rows, pending = [], [(i, (a, c, v, start)) for i, (a, c, v) in enumerate(jobs)]
     while pending:
         retry = []
-        for (a, c, v, k), (raw, extra) in zip(pending, gen(pending)):
-            last = k == stop - 1
-            if needs_retry(raw) and not last:
-                retry.append((a, c, v, k + 1))
+        for (i, (a, c, v, k)), (raw, extra) in zip(pending, gen([r for _, r in pending])):
+            bad = violations(raw)
+            if bad:
+                hist[i].append({"attempt": k + 1, "matches": bad})
+            if bad and k < stop - 1:
+                retry.append((i, (a, c, v, k + 1)))
             else:
-                rows.append(make(a, c, v, raw, k, extra, failed=needs_retry(raw)))
+                rows.append(make(a, c, v, raw, k, {**(extra or {}), "violations": hist[i]},
+                                 failed=bool(bad)))
         pending = retry
     return rows
 

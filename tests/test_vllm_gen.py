@@ -74,3 +74,21 @@ def test_replace_rows_keeps_order_and_swaps_by_key():
     out = replace_rows(rows, [new])
     assert [r["condition"] for r in out] == ["explorer", "recharger", "flat"]
     assert out[1] is new and out[0] is rows[0]
+
+
+def test_generate_rows_records_violations_per_attempt():
+    gen, _ = fake_backend({("Q1", "explorer"): ["", "Made for those who look.", OK]})
+    (r,) = generate_rows([(ART, "explorer", "full")], gen)
+    assert r["usage"]["violations"] == [{"attempt": 1, "matches": ["<vuoto>"]},
+                                        {"attempt": 2, "matches": ["for those"]}]
+    gen, _ = fake_backend({("Q1", "explorer"): [OK]})
+    (r,) = generate_rows([(ART, "explorer", "full")], gen)
+    assert r["usage"]["violations"] == []
+
+
+def test_generate_rows_appends_to_prior_violations():
+    prior = [[{"attempt": 12, "matches": ["for those"]}]]
+    gen, _ = fake_backend({("Q1", "explorer"): ["for those"] * 13 + [OK]})
+    (r,) = generate_rows([(ART, "explorer", "full")], gen, start=12, stop=20, prior=prior)
+    assert [v["attempt"] for v in r["usage"]["violations"]] == [12, 13]
+    assert r["usage"]["attempts"] == 14 and prior[0] == [{"attempt": 12, "matches": ["for those"]}]

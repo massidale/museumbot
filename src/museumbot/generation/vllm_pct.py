@@ -22,7 +22,7 @@ from museumbot.common.prompts import FALK_CATEGORIES, pct_messages
 from museumbot.generation.generate import ARTWORKS
 from museumbot.generation.rows import ATTEMPTS, row_seed
 from museumbot.generation.vllm_gen import (
-    CHUNK, MAX_TOKENS, MODEL, TEMPERATURE, generate_rows, load_llm, replace_rows,
+    CHUNK, MAX_TOKENS, MODEL, TEMPERATURE, generate_rows, load_llm, replace_rows, violations,
 )
 from museumbot.generation.vllm_mix import (
     failed_mix_jobs, mix_key, pair_name, plan_mix_jobs, read_done,
@@ -44,6 +44,14 @@ def make_pct_row(art, pair, alpha, raw, attempt, extra=None, failed=False) -> di
             "seed": pct_seed(art["id"], pair, alpha, attempt),
             "text": text, "words": len(text.split()),
             "usage": {"raw": raw, "attempts": attempt + 1, "failed": failed, **(extra or {})}}
+
+
+def known_violations(row: dict) -> list[dict]:
+    """Violazioni registrate di una riga; per le righe scritte prima del registro, solo
+    quella dell'ultimo tentativo, ricavata dal testo grezzo salvato."""
+    if "violations" in row["usage"]:
+        return row["usage"]["violations"]
+    return [{"attempt": row["usage"]["attempts"], "matches": violations(row["usage"]["raw"])}]
 
 
 def vllm_pct_backend(llm):
@@ -79,8 +87,8 @@ def main() -> None:
     ap.add_argument("--pair", nargs=2, action="append", choices=FALK_CATEGORIES)
     ap.add_argument("--alphas", nargs="+", type=float)
     ap.add_argument("--retry-failed", type=int, metavar="FINO_A",
-                    help="rigenera i testi con `failed` in --out, tentativi da ATTEMPTS a "
-                         "FINO_A escluso, e riscrive il file")
+                    help="rigenera i testi con `failed` in --out, dal tentativo dopo l'ultimo "
+                         "fatto fino a FINO_A compreso, e riscrive il file")
     ap.add_argument("--limit", type=int, help="usa solo le prime N opere (pilota)")
     ap.add_argument("--out", type=Path, default=OUT)
     args = ap.parse_args()
@@ -88,10 +96,13 @@ def main() -> None:
     if args.retry_failed:
         rows = [json.loads(l) for l in args.out.open()]
         jobs = failed_mix_jobs(rows, {a["id"]: a for a in map(json.loads, ARTWORKS.open())})
+        failed = [r for r in rows if r["usage"].get("failed")]
+        start = max((r["usage"]["attempts"] for r in failed), default=ATTEMPTS)
         print(f"[{MODEL}] da rigenerare {len(jobs)} testi a percentuale, tentativi "
-              f"{ATTEMPTS}..{args.retry_failed - 1}", flush=True)
-        new = (generate_rows(jobs, vllm_pct_backend(load_llm()), start=ATTEMPTS,
-                             stop=args.retry_failed, make=make_pct_row) if jobs else [])
+              f"{start + 1}..{args.retry_failed}", flush=True)
+        new = (generate_rows(jobs, vllm_pct_backend(load_llm()), start=start,
+                             stop=args.retry_failed, make=make_pct_row,
+                             prior=[known_violations(r) for r in failed]) if jobs else [])
         for r in new:
             print(f"  {r['title'][:30]:30s} {r['condition']} {r['alpha']} "
                   f"tentativi {r['usage']['attempts']} falliti {r['usage']['failed']}", flush=True)

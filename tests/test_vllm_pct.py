@@ -36,3 +36,12 @@ def test_generate_rows_retries_pct_with_new_seed():
     assert seen == [[("Q1", PAIR, 0.5, 0)], [("Q1", PAIR, 0.5, 1)]]
     assert r["usage"]["attempts"] == 2 and not r["usage"]["failed"]
     assert r["seed"] == pct_seed("Q1", PAIR, 0.5, 1) and r["text"] == OK
+
+
+def test_known_violations_rebuilds_last_attempt_for_old_rows():
+    from museumbot.generation.vllm_pct import known_violations
+
+    old = {"usage": {"attempts": 12, "raw": "For those who like it."}}
+    assert known_violations(old) == [{"attempt": 12, "matches": ["For those"]}]
+    new = {"usage": {"attempts": 3, "raw": OK, "violations": [{"attempt": 1, "matches": ["x"]}]}}
+    assert known_violations(new) == [{"attempt": 1, "matches": ["x"]}]

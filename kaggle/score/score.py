@@ -1,12 +1,12 @@
 """Kaggle (2x T4): rilettura dei testi a alpha = 0.5 con i due prompt puri (`vllm_score`), per
-il margine per token dei testi a percentuale. Con LIMIT (pilota) rilegge anche i misti delle
-stesse opere, da confrontare con la loro diagnostica. Output: /kaggle/working/scores_*.jsonl."""
+il margine per token dei testi a percentuale e dei misti (stessa misura, senza il troncamento
+alle prime 100 della diagnostica dei misti). Output: /kaggle/working/scores_*.jsonl."""
 
 import os
 import subprocess
 import sys
 
-LIMIT = "3"  # opere del pilota; "" = tutte, solo testi a percentuale
+LIMIT = ""  # opere del pilota ("3"); "" = tutte
 REPO = "/tmp/museumbot"
 os.environ.setdefault("HF_HOME", "/tmp/hf")
 
@@ -21,6 +21,6 @@ run(f"git clone -q -b restructure-src https://github.com/massidale/museumbot {RE
 run(f"git -C {REPO} log --oneline -1")
 run(f"{sys.executable} {REPO}/kaggle/patch_vllm_turing.py")
 limit = f"--limit {LIMIT} " if LIMIT else ""
-for method in (("mix", "pct") if LIMIT else ("pct",)):
+for method in ("mix", "pct"):
     run(f"PYTHONPATH={REPO}/src {sys.executable} -m museumbot.generation.vllm_score "
         f"--method {method} --alphas 0.5 {limit}--out /kaggle/working/scores_{method}.jsonl")

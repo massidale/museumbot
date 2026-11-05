@@ -19,11 +19,19 @@ fa vincere alla minoranza la sua quota m alla distanza d* fra i due esperti. Con
 la minoranza sceglie solo fra i suoi token che sono anche fra le prime K della maggioranza
 (rinormalizzati); se non ce n'e' nessuno il passo lo fa la miscela. Spec:
 docs/plans/2026-11-04-ingresso-minoranza-design.md.
+
+Debito della minoranza (facoltativo, due esperti, in alternativa all'ingresso): un passo e'
+conteso se il token scelto ha |log p_min - log p_mag| >= CONTEST; a ogni contesa il debito
+cresce di m e cala di 1 se vince la minoranza; il peso della minoranza nel passo dopo e'
+min(m + k max(debito, 0), 0.5). Spec: docs/plans/2026-11-05-debito-minoranza-design.md.
 """
 
 import math
 
 import numpy as np
+
+CONTEST = 3.0  # |margine| oltre il quale un passo e' conteso
+WMAX = 0.5     # tetto del peso della minoranza col debito
 
 
 def _check(weights) -> None:
@@ -92,6 +100,18 @@ def vetoed(lps: list[dict], low: int) -> dict:
     return {t: lp for t, lp in lps[low].items() if t in lps[high]}
 
 
+def debt_weight(m: float, k: float, debt: float) -> float:
+    """Peso della minoranza dato il debito: m + k max(debito, 0), al massimo WMAX."""
+    return min(m + k * max(debt, 0.0), WMAX)
+
+
+def debt_update(debt: float, margin: float, m: float, contest: float = CONTEST) -> float:
+    """Debito dopo un passo; margine = log p_min - log p_mag del token scelto."""
+    if abs(margin) < contest:
+        return debt
+    return debt + m - (margin > 0)
+
+
 def sample_token(toks: list[int], mixed: np.ndarray, rng: np.random.Generator) -> int:
     p = np.exp(mixed)
     return int(toks[rng.choice(len(toks), p=p / p.sum())])
@@ -105,23 +125,29 @@ def extra_diag(tok: int, solo: bool, toks: list[int], mixed: np.ndarray) -> dict
 
 
 def mix_generate(prompts, weights, step, *, eos: set[int], max_tokens: int, temp: float,
-                 seeds: list[int], qs: list[float] | None = None, veto: bool = False
-                 ) -> list[tuple[list[int], list[dict]]]:
+                 seeds: list[int], qs: list[float] | None = None, veto: bool = False,
+                 debts: list[float] | None = None) -> list[tuple[list[int], list[dict]]]:
     """Genera piu' testi insieme. `prompts[i]` sono i prompt (token) degli esperti del testo
     i, `weights[i]` i loro pesi; `step(sequenze)` restituisce per ogni sequenza il dizionario
     token -> log-probabilita' del prossimo token. Gli esperti a peso zero non si chiamano.
     `qs[i]` > 0: ingresso della minoranza con probabilita' q (diagnostica `extra_diag`);
-    `veto`: la minoranza sceglie solo fra token che la maggioranza ha fra le sue prime K."""
+    `veto`: la minoranza sceglie solo fra token che la maggioranza ha fra le sue prime K.
+    `debts[i]` = k > 0: debito della minoranza (`debt_weight`), ignorato senza minoranza
+    (alpha 0, 0.5, 1); diagnostica `wlow` (peso della minoranza) e `debt` (prima del passo)."""
     texts = []
     for i, (p, w, s) in enumerate(zip(prompts, weights, seeds)):
         _check(w)
         idx = [k for k, x in enumerate(w) if x > 0]
         q = qs[i] if qs else 0.0
-        low = minority([w[k] for k in idx]) if q > 0 else None
+        k = debts[i] if debts else 0.0
+        if q > 0 and k > 0:
+            raise ValueError("ingresso e debito della minoranza sono alternativi")
+        low = minority([w[j] for j in idx]) if q > 0 or k > 0 else None
         if q > 0 and low is None:
             raise ValueError("l'ingresso della minoranza vuole due esperti con pesi diversi")
-        texts.append({"prompts": [p[k] for k in idx], "w": [w[k] for k in idx], "q": q,
-                      "low": low, "rng": np.random.default_rng(s), "toks": [], "diag": [],
+        texts.append({"prompts": [p[j] for j in idx], "w": [w[j] for j in idx], "q": q,
+                      "k": k if low is not None else 0.0, "debt": 0.0, "low": low,
+                      "rng": np.random.default_rng(s), "toks": [], "diag": [],
                       "done": False})
     while not all(t["done"] for t in texts):
         live = [t for t in texts if not t["done"]]
@@ -129,7 +155,11 @@ def mix_generate(prompts, weights, step, *, eos: set[int], max_tokens: int, temp
         res = iter(step(seqs))
         for t in live:
             lps = [next(res) for _ in t["prompts"]]
-            toks, mixed, cov = mix_top(lps, t["w"], temp)
+            w = t["w"]
+            if t["k"] > 0:
+                wl = debt_weight(min(w), t["k"], t["debt"])
+                w = [wl if j == t["low"] else 1 - wl for j in range(2)]
+            toks, mixed, cov = mix_top(lps, w, temp)
             # con q = 0 nessuna estrazione in piu': stesso flusso del generatore di prima
             solo = t["q"] > 0 and t["rng"].random() < t["q"]
             if solo:
@@ -144,9 +174,14 @@ def mix_generate(prompts, weights, step, *, eos: set[int], max_tokens: int, temp
                 t["done"] = True
                 continue
             t["toks"].append(tok)
-            t["diag"].append({"logp": [round(d.get(tok, min(d.values())), 4) for d in lps],
-                              "covered": cov[tok],
-                              "div": round(divergence(lps, t["w"], toks, mixed, temp), 5),
-                              **(extra_diag(tok, solo, toks, mixed) if t["q"] > 0 else {})})
+            logp = [round(d.get(tok, min(d.values())), 4) for d in lps]
+            t["diag"].append({"logp": logp, "covered": cov[tok],
+                              "div": round(divergence(lps, w, toks, mixed, temp), 5),
+                              **(extra_diag(tok, solo, toks, mixed) if t["q"] > 0 else {}),
+                              **({"wlow": round(w[t["low"]], 4), "debt": round(t["debt"], 4)}
+                                 if t["k"] > 0 else {})})
+            if t["k"] > 0:
+                lo = t["low"]
+                t["debt"] = debt_update(t["debt"], logp[lo] - logp[1 - lo], min(t["w"]))
             t["done"] = len(t["toks"]) >= max_tokens
     return [(t["toks"], t["diag"]) for t in texts]

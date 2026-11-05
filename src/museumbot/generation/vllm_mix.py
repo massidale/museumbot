@@ -9,7 +9,9 @@ per token (log-probabilita' per esperto, copertura, divergenza).
 
 Con --dstar la miscela ha l'ingresso della minoranza (`mixing.minority_q`, variante `mixq`;
 con --veto anche il veto della maggioranza, variante `mixqv`; spec
-docs/plans/2026-11-04-ingresso-minoranza-design.md); --ids limita le opere per coppia.
+docs/plans/2026-11-04-ingresso-minoranza-design.md); con --debt il debito della minoranza
+(`mixing.debt_weight`, variante `mixd`, spec docs/plans/2026-11-05-debito-minoranza-design.md);
+--ids limita le opere per coppia.
 
 Uso (su Kaggle, dopo il clone del repo):
     python -m museumbot.generation.vllm_mix --pair recharger professional_hobbyist \\
@@ -27,7 +29,7 @@ from museumbot.common.clean import clean_guide
 from museumbot.common.config import ROOT
 from museumbot.common.prompts import FALK_CATEGORIES, local_messages
 from museumbot.generation.generate import ARTWORKS
-from museumbot.generation.mixing import minority_q, mix_generate
+from museumbot.generation.mixing import CONTEST, minority_q, mix_generate
 from museumbot.generation.rows import ATTEMPTS, row_seed
 from museumbot.generation.vllm_gen import (
     LLM_ARGS, MAX_TOKENS, MODEL, TEMPERATURE, generate_rows, replace_rows,
@@ -54,10 +56,11 @@ def make_mix_row(art, pair, alpha, raw, attempt, extra=None, failed=False) -> di
     extra = dict(extra or {})
     diag = extra.pop("diag", [])
     q, dstar, veto = extra.pop("q", None), extra.pop("dstar", None), extra.pop("veto", False)
+    k = extra.pop("debt_k", None)
     n = max(len(diag), 1)
     row = {"artwork_id": art["id"], "title": art["title"], "artist": art["artist"],
             "condition": pair_name(pair),
-            "variant": "mix" if dstar is None else "mixqv" if veto else "mixq",
+            "variant": variant_name(dstar, veto, k),
             "pair": list(pair),
             "alpha": alpha, "weights": {pair[0]: round(1 - alpha, 6), pair[1]: alpha},
             "model": MODEL, "temperature": TEMPERATURE,
@@ -70,7 +73,16 @@ def make_mix_row(art, pair, alpha, raw, attempt, extra=None, failed=False) -> di
     if dstar is not None:
         row |= {"q": q, "dstar": dstar, "veto": veto}
         row["usage"]["solo_share"] = round(sum(d.get("solo", False) for d in diag) / n, 4)
+    if k is not None:
+        row |= {"debt_k": k, "contest": CONTEST}
+        row["usage"]["wlow_mean"] = round(sum(d.get("wlow", 0) for d in diag) / n, 4)
     return row
+
+
+def variant_name(dstar, veto, k) -> str:
+    if k is not None:
+        return "mixd"
+    return "mix" if dstar is None else "mixqv" if veto else "mixq"
 
 
 def mix_key(r: dict) -> tuple:
@@ -96,7 +108,8 @@ def read_done(path: Path) -> set:
     return {mix_key(r) for r in map(json.loads, path.open())}
 
 
-def vllm_mixer(llm, group: int = GROUP, dstar: float | None = None, veto: bool = False):
+def vllm_mixer(llm, group: int = GROUP, dstar: float | None = None, veto: bool = False,
+               debt: float | None = None):
     """Backend vero: (opera, coppia, alpha, tentativo) -> (testo grezzo, extra)."""
     from transformers import GenerationConfig
     from vllm import SamplingParams
@@ -128,12 +141,14 @@ def vllm_mixer(llm, group: int = GROUP, dstar: float | None = None, veto: bool =
                                max_tokens=MAX_TOKENS, temp=TEMPERATURE,
                                seeds=[mix_seed(a["id"], p, al, k) for a, p, al, k in batch],
                                qs=[minority_q(al, dstar) if dstar else 0.0
-                                   for a, p, al, k in batch], veto=veto)
+                                   for a, p, al, k in batch], veto=veto,
+                               debts=[debt or 0.0] * len(batch))
             secs = round(time.time() - t0, 1)
             out += [(tok.decode(toks, skip_special_tokens=True).strip(),
                      {"completion_tokens": len(toks), "group_seconds": secs, "diag": diag,
                       **({"q": round(minority_q(al, dstar), 4), "dstar": dstar, "veto": veto}
-                         if dstar else {})})
+                         if dstar else {}),
+                      **({"debt_k": debt} if debt else {})})
                     for (toks, diag), (a, p, al, k) in zip(res, batch)]
         return out
 
@@ -154,6 +169,8 @@ def main() -> None:
     ap.add_argument("--ids", type=Path, help="JSON con 'pairs': coppia -> opere (pilota)")
     ap.add_argument("--veto", action="store_true",
                     help="con --dstar: la minoranza sceglie solo fra le prime K della maggioranza")
+    ap.add_argument("--debt", type=float, metavar="K",
+                    help="debito della minoranza con passo K (alternativo a --dstar)")
     args = ap.parse_args()
 
     from vllm import LLM
@@ -164,7 +181,7 @@ def main() -> None:
         print(f"[{MODEL}] da rigenerare {len(jobs)} testi misti, tentativi "
               f"{ATTEMPTS}..{args.retry_failed - 1}", flush=True)
         gen = vllm_mixer(LLM(MODEL, **LLM_ARGS, max_logprobs=TOP, logprobs_mode="raw_logprobs"),
-                         args.group, args.dstar, args.veto)
+                         args.group, args.dstar, args.veto, args.debt)
         new = generate_rows(jobs, gen, start=ATTEMPTS, stop=args.retry_failed, make=make_mix_row)
         for r in new:
             print(f"  {r['title'][:30]:30s} {r['condition']} {r['alpha']} "
@@ -182,7 +199,7 @@ def main() -> None:
     if not todo:
         return
     gen = vllm_mixer(LLM(MODEL, **LLM_ARGS, max_logprobs=TOP, logprobs_mode="raw_logprobs"),
-                     args.group, args.dstar, args.veto)
+                     args.group, args.dstar, args.veto, args.debt)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
     chunk = 4 * args.group  # righe scritte su disco a ogni blocco

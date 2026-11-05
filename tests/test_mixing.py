@@ -177,3 +177,45 @@ def test_mix_generate_veto_falls_back_to_mix_without_shared_tokens():
     (toks, diag), = mix_generate([[[10, 1], [20, 1]]], [[0.9, 0.1]], disjoint, eos={EOS},
                                  max_tokens=1, temp=1.0, seeds=[0], qs=[1.0], veto=True)
     assert not diag[0]["solo"]  # passo fatto dalla miscela
+
+
+def test_debt_weight_grows_with_debt_and_stops_at_half():
+    from museumbot.generation.mixing import debt_weight
+    assert debt_weight(0.25, 0.25, 0.0) == 0.25 and debt_weight(0.25, 0.25, -1.0) == 0.25
+    assert debt_weight(0.25, 0.25, 0.5) == pytest.approx(0.375)
+    assert debt_weight(0.25, 0.25, 3.0) == 0.5
+
+
+def test_debt_update_counts_only_contested_steps():
+    from museumbot.generation.mixing import debt_update
+    assert debt_update(0.4, 2.9, 0.25) == 0.4 and debt_update(0.4, -2.9, 0.25) == 0.4
+    assert debt_update(0.0, -4.0, 0.25) == pytest.approx(0.25)   # vince la maggioranza
+    assert debt_update(0.0, 4.0, 0.25) == pytest.approx(-0.75)   # vince la minoranza
+
+
+def test_mix_generate_debt_zero_or_without_minority_unchanged():
+    base = dict(eos={EOS}, max_tokens=6, temp=0.7, seeds=[4])
+    a = mix_generate([[[10, 1], [20, 1]]], [[0.7, 0.3]], fake_step, **base)
+    assert a == mix_generate([[[10, 1], [20, 1]]], [[0.7, 0.3]], fake_step, **base, debts=[0.0])
+    b = mix_generate([[[10, 1], [20, 1]]], [[0.5, 0.5]], fake_step, **base)
+    assert b == mix_generate([[[10, 1], [20, 1]]], [[0.5, 0.5]], fake_step, **base, debts=[0.25])
+
+
+def test_mix_generate_debt_raises_minority_weight_up_to_half():
+    from museumbot.generation.mixing import debt_update, debt_weight
+    # gli esperti vogliono token diversi a ogni passo: ogni passo e' conteso (|margine| 3.9)
+    (toks, diag), = mix_generate([[[10, 1], [20, 1]]], [[0.9, 0.1]], fake_step, eos={EOS},
+                                 max_tokens=5, temp=0.7, seeds=[1], debts=[4.0])
+    assert diag[0]["wlow"] == pytest.approx(0.1) and diag[0]["debt"] == 0
+    debt = 0.0
+    for d in diag:  # la diagnostica ripercorre il debito passo per passo
+        assert d["debt"] == pytest.approx(debt, abs=1e-4)
+        assert d["wlow"] == pytest.approx(debt_weight(0.1, 4.0, debt), abs=1e-4)
+        debt = debt_update(debt, d["logp"][1] - d["logp"][0], 0.1)
+    assert max(d["wlow"] for d in diag) == 0.5
+
+
+def test_mix_generate_entry_and_debt_are_alternative():
+    with pytest.raises(ValueError):
+        mix_generate([[[10, 1], [20, 1]]], [[0.9, 0.1]], fake_step, eos={EOS}, max_tokens=3,
+                     temp=0.7, seeds=[0], qs=[0.2], debts=[0.25])

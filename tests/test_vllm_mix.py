@@ -81,3 +81,11 @@ def test_make_mix_row_mixqv_marks_veto():
     assert r["variant"] == "mixqv" and r["veto"] is True
     r = make_mix_row(ART, PAIR, 0.75, OK, 0, {"diag": DIAG, "q": 0.148, "dstar": 4.0})
     assert r["variant"] == "mixq" and r["veto"] is False
+
+
+def test_make_mix_row_mixd_records_debt_and_mean_weight():
+    diag = [{**d, "wlow": w, "debt": b} for d, w, b in zip(DIAG, (0.25, 0.5), (0.0, 1.0))]
+    r = make_mix_row(ART, PAIR, 0.25, OK, 0, {"diag": diag, "debt_k": 0.25})
+    assert r["variant"] == "mixd" and r["debt_k"] == 0.25 and r["contest"] == 3.0
+    assert r["usage"]["wlow_mean"] == 0.375 and "q" not in r
+    assert r["seed"] == mix_seed("Q1", PAIR, 0.25, 0)  # stesso seed dei misti di prima

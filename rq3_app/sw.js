@@ -93,13 +93,16 @@ self.addEventListener('message', event => {
   })());
 });
 
-// Media: cache-first; su mancanza dalla rete, e si salva nella cache della versione.
+// Media: cache-first, ma solo nella cache della versione corrente del manifesto
+// (gli stessi percorsi possono avere audio diversi in un'altra versione).
 async function mediaFirst(req) {
-  const hit = await caches.match(req, {ignoreSearch: true});
+  const m = await cachedManifest();
+  if (!m) return fetch(req);
+  const cache = await caches.open(mediaCacheName(m));
+  const hit = await cache.match(req, {ignoreSearch: true});
   if (hit) return hit;
   const r = await fetch(req);
-  const m = await cachedManifest();
-  if (r.ok && r.status === 200 && m) await (await caches.open(mediaCacheName(m))).put(req, r.clone());
+  if (r.ok && r.status === 200) await cache.put(req, r.clone());
   return r;
 }
 

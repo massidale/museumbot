@@ -24,12 +24,23 @@ export function mediaUrls(manifest) {
   return [...out];
 }
 
-// Quali media mancano dalla cache e quanti byte occupano quelli presenti.
+// Nome della cache dei media per una versione del manifesto (lo stesso di sw.js).
+export const mediaCacheName = version => `rq3-media-${version}`;
+
+// Cerca u solo nella cache della versione: un'altra versione puo' avere gli stessi
+// percorsi con audio diversi.
+async function matchMedia(u, version) {
+  const name = mediaCacheName(version);
+  if (!(await caches.has(name))) return undefined;
+  return (await caches.open(name)).match(u);
+}
+
+// Quali media della versione del manifesto mancano dalla cache e quanti byte occupano gli altri.
 export async function checkCache(manifest) {
   const missing = [];
   let bytes = 0;
   for (const u of mediaUrls(manifest)) {
-    const r = await caches.match(u);
+    const r = await matchMedia(u, manifest.version);
     if (!r) { missing.push(u); continue; }
     const len = Number(r.headers.get('content-length'));
     bytes += Number.isFinite(len) && len > 0 ? len : (await r.blob()).size;
@@ -37,8 +48,10 @@ export async function checkCache(manifest) {
   return {missing, bytes};
 }
 
-async function loadBlob(src) {
-  const r = (await caches.match(src)) || (await fetch(src));
+// Dalla cache della versione; se manca (o la versione non e' data), dalla rete,
+// passando dal service worker, che usa la stessa cache.
+async function loadBlob(src, version) {
+  const r = (version != null && (await matchMedia(src, version))) || (await fetch(src));
   if (!r.ok) throw new Error(`${src}: HTTP ${r.status}`);
   const blob = await r.blob();
   return blob.type ? blob : new Blob([blob], {type: 'audio/mpeg'});
@@ -52,7 +65,8 @@ function el(tag, cls, text) {
 }
 
 // state = {plays, ended}: plays conta gli avvii da capo, ended resta vero dopo la prima fine.
-export function createPlayer(container, src, label, onChange = () => {}, labels = {}) {
+// version: versione del manifesto, per leggere l'audio dalla sua cache.
+export function createPlayer(container, src, label, onChange = () => {}, labels = {}, version = null) {
   const L = {...DEFAULT_LABELS, ...labels};
   const state = {plays: 0, ended: false};
   let enabled = true, ready = false, destroyed = false, fromStart = true, url = null;
@@ -109,7 +123,7 @@ export function createPlayer(container, src, label, onChange = () => {}, labels 
   });
 
   refresh();
-  loadBlob(src).then(blob => {
+  loadBlob(src, version).then(blob => {
     if (destroyed) return;
     url = URL.createObjectURL(blob);
     audio.src = url;

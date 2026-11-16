@@ -2,16 +2,15 @@
 // salvato in IndexedDB dopo ogni passo. Tutti i testi per il visitatore vengono da texts.json.
 import {
   LANGS, REASONS, validateManifest, planSession, newSession, buildTrial,
-  canPlay, canAnswer, answerComplete, answer, markStep,
+  canPlay, canAnswer, answerComplete, answer, markStep, abortSession,
 } from './logic.js';
 import {createPlayer, loadBlob} from './player.js';
 import {APP_VERSION} from './config.js';
 import {putSession, getSetting} from './store.js';
 import {registerServiceWorker} from './swclient.js';
-import {showOperator as operatorScreen, onSwStatus, DEFAULT_DEVICE} from './operator.js';
+import {showOperator as operatorScreen, onSwStatus, mountAbortGate, DEFAULT_DEVICE} from './operator.js';
 
 const MAX_ARTWORKS = 4;
-const SAMPLE_SEC = 8;           // durata della prova del volume
 const RETURN_MS = 30 * 1000;    // dopo i saluti si torna da soli all'operatore
 
 const app = document.getElementById('app');
@@ -19,6 +18,7 @@ let texts = null;      // texts.json intero
 let T = null;          // testi della lingua scelta
 let S = null;          // sessione in corso: manifest, plan, record, ...
 let cleanups = [];     // da chiamare quando si cambia schermata
+let unmountGate = null;  // angolo dell'operatore sulle schermate del visitatore
 
 const now = () => new Date().toISOString();
 
@@ -80,6 +80,15 @@ function putTrial(trial) {
   return save();
 }
 
+// Errore di un audio: dettagli nel record (e in console dal player); al visitatore solo
+// il testo neutro. trialIndex e position sono null per la prova del volume.
+function playerError(trialIndex, position, {src, message}) {
+  if (!S || !S.record) return;
+  const entry = {trial_index: trialIndex, position, src, message, at: now()};
+  S.record = {...S.record, player_errors: [...(S.record.player_errors || []), entry], updated_at: now()};
+  save();
+}
+
 // ---- identificativi ----
 
 function randomU32() {
@@ -95,9 +104,20 @@ function newSessionId() {
 
 function showOperator(message = '') {
   S = null;
+  if (unmountGate) { unmountGate(); unmountGate = null; }
   document.documentElement.lang = 'it';
   screen('operator');
   cleanups.push(operatorScreen(app, {onStart: startSession, message}));
+}
+
+// L'operatore interrompe la sessione (tocco lungo, PIN, conferma). screen() in
+// showOperator ferma l'audio; il record resta incompleto, col passo a cui si era fermato.
+async function abortByOperator() {
+  if (S && S.record && !S.record.completed) {
+    S.record = abortSession(S.record, now());
+    await save();
+  }
+  showOperator();
 }
 
 // ---- percorso del visitatore ----
@@ -116,6 +136,7 @@ export async function startSession() {
       manifest, seed, plan, device, sessionId: newSessionId(), record: null,
       total: Math.min(MAX_ARTWORKS, plan.artworkOrder.length), categories: null,
     };
+    if (!unmountGate) unmountGate = mountAbortGate(abortByOperator);
     showLanguage();
   } catch (e) {
     console.error(e);
@@ -209,7 +230,7 @@ function showClassification() {
   next.addEventListener('click', () => {
     // le scelte nell'ordine in cui sono mostrate
     const chosen = S.plan.descriptionOrder.filter(c => selected.includes(c));
-    step('classification');
+    step('classification', {chosen: [...selected]});  // nel record: nell'ordine in cui sono state toccate
     if (chosen.length === 1) setCategories(chosen[0], null);
     else showMain(chosen);
   });
@@ -245,38 +266,52 @@ function setCategories(main, secondary) {
 // Audio come blob, come nel player (Safari e le richieste a intervalli).
 const blobUrl = async (src, version) => URL.createObjectURL(await loadBlob(src, version));
 
-// Prova del volume: i primi secondi della 'flat' della prima opera.
+// Prova del volume: un audio neutro per lingua (manifest.sample), non una delle guide.
 function showVolume() {
-  const art = artwork(0);
+  const sample = S.manifest.sample[S.lang].src;
   const audio = new Audio();
-  let url = null, timer = null, closed = false;
+  let url = null, closed = false, failed = false;
   const play = h('button', {type: 'button', class: 'big secondary', disabled: true}, T.volume_play);
-  const stop = () => { clearTimeout(timer); audio.pause(); };
+  const errBox = h('p', {class: 'player-error', hidden: true}, T.player_error);
+  const fail = message => {
+    if (closed || failed) return;
+    failed = true;
+    play.disabled = true;
+    errBox.hidden = false;
+    console.error('prova del volume:', sample, message);
+    playerError(null, null, {src: sample, message});
+  };
   play.addEventListener('click', () => {
-    stop();
+    audio.pause();
     audio.currentTime = 0;
-    audio.play().then(() => { timer = setTimeout(stop, SAMPLE_SEC * 1000); })
-      .catch(e => console.warn('play non riuscito', e));
+    audio.play().catch(e => console.warn('play non riuscito', e));
   });
-  blobUrl(art.audio[S.lang].flat.src, S.manifest.version).then(u => {
+  audio.addEventListener('error', () => {
+    if (!url) return;
+    const e = audio.error;
+    fail(e ? `MediaError ${e.code}${e.message ? `: ${e.message}` : ''}` : 'errore audio');
+  });
+  blobUrl(sample, S.manifest.version).then(u => {
     if (closed) { URL.revokeObjectURL(u); return; }
     url = u;
     audio.src = u;
     audio.load();
     play.disabled = false;
-  }).catch(e => console.error(e));
+  }).catch(e => fail(String((e && e.message) || e)));
   const ok = h('button', {type: 'button', class: 'big', onclick: () => { step('volume'); showTask(); }}, T.volume_ok);
   screen('',
     h('h1', {}, T.volume_title),
     h('p', {class: 'lead'}, T.volume_body),
-    h('div', {class: 'stack'}, play, ok));
+    h('div', {class: 'stack'}, play, errBox, ok));
   // dopo screen(), che chiude la schermata precedente
   cleanups.push(() => {
     closed = true;
-    stop();
+    audio.pause();
+    const u = url;
+    url = null;  // prima di togliere src: l'eventuale 'error' che segue non conta
     audio.removeAttribute('src');
     audio.load();
-    if (url) URL.revokeObjectURL(url);
+    if (u) URL.revokeObjectURL(u);
   });
 }
 
@@ -309,7 +344,7 @@ function showTrial(i) {
   save();
 
   const ans = {position: null, strength: null, reasons: [], familiar: null};
-  const labels = {play: T.play, pause: T.pause, restart: T.restart};
+  const labels = {play: T.play, pause: T.pause, restart: T.restart, error: T.player_error};
   const guideLabel = n => fmt(T.guide_label, {n});
 
   // Guide: la 2 si attiva quando la 1 e' arrivata alla fine.
@@ -327,7 +362,8 @@ function showTrial(i) {
   [0, 1].forEach(pos => {
     const box = h('div', {class: 'guide'});
     guides.append(box);
-    players.push(createPlayer(box, trial.audio[pos], guideLabel(pos + 1), onChange(pos), labels, S.manifest.version));
+    players.push(createPlayer(box, trial.audio[pos], guideLabel(pos + 1), onChange(pos), labels,
+                              S.manifest.version, err => playerError(i, pos + 1, err)));
   });
   guides.lastChild.append(lockNote);
 

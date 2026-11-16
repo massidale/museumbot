@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   CATEGORIES, mixKey, allConditions, pairFor, rng, shuffle, validateManifest,
   planSession, newSession, buildTrial, canPlay, canAnswer, answerComplete,
-  answer, markStep, toJsonl, deletableIds,
+  answer, markStep, abortSession, toJsonl, deletableIds,
 } from '../logic.js';
 
 // Manifesto finto di 4 opere, stessa forma del Task 2.
@@ -15,6 +15,7 @@ function fakeManifest() {
   }
   return {
     version: 'v1', categories: CATEGORIES,
+    sample: {en: {src: 'audio/en/sample.mp3', sec: 8}, de: {src: 'audio/de/sample.mp3', sec: 8}},
     artworks: [1, 2, 3, 4].map(i => ({
       id: `a${i}`, image: `img/a${i}.jpg`, title: {en: `T${i}`, de: `T${i}`},
       artist: 'X', audio: structuredClone(audio),
@@ -107,6 +108,21 @@ test('validateManifest segnala l\'audio mancante', () => {
   assert.equal(e.length, 1); assert.match(e[0], /explorer\+recharger/);
   assert.deepEqual(validateManifest(M), []);
   assert.ok(validateManifest({version: 'v'}).length > 0);
+});
+test('validateManifest chiede la prova del volume in ogni lingua', () => {
+  const noDe = structuredClone(M); delete noDe.sample.de;
+  const e = validateManifest(noDe);
+  assert.equal(e.length, 1); assert.match(e[0], /prova del volume/); assert.match(e[0], /de/);
+  const none = structuredClone(M); delete none.sample;
+  assert.equal(validateManifest(none).length, 2);
+});
+test('abortSession tiene il passo e segna l\'interruzione', () => {
+  const s0 = markStep(newSession({sessionId: 'x', device: 'ipad-1', appVersion: '0.1.0',
+    manifestVersion: 'v', seed: 1, lang: 'en', now: 'A'}), 'trial_1', 'B');
+  const s = abortSession(s0, 'C');
+  assert.equal(s.last_step, 'trial_1'); assert.equal(s.completed, false);
+  assert.equal(s.aborted_by_operator, true); assert.equal(s.updated_at, 'C');
+  assert.equal(s0.aborted_by_operator, undefined);
 });
 test('deletableIds tocca solo gli esportati presenti', () => {
   assert.deepEqual(deletableIds([{session_id: 'a'}, {session_id: 'b'}], ['b', 'z']), ['b']);

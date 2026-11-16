@@ -2,9 +2,34 @@
 // L'audio si legge dalla Cache API come blob e si suona da un object URL:
 // Safari non serve le richieste a intervalli (Range) da una risposta intera in cache.
 
-const DEFAULT_LABELS = {play: 'Play', pause: 'Pause', restart: 'Restart'};
+const DEFAULT_LABELS = {play: 'Play', pause: 'Pause', restart: 'Restart', error: 'Error'};
+const SEEK_SLACK = 0.5;   // s: un salto avanti entro questa tolleranza e' ammesso
+const END_SLACK = 1;      // s: la fine conta se si e' ascoltato fino a qui dalla fine
 
 let playing = null;  // l'audio che sta suonando: ne suona uno alla volta
+
+// ---- niente salti avanti (decisioni pure, testate) ----
+
+// Dove riportare un salto: null se e' lecito (indietro o entro SEEK_SLACK dal punto raggiunto).
+export const seekTarget = (t, maxReached, slack = SEEK_SLACK) => (t > maxReached + slack ? maxReached : null);
+
+// Punto piu' avanti raggiunto ascoltando: non cresce durante un salto.
+export const reached = (maxReached, t, seeking) => (seeking ? maxReached : Math.max(maxReached, t));
+
+// La fine vale come ascolto completo solo se ci si e' arrivati ascoltando.
+export const endedCounts = (maxReached, duration) =>
+  Number.isFinite(duration) && maxReached >= duration - END_SLACK;
+
+// Comandi di Centro di controllo, schermata di blocco e cuffie: avanti e traccia
+// successiva/precedente non fanno niente. Le azioni non supportate lanciano un errore.
+let sessionLocked = false;
+function lockMediaSession() {
+  if (sessionLocked || typeof navigator === 'undefined' || !navigator.mediaSession) return;
+  sessionLocked = true;
+  for (const a of ['seekto', 'seekforward', 'nexttrack', 'previoustrack']) {
+    try { navigator.mediaSession.setActionHandler(a, () => {}); } catch (e) { /* non supportata */ }
+  }
+}
 
 // m:ss; '--:--' se la durata non e' ancora nota.
 export function fmtTime(sec) {
@@ -13,9 +38,10 @@ export function fmtTime(sec) {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
 
-// Ogni immagine e ogni audio del manifesto, senza doppioni.
+// Ogni immagine e ogni audio del manifesto (prove del volume comprese), senza doppioni.
 export function mediaUrls(manifest) {
   const out = new Set();
+  for (const s of Object.values(manifest.sample || {})) if (s && s.src) out.add(s.src);
   for (const art of manifest.artworks || []) {
     if (art.image) out.add(art.image);
     for (const lang of Object.keys(art.audio || {}))
@@ -64,13 +90,19 @@ function el(tag, cls, text) {
   return e;
 }
 
-// state = {plays, ended}: plays conta gli avvii da capo, ended resta vero dopo la prima fine.
+// state = {plays, ended}: plays conta gli avvii da capo, ended resta vero dopo la prima fine
+// raggiunta ascoltando (non saltando avanti).
 // version: versione del manifesto, per leggere l'audio dalla sua cache.
-export function createPlayer(container, src, label, onChange = () => {}, labels = {}, version = null) {
+// onError({src, message}): file non caricato o non riproducibile; il visitatore vede solo
+// labels.error, mai il percorso (che contiene il nome della condizione).
+export function createPlayer(container, src, label, onChange = () => {}, labels = {}, version = null,
+                             onError = () => {}) {
   const L = {...DEFAULT_LABELS, ...labels};
   const state = {plays: 0, ended: false};
   let enabled = true, ready = false, destroyed = false, fromStart = true, url = null;
+  let maxReached = 0, failed = false;
 
+  lockMediaSession();
   const audio = new Audio();
   audio.preload = 'auto';
 
@@ -87,7 +119,7 @@ export function createPlayer(container, src, label, onChange = () => {}, labels 
 
   const notify = () => onChange({...state});
   const refresh = () => {
-    const can = ready && enabled && !destroyed;
+    const can = ready && enabled && !destroyed && !failed;
     btnPlay.disabled = btnRestart.disabled = !can;
     btnPlay.textContent = audio.paused ? L.play : L.pause;
     root.classList.toggle('player-disabled', !can);
@@ -113,13 +145,37 @@ export function createPlayer(container, src, label, onChange = () => {}, labels 
 
   audio.addEventListener('play', () => { playing = audio; refresh(); });
   audio.addEventListener('pause', () => { if (playing === audio) playing = null; refresh(); });
-  audio.addEventListener('timeupdate', refresh);
+  audio.addEventListener('timeupdate', () => {
+    maxReached = reached(maxReached, audio.currentTime, audio.seeking);
+    refresh();
+  });
+  // Un salto oltre il punto raggiunto (Centro di controllo, cuffie, ...) torna indietro.
+  audio.addEventListener('seeking', () => {
+    const back = seekTarget(audio.currentTime, maxReached);
+    if (back != null) audio.currentTime = back;
+  });
   audio.addEventListener('loadedmetadata', refresh);
   audio.addEventListener('durationchange', refresh);
   audio.addEventListener('ended', () => {
     fromStart = true;
-    if (!state.ended) { state.ended = true; notify(); }
+    if (!state.ended && endedCounts(maxReached, audio.duration)) { state.ended = true; notify(); }
     refresh();
+  });
+
+  // Dettagli in console e all'app (che li registra); al visitatore un testo neutro.
+  const fail = message => {
+    if (destroyed || failed) return;
+    failed = true;
+    audio.pause();
+    console.error('player:', src, message);
+    root.append(el('div', 'player-error', L.error));
+    refresh();
+    onError({src, message});
+  };
+  audio.addEventListener('error', () => {
+    if (!url) return;  // nessun file ancora (o player chiuso)
+    const e = audio.error;
+    fail(e ? `MediaError ${e.code}${e.message ? `: ${e.message}` : ''}` : 'errore audio');
   });
 
   refresh();
@@ -130,10 +186,7 @@ export function createPlayer(container, src, label, onChange = () => {}, labels 
     audio.load();
     ready = true;
     refresh();
-  }).catch(e => {
-    if (destroyed) return;
-    root.append(el('div', 'player-error', String(e.message || e)));
-  });
+  }).catch(e => fail(String((e && e.message) || e)));
 
   return {
     destroy() {

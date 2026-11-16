@@ -8,7 +8,7 @@ import {fillMissing} from './swclient.js';
 import {APP_VERSION, PIN} from './config.js';
 
 export const DEFAULT_DEVICE = 'non-impostato';
-const HOLD_MS = 2000;      // tocco lungo per il PIN
+export const HOLD_MS = 2000;  // tocco lungo per il PIN
 const HOLD_SLOP = 12;      // px: oltre, il dito si e' spostato e il tocco lungo si annulla
 const MAX_LISTED = 20;     // file mancanti mostrati per esteso
 
@@ -39,8 +39,12 @@ export const validDevice = s => /^[A-Za-z0-9_-]{1,40}$/.test(s) && s !== DEFAULT
 
 const errText = e => String((e && e.message) || e);
 
+// Senza un service worker che controlla la pagina l'app non funziona offline.
+const swControls = () => 'serviceWorker' in navigator && navigator.serviceWorker.controller != null;
+
 // Tocco lungo (touch e mouse): onFire dopo ms; si annulla se il dito si alza o si sposta.
-function longPress(el, ms, onFire) {
+// Restituisce la funzione che annulla il tocco in corso.
+export function longPress(el, ms, onFire) {
   let timer = null, x = 0, y = 0;
   const cancel = () => {
     clearTimeout(timer);
@@ -59,6 +63,40 @@ function longPress(el, ms, onFire) {
   for (const t of ['pointerup', 'pointercancel', 'pointerleave']) el.addEventListener(t, cancel);
   el.addEventListener('contextmenu', e => e.preventDefault());
   return cancel;
+}
+
+// Form del PIN (nascosto): onOk dopo il PIN giusto; onCancel se c'e' "Annulla".
+function pinForm(onOk, onCancel = null) {
+  const input = h('input', {type: 'password', inputmode: 'numeric', autocomplete: 'off', 'aria-label': 'PIN'});
+  const msg = h('p', {class: 'err'});
+  const cancel = onCancel && h('button', {type: 'button', class: 'secondary'}, 'Annulla');
+  const form = h('form', {class: 'op-row op-pin', hidden: true}, input, h('button', {type: 'submit'}, 'Apri'), cancel, msg);
+  const reset = () => { input.value = ''; msg.textContent = ''; form.hidden = true; };
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    if (input.value === PIN) { reset(); onOk(); }
+    else { input.value = ''; msg.textContent = 'PIN errato.'; }
+  });
+  if (cancel) cancel.addEventListener('click', () => { reset(); onCancel(); });
+  const open = () => { form.hidden = false; input.focus(); };
+  return {form, input, open, reset};
+}
+
+// Angolo dell'operatore sulle schermate del visitatore: tocco lungo, PIN, conferma,
+// poi onAbort. Gli elementi stanno fuori da #app (le schermate non li toccano).
+// Restituisce la funzione che li toglie.
+export function mountAbortGate(onAbort) {
+  const corner = h('div', {class: 'op-corner', id: 'op-abort-corner', 'aria-label': 'Area operatore'});
+  const box = h('div', {class: 'op-overlay', id: 'op-abort', lang: 'it', hidden: true}, h('p', {}, 'Operatore: PIN'));
+  const close = () => { pin.reset(); box.hidden = true; };
+  const pin = pinForm(() => {
+    box.hidden = true;
+    if (window.confirm('Interrompere la sessione?')) onAbort();
+  }, close);
+  box.append(pin.form);
+  const cancelHold = longPress(corner, HOLD_MS, () => { box.hidden = false; pin.open(); });
+  document.body.append(corner, box);
+  return () => { cancelHold(); corner.remove(); box.remove(); };
 }
 
 // ---- stato del service worker (registrato da app.js) ----
@@ -106,27 +144,17 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
     const why = [];
     if (device == null) why.push('nome del dispositivo non impostato');
     if (check.state === 'pending') why.push('controllo del materiale in corso');
-    if (check.state === 'error') why.push('materiale incompleto o non valido');
+    if (check.state === 'error') why.push(check.sw === false ? 'materiale incompleto o service worker non attivo'
+                                                              : 'materiale incompleto o non valido');
     startNote.textContent = why.length ? `Nuova sessione disattivata: ${why.join('; ')}.` : '';
     startNote.className = check.state === 'error' ? 'err' : 'muted';
   }
 
   // -- PIN --
   const corner = h('div', {class: 'op-corner', id: 'op-corner', 'aria-label': 'Area operatore'});
-  const pinInput = h('input', {type: 'password', inputmode: 'numeric', autocomplete: 'off', id: 'op-pin', 'aria-label': 'PIN'});
-  const pinMsg = h('p', {class: 'err'});
-  const pinForm = h('form', {class: 'op-row op-pin', hidden: true},
-    pinInput, h('button', {type: 'submit'}, 'Apri'), pinMsg);
-  pinForm.addEventListener('submit', e => {
-    e.preventDefault();
-    if (pinInput.value === PIN) { pinInput.value = ''; pinMsg.textContent = ''; pinForm.hidden = true; openPanel(); }
-    else { pinInput.value = ''; pinMsg.textContent = 'PIN errato.'; }
-  });
-  const cancelHold = longPress(corner, HOLD_MS, () => {
-    if (!panel.hidden) return;
-    pinForm.hidden = false;
-    pinInput.focus();
-  });
+  const pin = pinForm(() => openPanel());
+  pin.input.id = 'op-pin';
+  const cancelHold = longPress(corner, HOLD_MS, () => { if (panel.hidden) pin.open(); });
 
   // -- dispositivo --
   const devInput = h('input', {type: 'text', id: 'op-device', autocomplete: 'off', autocapitalize: 'off',
@@ -247,10 +275,11 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
       const errors = validateManifest(manifest);
       const total = errors.length ? 0 : mediaUrls(manifest).length;
       const {missing, bytes} = errors.length ? {missing: [], bytes: 0} : await checkCache(manifest);
-      next = {state: errors.length || missing.length ? 'error' : 'ok', manifest, errors, missing, bytes, total};
+      const sw = swControls();
+      next = {state: errors.length || missing.length || !sw ? 'error' : 'ok', manifest, errors, missing, bytes, total, sw};
     } catch (e) {
       console.error(e);
-      next = {state: 'error', manifest: null, errors: [`controllo non riuscito: ${errText(e)}`], missing: []};
+      next = {state: 'error', manifest: null, errors: [`controllo non riuscito: ${errText(e)}`], missing: [], sw: swControls()};
     }
     if (closed || seq !== checkSeq) return;
     check = next;
@@ -260,8 +289,12 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
   }
 
   function renderCheck() {
-    const {state, manifest, errors, missing, bytes, total} = check;
+    const {state, manifest, errors, missing, bytes, total, sw} = check;
     const out = [];
+    if (!sw) {
+      out.push(h('p', {class: 'err', id: 'op-sw-missing'}, 'Il service worker non controlla la pagina: '
+        + 'senza, l\'app non funziona offline. Ricaricare la pagina con la rete e ripetere il controllo.'));
+    }
     if (state === 'ok') {
       out.push(h('p', {class: 'ok'}, `Materiale completo: manifesto ${manifest.version}, `
         + `${total} file in cache (${(bytes / 1e6).toFixed(1)} MB).`));
@@ -388,16 +421,20 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
     message && h('p', {class: 'err'}, message),
     saveWarning(),
     start, startNote,
-    pinForm,
+    pin.form,
     panel,
   ].filter(Boolean));
 
   // Anche senza PIN: "Nuova sessione" dipende dal nome e dal materiale.
   refresh();
   runCheck();
+  // un worker che prende il controllo cambia l'esito del controllo
+  const onController = () => { if (!closed) runCheck(); };
+  if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('controllerchange', onController);
 
   return () => {
     closed = true;
+    if ('serviceWorker' in navigator) navigator.serviceWorker.removeEventListener('controllerchange', onController);
     cancelHold();
     clearLink();
     swListener = () => {};

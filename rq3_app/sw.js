@@ -25,9 +25,11 @@ const NET_TIMEOUT_MS = 4000;  // oltre, il guscio viene dalla cache (wifi lento)
 
 const abs = path => new URL(path, self.registration.scope).href;
 
-// Ogni immagine e ogni audio del manifesto, senza doppioni.
+// Ogni immagine e ogni audio del manifesto (prove del volume comprese), senza doppioni.
+// Uguale a mediaUrls di player.js: il worker non importa moduli.
 function mediaUrls(manifest) {
   const out = new Set();
+  for (const s of Object.values(manifest.sample || {})) if (s && s.src) out.add(s.src);
   for (const art of manifest.artworks || []) {
     if (art.image) out.add(art.image);
     for (const lang of Object.keys(art.audio || {}))

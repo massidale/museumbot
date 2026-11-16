@@ -59,6 +59,8 @@ export function validateManifest(m) {
   if (!m || !Array.isArray(m.artworks) || m.artworks.length === 0) {
     return ['manifesto senza elenco di opere (artworks)'];
   }
+  for (const lang of LANGS)
+    if (!m.sample || !m.sample[lang] || !m.sample[lang].src) errs.push(`prova del volume mancante per ${lang}`);
   const conds = allConditions();
   for (const art of m.artworks) {
     for (const lang of LANGS) {
@@ -123,6 +125,10 @@ export function answer(trial, {position, strength, reasons, familiar, why, now})
 }
 
 export const markStep = (session, step, now) => ({...session, last_step: step, updated_at: now});
+
+// Sessione chiusa dall'operatore: resta incompleta, col passo a cui si era fermata.
+export const abortSession = (session, now) =>
+  ({...session, completed: false, aborted_by_operator: true, updated_at: now});
 
 export const toJsonl = records => records.map(r => JSON.stringify(r) + '\n').join('');
 

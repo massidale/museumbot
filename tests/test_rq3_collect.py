@@ -34,6 +34,14 @@ def test_validate_campi_e_scelte():
     assert len(validate(bad)) == 2
 
 
+def test_validate_campi_facoltativi():
+    # chosen, player_errors, aborted_by_operator possono mancare o esserci
+    r = rec("s1")
+    r.update(chosen=["recharger", "explorer"], aborted_by_operator=True,
+             player_errors=[{"trial_index": 0, "position": 1, "src": "x", "message": "m", "at": "t"}])
+    assert validate(r) == [] and validate(rec("s2")) == []
+
+
 def test_validate_motivi_fuori_elenco():
     bad = rec("s1")
     bad["trials"][0]["reasons"] = ["boh"]

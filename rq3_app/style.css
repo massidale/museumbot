@@ -1,0 +1,73 @@
+/* Stile dell'app RQ3: pagine semplici, pulsanti grandi per il tablet. */
+:root {
+  --bg: #f7f4ee;
+  --fg: #1d2a33;
+  --muted: #5d6b73;
+  --accent: #2f4858;
+  --accent-fg: #ffffff;
+  --line: #d9d3c7;
+  --ok: #2e7d4f;
+  --err: #b3261e;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 18px/1.5 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+main {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
+}
+
+h1 { font-size: 1.6rem; margin: 0 0 16px; }
+h2 { font-size: 1.2rem; margin: 24px 0 8px; }
+
+button {
+  font: inherit;
+  min-height: 48px;
+  min-width: 48px;
+  padding: 8px 20px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--accent-fg);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+button:disabled { opacity: 0.4; cursor: default; }
+button.secondary { background: transparent; color: var(--accent); border: 2px solid var(--accent); }
+
+.ok { color: var(--ok); }
+.err { color: var(--err); }
+.muted { color: var(--muted); }
+
+pre {
+  white-space: pre-wrap;
+  font-size: 0.85rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+/* Player */
+.player {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 12px 0;
+}
+.player-label { font-weight: 600; margin-bottom: 10px; }
+.player-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.player-play { min-width: 120px; }
+.player-time { font-variant-numeric: tabular-nums; color: var(--muted); margin-left: auto; }
+.player-disabled .player-label { color: var(--muted); }
+.player-error { color: var(--err); margin-top: 8px; font-size: 0.9rem; }

@@ -26,8 +26,11 @@ main {
   padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
 }
 
-h1 { font-size: 1.6rem; margin: 0 0 16px; }
+main.wide { max-width: 1240px; }
+
+h1 { font-size: 1.6rem; margin: 0 0 16px; line-height: 1.25; }
 h2 { font-size: 1.2rem; margin: 24px 0 8px; }
+p { margin: 0 0 14px; }
 
 button {
   font: inherit;
@@ -43,6 +46,7 @@ button {
 }
 button:disabled { opacity: 0.4; cursor: default; }
 button.secondary { background: transparent; color: var(--accent); border: 2px solid var(--accent); }
+button.big { min-height: 64px; font-size: 1.1rem; width: 100%; }
 
 .ok { color: var(--ok); }
 .err { color: var(--err); }
@@ -71,3 +75,78 @@ pre {
 .player-time { font-variant-numeric: tabular-nums; color: var(--muted); margin-left: auto; }
 .player-disabled .player-label { color: var(--muted); }
 .player-error { color: var(--err); margin-top: 8px; font-size: 0.9rem; }
+
+/* Percorso del visitatore */
+.lead { font-size: 1.1rem; }
+.note { color: var(--muted); font-size: 0.95rem; }
+.stack { display: flex; flex-direction: column; gap: 14px; margin: 20px 0; }
+.steps { padding-left: 1.4em; margin: 0 0 16px; }
+.steps li { margin-bottom: 8px; }
+.actions {
+  display: flex; justify-content: flex-end; align-items: center; gap: 16px;
+  margin-top: 28px;
+}
+.actions button { min-width: 160px; }
+.counter { margin: 0 auto 0 0; color: var(--muted); }
+
+/* Pulsanti a scelta (descrizioni, opzioni, scala) */
+button.opt, button.card {
+  background: #fff;
+  color: var(--fg);
+  border: 2px solid var(--line);
+}
+button.card { text-align: left; padding: 16px 20px; line-height: 1.45; }
+button.opt[aria-pressed="true"], button.card[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: #e3ebef;
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.choices { display: flex; gap: 12px; }
+.choices button { flex: 1 1 0; }
+.choices.wrap { flex-wrap: wrap; }
+.choices.wrap button { flex: 1 1 200px; }
+.scale { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+.scale button { padding: 8px 0; font-variant-numeric: tabular-nums; }
+.scale-ends { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.95rem; margin-top: 6px; }
+
+/* Domande */
+.question { margin: 0 0 24px; }
+.q { font-weight: 600; margin: 0 0 10px; display: block; }
+fieldset.questions { border: 0; padding: 0; margin: 20px 0 0; min-width: 0; }
+fieldset.questions:disabled { opacity: 0.45; }
+.reasons { display: flex; flex-direction: column; gap: 6px; }
+.reason {
+  display: flex; align-items: center; gap: 14px;
+  min-height: 52px; padding: 6px 14px;
+  background: #fff; border: 1px solid var(--line); border-radius: 10px;
+}
+.reason input { width: 28px; height: 28px; flex: none; margin: 0; accent-color: var(--accent); }
+textarea {
+  display: block; width: 100%; margin-top: 10px;
+  font: inherit; font-weight: normal; padding: 10px 12px;
+  border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--fg);
+}
+
+/* Prova: dipinto e guide */
+.trial { display: block; }
+.painting { margin: 0 0 16px; }
+.painting img {
+  display: block; width: 100%; max-height: 42vh; object-fit: contain;
+  background: #ebe6dc; border-radius: 10px;
+}
+.painting figcaption { margin-top: 12px; }
+.painting h1 { margin: 0 0 4px; }
+.kicker { color: var(--muted); margin: 0 0 8px; font-size: 0.95rem; }
+.artist { color: var(--muted); margin: 0; }
+.guide .note { margin: -4px 0 12px; }
+
+/* iPad orizzontale: dipinto a sinistra, guide e domande a destra */
+@media (orientation: landscape) and (min-width: 960px) {
+  .trial { display: grid; grid-template-columns: 5fr 6fr; gap: 32px; align-items: start; }
+  .painting { position: sticky; top: 24px; }
+  .painting img { max-height: 62vh; }
+}
+
+/* Operatore (provvisorio) */
+main.operator button.big { max-width: 420px; margin: 16px 0 24px; }
+.op-status p { margin: 0 0 4px; font-size: 0.95rem; }

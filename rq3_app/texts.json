@@ -1,0 +1,278 @@
+{
+  "en": {
+    "lang_name": "English",
+    "choose_language": "Please choose your language",
+    "continue": "Continue",
+    "intro_title": "Which audio guide do you prefer?",
+    "intro_body": [
+      "Thank you for your interest! This short study is carried out at the Human-Centred Robotics Lab of Ostfalia University of Applied Sciences, as part of a master's thesis at Roma Tre University. It is about museum audio guides written with artificial intelligence."
+    ],
+    "intro_steps_title": "What you will do:",
+    "intro_steps": [
+      "Read five short descriptions of why people visit museums, and choose the one or two that fit you best.",
+      "Look at a painting from this museum and listen to two different audio guides about it with the headphones. Please listen to both until the end.",
+      "Tell us which guide you preferred and why.",
+      "You can then continue with another painting, up to four in total. Each painting takes about 4 minutes, and you can stop after any painting."
+    ],
+    "intro_note": "Taking part is voluntary and anonymous. There are no right or wrong answers: we are interested in your personal opinion.",
+    "consent_title": "Consent",
+    "consent_body": [
+      "Taking part is voluntary. You can stop at any time without giving a reason: just tell the person at the stand.",
+      "We do not ask for your name or any contact details. We record your choices and answers, the time you spend on each step, and three general questions about you (age group, how often you visit museums, native language).",
+      "The data are used only for scientific research, stored securely, and published only in summarised form, so that no individual person can be recognised. Because the data are anonymous, your answers can no longer be linked to you after you leave.",
+      "If you have any questions, please ask the person at the stand."
+    ],
+    "consent_yes": "I am at least 18 years old and I agree to take part",
+    "consent_no": "I do not want to take part",
+    "no_consent_title": "No problem",
+    "no_consent_body": "Thank you for your time! Please return the tablet to the person at the stand.",
+    "class_title": "Why are you visiting a museum today?",
+    "class_hint": "Choose the one or two descriptions that fit you best.",
+    "class_selected": "{n} of 2 selected",
+    "falk": {
+      "explorer": "I am curious and like discovering new things. I come to the museum to find something that catches my attention and to learn something.",
+      "facilitator": "I am here mainly for the people I came with (family, friends, children). I want them to have a good time and take something away from the visit.",
+      "experience_seeker": "I am here because this museum is a place you have to see. I want to see the most famous works and take home a memorable experience.",
+      "professional_hobbyist": "Art is part of my job or a serious hobby of mine. I come with a specific interest and want to deepen my knowledge.",
+      "recharger": "I come to the museum to slow down and find some calm. For me it is a place to step away from everyday life and reflect."
+    },
+    "main_title": "Which of the two descriptions fits you best?",
+    "volume_title": "Please put on the headphones",
+    "volume_body": "Tap the button to hear a short sample and adjust the volume.",
+    "volume_play": "Play sample",
+    "volume_ok": "The volume is fine, continue",
+    "task_title": "How it works",
+    "task_body": "You will now see a painting and two audio guides about it: Guide 1 and Guide 2. Listen to Guide 1 first, then Guide 2, both until the end. You can listen to them again if you like. The questions appear once you have heard both guides.",
+    "painting_of": "Painting {i} of {n}",
+    "guide_label": "Guide {n}",
+    "play": "Play",
+    "pause": "Pause",
+    "restart": "From the start",
+    "guide2_locked": "Available when Guide 1 has finished.",
+    "listen_both": "Please listen to both guides until the end to answer the questions.",
+    "q_choice": "Which guide did you prefer?",
+    "q_strength": "How strong is your preference?",
+    "strength_low": "Slight",
+    "strength_high": "Very strong",
+    "q_reasons": "Why did you prefer this guide? (You can choose more than one.)",
+    "reasons": {
+      "interesting": "It was more interesting",
+      "suited": "It suited me and what I look for in a museum better",
+      "clear": "It was easier to follow",
+      "information": "It told me more about the painting",
+      "looking": "It helped me look at the painting more closely",
+      "tone": "I liked its tone or mood",
+      "other": "Another reason"
+    },
+    "q_why_text": "Would you like to add anything? (optional)",
+    "q_familiar": "Did you know this painting before today?",
+    "yes": "Yes",
+    "no": "No",
+    "next": "Next",
+    "more_title": "Would you like to listen to another painting?",
+    "more_yes": "Yes, another painting",
+    "more_no": "No, finish",
+    "final_title": "Finally, three short questions",
+    "final": {
+      "age_band": {
+        "label": "How old are you?",
+        "options": {"18_29": "18–29", "30_44": "30–44", "45_59": "45–59", "60_74": "60–74", "75_plus": "75 or older", "no_answer": "Prefer not to say"}
+      },
+      "visit_frequency": {
+        "label": "How often do you visit museums?",
+        "options": {"lt1": "Less than once a year", "1_2": "1–2 times a year", "3_5": "3–5 times a year", "gt5": "More than 5 times a year", "no_answer": "Prefer not to say"}
+      },
+      "native_language": {
+        "label": "What is your native language?",
+        "options": {"german": "German", "english": "English", "other": "Another language", "no_answer": "Prefer not to say"}
+      }
+    },
+    "finish": "Finish",
+    "end_title": "Thank you!",
+    "end_body": "Your answers have been saved. Please return the tablet and the headphones to the person at the stand."
+  },
+  "de": {
+    "lang_name": "Deutsch",
+    "choose_language": "Bitte wählen Sie Ihre Sprache",
+    "continue": "Weiter",
+    "intro_title": "Welcher Audioguide gefällt Ihnen besser?",
+    "intro_body": [
+      "Vielen Dank für Ihr Interesse! Diese kurze Studie wird im Human-Centred Robotics Lab der Ostfalia Hochschule für angewandte Wissenschaften im Rahmen einer Masterarbeit an der Universität Roma Tre durchgeführt. Es geht um Audioguides für Museen, die mit künstlicher Intelligenz geschrieben wurden."
+    ],
+    "intro_steps_title": "So läuft es ab:",
+    "intro_steps": [
+      "Sie lesen fünf kurze Beschreibungen, warum Menschen ins Museum gehen, und wählen die eine oder die zwei aus, die am besten zu Ihnen passen.",
+      "Sie sehen ein Gemälde aus diesem Museum und hören über die Kopfhörer zwei verschiedene Audioguides dazu. Bitte hören Sie beide bis zum Ende.",
+      "Sie sagen uns, welcher Audioguide Ihnen besser gefallen hat und warum.",
+      "Danach können Sie mit einem weiteren Gemälde fortfahren, insgesamt bis zu vier. Ein Gemälde dauert etwa 4 Minuten, und Sie können nach jedem Gemälde aufhören."
+    ],
+    "intro_note": "Die Teilnahme ist freiwillig und anonym. Es gibt keine richtigen oder falschen Antworten: Uns interessiert Ihre persönliche Meinung.",
+    "consent_title": "Einwilligung",
+    "consent_body": [
+      "Die Teilnahme ist freiwillig. Sie können jederzeit ohne Angabe von Gründen aufhören: Sagen Sie einfach der Person am Stand Bescheid.",
+      "Wir fragen weder nach Ihrem Namen noch nach Kontaktdaten. Wir speichern Ihre Auswahl und Ihre Antworten, die Zeit, die Sie für jeden Schritt brauchen, und drei allgemeine Angaben zu Ihrer Person (Altersgruppe, wie oft Sie Museen besuchen, Muttersprache).",
+      "Die Daten werden ausschließlich für die wissenschaftliche Forschung verwendet, sicher gespeichert und nur in zusammengefasster Form veröffentlicht, sodass keine einzelne Person erkennbar ist. Da die Daten anonym sind, können Ihre Antworten nach Ihrem Besuch nicht mehr Ihnen zugeordnet werden.",
+      "Wenn Sie Fragen haben, wenden Sie sich bitte an die Person am Stand."
+    ],
+    "consent_yes": "Ich bin mindestens 18 Jahre alt und möchte teilnehmen",
+    "consent_no": "Ich möchte nicht teilnehmen",
+    "no_consent_title": "Kein Problem",
+    "no_consent_body": "Vielen Dank für Ihre Zeit! Bitte geben Sie das Tablet der Person am Stand zurück.",
+    "class_title": "Warum besuchen Sie heute ein Museum?",
+    "class_hint": "Wählen Sie die eine oder die zwei Beschreibungen, die am besten zu Ihnen passen.",
+    "class_selected": "{n} von 2 ausgewählt",
+    "falk": {
+      "explorer": "Ich bin neugierig und entdecke gern Neues. Ich komme ins Museum, um etwas zu finden, das meine Aufmerksamkeit weckt, und um etwas dazuzulernen.",
+      "facilitator": "Ich bin vor allem wegen der Menschen hier, mit denen ich gekommen bin (Familie, Freunde, Kinder). Mir ist wichtig, dass sie eine schöne Zeit haben und etwas vom Besuch mitnehmen.",
+      "experience_seeker": "Ich bin hier, weil man dieses Museum gesehen haben muss. Ich möchte die bekanntesten Werke sehen und ein besonderes Erlebnis mit nach Hause nehmen.",
+      "professional_hobbyist": "Kunst gehört zu meinem Beruf oder ist ein ernsthaftes Hobby von mir. Ich komme mit einem bestimmten Interesse und möchte mein Wissen vertiefen.",
+      "recharger": "Ich komme ins Museum, um langsamer zu werden und zur Ruhe zu kommen. Es ist für mich ein Ort, um Abstand vom Alltag zu gewinnen und nachzudenken."
+    },
+    "main_title": "Welche der beiden Beschreibungen passt am besten zu Ihnen?",
+    "volume_title": "Bitte setzen Sie die Kopfhörer auf",
+    "volume_body": "Tippen Sie auf die Schaltfläche, um eine kurze Hörprobe zu hören, und stellen Sie die Lautstärke ein.",
+    "volume_play": "Hörprobe abspielen",
+    "volume_ok": "Die Lautstärke passt, weiter",
+    "task_title": "So funktioniert es",
+    "task_body": "Sie sehen gleich ein Gemälde und zwei Audioguides dazu: Audioguide 1 und Audioguide 2. Hören Sie zuerst Audioguide 1, dann Audioguide 2, jeweils bis zum Ende. Sie können sie auch noch einmal hören. Die Fragen erscheinen, sobald Sie beide Audioguides gehört haben.",
+    "painting_of": "Gemälde {i} von {n}",
+    "guide_label": "Audioguide {n}",
+    "play": "Abspielen",
+    "pause": "Pause",
+    "restart": "Von vorne",
+    "guide2_locked": "Verfügbar, sobald Audioguide 1 zu Ende ist.",
+    "listen_both": "Bitte hören Sie beide Audioguides bis zum Ende, um die Fragen zu beantworten.",
+    "q_choice": "Welcher Audioguide hat Ihnen besser gefallen?",
+    "q_strength": "Wie deutlich ist Ihre Vorliebe?",
+    "strength_low": "Kaum",
+    "strength_high": "Sehr deutlich",
+    "q_reasons": "Warum hat Ihnen dieser Audioguide besser gefallen? (Mehrfachauswahl möglich)",
+    "reasons": {
+      "interesting": "Er war interessanter",
+      "suited": "Er passte besser zu mir und zu dem, was ich im Museum suche",
+      "clear": "Er war leichter zu verstehen",
+      "information": "Er hat mir mehr über das Gemälde erzählt",
+      "looking": "Er hat mir geholfen, das Gemälde genauer anzuschauen",
+      "tone": "Mir gefiel sein Ton oder seine Stimmung",
+      "other": "Ein anderer Grund"
+    },
+    "q_why_text": "Möchten Sie noch etwas ergänzen? (optional)",
+    "q_familiar": "Kannten Sie dieses Gemälde schon vor dem heutigen Tag?",
+    "yes": "Ja",
+    "no": "Nein",
+    "next": "Weiter",
+    "more_title": "Möchten Sie ein weiteres Gemälde hören?",
+    "more_yes": "Ja, ein weiteres Gemälde",
+    "more_no": "Nein, abschließen",
+    "final_title": "Zum Schluss drei kurze Fragen",
+    "final": {
+      "age_band": {
+        "label": "Wie alt sind Sie?",
+        "options": {"18_29": "18–29", "30_44": "30–44", "45_59": "45–59", "60_74": "60–74", "75_plus": "75 oder älter", "no_answer": "Keine Angabe"}
+      },
+      "visit_frequency": {
+        "label": "Wie oft besuchen Sie Museen?",
+        "options": {"lt1": "Seltener als einmal im Jahr", "1_2": "1–2 Mal im Jahr", "3_5": "3–5 Mal im Jahr", "gt5": "Mehr als 5 Mal im Jahr", "no_answer": "Keine Angabe"}
+      },
+      "native_language": {
+        "label": "Was ist Ihre Muttersprache?",
+        "options": {"german": "Deutsch", "english": "Englisch", "other": "Eine andere Sprache", "no_answer": "Keine Angabe"}
+      }
+    },
+    "finish": "Abschließen",
+    "end_title": "Vielen Dank!",
+    "end_body": "Ihre Antworten wurden gespeichert. Bitte geben Sie das Tablet und die Kopfhörer der Person am Stand zurück."
+  },
+  "it": {
+    "lang_name": "Italiano",
+    "choose_language": "Scegli la lingua",
+    "continue": "Continua",
+    "intro_title": "Quale audioguida preferisci?",
+    "intro_body": [
+      "Grazie per l'interesse! Questo breve studio si svolge allo Human-Centred Robotics Lab della Ostfalia Hochschule für angewandte Wissenschaften, nell'ambito di una tesi magistrale all'Università Roma Tre. Riguarda audioguide per musei scritte con l'intelligenza artificiale."
+    ],
+    "intro_steps_title": "Cosa farai:",
+    "intro_steps": [
+      "Leggi cinque brevi descrizioni dei motivi per cui le persone vanno al museo e scegli la o le due che ti descrivono meglio.",
+      "Guardi un dipinto di questo museo e ascolti in cuffia due audioguide diverse su quel dipinto. Ascoltale entrambe fino alla fine.",
+      "Ci dici quale audioguida hai preferito e perché.",
+      "Poi puoi continuare con un altro dipinto, fino a quattro in tutto. Ogni dipinto richiede circa 4 minuti, e puoi fermarti dopo ognuno."
+    ],
+    "intro_note": "La partecipazione è volontaria e anonima. Non ci sono risposte giuste o sbagliate: ci interessa la tua opinione personale.",
+    "consent_title": "Consenso",
+    "consent_body": [
+      "La partecipazione è volontaria. Puoi fermarti in qualsiasi momento senza dare spiegazioni: basta dirlo alla persona allo stand.",
+      "Non chiediamo il tuo nome né contatti. Registriamo le tue scelte e risposte, il tempo che passi su ogni passo e tre domande generali su di te (fascia d'età, quanto spesso visiti musei, lingua madre).",
+      "I dati sono usati solo per la ricerca scientifica, conservati in modo sicuro e pubblicati solo in forma aggregata, così che nessuna persona sia riconoscibile. Poiché i dati sono anonimi, dopo che te ne sei andato le tue risposte non possono più essere collegate a te.",
+      "Se hai domande, chiedi alla persona allo stand."
+    ],
+    "consent_yes": "Ho almeno 18 anni e accetto di partecipare",
+    "consent_no": "Non voglio partecipare",
+    "no_consent_title": "Nessun problema",
+    "no_consent_body": "Grazie per il tuo tempo! Restituisci il tablet alla persona allo stand.",
+    "class_title": "Perché visiti un museo oggi?",
+    "class_hint": "Scegli la o le due descrizioni che ti descrivono meglio.",
+    "class_selected": "{n} su 2 selezionate",
+    "falk": {
+      "explorer": "Sono curioso e mi piace scoprire cose nuove. Vengo al museo per trovare qualcosa che catturi la mia attenzione e per imparare qualcosa.",
+      "facilitator": "Sono qui soprattutto per le persone con cui sono venuto (famiglia, amici, bambini). Voglio che passino un bel momento e portino via qualcosa dalla visita.",
+      "experience_seeker": "Sono qui perché questo museo è un posto da vedere. Voglio vedere le opere più famose e portarmi a casa un'esperienza memorabile.",
+      "professional_hobbyist": "L'arte fa parte del mio lavoro o è un mio hobby serio. Vengo con un interesse preciso e voglio approfondire le mie conoscenze.",
+      "recharger": "Vengo al museo per rallentare e trovare un po' di calma. Per me è un posto dove staccare dalla vita di tutti i giorni e riflettere."
+    },
+    "main_title": "Quale delle due descrizioni ti descrive meglio?",
+    "volume_title": "Indossa le cuffie",
+    "volume_body": "Tocca il pulsante per sentire un breve campione e regolare il volume.",
+    "volume_play": "Ascolta il campione",
+    "volume_ok": "Il volume va bene, continua",
+    "task_title": "Come funziona",
+    "task_body": "Ora vedrai un dipinto e due audioguide su di esso: Guida 1 e Guida 2. Ascolta prima la Guida 1, poi la Guida 2, entrambe fino alla fine. Puoi riascoltarle se vuoi. Le domande compaiono dopo che hai ascoltato entrambe le guide.",
+    "painting_of": "Dipinto {i} di {n}",
+    "guide_label": "Guida {n}",
+    "play": "Riproduci",
+    "pause": "Pausa",
+    "restart": "Da capo",
+    "guide2_locked": "Disponibile quando la Guida 1 è finita.",
+    "listen_both": "Ascolta entrambe le guide fino alla fine per rispondere alle domande.",
+    "q_choice": "Quale guida hai preferito?",
+    "q_strength": "Quanto è forte la tua preferenza?",
+    "strength_low": "Poco",
+    "strength_high": "Moltissimo",
+    "q_reasons": "Perché hai preferito questa guida? (Puoi sceglierne più di una.)",
+    "reasons": {
+      "interesting": "Era più interessante",
+      "suited": "Era più adatta a me e a quello che cerco in un museo",
+      "clear": "Era più facile da seguire",
+      "information": "Mi ha detto di più sul dipinto",
+      "looking": "Mi ha aiutato a guardare il dipinto con più attenzione",
+      "tone": "Mi è piaciuto il tono o l'atmosfera",
+      "other": "Un altro motivo"
+    },
+    "q_why_text": "Vuoi aggiungere qualcosa? (facoltativo)",
+    "q_familiar": "Conoscevi questo dipinto prima di oggi?",
+    "yes": "Sì",
+    "no": "No",
+    "next": "Avanti",
+    "more_title": "Vuoi ascoltare un altro dipinto?",
+    "more_yes": "Sì, un altro dipinto",
+    "more_no": "No, concludi",
+    "final_title": "Per finire, tre domande brevi",
+    "final": {
+      "age_band": {
+        "label": "Quanti anni hai?",
+        "options": {"18_29": "18–29", "30_44": "30–44", "45_59": "45–59", "60_74": "60–74", "75_plus": "75 o più", "no_answer": "Preferisco non rispondere"}
+      },
+      "visit_frequency": {
+        "label": "Quanto spesso visiti musei?",
+        "options": {"lt1": "Meno di una volta l'anno", "1_2": "1–2 volte l'anno", "3_5": "3–5 volte l'anno", "gt5": "Più di 5 volte l'anno", "no_answer": "Preferisco non rispondere"}
+      },
+      "native_language": {
+        "label": "Qual è la tua lingua madre?",
+        "options": {"german": "Tedesco", "english": "Inglese", "other": "Un'altra lingua", "no_answer": "Preferisco non rispondere"}
+      }
+    },
+    "finish": "Concludi",
+    "end_title": "Grazie!",
+    "end_body": "Le tue risposte sono state salvate. Restituisci il tablet e le cuffie alla persona allo stand."
+  }
+}

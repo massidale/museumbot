@@ -50,7 +50,7 @@ export async function checkCache(manifest) {
 
 // Dalla cache della versione; se manca (o la versione non e' data), dalla rete,
 // passando dal service worker, che usa la stessa cache.
-async function loadBlob(src, version) {
+export async function loadBlob(src, version) {
   const r = (version != null && (await matchMedia(src, version))) || (await fetch(src));
   if (!r.ok) throw new Error(`${src}: HTTP ${r.status}`);
   const blob = await r.blob();

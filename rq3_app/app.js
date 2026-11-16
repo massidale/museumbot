@@ -4,9 +4,9 @@ import {
   LANGS, REASONS, validateManifest, planSession, newSession, buildTrial,
   canPlay, canAnswer, answerComplete, answer, markStep,
 } from './logic.js';
-import {createPlayer, mediaCacheName} from './player.js';
+import {createPlayer, loadBlob} from './player.js';
 import {APP_VERSION} from './config.js';
-import {putSession, getSetting} from './store.js';
+import {putSession, getSetting, getSaveFailures} from './store.js';
 import {registerServiceWorker} from './swclient.js';
 
 const MAX_ARTWORKS = 4;
@@ -103,8 +103,19 @@ function showOperator(message = '') {
     h('h1', {}, 'Audioguide: operatore'),
     h('p', {class: 'muted'}, `app ${APP_VERSION}`),
     message && h('p', {class: 'err'}, message),
+    saveWarning(),
     h('button', {type: 'button', class: 'big', onclick: () => startSession()}, 'Nuova sessione'),
     status);
+}
+
+// Avviso in rosso se dei salvataggi non sono riusciti: quei dati potrebbero mancare.
+function saveWarning() {
+  const f = getSaveFailures();
+  if (!f.length) return null;
+  const ids = [...new Set(f.map(x => x.session_id))].join(', ');
+  return h('p', {class: 'err', id: 'op-save-errors'},
+    `Attenzione: ${f.length} salvataggi non riusciti (sessioni ${ids}); `
+    + `l'ultimo al passo ${f[f.length - 1].last_step}: ${f[f.length - 1].error}`);
 }
 
 function renderStatus(box = document.getElementById('op-status')) {
@@ -128,10 +139,12 @@ export async function startSession() {
     const errs = validateManifest(manifest);
     if (errs.length) throw new Error(`manifesto non valido: ${errs.slice(0, 3).join('; ')}`);
     if (!texts) texts = await (await fetch('texts.json')).json();
+    let device = DEFAULT_DEVICE;
+    try { device = (await getSetting('device')) || DEFAULT_DEVICE; } catch (e) { console.error(e); }
     const seed = randomU32();
     const plan = planSession(manifest, seed);
     S = {
-      manifest, seed, plan, sessionId: newSessionId(), record: null,
+      manifest, seed, plan, device, sessionId: newSessionId(), record: null,
       total: Math.min(MAX_ARTWORKS, plan.artworkOrder.length), categories: null,
     };
     showLanguage();
@@ -165,28 +178,28 @@ function showIntro() {
     h('div', {class: 'actions'}, h('button', {type: 'button', onclick: showConsent}, T.continue)));
 }
 
+// Al primo tocco si disattivano entrambi i pulsanti: una sola risposta.
 function showConsent() {
   const yes = h('button', {type: 'button', class: 'big'}, T.consent_yes);
-  yes.addEventListener('click', async () => {
-    yes.disabled = true;
-    await accept();
-  });
+  const no = h('button', {type: 'button', class: 'big secondary'}, T.consent_no);
+  const once = f => () => {
+    if (yes.disabled) return;
+    yes.disabled = no.disabled = true;
+    f();
+  };
+  yes.addEventListener('click', once(accept));
+  no.addEventListener('click', once(() => goodbye('no_consent_title', 'no_consent_body')));
   screen('',
     h('h1', {}, T.consent_title),
     paras(T.consent_body),
-    h('div', {class: 'stack'},
-      yes,
-      h('button', {type: 'button', class: 'big secondary', onclick: () => goodbye('no_consent_title', 'no_consent_body')},
-        T.consent_no)));
+    h('div', {class: 'stack'}, yes, no));
 }
 
 // Il record nasce col consenso: senza consenso non si salva niente.
-async function accept() {
-  let device = DEFAULT_DEVICE;
-  try { device = (await getSetting('device')) || DEFAULT_DEVICE; } catch (e) { console.error(e); }
+function accept() {
   S.record = {
     ...newSession({
-      sessionId: S.sessionId, device, appVersion: APP_VERSION, manifestVersion: S.manifest.version,
+      sessionId: S.sessionId, device: S.device, appVersion: APP_VERSION, manifestVersion: S.manifest.version,
       seed: S.seed, lang: S.lang, now: now(),
     }),
     consent: true,
@@ -260,16 +273,8 @@ function setCategories(main, secondary) {
   showVolume();
 }
 
-// Audio come blob dalla cache della versione (o dalla rete): Safari non serve
-// le richieste a intervalli da una risposta intera in cache.
-async function blobUrl(src, version) {
-  const name = mediaCacheName(version);
-  const hit = (await caches.has(name)) && (await (await caches.open(name)).match(src));
-  const r = hit || (await fetch(src));
-  if (!r.ok) throw new Error(`${src}: HTTP ${r.status}`);
-  const blob = await r.blob();
-  return URL.createObjectURL(blob.type ? blob : new Blob([blob], {type: 'audio/mpeg'}));
-}
+// Audio come blob, come nel player (Safari e le richieste a intervalli).
+const blobUrl = async (src, version) => URL.createObjectURL(await loadBlob(src, version));
 
 // Prova del volume: i primi secondi della 'flat' della prima opera.
 function showVolume() {

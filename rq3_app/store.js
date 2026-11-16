@@ -41,8 +41,19 @@ async function run(storeName, mode, fn) {
   });
 }
 
+// Salvataggi di sessioni non riusciti da quando la pagina e' aperta (per l'operatore).
+const failures = [];
+export const getSaveFailures = () => failures.map(f => ({...f}));
+
+// Un errore resta registrato e si propaga a chi ha chiamato.
 export async function putSession(record) {
-  await run('sessions', 'readwrite', s => s.put(record));
+  try {
+    await run('sessions', 'readwrite', s => s.put(record));
+  } catch (e) {
+    failures.push({session_id: record.session_id, last_step: record.last_step,
+                   at: new Date().toISOString(), error: String((e && e.message) || e)});
+    throw e;
+  }
 }
 
 export const getAllSessions = () => run('sessions', 'readonly', s => s.getAll());

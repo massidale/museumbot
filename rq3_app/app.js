@@ -6,20 +6,19 @@ import {
 } from './logic.js';
 import {createPlayer, loadBlob} from './player.js';
 import {APP_VERSION} from './config.js';
-import {putSession, getSetting, getSaveFailures} from './store.js';
+import {putSession, getSetting} from './store.js';
 import {registerServiceWorker} from './swclient.js';
+import {showOperator as operatorScreen, onSwStatus, DEFAULT_DEVICE} from './operator.js';
 
 const MAX_ARTWORKS = 4;
 const SAMPLE_SEC = 8;           // durata della prova del volume
 const RETURN_MS = 30 * 1000;    // dopo i saluti si torna da soli all'operatore
-const DEFAULT_DEVICE = 'non-impostato';
 
 const app = document.getElementById('app');
 let texts = null;      // texts.json intero
 let T = null;          // testi della lingua scelta
 let S = null;          // sessione in corso: manifest, plan, record, ...
 let cleanups = [];     // da chiamare quando si cambia schermata
-let swStatus = [];     // ultimi messaggi del service worker, per l'operatore
 
 const now = () => new Date().toISOString();
 
@@ -92,43 +91,13 @@ function newSessionId() {
   return Array.from(crypto.getRandomValues(new Uint32Array(6)), v => (v % 36).toString(36)).join('');
 }
 
-// ---- operatore (provvisorio: il Task 5 lo sostituisce con operator.js) ----
+// ---- operatore (operator.js) ----
 
 function showOperator(message = '') {
   S = null;
   document.documentElement.lang = 'it';
-  const status = h('div', {class: 'op-status', id: 'op-status'});
-  renderStatus(status);
-  screen('operator',
-    h('h1', {}, 'Audioguide: operatore'),
-    h('p', {class: 'muted'}, `app ${APP_VERSION}`),
-    message && h('p', {class: 'err'}, message),
-    saveWarning(),
-    h('button', {type: 'button', class: 'big', onclick: () => startSession()}, 'Nuova sessione'),
-    status);
-}
-
-// Avviso in rosso se dei salvataggi non sono riusciti: quei dati potrebbero mancare.
-function saveWarning() {
-  const f = getSaveFailures();
-  if (!f.length) return null;
-  const ids = [...new Set(f.map(x => x.session_id))].join(', ');
-  return h('p', {class: 'err', id: 'op-save-errors'},
-    `Attenzione: ${f.length} salvataggi non riusciti (sessioni ${ids}); `
-    + `l'ultimo al passo ${f[f.length - 1].last_step}: ${f[f.length - 1].error}`);
-}
-
-function renderStatus(box = document.getElementById('op-status')) {
-  if (!box) return;
-  box.replaceChildren(...swStatus.map(([msg, isErr]) => h('p', {class: isErr ? 'err' : 'muted'}, msg)));
-}
-
-// Un messaggio per tipo (persist, service worker, ...): il nuovo sostituisce il vecchio.
-function onSwStatus(msg, isError) {
-  const kind = msg.split(':')[0];
-  swStatus = swStatus.filter(([m]) => m.split(':')[0] !== kind);
-  swStatus.push([msg, isError]);
-  renderStatus();
+  screen('operator');
+  cleanups.push(operatorScreen(app, {onStart: startSession, message}));
 }
 
 // ---- percorso del visitatore ----

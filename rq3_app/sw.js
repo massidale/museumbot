@@ -12,6 +12,7 @@ const SHELL_FILES = [
   'config.js',
   'store.js',
   'swclient.js',
+  'operator.js',
   'texts.json',
   'manifest.json',
   'app.webmanifest',

@@ -81,18 +81,18 @@ test('newSession: niente campo consent, primo passo start', () => {
 });
 test('answer traduce la posizione nella condizione', () => {
   const t = buildTrial(0, M.artworks[0], 'en', ['recharger'], 'comparison');
-  const r = answer(t, {position: 2, strength: 5, familiar: false, why: 'piu\' vivace', now: 'T'});
+  const r = answer(t, {position: 2, strength: 5, why: 'piu\' vivace', now: 'T'});
   assert.equal(r.choice, 'personal'); assert.equal(r.choice_position, 2);
   assert.equal(r.why, 'piu\' vivace'); assert.equal(r.answered_at, 'T');
-  assert.equal('reasons' in r, false);
+  assert.equal('reasons' in r, false); assert.equal('familiar' in r, false);
   assert.equal(t.choice, null);
 });
-test('answerComplete chiede posizione, forza e familiarita\'; il perche\' e\' facoltativo', () => {
-  const ok = {position: 1, strength: 7, familiar: true};
+test('answerComplete chiede posizione e forza; il perche\' e\' facoltativo', () => {
+  const ok = {position: 1, strength: 7};
   assert.equal(answerComplete(ok), true);
   assert.equal(answerComplete({...ok, position: null}), false);
   assert.equal(answerComplete({...ok, strength: 0}), false);
-  assert.equal(answerComplete({...ok, familiar: null}), false);
+  assert.equal(answerComplete({...ok, strength: 7.5}), false);
 });
 test('markStep aggiorna passo e ora', () => {
   const s0 = newSession({sessionId: 'x', device: 'ipad-1', appVersion: '0.1.0',

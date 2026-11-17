@@ -97,24 +97,22 @@ export function buildTrial(index, artwork, lang, categories, first) {
     index, artwork_id: artwork.id, personal, comparison, first, audio,
     plays: [0, 0], reached_end: [false, false], heard_sec: [0, 0],
     choice: null, choice_position: null, strength: null,
-    familiar: null, why: '', shown_at: null, answered_at: null,
+    why: '', shown_at: null, answered_at: null,
   };
 }
 
 // Il perche' e' una domanda aperta facoltativa: non conta.
-export function answerComplete({position, strength, familiar}) {
+export function answerComplete({position, strength}) {
   return (position === 1 || position === 2)
-    && Number.isInteger(strength) && strength >= 1 && strength <= 7
-    && typeof familiar === 'boolean';
+    && Number.isInteger(strength) && strength >= 1 && strength <= 7;
 }
 
 // La posizione (1|2) diventa la condizione scelta, secondo l'ordine di ascolto.
-export function answer(trial, {position, strength, familiar, why, now}) {
+export function answer(trial, {position, strength, why, now}) {
   const second = trial.first === 'personal' ? 'comparison' : 'personal';
   const choice = position === 1 ? trial.first : second;
   return {
-    ...trial, choice, choice_position: position, strength,
-    familiar, why: why || '', answered_at: now,
+    ...trial, choice, choice_position: position, strength, why: why || '', answered_at: now,
   };
 }
 

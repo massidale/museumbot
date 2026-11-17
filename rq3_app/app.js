@@ -273,7 +273,7 @@ function showTrial(i) {
   S.record = markStep({...S.record, trials: [...S.record.trials.slice(0, i), trial]}, `trial_${i}`, now());
   save();
 
-  const ans = {position: null, strength: null, familiar: null};
+  const ans = {position: null, strength: null};
   const labels = {play: T.play, pause: T.pause, back10: T.back10, seek: T.seek, error: T.player_error};
   const guideLabel = n => fmt(T.guide_label, {n});
 
@@ -301,8 +301,7 @@ function showTrial(i) {
       h('p', {class: 'q'}, T.q_strength),
       choiceButtons([1, 2, 3, 4, 5, 6, 7].map(n => [n, String(n)]), v => { ans.strength = v; refresh(); }, 'scale'),
       h('div', {class: 'scale-ends'}, h('span', {}, T.strength_low), h('span', {}, T.strength_high))),
-    h('div', {class: 'question'}, h('label', {class: 'q'}, T.q_why_text, why)),
-    choiceGroup(T.q_familiar, [[true, T.yes], [false, T.no]], v => { ans.familiar = v; refresh(); }));
+    h('div', {class: 'question'}, h('label', {class: 'q'}, T.q_why_text, why)));
 
   const refresh = () => { next.disabled = !answerComplete(ans); };
 

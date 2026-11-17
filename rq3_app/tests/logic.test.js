@@ -1,9 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {SAMPLE} from './sample_sessions.js';
 import {
   CATEGORIES, mixKey, allConditions, pairFor, rng, shuffle, validateManifest,
   planSession, newSession, buildTrial, answerComplete,
-  answer, markStep, abortSession, toJsonl, deletableIds,
+  answer, markStep, abortSession, toCsv, csvCell, sessionRows, CSV_COLUMNS, deletableIds,
 } from '../logic.js';
 
 // Manifesto finto di 4 opere, stessa forma del Task 2.
@@ -121,6 +123,20 @@ test('deletableIds tocca solo gli esportati presenti', () => {
   assert.deepEqual(deletableIds([{session_id: 'a'}, {session_id: 'b'}], ['b', 'z']), ['b']);
   assert.deepEqual(deletableIds([{session_id: 'a'}], []), []);
 });
-test('toJsonl', () => {
-  assert.equal(toJsonl([{a: 1}, {b: 2}]), '{"a":1}\n{"b":2}\n');
+test('toCsv coincide con tests/data/rq3_export.csv', () => {
+  const expected = readFileSync(new URL('../../tests/data/rq3_export.csv', import.meta.url), 'utf8');
+  assert.equal(toCsv(SAMPLE), expected);
+});
+test('toCsv: BOM, intestazione, una riga per opera e una per la sessione senza opere', () => {
+  const lines = toCsv(SAMPLE).split('\r\n');
+  assert.equal(lines[0], '﻿' + CSV_COLUMNS.join(','));
+  assert.equal(sessionRows(SAMPLE[0]).length, 2);
+  assert.equal(sessionRows(SAMPLE[1]).length, 1);
+  assert.equal(sessionRows(SAMPLE[1])[0].trial_index, undefined);
+});
+test('csvCell: vuoto, liste, virgolette', () => {
+  assert.equal(csvCell(null), ''); assert.equal(csvCell(false), 'false'); assert.equal(csvCell(0), '0');
+  assert.equal(csvCell(['a', 'b']), 'a|b');
+  assert.equal(csvCell('x, "y"'), '"x, ""y"""');
+  assert.equal(csvCell('a\nb'), '"a\nb"');
 });

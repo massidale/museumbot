@@ -1,7 +1,7 @@
 // Schermata dell'operatore (solo per chi conduce lo studio, in italiano). Senza PIN: solo
 // "Nuova sessione" e l'area d'angolo; col PIN: nome del dispositivo, conteggi, controllo
 // del materiale, export delle sessioni e cancellazione di quelle esportate.
-import {toJsonl, deletableIds, validateManifest} from './logic.js';
+import {toCsv, deletableIds, validateManifest} from './logic.js';
 import {getAllSessions, deleteSessions, getSetting, setSetting, getSaveFailures} from './store.js';
 import {checkCache, mediaUrls} from './player.js';
 import {fillMissing} from './swclient.js';
@@ -28,10 +28,10 @@ function h(tag, props = {}, ...kids) {
 
 const pad = n => String(n).padStart(2, '0');
 
-// rq3_<device>_<AAAAMMGG-HHMM>.jsonl, ora locale.
+// rq3_<device>_<AAAAMMGG-HHMM>.csv, ora locale.
 export function exportFileName(device, d = new Date()) {
   const stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
-  return `rq3_${device}_${stamp}.jsonl`;
+  return `rq3_${device}_${stamp}.csv`;
 }
 
 // Il nome finisce nel nome del file: solo lettere, cifre, '-' e '_'.
@@ -249,7 +249,7 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
       if (document.activeElement !== devInput) devInput.value = device || '';
       const complete = all.filter(r => r.completed === true).length;
       const inExport = deletableIds(all, exported || []).length;
-      prepared = {text: toJsonl(all), ids: all.map(r => r.session_id)};
+      prepared = {text: toCsv(all), ids: all.map(r => r.session_id)};
       counts.textContent = `${all.length} sessioni nel dispositivo: ${complete} complete, `
         + `${all.length - complete} interrotte. Gia' esportate (ultimo export): ${inExport}.`;
       exportBtn.disabled = all.length === 0;
@@ -360,7 +360,7 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
     clearLink();
     if (!prepared || prepared.ids.length === 0) { say(exportMsg, 'Nessuna sessione da esportare.'); return; }
     const {text, ids} = prepared;
-    const file = new File([text], exportFileName(device || DEFAULT_DEVICE), {type: 'text/plain'});
+    const file = new File([text], exportFileName(device || DEFAULT_DEVICE), {type: 'text/csv'});
     let canShare = false;
     try { canShare = !!(navigator.canShare && navigator.canShare({files: [file]})); } catch (e) { canShare = false; }
     if (!canShare) {

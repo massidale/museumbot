@@ -122,7 +122,58 @@ export const markStep = (session, step, now) => ({...session, last_step: step, u
 export const abortSession = (session, now) =>
   ({...session, completed: false, aborted_by_operator: true, updated_at: now});
 
-export const toJsonl = records => records.map(r => JSON.stringify(r) + '\n').join('');
+// ---- export in CSV: una riga per opera, coi dati della sessione ripetuti ----
+// Le stesse colonne le legge rq3_visitors/collect.py.
+
+export const CSV_COLUMNS = [
+  'session_id', 'device', 'app_version', 'manifest_version', 'seed', 'lang',
+  'started_at', 'updated_at', 'finished_at', 'completed', 'last_step', 'aborted_by_operator',
+  'chosen', 'description_order', 'category_main', 'category_secondary', 'player_errors',
+  'trial_index', 'artwork_id', 'personal', 'comparison', 'first', 'audio_1', 'audio_2',
+  'plays_1', 'plays_2', 'heard_sec_1', 'heard_sec_2', 'reached_end_1', 'reached_end_2',
+  'choice', 'choice_position', 'strength', 'why', 'shown_at', 'answered_at',
+];
+
+// Un valore della cella: vuoto per null, liste unite da '|', testo tra virgolette se serve.
+export function csvCell(v) {
+  if (v == null) return '';
+  const s = Array.isArray(v) ? v.join('|') : String(v);
+  return /[",\r\n]|^\s|\s$/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+
+// Le righe di una sessione; una senza opere da' una riga con le colonne dell'opera vuote.
+export function sessionRows(r) {
+  const cats = r.categories || {};
+  const errs = r.player_errors && r.player_errors.length ? JSON.stringify(r.player_errors) : null;
+  const base = {
+    session_id: r.session_id, device: r.device, app_version: r.app_version,
+    manifest_version: r.manifest_version, seed: r.seed, lang: r.lang,
+    started_at: r.started_at, updated_at: r.updated_at, finished_at: r.finished_at,
+    completed: r.completed, last_step: r.last_step, aborted_by_operator: r.aborted_by_operator || false,
+    chosen: r.chosen, description_order: r.description_order,
+    category_main: cats.main, category_secondary: cats.secondary, player_errors: errs,
+  };
+  const pair = (row, name, arr) => { row[`${name}_1`] = arr ? arr[0] : null; row[`${name}_2`] = arr ? arr[1] : null; };
+  if (!r.trials || r.trials.length === 0) return [base];
+  return r.trials.map(t => {
+    const row = {...base, trial_index: t.index, artwork_id: t.artwork_id, personal: t.personal,
+      comparison: t.comparison, first: t.first, choice: t.choice, choice_position: t.choice_position,
+      strength: t.strength, why: t.why, shown_at: t.shown_at, answered_at: t.answered_at};
+    pair(row, 'audio', t.audio);
+    pair(row, 'plays', t.plays);
+    pair(row, 'heard_sec', t.heard_sec);
+    pair(row, 'reached_end', t.reached_end);
+    return row;
+  });
+}
+
+// CSV con BOM (Excel lo legge come UTF-8), virgola e righe CRLF.
+export function toCsv(records) {
+  const lines = [CSV_COLUMNS.join(',')];
+  for (const r of records)
+    for (const row of sessionRows(r)) lines.push(CSV_COLUMNS.map(c => csvCell(row[c])).join(','));
+  return '﻿' + lines.join('\r\n') + '\r\n';
+}
 
 export function deletableIds(records, exportedIds) {
   const present = new Set(records.map(r => r.session_id));

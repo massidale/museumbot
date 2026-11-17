@@ -1,0 +1,28 @@
+// Due sessioni d'esempio: una con 2 opere (testo libero con virgola, virgolette e a capo),
+// una interrotta prima delle opere. Lo stesso CSV lo legge tests/test_rq3_collect.py.
+export const SAMPLE = [
+  {session_id: 'abc123', device: 'ipad-1', app_version: '0.1.0', manifest_version: 'haum-1',
+   seed: 42, lang: 'de', started_at: '2026-12-01T09:00:00.000Z', updated_at: '2026-12-01T09:20:00.000Z',
+   finished_at: '2026-12-01T09:20:00.000Z', last_step: 'end', completed: true,
+   categories: {main: 'explorer', secondary: 'facilitator'}, chosen: ['facilitator', 'explorer'],
+   description_order: ['recharger', 'explorer', 'facilitator', 'experience_seeker', 'professional_hobbyist'],
+   player_errors: [{trial_index: 1, position: 2, src: 'audio/de/x/explorer.mp3', message: 'MediaError 4', at: 'T'}],
+   trials: [
+     {index: 0, artwork_id: 'portrait-of-a-family', personal: 'explorer+facilitator', comparison: 'explorer',
+      first: 'comparison',
+      audio: ['audio/de/portrait-of-a-family/explorer.mp3', 'audio/de/portrait-of-a-family/explorer+facilitator.mp3'],
+      plays: [1, 2], reached_end: [true, false], heard_sec: [201.5, 88],
+      choice: 'personal', choice_position: 2, strength: 6, why: 'Lebendiger, "persönlicher"\nund kürzer',
+      shown_at: '2026-12-01T09:05:00.000Z', answered_at: '2026-12-01T09:12:00.000Z'},
+     {index: 1, artwork_id: 'self-portrait-as-david', personal: 'explorer+facilitator', comparison: 'explorer',
+      first: 'personal',
+      audio: ['audio/de/self-portrait-as-david/explorer+facilitator.mp3', 'audio/de/self-portrait-as-david/explorer.mp3'],
+      plays: [1, 0], reached_end: [false, false], heard_sec: [12.3, 0],
+      choice: null, choice_position: null, strength: null, why: '',
+      shown_at: '2026-12-01T09:13:00.000Z', answered_at: null},
+   ]},
+  {session_id: 'zz9', device: 'ipad-1', app_version: '0.1.0', manifest_version: 'haum-1',
+   seed: 7, lang: 'en', started_at: '2026-12-01T10:00:00.000Z', updated_at: '2026-12-01T10:01:00.000Z',
+   finished_at: null, last_step: 'classification', completed: false, aborted_by_operator: true,
+   categories: null, chosen: ['recharger'], description_order: ['explorer'], trials: []},
+];

@@ -1,4 +1,10 @@
-from museumbot.rq3_visitors.collect import load_file, merge, validate
+import csv
+from pathlib import Path
+
+from museumbot.rq3_visitors.collect import COLUMNS, load_file, merge, validate, write_csv
+
+# Export d'esempio scritto da toCsv (rq3_app/logic.js) con rq3_app/tests/sample_sessions.js.
+FIXTURE = Path(__file__).parent / "data" / "rq3_export.csv"
 
 
 def rec(sid, completed=False, answered=1, updated="2026-12-01T10:00"):
@@ -48,8 +54,53 @@ def test_validate_why_non_testo():
     assert len(validate(bad)) == 1
 
 
-def test_load_file_riga_malformata(tmp_path):
-    p = tmp_path / "x.jsonl"
-    p.write_text('{"a": 1}\n{rotto\n\n')
-    righe, errori = load_file(p)
-    assert righe == [{"a": 1}] and len(errori) == 1 and "x.jsonl:2" in errori[0]
+def test_colonne_come_nell_app():
+    with open(FIXTURE, encoding="utf-8-sig", newline="") as fh:
+        assert tuple(next(csv.reader(fh))) == COLUMNS
+
+
+def test_load_file_ricostruisce_le_sessioni():
+    recs, errori = load_file(FIXTURE)
+    assert errori == [] and [r["session_id"] for r in recs] == ["abc123", "zz9"]
+    a, z = recs
+    assert a["seed"] == 42 and a["completed"] is True and a["finished_at"] == "2026-12-01T09:20:00.000Z"
+    assert a["categories"] == {"main": "explorer", "secondary": "facilitator"}
+    assert a["chosen"] == ["facilitator", "explorer"] and len(a["description_order"]) == 5
+    assert a["player_errors"][0]["message"] == "MediaError 4"
+    t0, t1 = a["trials"]
+    assert t0["why"] == 'Lebendiger, "persönlicher"\nund kürzer'
+    assert t0["plays"] == [1, 2] and t0["heard_sec"] == [201.5, 88.0]
+    assert t0["reached_end"] == [True, False] and t0["choice_position"] == 2 and t0["strength"] == 6
+    assert t1["choice"] is None and t1["strength"] is None and t1["answered_at"] is None
+    assert z["trials"] == [] and z["categories"] is None and z["aborted_by_operator"] is True
+    assert all(validate(r) == [] for r in recs)
+
+
+def test_write_csv_e_rilettura(tmp_path):
+    recs, _ = load_file(FIXTURE)
+    out = tmp_path / "responses.csv"
+    write_csv(out, recs)
+    again, errori = load_file(out)
+    assert errori == [] and again == recs
+
+
+def test_load_file_colonne_mancanti_e_celle_sbagliate(tmp_path):
+    p = tmp_path / "x.csv"
+    p.write_text("session_id,device\ns1,ipad\n")
+    recs, errori = load_file(p)
+    assert recs == [] and "colonne mancanti" in errori[0]
+    righe = FIXTURE.read_text(encoding="utf-8-sig").replace(",true,end,", ",forse,end,")
+    q = tmp_path / "y.csv"
+    q.write_text(righe, encoding="utf-8")
+    recs, errori = load_file(q)
+    assert [r["session_id"] for r in recs] == ["zz9"] and "abc123" in errori[0]
+
+
+def test_load_file_contatori_vuoti(tmp_path):
+    # sessioni registrate prima che l'app contasse l'ascolto: celle vuote, non errori
+    testo = FIXTURE.read_text(encoding="utf-8-sig").replace(",1,0,12.3,0,false,false,", ",1,0,,,,,")
+    p = tmp_path / "x.csv"
+    p.write_text(testo, encoding="utf-8")
+    recs, errori = load_file(p)
+    t1 = recs[0]["trials"][1]
+    assert errori == [] and t1["heard_sec"] == [None, None] and t1["reached_end"] == [None, None]

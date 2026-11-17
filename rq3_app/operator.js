@@ -1,7 +1,7 @@
 // Schermata dell'operatore (solo per chi conduce lo studio, in italiano). Senza PIN: solo
 // "Nuova sessione" e l'area d'angolo; col PIN: nome del dispositivo, conteggi, controllo
 // del materiale, export delle sessioni e cancellazione di quelle esportate.
-import {toCsv, deletableIds, validateManifest} from './logic.js';
+import {toJson, deletableIds, validateManifest} from './logic.js';
 import {getAllSessions, deleteSessions, getSetting, setSetting, getSaveFailures} from './store.js';
 import {checkCache, mediaUrls} from './player.js';
 import {fillMissing} from './swclient.js';
@@ -28,10 +28,10 @@ function h(tag, props = {}, ...kids) {
 
 const pad = n => String(n).padStart(2, '0');
 
-// rq3_<device>_<AAAAMMGG-HHMM>.csv, ora locale.
+// rq3_<device>_<AAAAMMGG-HHMM>.json, ora locale.
 export function exportFileName(device, d = new Date()) {
   const stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
-  return `rq3_${device}_${stamp}.csv`;
+  return `rq3_${device}_${stamp}.json`;
 }
 
 // Il nome finisce nel nome del file: solo lettere, cifre, '-' e '_'.
@@ -177,12 +177,14 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
 
   // -- sessioni, export, cancellazione --
   const counts = h('p', {id: 'op-counts'}, 'Lettura delle sessioni...');
-  const exportBtn = h('button', {type: 'button', id: 'op-export'}, 'Esporta');
+  const exportBtn = h('button', {type: 'button', id: 'op-export'}, 'Scarica');
+  const shareBtn = h('button', {type: 'button', class: 'secondary', id: 'op-share'}, 'Condividi');
   const deleteBtn = h('button', {type: 'button', class: 'secondary', id: 'op-delete'}, 'Cancella le sessioni esportate');
   const exportMsg = h('p', {class: 'muted', id: 'op-export-msg'});
   const linkBox = h('div', {id: 'op-download'});
   const deleteMsg = h('p', {class: 'muted', id: 'op-delete-msg'});
-  exportBtn.addEventListener('click', doExport);
+  exportBtn.addEventListener('click', doDownload);
+  shareBtn.addEventListener('click', doShare);
   deleteBtn.addEventListener('click', doDelete);
 
   // -- materiale --
@@ -207,7 +209,7 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
     devForm, devMsg,
     h('h2', {}, 'Sessioni'),
     counts,
-    h('div', {class: 'op-row'}, exportBtn, deleteBtn),
+    h('div', {class: 'op-row'}, exportBtn, shareBtn, deleteBtn),
     exportMsg, linkBox, deleteMsg,
     h('p', {class: 'note'}, 'Cancellare solo dopo aver controllato che il file sia arrivato sul Mac.'),
     h('h2', {}, 'Materiale'),
@@ -249,10 +251,10 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
       if (document.activeElement !== devInput) devInput.value = device || '';
       const complete = all.filter(r => r.completed === true).length;
       const inExport = deletableIds(all, exported || []).length;
-      prepared = {text: toCsv(all), ids: all.map(r => r.session_id)};
+      prepared = {text: toJson(all), ids: all.map(r => r.session_id)};
       counts.textContent = `${all.length} sessioni nel dispositivo: ${complete} complete, `
         + `${all.length - complete} interrotte. Gia' esportate (ultimo export): ${inExport}.`;
-      exportBtn.disabled = all.length === 0;
+      exportBtn.disabled = shareBtn.disabled = all.length === 0;
     } catch (e) {
       console.error(e);
       if (closed) return;
@@ -355,12 +357,30 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
     linkBox.append(a);
   }
 
-  // Il file si prepara prima (refresh): share() va chiamato subito, nel tocco.
-  function doExport() {
+  // Il file dell'export: tutte le sessioni del dispositivo, preparate in refresh().
+  function exportFile() {
+    if (!prepared || prepared.ids.length === 0) { say(exportMsg, 'Nessuna sessione da esportare.'); return null; }
+    return {file: new File([prepared.text], exportFileName(device || DEFAULT_DEVICE), {type: 'application/json'}),
+            ids: prepared.ids};
+  }
+
+  // Download normale: sul Mac in Download, sull'iPad in File > Download. Il link resta
+  // visibile se il browser non fa partire il download da solo.
+  function doDownload() {
     clearLink();
-    if (!prepared || prepared.ids.length === 0) { say(exportMsg, 'Nessuna sessione da esportare.'); return; }
-    const {text, ids} = prepared;
-    const file = new File([text], exportFileName(device || DEFAULT_DEVICE), {type: 'text/csv'});
+    const ex = exportFile();
+    if (!ex) return;
+    offerDownload(ex.file, ex.ids);
+    const a = linkBox.querySelector('a');
+    a.click();
+  }
+
+  // Menu di condivisione (AirDrop, mail, Salva su File): share() va chiamato subito, nel tocco.
+  function doShare() {
+    clearLink();
+    const ex = exportFile();
+    if (!ex) return;
+    const {file, ids} = ex;
     let canShare = false;
     try { canShare = !!(navigator.canShare && navigator.canShare({files: [file]})); } catch (e) { canShare = false; }
     if (!canShare) {
@@ -368,7 +388,7 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
       offerDownload(file, ids);
       return;
     }
-    exportBtn.disabled = true;
+    shareBtn.disabled = true;
     say(exportMsg, 'Condivisione in corso...');
     navigator.share({files: [file]}).then(
       () => markExported(ids, file.name),
@@ -381,7 +401,7 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
           say(exportMsg, `Condivisione non riuscita (${errText(e)}): scaricare il file dal link.`, true);
           offerDownload(file, ids);
         }
-      }).finally(() => { if (!closed) exportBtn.disabled = prepared == null || prepared.ids.length === 0; });
+      }).finally(() => { if (!closed) shareBtn.disabled = prepared == null || prepared.ids.length === 0; });
   }
 
   // Cancella solo le sessioni dell'ultimo export ancora presenti; poi l'export si azzera.

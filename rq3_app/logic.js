@@ -58,8 +58,6 @@ export function validateManifest(m) {
   if (!m || !Array.isArray(m.artworks) || m.artworks.length === 0) {
     return ['manifesto senza elenco di opere (artworks)'];
   }
-  for (const lang of LANGS)
-    if (!m.sample || !m.sample[lang] || !m.sample[lang].src) errs.push(`prova del volume mancante per ${lang}`);
   const conds = allConditions();
   for (const art of m.artworks) {
     for (const lang of LANGS) {
@@ -86,7 +84,7 @@ export function newSession({sessionId, device, appVersion, manifestVersion, seed
     session_id: sessionId, device, app_version: appVersion, manifest_version: manifestVersion,
     seed, lang, started_at: now, updated_at: now, finished_at: null,
     last_step: 'start', completed: false,
-    categories: null, trials: [], final: null,
+    categories: null, trials: [],
   };
 }
 

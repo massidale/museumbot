@@ -15,7 +15,6 @@ function fakeManifest() {
   }
   return {
     version: 'v1', categories: CATEGORIES,
-    sample: {en: {src: 'audio/en/sample.mp3', sec: 8}, de: {src: 'audio/de/sample.mp3', sec: 8}},
     artworks: [1, 2, 3, 4].map(i => ({
       id: `a${i}`, image: `img/a${i}.jpg`, title: {en: `T${i}`, de: `T${i}`},
       artist: 'X', audio: structuredClone(audio),
@@ -77,7 +76,8 @@ test('buildTrial parte con contatori di ascolto a zero', () => {
 test('newSession: niente campo consent, primo passo start', () => {
   const s = newSession({sessionId: 'x', device: 'ipad-1', appVersion: '0.1.0',
     manifestVersion: 'v', seed: 1, lang: 'en', now: 'A'});
-  assert.equal('consent' in s, false); assert.equal(s.last_step, 'start');
+  assert.equal('consent' in s, false); assert.equal('final' in s, false);
+  assert.equal(s.last_step, 'start');
 });
 test('answer traduce la posizione nella condizione', () => {
   const t = buildTrial(0, M.artworks[0], 'en', ['recharger'], 'comparison');
@@ -108,13 +108,6 @@ test('validateManifest segnala l\'audio mancante', () => {
   assert.equal(e.length, 1); assert.match(e[0], /explorer\+recharger/);
   assert.deepEqual(validateManifest(M), []);
   assert.ok(validateManifest({version: 'v'}).length > 0);
-});
-test('validateManifest chiede la prova del volume in ogni lingua', () => {
-  const noDe = structuredClone(M); delete noDe.sample.de;
-  const e = validateManifest(noDe);
-  assert.equal(e.length, 1); assert.match(e[0], /prova del volume/); assert.match(e[0], /de/);
-  const none = structuredClone(M); delete none.sample;
-  assert.equal(validateManifest(none).length, 2);
 });
 test('abortSession tiene il passo e segna l\'interruzione', () => {
   const s0 = markStep(newSession({sessionId: 'x', device: 'ipad-1', appVersion: '0.1.0',

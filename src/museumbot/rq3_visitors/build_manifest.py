@@ -9,7 +9,6 @@ from museumbot.common.prompts import FALK_CATEGORIES
 
 LANGS = ("en", "de")
 EXTS = (".mp3", ".m4a")
-SAMPLE = "sample"  # prova del volume: una per lingua, neutra (non e' una guida)
 
 
 def condition_key(name: str) -> str:
@@ -53,17 +52,6 @@ def scan_audio(audio_root: Path, artwork_id: str, lang: str) -> dict[str, Path]:
     return out
 
 
-def scan_sample(audio_root: Path, lang: str) -> Path | None:
-    """Prova del volume audio_root/<lang>/sample.(mp3|m4a), o None."""
-    d = Path(audio_root) / lang
-    out = {}
-    if d.is_dir():
-        for p in _audio_files(d):
-            if p.stem == SAMPLE:
-                _add(out, SAMPLE, p)
-    return out.get(SAMPLE)
-
-
 def duration(path: Path) -> float:
     """Durata in secondi, letta con ffprobe."""
     r = subprocess.run(
@@ -74,19 +62,12 @@ def duration(path: Path) -> float:
 
 def build(artworks: list[dict], audio_root: Path, app_root: Path, version: str,
           dur=duration) -> dict:
-    """Manifesto; ValueError con tutti gli audio mancanti (prove del volume comprese)."""
+    """Manifesto; ValueError con tutti gli audio mancanti."""
     mancanti, opere = [], []
 
     def rel(p: Path) -> str:
         return p.resolve().relative_to(Path(app_root).resolve()).as_posix()
 
-    sample = {}
-    for lang in LANGS:
-        p = scan_sample(audio_root, lang)
-        if p is None:
-            mancanti.append(f"{SAMPLE} / {lang}")
-        else:
-            sample[lang] = {"src": rel(p), "sec": dur(p)}
     for art in artworks:
         audio = {}
         for lang in LANGS:
@@ -100,10 +81,9 @@ def build(artworks: list[dict], audio_root: Path, app_root: Path, version: str,
         opere.append({"id": art["id"], "image": art["image"], "title": art["title"],
                       "artist": art["artist"], "audio": audio})
     if mancanti:
-        raise ValueError("audio mancanti (opera / lingua / condizione, o sample / lingua):\n"
+        raise ValueError("audio mancanti (opera / lingua / condizione):\n"
                          + "\n".join(mancanti))
-    return {"version": version, "categories": list(FALK_CATEGORIES), "sample": sample,
-            "artworks": opere}
+    return {"version": version, "categories": list(FALK_CATEGORIES), "artworks": opere}
 
 
 def main():

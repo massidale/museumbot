@@ -26,10 +26,9 @@ export function fmtTime(sec) {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
 
-// Ogni immagine e ogni audio del manifesto (prove del volume comprese), senza doppioni.
+// Ogni immagine e ogni audio del manifesto, senza doppioni.
 export function mediaUrls(manifest) {
   const out = new Set();
-  for (const s of Object.values(manifest.sample || {})) if (s && s.src) out.add(s.src);
   for (const art of manifest.artworks || []) {
     if (art.image) out.add(art.image);
     for (const lang of Object.keys(art.audio || {}))

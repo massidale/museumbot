@@ -4,7 +4,7 @@ import {
   LANGS, validateManifest, planSession, newSession, buildTrial,
   answerComplete, answer, markStep, abortSession,
 } from './logic.js';
-import {createPlayer, loadBlob} from './player.js';
+import {createPlayer} from './player.js';
 import {APP_VERSION} from './config.js';
 import {putSession, getSetting} from './store.js';
 import {registerServiceWorker} from './swclient.js';
@@ -81,7 +81,7 @@ function putTrial(trial) {
 }
 
 // Errore di un audio: dettagli nel record (e in console dal player); al visitatore solo
-// il testo neutro. trialIndex e position sono null per la prova del volume.
+// il testo neutro.
 function playerError(trialIndex, position, {src, message}) {
   if (!S || !S.record) return;
   const entry = {trial_index: trialIndex, position, src, message, at: now()};
@@ -242,59 +242,7 @@ function showMain(chosen) {
 function setCategories(main, secondary) {
   S.categories = secondary ? [main, secondary] : [main];
   step('main', {categories: {main, secondary}});
-  showVolume();
-}
-
-// Audio come blob, come nel player (Safari e le richieste a intervalli).
-const blobUrl = async (src, version) => URL.createObjectURL(await loadBlob(src, version));
-
-// Prova del volume: un audio neutro per lingua (manifest.sample), non una delle guide.
-function showVolume() {
-  const sample = S.manifest.sample[S.lang].src;
-  const audio = new Audio();
-  let url = null, closed = false, failed = false;
-  const play = h('button', {type: 'button', class: 'big secondary', disabled: true}, T.volume_play);
-  const errBox = h('p', {class: 'player-error', hidden: true}, T.player_error);
-  const fail = message => {
-    if (closed || failed) return;
-    failed = true;
-    play.disabled = true;
-    errBox.hidden = false;
-    console.error('prova del volume:', sample, message);
-    playerError(null, null, {src: sample, message});
-  };
-  play.addEventListener('click', () => {
-    audio.pause();
-    audio.currentTime = 0;
-    audio.play().catch(e => console.warn('play non riuscito', e));
-  });
-  audio.addEventListener('error', () => {
-    if (!url) return;
-    const e = audio.error;
-    fail(e ? `MediaError ${e.code}${e.message ? `: ${e.message}` : ''}` : 'errore audio');
-  });
-  blobUrl(sample, S.manifest.version).then(u => {
-    if (closed) { URL.revokeObjectURL(u); return; }
-    url = u;
-    audio.src = u;
-    audio.load();
-    play.disabled = false;
-  }).catch(e => fail(String((e && e.message) || e)));
-  const ok = h('button', {type: 'button', class: 'big', onclick: () => { step('volume'); showTask(); }}, T.volume_ok);
-  screen('',
-    h('h1', {}, T.volume_title),
-    h('p', {class: 'lead'}, T.volume_body),
-    h('div', {class: 'stack bottom'}, play, errBox, ok));
-  // dopo screen(), che chiude la schermata precedente
-  cleanups.push(() => {
-    closed = true;
-    audio.pause();
-    const u = url;
-    url = null;  // prima di togliere src: l'eventuale 'error' che segue non conta
-    audio.removeAttribute('src');
-    audio.load();
-    if (u) URL.revokeObjectURL(u);
-  });
+  showTask();
 }
 
 function showTask() {
@@ -365,7 +313,7 @@ function showTrial(i) {
     trial = answer(trial, {...ans, why: why.value.trim(), now: now()});
     putTrial(trial);
     if (i + 1 < S.total) showMore(i);
-    else showFinal();
+    else finish();
   });
 
   screen('wide',
@@ -385,25 +333,13 @@ function showMore(i) {
     h('h1', {}, T.more_title),
     h('div', {class: 'stack bottom'},
       h('button', {type: 'button', class: 'big', onclick: () => { step(`more_${i}`); showTrial(i + 1); }}, T.more_yes),
-      h('button', {type: 'button', class: 'big secondary', onclick: () => { step(`more_${i}`); showFinal(); }}, T.more_no)));
+      h('button', {type: 'button', class: 'big secondary', onclick: () => { step(`more_${i}`); finish(); }}, T.more_no)));
 }
 
-// Eta', frequenza di visita, lingua madre: si salvano gli id delle opzioni.
-function showFinal() {
-  const keys = Object.keys(T.final);
-  const final = Object.fromEntries(keys.map(k => [k, null]));
-  const finish = h('button', {type: 'button', disabled: true}, T.finish);
-  const groups = keys.map(k => choiceGroup(T.final[k].label, Object.entries(T.final[k].options), v => {
-    final[k] = v;
-    finish.disabled = !keys.every(q => final[q] != null);
-  }, 'choices wrap'));
-  finish.addEventListener('click', () => {
-    if (!keys.every(q => final[q] != null)) return;
-    step('final', {final: {...final}});
-    step('end', {completed: true, finished_at: now()});
-    goodbye('end_title', 'end_body');
-  });
-  screen('', h('h1', {}, T.final_title), groups, h('div', {class: 'actions'}, finish));
+// Fine della sessione, dopo l'ultima opera o quando il visitatore dice basta.
+function finish() {
+  step('end', {completed: true, finished_at: now()});
+  goodbye('end_title', 'end_body');
 }
 
 // Saluti; poi, a un tocco o da soli, si torna all'operatore.

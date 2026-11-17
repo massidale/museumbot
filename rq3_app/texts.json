@@ -26,12 +26,8 @@
       "recharger": "I come to the museum to slow down and find some calm. For me it is a place to step away from everyday life and reflect."
     },
     "main_title": "Which of the two descriptions fits you best?",
-    "volume_title": "Please put on the headphones",
-    "volume_body": "Tap the button to hear a short sample and adjust the volume.",
-    "volume_play": "Play sample",
-    "volume_ok": "The volume is fine, continue",
     "task_title": "How it works",
-    "task_body": "You will now see a painting and two audio guides about it: Guide 1 and Guide 2. Listen to Guide 1 first, then Guide 2, both until the end. You can go back 10 seconds or move to any point with the slider. The questions are below the guides.",
+    "task_body": "Please put on the headphones. You will now see a painting and two audio guides about it: Guide 1 and Guide 2. Listen to Guide 1 first, then Guide 2, both until the end. You can go back 10 seconds or move to any point with the slider. The questions are below the guides.",
     "painting_of": "Painting {i} of {n}",
     "guide_label": "Guide {n}",
     "play": "Play",
@@ -51,22 +47,6 @@
     "more_title": "Would you like to listen to another painting?",
     "more_yes": "Yes, another painting",
     "more_no": "No, finish",
-    "final_title": "Finally, three short questions",
-    "final": {
-      "age_band": {
-        "label": "How old are you?",
-        "options": {"18_29": "18–29", "30_44": "30–44", "45_59": "45–59", "60_74": "60–74", "75_plus": "75 or older", "no_answer": "Prefer not to say"}
-      },
-      "visit_frequency": {
-        "label": "How often do you visit museums?",
-        "options": {"lt1": "Less than once a year", "1_2": "1–2 times a year", "3_5": "3–5 times a year", "gt5": "More than 5 times a year", "no_answer": "Prefer not to say"}
-      },
-      "native_language": {
-        "label": "What is your native language?",
-        "options": {"german": "German", "english": "English", "other": "Another language", "no_answer": "Prefer not to say"}
-      }
-    },
-    "finish": "Finish",
     "end_title": "Thank you!",
     "end_body": "Your answers have been saved. Please return the tablet and the headphones to the person at the stand."
   },
@@ -97,12 +77,8 @@
       "recharger": "Ich komme ins Museum, um langsamer zu werden und zur Ruhe zu kommen. Es ist für mich ein Ort, um Abstand vom Alltag zu gewinnen und nachzudenken."
     },
     "main_title": "Welche der beiden Beschreibungen passt am besten zu Ihnen?",
-    "volume_title": "Bitte setzen Sie die Kopfhörer auf",
-    "volume_body": "Tippen Sie auf die Schaltfläche, um eine kurze Hörprobe zu hören, und stellen Sie die Lautstärke ein.",
-    "volume_play": "Hörprobe abspielen",
-    "volume_ok": "Die Lautstärke passt, weiter",
     "task_title": "So funktioniert es",
-    "task_body": "Sie sehen gleich ein Gemälde und zwei Audioguides dazu: Audioguide 1 und Audioguide 2. Hören Sie zuerst Audioguide 1, dann Audioguide 2, jeweils bis zum Ende. Sie können 10 Sekunden zurückspringen oder mit dem Schieberegler zu jeder Stelle gehen. Die Fragen stehen unter den Audioguides.",
+    "task_body": "Bitte setzen Sie die Kopfhörer auf. Sie sehen gleich ein Gemälde und zwei Audioguides dazu: Audioguide 1 und Audioguide 2. Hören Sie zuerst Audioguide 1, dann Audioguide 2, jeweils bis zum Ende. Sie können 10 Sekunden zurückspringen oder mit dem Schieberegler zu jeder Stelle gehen. Die Fragen stehen unter den Audioguides.",
     "painting_of": "Gemälde {i} von {n}",
     "guide_label": "Audioguide {n}",
     "play": "Abspielen",
@@ -122,22 +98,6 @@
     "more_title": "Möchten Sie ein weiteres Gemälde hören?",
     "more_yes": "Ja, ein weiteres Gemälde",
     "more_no": "Nein, abschließen",
-    "final_title": "Zum Schluss drei kurze Fragen",
-    "final": {
-      "age_band": {
-        "label": "Wie alt sind Sie?",
-        "options": {"18_29": "18–29", "30_44": "30–44", "45_59": "45–59", "60_74": "60–74", "75_plus": "75 oder älter", "no_answer": "Keine Angabe"}
-      },
-      "visit_frequency": {
-        "label": "Wie oft besuchen Sie Museen?",
-        "options": {"lt1": "Seltener als einmal im Jahr", "1_2": "1–2 Mal im Jahr", "3_5": "3–5 Mal im Jahr", "gt5": "Mehr als 5 Mal im Jahr", "no_answer": "Keine Angabe"}
-      },
-      "native_language": {
-        "label": "Was ist Ihre Muttersprache?",
-        "options": {"german": "Deutsch", "english": "Englisch", "other": "Eine andere Sprache", "no_answer": "Keine Angabe"}
-      }
-    },
-    "finish": "Abschließen",
     "end_title": "Vielen Dank!",
     "end_body": "Ihre Antworten wurden gespeichert. Bitte geben Sie das Tablet und die Kopfhörer der Person am Stand zurück."
   },
@@ -168,12 +128,8 @@
       "recharger": "Vengo al museo per rallentare e trovare un po' di calma. Per me è un posto dove staccare dalla vita di tutti i giorni e riflettere."
     },
     "main_title": "Quale delle due descrizioni ti descrive meglio?",
-    "volume_title": "Indossa le cuffie",
-    "volume_body": "Tocca il pulsante per sentire un breve campione e regolare il volume.",
-    "volume_play": "Ascolta il campione",
-    "volume_ok": "Il volume va bene, continua",
     "task_title": "Come funziona",
-    "task_body": "Ora vedrai un dipinto e due audioguide su di esso: Guida 1 e Guida 2. Ascolta prima la Guida 1, poi la Guida 2, entrambe fino alla fine. Puoi tornare indietro di 10 secondi o spostarti in qualsiasi punto con il cursore. Le domande sono sotto le guide.",
+    "task_body": "Indossa le cuffie. Ora vedrai un dipinto e due audioguide su di esso: Guida 1 e Guida 2. Ascolta prima la Guida 1, poi la Guida 2, entrambe fino alla fine. Puoi tornare indietro di 10 secondi o spostarti in qualsiasi punto con il cursore. Le domande sono sotto le guide.",
     "painting_of": "Dipinto {i} di {n}",
     "guide_label": "Guida {n}",
     "play": "Riproduci",
@@ -193,22 +149,6 @@
     "more_title": "Vuoi ascoltare un altro dipinto?",
     "more_yes": "Sì, un altro dipinto",
     "more_no": "No, concludi",
-    "final_title": "Per finire, tre domande brevi",
-    "final": {
-      "age_band": {
-        "label": "Quanti anni hai?",
-        "options": {"18_29": "18–29", "30_44": "30–44", "45_59": "45–59", "60_74": "60–74", "75_plus": "75 o più", "no_answer": "Preferisco non rispondere"}
-      },
-      "visit_frequency": {
-        "label": "Quanto spesso visiti musei?",
-        "options": {"lt1": "Meno di una volta l'anno", "1_2": "1–2 volte l'anno", "3_5": "3–5 volte l'anno", "gt5": "Più di 5 volte l'anno", "no_answer": "Preferisco non rispondere"}
-      },
-      "native_language": {
-        "label": "Qual è la tua lingua madre?",
-        "options": {"german": "Tedesco", "english": "Inglese", "other": "Un'altra lingua", "no_answer": "Preferisco non rispondere"}
-      }
-    },
-    "finish": "Concludi",
     "end_title": "Grazie!",
     "end_body": "Le tue risposte sono state salvate. Restituisci il tablet e le cuffie alla persona allo stand."
   }

@@ -6,15 +6,11 @@ import tempfile
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from museumbot.rq3_visitors.build_manifest import LANGS, SAMPLE, all_conditions
+from museumbot.rq3_visitors.build_manifest import LANGS, all_conditions
 
 VOCI = {"en": "Samantha", "de": "Anna"}
 COLORI = ["0x3b5b7a", "0x7a3b4e", "0x4e7a3b", "0x7a6a3b"]
 SEC = 90
-
-
-SAMPLE_SEC = 8
-SAMPLE_TEXT = {"en": "This is a sound check.", "de": "Dies ist eine Hörprobe."}
 
 
 def render_speech(lang: str, testo: str, sec: int, out: Path):
@@ -32,11 +28,6 @@ def render_audio(lang: str, art_id: str, cond: str, out: Path):
     """Opera e condizione pronunciate, poi silenzio fino a 90 s."""
     testo = f"{art_id.replace('_', ' ')}. {cond.replace('+', ' plus ').replace('_', ' ')}."
     render_speech(lang, testo, SEC, out)
-
-
-def render_sample(lang: str, out: Path):
-    """Prova del volume neutra: una frase ripetuta fino a circa 8 s."""
-    render_speech(lang, " ".join([SAMPLE_TEXT[lang]] * 3), SAMPLE_SEC, out)
 
 
 def render_image(i: int, out: Path):
@@ -64,13 +55,11 @@ def main():
             for art_id in ids for lang in LANGS for c in all_conditions()]
     with ThreadPoolExecutor(a.workers) as ex:
         list(ex.map(lambda j: render_audio(*j), jobs))
-    for lang in LANGS:
-        render_sample(lang, root / "audio" / lang / f"{SAMPLE}.mp3")
     d = Path(a.data_dir)
     d.mkdir(parents=True, exist_ok=True)
     (d / "artworks_demo.json").write_text(
         json.dumps(artworks, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"{len(jobs)} audio, {len(LANGS)} prove del volume, {len(ids)} immagini, "
+    print(f"{len(jobs)} audio, {len(ids)} immagini, "
           f"{d / 'artworks_demo.json'}")
 
 

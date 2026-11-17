@@ -109,8 +109,6 @@ button.opt[aria-pressed="true"], button.card[aria-pressed="true"] {
 }
 .choices { display: flex; gap: 12px; }
 .choices button { flex: 1 1 0; }
-.choices.wrap { flex-wrap: wrap; }
-.choices.wrap button { flex: 1 1 200px; }
 .scale { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
 .scale button { padding: 8px 0; font-variant-numeric: tabular-nums; }
 .scale-ends { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.95rem; margin-top: 6px; }

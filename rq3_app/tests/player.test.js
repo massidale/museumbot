@@ -13,9 +13,9 @@ test('backTo: indietro di 10 s, non prima dell\'inizio', () => {
   assert.equal(backTo(4), 0);
   assert.equal(backTo(NaN), 0);
 });
-test('mediaUrls comprende le prove del volume', () => {
-  const m = {sample: {en: {src: 'audio/en/sample.mp3'}, de: {src: 'audio/de/sample.mp3'}},
-             artworks: [{image: 'img/a.jpg', audio: {en: {flat: {src: 'audio/en/a/flat.mp3'}}}}]};
+test('mediaUrls: immagini e audio delle opere, senza doppioni', () => {
+  const m = {artworks: [{image: 'img/a.jpg', audio: {en: {flat: {src: 'audio/en/a/flat.mp3'}}}},
+                       {image: 'img/a.jpg', audio: {en: {flat: {src: 'audio/en/a/flat.mp3'}}}}]};
   assert.deepEqual(mediaUrls(m).sort(),
-    ['audio/de/sample.mp3', 'audio/en/a/flat.mp3', 'audio/en/sample.mp3', 'img/a.jpg']);
+    ['audio/en/a/flat.mp3', 'img/a.jpg']);
 });

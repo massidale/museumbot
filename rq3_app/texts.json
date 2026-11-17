@@ -34,7 +34,7 @@
     "pause": "Pause",
     "back10": "Back 10 s",
     "seek": "Position in the guide",
-    "player_error": "This audio guide cannot be played. Please ask the person at the stand.",
+    "player_error": "This audio guide cannot be played. Please let us know.",
     "q_choice": "Which guide did you prefer?",
     "q_strength": "How strong is your preference?",
     "strength_low": "Slight",
@@ -45,7 +45,7 @@
     "more_yes": "Yes, another painting",
     "more_no": "No, finish",
     "end_title": "Thank you!",
-    "end_body": "Your answers have been saved. Please return the tablet and the headphones to the person at the stand."
+    "end_body": "Your answers have been saved. You can take off the headphones now."
   },
   "de": {
     "lang_name": "Deutsch",
@@ -82,7 +82,7 @@
     "pause": "Pause",
     "back10": "10 s zurück",
     "seek": "Position im Audioguide",
-    "player_error": "Dieser Audioguide kann nicht abgespielt werden. Bitte wenden Sie sich an die Person am Stand.",
+    "player_error": "Dieser Audioguide kann nicht abgespielt werden. Bitte geben Sie uns kurz Bescheid.",
     "q_choice": "Welcher Audioguide hat Ihnen besser gefallen?",
     "q_strength": "Wie deutlich ist Ihre Vorliebe?",
     "strength_low": "Kaum",
@@ -93,7 +93,7 @@
     "more_yes": "Ja, ein weiteres Gemälde",
     "more_no": "Nein, abschließen",
     "end_title": "Vielen Dank!",
-    "end_body": "Ihre Antworten wurden gespeichert. Bitte geben Sie das Tablet und die Kopfhörer der Person am Stand zurück."
+    "end_body": "Ihre Antworten wurden gespeichert. Sie können die Kopfhörer jetzt abnehmen."
   },
   "it": {
     "lang_name": "Italiano",
@@ -130,7 +130,7 @@
     "pause": "Pausa",
     "back10": "Indietro 10 s",
     "seek": "Posizione nella guida",
-    "player_error": "Questa audioguida non si può riprodurre. Chiedi alla persona allo stand.",
+    "player_error": "Questa audioguida non si può riprodurre. Avvisaci, per favore.",
     "q_choice": "Quale guida hai preferito?",
     "q_strength": "Quanto è forte la tua preferenza?",
     "strength_low": "Poco",
@@ -141,6 +141,6 @@
     "more_yes": "Sì, un altro dipinto",
     "more_no": "No, concludi",
     "end_title": "Grazie!",
-    "end_body": "Le tue risposte sono state salvate. Restituisci il tablet e le cuffie alla persona allo stand."
+    "end_body": "Le tue risposte sono state salvate. Ora puoi togliere le cuffie."
   }
 }

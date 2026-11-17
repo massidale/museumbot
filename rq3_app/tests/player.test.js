@@ -1,23 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mediaUrls, seekTarget, reached, endedCounts} from '../player.js';
+import {mediaUrls, heardStep, backTo} from '../player.js';
 
-test("seekTarget: indietro si', avanti oltre il punto raggiunto no", () => {
-  assert.equal(seekTarget(0, 40), null);           // ricomincia da capo
-  assert.equal(seekTarget(20, 40), null);          // torna indietro
-  assert.equal(seekTarget(40.4, 40), null);        // entro la tolleranza
-  assert.equal(seekTarget(85, 40), 40);            // salto avanti: si torna a 40
-  assert.equal(seekTarget(10, 0), 0);
+test('heardStep conta l\'ascolto continuo, non i salti', () => {
+  assert.equal(heardStep(10, 10.25, false), 0.25);
+  assert.equal(heardStep(10, 40, false), 0);        // salto avanti col cursore
+  assert.equal(heardStep(40, 30, false), 0);        // indietro di 10 s
+  assert.equal(heardStep(10, 10.25, true), 0);      // salto in corso
 });
-test('reached cresce con la riproduzione, non durante un salto', () => {
-  assert.equal(reached(10, 10.25, false), 10.25);
-  assert.equal(reached(10, 3, false), 10);         // riascolto: il massimo resta
-  assert.equal(reached(10, 80, true), 10);         // salto in corso
-});
-test('endedCounts: la fine vale solo se ci si e\' arrivati ascoltando', () => {
-  assert.equal(endedCounts(89.6, 90), true);
-  assert.equal(endedCounts(40, 90), false);
-  assert.equal(endedCounts(0, NaN), false);
+test('backTo: indietro di 10 s, non prima dell\'inizio', () => {
+  assert.equal(backTo(25), 15);
+  assert.equal(backTo(4), 0);
+  assert.equal(backTo(NaN), 0);
 });
 test('mediaUrls comprende le prove del volume', () => {
   const m = {sample: {en: {src: 'audio/en/sample.mp3'}, de: {src: 'audio/de/sample.mp3'}},

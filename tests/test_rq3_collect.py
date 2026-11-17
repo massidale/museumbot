@@ -9,7 +9,7 @@ def rec(sid, completed=False, answered=1, updated="2026-12-01T10:00"):
               for i in range(2)]
     return {"session_id": sid, "device": "ipad1", "app_version": "1", "manifest_version": "m1",
             "seed": 7, "lang": "en", "started_at": "2026-12-01T09:00", "updated_at": updated,
-            "completed": completed, "last_step": "trial", "consent": True, "trials": trials}
+            "completed": completed, "last_step": "trial", "trials": trials}
 
 
 def test_merge_tiene_il_record_piu_avanti():

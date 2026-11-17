@@ -2,34 +2,22 @@
 // L'audio si legge dalla Cache API come blob e si suona da un object URL:
 // Safari non serve le richieste a intervalli (Range) da una risposta intera in cache.
 
-const DEFAULT_LABELS = {play: 'Play', pause: 'Pause', restart: 'Restart', error: 'Error'};
-const SEEK_SLACK = 0.5;   // s: un salto avanti entro questa tolleranza e' ammesso
-const END_SLACK = 1;      // s: la fine conta se si e' ascoltato fino a qui dalla fine
+const DEFAULT_LABELS = {play: 'Play', pause: 'Pause', back10: '-10 s', seek: 'Position', error: 'Error'};
+const BACK = 10;      // s: il tasto indietro
+const MAX_STEP = 2;   // s: fra due timeupdate di un ascolto continuo passa meno di cosi'
 
 let playing = null;  // l'audio che sta suonando: ne suona uno alla volta
 
-// ---- niente salti avanti (decisioni pure, testate) ----
+// ---- decisioni pure, testate ----
 
-// Dove riportare un salto: null se e' lecito (indietro o entro SEEK_SLACK dal punto raggiunto).
-export const seekTarget = (t, maxReached, slack = SEEK_SLACK) => (t > maxReached + slack ? maxReached : null);
+// Secondi ascoltati fra due timeupdate: i salti (avanti o indietro) non contano.
+export const heardStep = (prev, t, seeking) => {
+  const d = t - prev;
+  return !seeking && d > 0 && d <= MAX_STEP ? d : 0;
+};
 
-// Punto piu' avanti raggiunto ascoltando: non cresce durante un salto.
-export const reached = (maxReached, t, seeking) => (seeking ? maxReached : Math.max(maxReached, t));
-
-// La fine vale come ascolto completo solo se ci si e' arrivati ascoltando.
-export const endedCounts = (maxReached, duration) =>
-  Number.isFinite(duration) && maxReached >= duration - END_SLACK;
-
-// Comandi di Centro di controllo, schermata di blocco e cuffie: avanti e traccia
-// successiva/precedente non fanno niente. Le azioni non supportate lanciano un errore.
-let sessionLocked = false;
-function lockMediaSession() {
-  if (sessionLocked || typeof navigator === 'undefined' || !navigator.mediaSession) return;
-  sessionLocked = true;
-  for (const a of ['seekto', 'seekforward', 'nexttrack', 'previoustrack']) {
-    try { navigator.mediaSession.setActionHandler(a, () => {}); } catch (e) { /* non supportata */ }
-  }
-}
+// Indietro di BACK secondi, non prima dell'inizio.
+export const backTo = t => Math.max(0, (Number.isFinite(t) ? t : 0) - BACK);
 
 // m:ss; '--:--' se la durata non e' ancora nota.
 export function fmtTime(sec) {
@@ -90,78 +78,81 @@ function el(tag, cls, text) {
   return e;
 }
 
-// state = {plays, ended}: plays conta gli avvii da capo, ended resta vero dopo la prima fine
-// raggiunta ascoltando (non saltando avanti).
+// state = {plays, ended, heard}: plays conta gli avvii riusciti, ended resta vero dopo la
+// prima volta che si arriva alla fine, heard sono i secondi ascoltati (senza i salti).
 // version: versione del manifesto, per leggere l'audio dalla sua cache.
+// onChange(state) a ogni avvio, pausa e fine; stats() da' lo stato in ogni momento.
 // onError({src, message}): file non caricato o non riproducibile; il visitatore vede solo
 // labels.error, mai il percorso (che contiene il nome della condizione).
 export function createPlayer(container, src, label, onChange = () => {}, labels = {}, version = null,
                              onError = () => {}) {
   const L = {...DEFAULT_LABELS, ...labels};
-  const state = {plays: 0, ended: false};
-  let enabled = true, ready = false, destroyed = false, fromStart = true, url = null;
-  let maxReached = 0, failed = false;
+  const state = {plays: 0, ended: false, heard: 0};
+  let ready = false, destroyed = false, url = null, failed = false;
+  let last = 0, dragging = false;
 
-  lockMediaSession();
   const audio = new Audio();
   audio.preload = 'auto';
 
   const root = el('div', 'player');
   const title = el('div', 'player-label', label);
   const btnPlay = el('button', 'player-play', L.play);
-  const btnRestart = el('button', 'player-restart', L.restart);
+  const btnBack = el('button', 'player-back secondary', L.back10);
   const time = el('div', 'player-time', `${fmtTime(0)} / --:--`);
-  btnPlay.type = btnRestart.type = 'button';
+  btnPlay.type = btnBack.type = 'button';
+  const seek = el('input', 'player-seek');
+  Object.assign(seek, {type: 'range', min: '0', max: '0', step: '0.1', value: '0'});
+  seek.setAttribute('aria-label', L.seek);
   const controls = el('div', 'player-controls');
-  controls.append(btnPlay, btnRestart, time);
-  root.append(title, controls);
+  controls.append(btnPlay, btnBack, time);
+  root.append(title, controls, seek);
   container.append(root);
 
-  const notify = () => onChange({...state});
+  const stats = () => ({...state, heard: Math.round(state.heard * 10) / 10});
+  const notify = () => { if (!destroyed) onChange(stats()); };  // non dopo destroy (pausa finale)
   const refresh = () => {
-    const can = ready && enabled && !destroyed && !failed;
-    btnPlay.disabled = btnRestart.disabled = !can;
+    const can = ready && !destroyed && !failed;
+    btnPlay.disabled = btnBack.disabled = seek.disabled = !can;
     btnPlay.textContent = audio.paused ? L.play : L.pause;
     root.classList.toggle('player-disabled', !can);
-    time.textContent = `${fmtTime(audio.currentTime)} / ${fmtTime(audio.duration)}`;
+    const dur = audio.duration;
+    if (Number.isFinite(dur)) seek.max = String(dur);
+    const t = dragging ? Number(seek.value) : audio.currentTime;
+    if (!dragging) seek.value = String(t);
+    time.textContent = `${fmtTime(t)} / ${fmtTime(dur)}`;
   };
 
   const start = () => {
-    if (!ready || !enabled || destroyed) return;
+    if (!ready || destroyed) return;
     if (playing && playing !== audio) playing.pause();
     // si conta solo un avvio riuscito
-    audio.play().then(() => {
-      if (fromStart) { state.plays++; fromStart = false; notify(); }
-    }).catch(e => console.warn('play non riuscito', e));
+    audio.play().then(() => { state.plays++; notify(); })
+      .catch(e => console.warn('play non riuscito', e));
   };
+  const jump = t => { audio.currentTime = t; last = t; refresh(); };
 
   btnPlay.addEventListener('click', () => (audio.paused ? start() : audio.pause()));
-  btnRestart.addEventListener('click', () => {
-    audio.pause();
-    audio.currentTime = 0;
-    fromStart = true;
-    start();
-  });
+  btnBack.addEventListener('click', () => jump(backTo(audio.currentTime)));
+  // Mentre si trascina si mostra solo il punto; si salta quando si lascia il cursore.
+  seek.addEventListener('input', () => { dragging = true; refresh(); });
+  seek.addEventListener('change', () => { dragging = false; jump(Number(seek.value)); });
 
-  audio.addEventListener('play', () => { playing = audio; refresh(); });
-  audio.addEventListener('pause', () => { if (playing === audio) playing = null; refresh(); });
+  audio.addEventListener('play', () => { playing = audio; last = audio.currentTime; refresh(); });
+  audio.addEventListener('pause', () => { if (playing === audio) playing = null; refresh(); notify(); });
   audio.addEventListener('timeupdate', () => {
-    maxReached = reached(maxReached, audio.currentTime, audio.seeking);
+    const t = audio.currentTime;
+    if (!audio.paused) state.heard += heardStep(last, t, audio.seeking);
+    last = t;
     refresh();
   });
-  // Un salto oltre il punto raggiunto (Centro di controllo, cuffie, ...) torna indietro.
-  audio.addEventListener('seeking', () => {
-    const back = seekTarget(audio.currentTime, maxReached);
-    if (back != null) audio.currentTime = back;
-  });
+  audio.addEventListener('seeked', () => { last = audio.currentTime; });
   audio.addEventListener('loadedmetadata', refresh);
   audio.addEventListener('durationchange', refresh);
   audio.addEventListener('ended', () => {
-    fromStart = true;
-    if (!state.ended && endedCounts(maxReached, audio.duration)) { state.ended = true; notify(); }
+    state.ended = true;
     refresh();
+    notify();
   });
-
   // Dettagli in console e all'app (che li registra); al visitatore un testo neutro.
   const fail = message => {
     if (destroyed || failed) return;
@@ -199,11 +190,6 @@ export function createPlayer(container, src, label, onChange = () => {}, labels 
       if (playing === audio) playing = null;
       root.remove();
     },
-    // Un player disattivato non si avvia; se stava suonando, si ferma.
-    setEnabled(on) {
-      enabled = Boolean(on);
-      if (!enabled) audio.pause();
-      refresh();
-    },
+    stats,
   };
 }

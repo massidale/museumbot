@@ -2,7 +2,7 @@
 // salvato in IndexedDB dopo ogni passo. Tutti i testi per il visitatore vengono da texts.json.
 import {
   LANGS, REASONS, validateManifest, planSession, newSession, buildTrial,
-  canPlay, canAnswer, answerComplete, answer, markStep, abortSession,
+  answerComplete, answer, markStep, abortSession,
 } from './logic.js';
 import {createPlayer, loadBlob} from './player.js';
 import {APP_VERSION} from './config.js';
@@ -154,7 +154,7 @@ function showLanguage() {
   };
   screen('',
     LANGS.map(l => h('p', {class: 'lead', lang: l}, texts[l].choose_language)),
-    h('div', {class: 'stack'},
+    h('div', {class: 'stack bottom'},
       LANGS.map(l => h('button', {type: 'button', class: 'big', lang: l, onclick: () => pick(l)}, texts[l].lang_name))));
 }
 
@@ -165,34 +165,16 @@ function showIntro() {
     h('h2', {}, T.intro_steps_title),
     h('ol', {class: 'steps'}, T.intro_steps.map(s => h('li', {}, s))),
     h('p', {class: 'note'}, T.intro_note),
-    h('div', {class: 'actions'}, h('button', {type: 'button', onclick: showConsent}, T.continue)));
+    h('div', {class: 'actions'}, h('button', {type: 'button', onclick: begin}, T.continue)));
 }
 
-// Al primo tocco si disattivano entrambi i pulsanti: una sola risposta.
-function showConsent() {
-  const yes = h('button', {type: 'button', class: 'big'}, T.consent_yes);
-  const no = h('button', {type: 'button', class: 'big secondary'}, T.consent_no);
-  const once = f => () => {
-    if (yes.disabled) return;
-    yes.disabled = no.disabled = true;
-    f();
-  };
-  yes.addEventListener('click', once(accept));
-  no.addEventListener('click', once(() => goodbye('no_consent_title', 'no_consent_body')));
-  screen('',
-    h('h1', {}, T.consent_title),
-    paras(T.consent_body),
-    h('div', {class: 'stack'}, yes, no));
-}
-
-// Il record nasce col consenso: senza consenso non si salva niente.
-function accept() {
+// Il record nasce quando il visitatore comincia (dopo l'introduzione).
+function begin() {
   S.record = {
     ...newSession({
       sessionId: S.sessionId, device: S.device, appVersion: APP_VERSION, manifestVersion: S.manifest.version,
       seed: S.seed, lang: S.lang, now: now(),
     }),
-    consent: true,
     description_order: [...S.plan.descriptionOrder],
   };
   save();
@@ -302,7 +284,7 @@ function showVolume() {
   screen('',
     h('h1', {}, T.volume_title),
     h('p', {class: 'lead'}, T.volume_body),
-    h('div', {class: 'stack'}, play, errBox, ok));
+    h('div', {class: 'stack bottom'}, play, errBox, ok));
   // dopo screen(), che chiude la schermata precedente
   cleanups.push(() => {
     closed = true;
@@ -344,33 +326,27 @@ function showTrial(i) {
   save();
 
   const ans = {position: null, strength: null, reasons: [], familiar: null};
-  const labels = {play: T.play, pause: T.pause, restart: T.restart, error: T.player_error};
+  const labels = {play: T.play, pause: T.pause, back10: T.back10, seek: T.seek, error: T.player_error};
   const guideLabel = n => fmt(T.guide_label, {n});
 
-  // Guide: la 2 si attiva quando la 1 e' arrivata alla fine.
+  // Guide: ascolto libero (avanti, indietro, cursore); si registra quanto si e' sentito.
   const guides = h('div', {class: 'guides'});
-  const lockNote = h('p', {class: 'note'}, T.guide2_locked);
   const players = [];
-  const onChange = pos => s => {
-    const plays = [...trial.plays], full = [...trial.listened_full];
-    plays[pos] = s.plays;
-    full[pos] = full[pos] || s.ended;
-    trial = {...trial, plays, listened_full: full};
-    putTrial(trial);
-    refresh();
+  const withStats = (t, pos, s) => {
+    const upd = (arr, v) => arr.map((x, k) => (k === pos ? v : x));
+    return {...t, plays: upd(t.plays, s.plays), reached_end: upd(t.reached_end, t.reached_end[pos] || s.ended),
+            heard_sec: upd(t.heard_sec, s.heard)};
   };
   [0, 1].forEach(pos => {
     const box = h('div', {class: 'guide'});
     guides.append(box);
-    players.push(createPlayer(box, trial.audio[pos], guideLabel(pos + 1), onChange(pos), labels,
+    players.push(createPlayer(box, trial.audio[pos], guideLabel(pos + 1),
+                              s => { trial = withStats(trial, pos, s); putTrial(trial); }, labels,
                               S.manifest.version, err => playerError(i, pos + 1, err)));
   });
-  guides.lastChild.append(lockNote);
 
-  // Domande, disattivate finche' non si sono ascoltate entrambe le guide.
   const why = h('textarea', {rows: '3'});
   const next = h('button', {type: 'button'}, T.next);
-  const listenNote = h('p', {class: 'note'}, T.listen_both);
   const reasonBoxes = REASONS.map(r => {
     const box = h('input', {type: 'checkbox', value: r});
     box.addEventListener('change', () => {
@@ -379,7 +355,7 @@ function showTrial(i) {
     });
     return box;
   });
-  const questions = h('fieldset', {class: 'questions'},
+  const questions = h('div', {class: 'questions'},
     choiceGroup(T.q_choice, [[1, guideLabel(1)], [2, guideLabel(2)]], v => { ans.position = v; refresh(); }),
     h('div', {class: 'question'},
       h('p', {class: 'q'}, T.q_strength),
@@ -389,21 +365,14 @@ function showTrial(i) {
       h('p', {class: 'q'}, T.q_reasons),
       h('div', {class: 'reasons'}, reasonBoxes.map(b => h('label', {class: 'reason'}, b, h('span', {}, T.reasons[b.value]))))),
     h('div', {class: 'question'}, h('label', {class: 'q'}, T.q_why_text, why)),
-    choiceGroup(T.q_familiar, [[true, T.yes], [false, T.no]], v => { ans.familiar = v; refresh(); }),
-    h('div', {class: 'actions'}, next));
+    choiceGroup(T.q_familiar, [[true, T.yes], [false, T.no]], v => { ans.familiar = v; refresh(); }));
 
-  const refresh = () => {
-    const two = canPlay(trial, 1);
-    if (players[1]) players[1].setEnabled(two);
-    lockNote.hidden = two;
-    const open = canAnswer(trial);
-    questions.disabled = !open;
-    listenNote.hidden = open;
-    next.disabled = !(open && answerComplete(ans));
-  };
+  const refresh = () => { next.disabled = !answerComplete(ans); };
 
   next.addEventListener('click', () => {
-    if (!canAnswer(trial) || !answerComplete(ans)) return;
+    if (!answerComplete(ans)) return;
+    // lo stato dei player in questo momento (un audio puo' stare ancora suonando)
+    players.forEach((p, pos) => { trial = withStats(trial, pos, p.stats()); });
     trial = answer(trial, {...ans, why: why.value.trim(), now: now()});
     putTrial(trial);
     if (i + 1 < S.total) showMore(i);
@@ -416,7 +385,8 @@ function showTrial(i) {
         h('p', {class: 'kicker'}, fmt(T.painting_of, {i: i + 1, n: S.total})),
         h('img', {src: art.image, alt: art.title[S.lang]}),
         h('figcaption', {}, h('h1', {}, art.title[S.lang]), h('p', {class: 'artist'}, art.artist))),
-      h('div', {class: 'panel'}, guides, listenNote, questions)));
+      h('div', {class: 'panel'}, guides, questions)),
+    h('div', {class: 'actions'}, next));
   cleanups.push(() => players.forEach(p => p.destroy()));  // dopo screen()
   refresh();
 }
@@ -424,7 +394,7 @@ function showTrial(i) {
 function showMore(i) {
   screen('',
     h('h1', {}, T.more_title),
-    h('div', {class: 'stack'},
+    h('div', {class: 'stack bottom'},
       h('button', {type: 'button', class: 'big', onclick: () => { step(`more_${i}`); showTrial(i + 1); }}, T.more_yes),
       h('button', {type: 'button', class: 'big secondary', onclick: () => { step(`more_${i}`); showFinal(); }}, T.more_no)));
 }

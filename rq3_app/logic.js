@@ -86,7 +86,7 @@ export function newSession({sessionId, device, appVersion, manifestVersion, seed
   return {
     session_id: sessionId, device, app_version: appVersion, manifest_version: manifestVersion,
     seed, lang, started_at: now, updated_at: now, finished_at: null,
-    last_step: 'consent', completed: false, consent: false,
+    last_step: 'start', completed: false,
     categories: null, trials: [], final: null,
   };
 }
@@ -98,14 +98,11 @@ export function buildTrial(index, artwork, lang, categories, first) {
                                      : [src(comparison), src(personal)];
   return {
     index, artwork_id: artwork.id, personal, comparison, first, audio,
-    plays: [0, 0], listened_full: [false, false],
+    plays: [0, 0], reached_end: [false, false], heard_sec: [0, 0],
     choice: null, choice_position: null, strength: null, reasons: [],
     familiar: null, why: '', shown_at: null, answered_at: null,
   };
 }
-
-export const canPlay = (trial, i) => i === 0 || trial.listened_full[0] === true;
-export const canAnswer = trial => trial.listened_full[0] === true && trial.listened_full[1] === true;
 
 export function answerComplete({position, strength, reasons, familiar}) {
   return (position === 1 || position === 2)

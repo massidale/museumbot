@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   CATEGORIES, mixKey, allConditions, pairFor, rng, shuffle, validateManifest,
-  planSession, newSession, buildTrial, canPlay, canAnswer, answerComplete,
+  planSession, newSession, buildTrial, answerComplete,
   answer, markStep, abortSession, toJsonl, deletableIds,
 } from '../logic.js';
 
@@ -68,16 +68,16 @@ test('buildTrial mette gli audio nell\'ordine di ascolto', () => {
   assert.deepEqual(t.audio, [M.artworks[0].audio.de.explorer.src,
                              M.artworks[0].audio.de['explorer+facilitator'].src]);
 });
-test('canAnswer solo dopo due ascolti completi', () => {
+test('buildTrial parte con contatori di ascolto a zero', () => {
   const t = buildTrial(0, M.artworks[0], 'en', ['recharger'], 'personal');
-  assert.equal(canAnswer(t), false);
-  assert.equal(canAnswer({...t, listened_full: [true, false]}), false);
-  assert.equal(canAnswer({...t, listened_full: [true, true]}), true);
+  assert.deepEqual(t.plays, [0, 0]); assert.deepEqual(t.reached_end, [false, false]);
+  assert.deepEqual(t.heard_sec, [0, 0]);
+  assert.equal('listened_full' in t, false);
 });
-test('canPlay: la Guida 2 dopo la fine della Guida 1', () => {
-  const t = buildTrial(0, M.artworks[0], 'en', ['recharger'], 'personal');
-  assert.equal(canPlay(t, 0), true); assert.equal(canPlay(t, 1), false);
-  assert.equal(canPlay({...t, listened_full: [true, false]}, 1), true);
+test('newSession: niente campo consent, primo passo start', () => {
+  const s = newSession({sessionId: 'x', device: 'ipad-1', appVersion: '0.1.0',
+    manifestVersion: 'v', seed: 1, lang: 'en', now: 'A'});
+  assert.equal('consent' in s, false); assert.equal(s.last_step, 'start');
 });
 test('answer traduce la posizione nella condizione', () => {
   const t = buildTrial(0, M.artworks[0], 'en', ['recharger'], 'comparison');
@@ -100,7 +100,7 @@ test('markStep aggiorna passo e ora', () => {
   const s = markStep(s0, 'classification', 'B');
   assert.equal(s.last_step, 'classification'); assert.equal(s.updated_at, 'B');
   assert.equal(s.completed, false);
-  assert.equal(s0.last_step, 'consent');
+  assert.equal(s0.last_step, 'start');
 });
 test('validateManifest segnala l\'audio mancante', () => {
   const bad = structuredClone(M); delete bad.artworks[2].audio.de['explorer+recharger'];

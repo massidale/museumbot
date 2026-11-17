@@ -6,7 +6,7 @@ from pathlib import Path
 from museumbot.common.config import ROOT
 
 REQUIRED = ("session_id", "device", "app_version", "manifest_version", "seed", "lang",
-            "started_at", "updated_at", "completed", "last_step", "consent", "trials")
+            "started_at", "updated_at", "completed", "last_step", "trials")
 CHOICES = ("personal", "comparison")
 REASONS = ("interesting", "suited", "clear", "information", "looking", "tone", "other")
 OUT = ROOT / "data" / "rq3" / "responses.jsonl"

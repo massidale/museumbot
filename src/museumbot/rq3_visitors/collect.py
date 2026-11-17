@@ -8,7 +8,6 @@ from museumbot.common.config import ROOT
 REQUIRED = ("session_id", "device", "app_version", "manifest_version", "seed", "lang",
             "started_at", "updated_at", "completed", "last_step", "trials")
 CHOICES = ("personal", "comparison")
-REASONS = ("interesting", "suited", "clear", "information", "looking", "tone", "other")
 OUT = ROOT / "data" / "rq3" / "responses.jsonl"
 
 
@@ -24,9 +23,8 @@ def validate(rec: dict) -> list[str]:
             continue
         if t.get("choice") not in (None, *CHOICES):
             errori.append(f"prova {i}: choice {t.get('choice')!r}")
-        reasons = t.get("reasons") or []
-        if not isinstance(reasons, list) or any(r not in REASONS for r in reasons):
-            errori.append(f"prova {i}: motivi {reasons!r}")
+        if not isinstance(t.get("why", ""), str):
+            errori.append(f"prova {i}: why {t.get('why')!r}")
     return errori
 
 

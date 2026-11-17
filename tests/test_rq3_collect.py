@@ -5,7 +5,7 @@ def rec(sid, completed=False, answered=1, updated="2026-12-01T10:00"):
     trials = [{"index": i, "artwork_id": f"a{i}", "personal": "explorer", "comparison": "flat",
                "first": "personal",
                "choice": "personal" if i < answered else None,
-               "reasons": ["interesting"] if i < answered else []}
+               "why": "piu' vivace" if i < answered else ""}
               for i in range(2)]
     return {"session_id": sid, "device": "ipad1", "app_version": "1", "manifest_version": "m1",
             "seed": 7, "lang": "en", "started_at": "2026-12-01T09:00", "updated_at": updated,
@@ -42,9 +42,9 @@ def test_validate_campi_facoltativi():
     assert validate(r) == [] and validate(rec("s2")) == []
 
 
-def test_validate_motivi_fuori_elenco():
+def test_validate_why_non_testo():
     bad = rec("s1")
-    bad["trials"][0]["reasons"] = ["boh"]
+    bad["trials"][0]["why"] = ["boh"]
     assert len(validate(bad)) == 1
 
 

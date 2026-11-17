@@ -3,7 +3,6 @@
 export const CATEGORIES = ['explorer', 'facilitator', 'experience_seeker',
                            'professional_hobbyist', 'recharger'];
 export const LANGS = ['en', 'de'];
-export const REASONS = ['interesting', 'suited', 'clear', 'information', 'looking', 'tone', 'other'];
 
 // Nome di un misto: le due categorie nell'ordine di Falk, unite da '+'.
 export function mixKey(a, b) {
@@ -99,24 +98,24 @@ export function buildTrial(index, artwork, lang, categories, first) {
   return {
     index, artwork_id: artwork.id, personal, comparison, first, audio,
     plays: [0, 0], reached_end: [false, false], heard_sec: [0, 0],
-    choice: null, choice_position: null, strength: null, reasons: [],
+    choice: null, choice_position: null, strength: null,
     familiar: null, why: '', shown_at: null, answered_at: null,
   };
 }
 
-export function answerComplete({position, strength, reasons, familiar}) {
+// Il perche' e' una domanda aperta facoltativa: non conta.
+export function answerComplete({position, strength, familiar}) {
   return (position === 1 || position === 2)
     && Number.isInteger(strength) && strength >= 1 && strength <= 7
-    && Array.isArray(reasons) && reasons.length > 0 && reasons.every(r => REASONS.includes(r))
     && typeof familiar === 'boolean';
 }
 
 // La posizione (1|2) diventa la condizione scelta, secondo l'ordine di ascolto.
-export function answer(trial, {position, strength, reasons, familiar, why, now}) {
+export function answer(trial, {position, strength, familiar, why, now}) {
   const second = trial.first === 'personal' ? 'comparison' : 'personal';
   const choice = position === 1 ? trial.first : second;
   return {
-    ...trial, choice, choice_position: position, strength, reasons: [...reasons],
+    ...trial, choice, choice_position: position, strength,
     familiar, why: why || '', answered_at: now,
   };
 }

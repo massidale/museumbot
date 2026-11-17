@@ -1,7 +1,7 @@
 // Percorso del visitatore: dalla lingua ai ringraziamenti, con il record della sessione
 // salvato in IndexedDB dopo ogni passo. Tutti i testi per il visitatore vengono da texts.json.
 import {
-  LANGS, REASONS, validateManifest, planSession, newSession, buildTrial,
+  LANGS, validateManifest, planSession, newSession, buildTrial,
   answerComplete, answer, markStep, abortSession,
 } from './logic.js';
 import {createPlayer, loadBlob} from './player.js';
@@ -325,7 +325,7 @@ function showTrial(i) {
   S.record = markStep({...S.record, trials: [...S.record.trials.slice(0, i), trial]}, `trial_${i}`, now());
   save();
 
-  const ans = {position: null, strength: null, reasons: [], familiar: null};
+  const ans = {position: null, strength: null, familiar: null};
   const labels = {play: T.play, pause: T.pause, back10: T.back10, seek: T.seek, error: T.player_error};
   const guideLabel = n => fmt(T.guide_label, {n});
 
@@ -347,23 +347,12 @@ function showTrial(i) {
 
   const why = h('textarea', {rows: '3'});
   const next = h('button', {type: 'button'}, T.next);
-  const reasonBoxes = REASONS.map(r => {
-    const box = h('input', {type: 'checkbox', value: r});
-    box.addEventListener('change', () => {
-      ans.reasons = REASONS.filter(id => reasonBoxes.some(b => b.value === id && b.checked));
-      refresh();
-    });
-    return box;
-  });
   const questions = h('div', {class: 'questions'},
     choiceGroup(T.q_choice, [[1, guideLabel(1)], [2, guideLabel(2)]], v => { ans.position = v; refresh(); }),
     h('div', {class: 'question'},
       h('p', {class: 'q'}, T.q_strength),
       choiceButtons([1, 2, 3, 4, 5, 6, 7].map(n => [n, String(n)]), v => { ans.strength = v; refresh(); }, 'scale'),
       h('div', {class: 'scale-ends'}, h('span', {}, T.strength_low), h('span', {}, T.strength_high))),
-    h('div', {class: 'question'},
-      h('p', {class: 'q'}, T.q_reasons),
-      h('div', {class: 'reasons'}, reasonBoxes.map(b => h('label', {class: 'reason'}, b, h('span', {}, T.reasons[b.value]))))),
     h('div', {class: 'question'}, h('label', {class: 'q'}, T.q_why_text, why)),
     choiceGroup(T.q_familiar, [[true, T.yes], [false, T.no]], v => { ans.familiar = v; refresh(); }));
 

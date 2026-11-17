@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {CATEGORIES, REASONS} from '../logic.js';
+import {CATEGORIES} from '../logic.js';
 
 const texts = JSON.parse(readFileSync(new URL('../texts.json', import.meta.url), 'utf8'));
 const LANGS = ['en', 'de', 'it'];
@@ -28,10 +28,9 @@ test('en, de, it hanno le stesse chiavi e liste della stessa lunghezza', () => {
   for (const l of ['de', 'it']) assert.deepEqual(shape(texts[l]), ref, `lingua ${l}`);
 });
 
-test('falk ha le 5 categorie e reasons i 7 motivi', () => {
+test('falk ha le 5 categorie', () => {
   for (const l of LANGS) {
     assert.deepEqual(Object.keys(texts[l].falk).sort(), [...CATEGORIES].sort(), `falk ${l}`);
-    assert.deepEqual(Object.keys(texts[l].reasons).sort(), [...REASONS].sort(), `reasons ${l}`);
   }
 });
 

@@ -81,16 +81,16 @@ test('newSession: niente campo consent, primo passo start', () => {
 });
 test('answer traduce la posizione nella condizione', () => {
   const t = buildTrial(0, M.artworks[0], 'en', ['recharger'], 'comparison');
-  const r = answer(t, {position: 2, strength: 5, reasons: ['suited'], familiar: false, why: '', now: 'T'});
+  const r = answer(t, {position: 2, strength: 5, familiar: false, why: 'piu\' vivace', now: 'T'});
   assert.equal(r.choice, 'personal'); assert.equal(r.choice_position, 2);
-  assert.deepEqual(r.reasons, ['suited']); assert.equal(r.answered_at, 'T');
+  assert.equal(r.why, 'piu\' vivace'); assert.equal(r.answered_at, 'T');
+  assert.equal('reasons' in r, false);
   assert.equal(t.choice, null);
 });
-test('answerComplete chiede posizione, forza, almeno un motivo e familiarita\'', () => {
-  const ok = {position: 1, strength: 7, reasons: ['tone'], familiar: true};
+test('answerComplete chiede posizione, forza e familiarita\'; il perche\' e\' facoltativo', () => {
+  const ok = {position: 1, strength: 7, familiar: true};
   assert.equal(answerComplete(ok), true);
-  assert.equal(answerComplete({...ok, reasons: []}), false);
-  assert.equal(answerComplete({...ok, reasons: ['boh']}), false);
+  assert.equal(answerComplete({...ok, position: null}), false);
   assert.equal(answerComplete({...ok, strength: 0}), false);
   assert.equal(answerComplete({...ok, familiar: null}), false);
 });

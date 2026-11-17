@@ -119,13 +119,6 @@ button.opt[aria-pressed="true"], button.card[aria-pressed="true"] {
 .question { margin: 0 0 24px; }
 .q { font-weight: 600; margin: 0 0 10px; display: block; }
 .questions { margin: 20px 0 0; }
-.reasons { display: flex; flex-direction: column; gap: 6px; }
-.reason {
-  display: flex; align-items: center; gap: 14px;
-  min-height: 52px; padding: 6px 14px;
-  background: #fff; border: 1px solid var(--line); border-radius: 10px;
-}
-.reason input { width: 28px; height: 28px; flex: none; margin: 0; accent-color: var(--accent); }
 textarea {
   display: block; width: 100%; margin-top: 10px;
   font: inherit; font-weight: normal; padding: 10px 12px;

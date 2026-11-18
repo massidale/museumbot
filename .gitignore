@@ -18,3 +18,5 @@ rq3_app/audio/
 rq3_app/img/demo_*
 rq3_app/manifest.json
 data/rq3/
+.wrangler/
+rq3_pages/.dev.vars

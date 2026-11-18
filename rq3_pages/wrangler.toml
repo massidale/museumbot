@@ -1,0 +1,8 @@
+name = "museumbot"
+pages_build_output_dir = "../rq3_app"
+compatibility_date = "2026-11-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "rq3"
+database_id = "d7c9e278-68f1-491f-a261-53ed5818fe0e"

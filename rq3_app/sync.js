@@ -33,22 +33,32 @@ async function mark(name, id, at) {
   await setSetting(name, m);
 }
 
-// Un record: 'ok', 'rejected' (400/403, non si riprova) o 'stop' (rete assente, 429, altro).
-async function sendOne(rec) {
-  const key = await keyFor(rec.session_id);
-  let res;
-  try {
-    res = await fetch(endpoint, {method: 'POST', body: JSON.stringify(rec),
-      headers: {'Content-Type': 'application/json', 'X-Write-Key': key}});
-  } catch (e) { return 'stop'; }
-  if (res.status === 200) return 'ok';
+// Opzioni dell'invio: keepalive (parte anche a pagina chiusa), niente redirect (portali), timeout.
+export const fetchInit = (rec, key) => ({method: 'POST', body: JSON.stringify(rec),
+  headers: {'Content-Type': 'application/json', 'X-Write-Key': key},
+  keepalive: true, redirect: 'error', signal: AbortSignal.timeout(15000)});
+
+// Esito di una risposta: 'ok' (200 con {ok:true}), 'rejected' (400/403, non si riprova),
+// 'skip' (429: questo record per ora, si va avanti) o 'stop' (rete, portale, altro).
+export async function classify(res) {
+  if (res.status === 200) {
+    try { return (await res.json()).ok === true ? 'ok' : 'stop'; } catch (e) { return 'stop'; }
+  }
+  if (res.status === 429) return 'skip';
   if (res.status === 400 || res.status === 403) {
     let err = '';
     try { err = (await res.json()).error || ''; } catch (e) { /* corpo non JSON */ }
-    console.warn(`invio respinto (${res.status}) per ${rec.session_id}: ${err}`);
+    console.warn(`invio respinto (${res.status}): ${err}`);
     return 'rejected';
   }
   return 'stop';
+}
+
+async function sendOne(rec) {
+  const key = await keyFor(rec.session_id);
+  let res;
+  try { res = await fetch(endpoint, fetchInit(rec, key)); } catch (e) { return 'stop'; }
+  return classify(res);
 }
 
 async function round() {
@@ -57,6 +67,7 @@ async function round() {
   for (const rec of pending(all, {...(sent || {}), ...(rejected || {})})) {
     const out = await sendOne(rec);
     if (out === 'stop') return;
+    if (out === 'skip') continue;
     await mark(out === 'ok' ? 'sent' : 'rejected', rec.session_id, rec.updated_at);
   }
 }
@@ -77,6 +88,10 @@ export function startSync(opts = {}) {
   endpoint = opts.endpoint || 'api/session';
   setInterval(syncSoon, opts.every || 30000);
   window.addEventListener('online', syncSoon);
+  window.addEventListener('pagehide', syncSoon);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') syncSoon();
+  });
   syncSoon();
 }
 

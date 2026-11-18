@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {LIMITS, KEY_RE, decideWrite, authorized} from '../lib/server.js';
+import {LIMITS, KEY_RE, decideWrite, authorized, precheck} from '../lib/server.js';
 import {MAX_BYTES} from '../../rq3_app/validate.js';
 import {newSession, buildTrial, answer, allConditions, CATEGORIES} from '../../rq3_app/logic.js';
 
@@ -117,4 +117,16 @@ test('authorized: solo con token impostato e intestazione identica', () => {
   assert.equal(authorized(null, 't0k'), false);
   assert.equal(authorized('Bearer undefined', undefined), false);
   assert.equal(authorized('Bearer ', ''), false);
+});
+
+test('precheck: record e chiave buoni', () => {
+  const out = precheck(JSON.stringify(rec()), KEY);
+  assert.equal(out.rec.session_id, rec().session_id);
+});
+test('precheck: stessi errori 400 di decideWrite', () => {
+  assert.equal(precheck('x'.repeat(MAX_BYTES + 1), KEY).error, 'corpo troppo lungo');
+  assert.equal(precheck('{non json', KEY).error, 'JSON non valido');
+  assert.equal(precheck('{}', KEY).status, 400);
+  assert.equal(precheck(JSON.stringify(rec()), 'zz').error, 'chiave non valida');
+  assert.equal(precheck(JSON.stringify(rec()), null).status, 400);
 });

@@ -35,3 +35,32 @@ test('newKey: 32 caratteri esadecimali minuscoli', () => {
   assert.equal(newKey(new Uint8Array(16)), '0'.repeat(32));
   assert.equal(newKey(new Uint8Array(16).fill(255)), 'f'.repeat(32));
 });
+
+import {fetchInit, classify} from '../sync.js';
+
+test('fetchInit: keepalive, nessun redirect, timeout', () => {
+  const i = fetchInit({a: 1}, 'k'.repeat(32));
+  assert.equal(i.method, 'POST');
+  assert.equal(i.keepalive, true);
+  assert.equal(i.redirect, 'error');
+  assert.ok(i.signal instanceof AbortSignal);
+  assert.equal(i.headers['X-Write-Key'], 'k'.repeat(32));
+  assert.equal(i.body, '{"a":1}');
+});
+
+const resp = (body, status) => new Response(body, {status});
+
+test('classify: 200 con ok true e\' inviato', async () => {
+  assert.equal(await classify(resp('{"ok":true}', 200)), 'ok');
+});
+test('classify: 200 HTML (portale) o senza ok e\' rete assente', async () => {
+  assert.equal(await classify(resp('<html></html>', 200)), 'stop');
+  assert.equal(await classify(resp('{"ok":false}', 200)), 'stop');
+  assert.equal(await classify(resp('null', 200)), 'stop');
+});
+test('classify: 400 e 403 respinti, 429 saltato, altro stop', async () => {
+  assert.equal(await classify(resp('{"error":"x"}', 400)), 'rejected');
+  assert.equal(await classify(resp('{}', 403)), 'rejected');
+  assert.equal(await classify(resp('{}', 429)), 'skip');
+  assert.equal(await classify(resp('', 500)), 'stop');
+});

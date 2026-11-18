@@ -7,14 +7,22 @@ export const KEY_RE = /^[0-9a-f]{32}$/;
 const no = (status, error) => ({status, write: null, error});
 const byteLength = s => new TextEncoder().encode(s).length;
 
+// Controlli sul solo corpo e sulla chiave: {status: 400, error} oppure {rec}.
+export function precheck(body, key) {
+  if (byteLength(body) > MAX_BYTES) return {status: 400, error: 'corpo troppo lungo'};
+  let rec;
+  try { rec = JSON.parse(body); } catch { return {status: 400, error: 'JSON non valido'}; }
+  const problems = validateRecord(rec);
+  if (problems.length) return {status: 400, error: problems.join('; ')};
+  if (typeof key !== 'string' || !KEY_RE.test(key)) return {status: 400, error: 'chiave non valida'};
+  return {rec};
+}
+
 // Esito dell'invio: scrittura (riga da salvare) o niente da scrivere.
 export function decideWrite({body, key, existing, newLastHour, now}) {
-  if (byteLength(body) > MAX_BYTES) return no(400, 'corpo troppo lungo');
-  let rec;
-  try { rec = JSON.parse(body); } catch { return no(400, 'JSON non valido'); }
-  const problems = validateRecord(rec);
-  if (problems.length) return no(400, problems.join('; '));
-  if (typeof key !== 'string' || !KEY_RE.test(key)) return no(400, 'chiave non valida');
+  const pre = precheck(body, key);
+  if (!pre.rec) return no(pre.status, pre.error);
+  const rec = pre.rec;
   if (existing && existing.write_key !== key) return no(403, 'chiave diversa');
   if (!existing && newLastHour >= LIMITS.newPerHour) return no(429, 'troppe sessioni nuove');
   if (existing && existing.writes >= LIMITS.writesPerSession) return no(429, 'troppi invii');

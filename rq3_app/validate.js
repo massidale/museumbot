@@ -8,6 +8,7 @@ export const MAX_WHY = 2000;
 export const SESSION_ID_RE = /^[0-9a-z]{6}$/;
 const LANGS = ['en', 'de'];
 const CHOICES = ['personal', 'comparison'];
+const DEVICE_RE = /^[A-Za-z0-9_-]{1,40}$/;   // come validDevice di operator.js
 
 function checkTrial(t, i) {
   if (t === null || typeof t !== 'object' || Array.isArray(t)) return [`prova ${i}: non e' un oggetto`];
@@ -26,6 +27,11 @@ export function validateRecord(rec) {
   const out = REQUIRED.filter(k => !(k in rec)).map(k => `manca ${k}`);
   if ('session_id' in rec && !(typeof rec.session_id === 'string' && SESSION_ID_RE.test(rec.session_id)))
     out.push('session_id non ammesso');
+  if ('completed' in rec && typeof rec.completed !== 'boolean') out.push('completed non ammesso');
+  for (const k of ['started_at', 'updated_at'])
+    if (k in rec && typeof rec[k] !== 'string') out.push(`${k} non ammesso`);
+  if ('device' in rec && !(typeof rec.device === 'string' && DEVICE_RE.test(rec.device)))
+    out.push('device non ammesso');
   if ('lang' in rec && !LANGS.includes(rec.lang)) out.push('lang non ammessa');
   if ('trials' in rec) {
     if (!Array.isArray(rec.trials)) out.push('trials non e\' una lista');

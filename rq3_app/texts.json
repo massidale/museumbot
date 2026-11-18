@@ -5,7 +5,7 @@
     "continue": "Continue",
     "info_title": "Before we start",
     "info_body": [
-      "We save your answers and how long you listened to each guide. We do not save your name, your IP address or anything else that identifies you.",
+      "We save your answers and how long you listened to each guide. We do not save your name, your IP address or anything else that identifies you. Cloudflare, which hosts this site, records IP addresses in its own technical logs; we do not store or use them.",
       "The answers are stored on Cloudflare servers in the European Union and are used only for this thesis.",
       "Taking part is voluntary. You can stop at any time; the answers you gave until then are kept.",
       "If you have questions, please ask the researcher at the stand."
@@ -61,7 +61,7 @@
     "continue": "Weiter",
     "info_title": "Bevor wir beginnen",
     "info_body": [
-      "Wir speichern Ihre Antworten und wie lange Sie jeden Audioguide gehört haben. Wir speichern weder Ihren Namen noch Ihre IP-Adresse noch sonst etwas, das Sie identifiziert.",
+      "Wir speichern Ihre Antworten und wie lange Sie jeden Audioguide gehört haben. Wir speichern weder Ihren Namen noch Ihre IP-Adresse noch sonst etwas, das Sie identifiziert. Cloudflare, das diese Website hostet, erfasst IP-Adressen in eigenen technischen Protokollen; wir speichern oder verwenden sie nicht.",
       "Die Antworten werden auf Cloudflare-Servern in der Europäischen Union gespeichert und nur für diese Masterarbeit verwendet.",
       "Die Teilnahme ist freiwillig. Sie können jederzeit aufhören; die bis dahin gegebenen Antworten bleiben erhalten.",
       "Bei Fragen wenden Sie sich bitte an die Forscherin oder den Forscher am Stand."
@@ -117,7 +117,7 @@
     "continue": "Continua",
     "info_title": "Prima di cominciare",
     "info_body": [
-      "Salviamo le tue risposte e per quanto tempo hai ascoltato ogni audioguida. Non salviamo il tuo nome, il tuo indirizzo IP né altro che ti identifichi.",
+      "Salviamo le tue risposte e per quanto tempo hai ascoltato ogni audioguida. Non salviamo il tuo nome, il tuo indirizzo IP né altro che ti identifichi. Cloudflare, che ospita questo sito, registra gli indirizzi IP nei propri log tecnici; noi non li conserviamo né li usiamo.",
       "Le risposte sono conservate su server Cloudflare nell'Unione Europea e sono usate solo per questa tesi.",
       "La partecipazione è volontaria. Puoi fermarti in qualsiasi momento; le risposte date fino a quel punto vengono conservate.",
       "Se hai domande, chiedi al ricercatore allo stand."

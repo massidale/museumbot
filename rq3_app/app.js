@@ -10,6 +10,7 @@ import {APP_VERSION} from './config.js';
 import {putSession, getSetting} from './store.js';
 import {registerServiceWorker} from './swclient.js';
 import {startSync, syncSoon} from './sync.js';
+import {MAX_WHY} from './validate.js';
 import {showOperator as operatorScreen, onSwStatus, mountAbortGate, DEFAULT_DEVICE} from './operator.js';
 
 const MAX_ARTWORKS = 4;
@@ -87,7 +88,7 @@ function press(buttons, active) {
 let saving = Promise.resolve();
 function save() {
   const copy = structuredClone(S.record);
-  saving = saving.then(() => putSession(copy)).then(() => syncSoon()).catch(e => console.error('salvataggio non riuscito', e));
+  saving = saving.then(() => putSession(copy)).then(() => { syncSoon(); }).catch(e => console.error('salvataggio non riuscito', e));
   return saving;
 }
 
@@ -339,7 +340,7 @@ function showTrial(i) {
     prefetch(buildTrial(i + 1, artwork(i + 1), S.lang, S.categories, S.plan.firsts[i + 1]).audio, S.manifest.version);
   }
 
-  const why = h('textarea', {rows: '3'});
+  const why = h('textarea', {rows: '3', maxlength: String(MAX_WHY)});
   const next = h('button', {type: 'button'}, T.next);
   const questions = h('div', {class: 'questions'},
     choiceGroup(T.q_choice, [[1, guideLabel(1)], [2, guideLabel(2)]], v => { ans.position = v; refresh(); }),

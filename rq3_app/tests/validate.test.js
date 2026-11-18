@@ -71,3 +71,18 @@ test('notBehind: completo, poi risposte, poi updated_at', () => {
   assert.equal(notBehind(base, later), false);
   assert.equal(notBehind(base, {...base}), true);
 });
+
+test('completed deve essere booleano', () => {
+  assert.deepEqual(validateRecord({...valid(), completed: 'si'}), ['completed non ammesso']);
+});
+test('started_at e updated_at devono essere stringhe', () => {
+  assert.deepEqual(validateRecord({...valid(), started_at: 5}), ['started_at non ammesso']);
+  assert.deepEqual(validateRecord({...valid(), updated_at: null}), ['updated_at non ammesso']);
+});
+test('device: stringa con il formato dell\'operatore', () => {
+  assert.deepEqual(validateRecord({...valid(), device: 'qr'}), []);
+  assert.deepEqual(validateRecord({...valid(), device: 'ipad-1_A'}), []);
+  assert.deepEqual(validateRecord({...valid(), device: 7}), ['device non ammesso']);
+  assert.deepEqual(validateRecord({...valid(), device: 'a b'}), ['device non ammesso']);
+  assert.deepEqual(validateRecord({...valid(), device: 'x'.repeat(41)}), ['device non ammesso']);
+});

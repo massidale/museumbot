@@ -11,6 +11,8 @@ const SHELL_FILES = [
   'player.js',
   'config.js',
   'store.js',
+  'sync.js',
+  'validate.js',
   'swclient.js',
   'operator.js',
   'texts.json',
@@ -145,6 +147,7 @@ self.addEventListener('fetch', event => {
   if (url.origin !== self.location.origin) return;
   const scope = new URL(self.registration.scope);
   const rel = url.pathname.slice(scope.pathname.length);
+  if (rel.startsWith('api/')) return;  // l'invio delle sessioni va sempre in rete
   if (rel.startsWith('audio/') || rel.startsWith('img/')) event.respondWith(mediaFirst(req));
   else event.respondWith(networkFirst(event));
 });

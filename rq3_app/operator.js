@@ -5,6 +5,7 @@ import {toJson, deletableIds, validateManifest} from './logic.js';
 import {getAllSessions, deleteSessions, getSetting, setSetting, getSaveFailures} from './store.js';
 import {checkCache, mediaUrls} from './player.js';
 import {fillMissing} from './swclient.js';
+import {syncSoon, syncState} from './sync.js';
 import {APP_VERSION, PIN} from './config.js';
 
 export const DEFAULT_DEVICE = 'non-impostato';
@@ -177,12 +178,19 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
 
   // -- sessioni, export, cancellazione --
   const counts = h('p', {id: 'op-counts'}, 'Lettura delle sessioni...');
+  const online = h('p', {class: 'muted', id: 'op-online'});
+  const syncBtn = h('button', {type: 'button', class: 'secondary', id: 'op-sync'}, 'Invia ora');
   const exportBtn = h('button', {type: 'button', id: 'op-export'}, 'Scarica');
   const shareBtn = h('button', {type: 'button', class: 'secondary', id: 'op-share'}, 'Condividi');
   const deleteBtn = h('button', {type: 'button', class: 'secondary', id: 'op-delete'}, 'Cancella le sessioni esportate');
   const exportMsg = h('p', {class: 'muted', id: 'op-export-msg'});
   const linkBox = h('div', {id: 'op-download'});
   const deleteMsg = h('p', {class: 'muted', id: 'op-delete-msg'});
+  syncBtn.addEventListener('click', async () => {
+    syncBtn.disabled = true;
+    try { await syncSoon(); } finally { syncBtn.disabled = false; }
+    await refresh();
+  });
   exportBtn.addEventListener('click', doDownload);
   shareBtn.addEventListener('click', doShare);
   deleteBtn.addEventListener('click', doDelete);
@@ -209,6 +217,8 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
     devForm, devMsg,
     h('h2', {}, 'Sessioni'),
     counts,
+    online,
+    h('div', {class: 'op-row'}, syncBtn),
     h('div', {class: 'op-row'}, exportBtn, shareBtn, deleteBtn),
     exportMsg, linkBox, deleteMsg,
     h('p', {class: 'note'}, 'Cancellare solo dopo aver controllato che il file sia arrivato sul Mac.'),
@@ -255,6 +265,9 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
       counts.textContent = `${all.length} sessioni nel dispositivo: ${complete} complete, `
         + `${all.length - complete} interrotte. Gia' esportate (ultimo export): ${inExport}.`;
       exportBtn.disabled = shareBtn.disabled = all.length === 0;
+      const st = await syncState();
+      if (closed) return;
+      online.textContent = `Online: ${st.sent} di ${st.total} sessioni inviate`;
     } catch (e) {
       console.error(e);
       if (closed) return;

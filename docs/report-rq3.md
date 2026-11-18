@@ -344,7 +344,8 @@ item (κ di Cohen) e tassi di vittoria per categoria, umani contro LLM.
 10. Raccolta, `analyze.py`, gemello LLM.
 
 **In corso: telefoni dei visitatori e risposte online.** Design in
-`docs/plans/2026-11-18-rq3-qr-online-design.md`, da approvare; niente ancora nel codice. Allo
+`docs/plans/2026-11-18-rq3-qr-online-design.md` (approvato), piano in
+`docs/plans/2026-11-18-rq3-qr-online.md` (9 task, da eseguire); niente ancora nel codice. Allo
 stand, oltre all'iPad, partecipano il telefono di Massimo (con le sue cuffie) e i telefoni dei
 visitatori che hanno cuffie, da un QR code (`?m=qr`, solo con Massimo presente). Tutte le
 sessioni vanno anche in un database D1 su Cloudflare (Pages Functions), che sostituisce

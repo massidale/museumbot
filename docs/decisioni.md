@@ -770,7 +770,8 @@ centesimo diversi (`style_only` 0.964 → 0.960, `no_style` 0.853 → 0.854, `na
 cuffie) e i telefoni dei visitatori che hanno cuffie, da un QR code. Il QR si usa solo con
 Massimo presente, non attaccato ai quadri. Le sessioni di tutti i dispositivi vanno anche in
 un database online (Cloudflare D1); l'informativa torna come schermata dell'app.
-Design in `docs/plans/2026-11-18-rq3-qr-online-design.md`, da approvare e implementare.
+Design in `docs/plans/2026-11-18-rq3-qr-online-design.md` (approvato), piano in
+`docs/plans/2026-11-18-rq3-qr-online.md`; da implementare.
 **Motivo.** Scelta di Massimo: con un solo iPad le sessioni al giorno sono poche. Senza
 qualcuno allo stand, quasi nessuno ascolterebbe due guide sullo stesso quadro. Dal telefono
 di un visitatore non si può fare l'export a mano.

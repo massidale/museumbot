@@ -129,3 +129,6 @@ export function deletableIds(records, exportedIds) {
   const present = new Set(records.map(r => r.session_id));
   return exportedIds.filter(id => present.has(id));
 }
+
+// Orologio strettamente crescente: ogni salvataggio ha un updated_at diverso.
+export const nextTime = (lastMs, nowMs) => Math.max(nowMs, lastMs + 1);

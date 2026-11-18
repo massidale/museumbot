@@ -2,7 +2,7 @@
 // salvato in IndexedDB dopo ogni passo. Tutti i testi per il visitatore vengono da texts.json.
 import {
   LANGS, validateManifest, planSession, newSession, buildTrial,
-  answerComplete, answer, markStep, abortSession,
+  answerComplete, answer, markStep, abortSession, nextTime,
 } from './logic.js';
 import {createPlayer, prefetch} from './player.js';
 import {isQrMode, nextCount} from './qr.js';
@@ -22,7 +22,8 @@ let S = null;          // sessione in corso: manifest, plan, record, ...
 let cleanups = [];     // da chiamare quando si cambia schermata
 let unmountGate = null;  // angolo dell'operatore sulle schermate del visitatore
 
-const now = () => new Date().toISOString();
+let lastMs = 0;
+const now = () => { lastMs = nextTime(lastMs, Date.now()); return new Date(lastMs).toISOString(); };
 
 // Modo QR (telefono del visitatore): si attiva con ?m=qr e resta per la scheda.
 const QR_SESSIONS_KEY = 'rq3_qr_sessions';

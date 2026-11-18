@@ -133,3 +133,14 @@ test('toJson: lista JSON rientrata che si rilegge uguale', () => {
   assert.deepEqual(JSON.parse(text), recs);
   assert.ok(text.startsWith('[\n  {') && text.endsWith(']\n'));
 });
+
+test('nextTime: orologio strettamente crescente', async () => {
+  const {nextTime} = await import('../logic.js');
+  assert.equal(nextTime(0, 1000), 1000);
+  assert.equal(nextTime(1000, 1000), 1001);
+  assert.equal(nextTime(1005, 1000), 1006);
+  let t = 0;
+  const seen = [];
+  for (let k = 0; k < 5; k++) { t = nextTime(t, 1000); seen.push(t); }
+  assert.deepEqual(seen, [1000, 1001, 1002, 1003, 1004]);
+});

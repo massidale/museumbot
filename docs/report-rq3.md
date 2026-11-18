@@ -343,15 +343,22 @@ item (κ di Cohen) e tassi di vittoria per categoria, umani contro LLM.
 9. Soglie delle esclusioni (§8) fissate e scritte prima della raccolta.
 10. Raccolta, `analyze.py`, gemello LLM.
 
-Proposte non implementate: un tasto dell'operatore che segna l'ultima risposta come errore
-(nel record, senza chiudere la sessione); una copia delle sessioni su Cloudflare (R2 o D1)
-quando c'è rete, in aggiunta a IndexedDB, come backup fuori dall'iPad.
+**In corso: telefoni dei visitatori e risposte online.** Design in
+`docs/plans/2026-11-18-rq3-qr-online-design.md`, da approvare; niente ancora nel codice. Allo
+stand, oltre all'iPad, partecipano il telefono di Massimo (con le sue cuffie) e i telefoni dei
+visitatori che hanno cuffie, da un QR code (`?m=qr`, solo con Massimo presente). Tutte le
+sessioni vanno anche in un database D1 su Cloudflare (Pages Functions), che sostituisce
+l'export a mano per i telefoni dei visitatori; nel record `device: qr`, `consent_at`
+(informativa, che torna su tutti i dispositivi) e `earlier_sessions`.
+
+Proposta non implementata: un tasto dell'operatore che segna l'ultima risposta come errore
+(nel record, senza chiudere la sessione).
 
 ## 10. File e comandi
 
 | cosa | dove |
 |---|---|
-| disegno e piano dell'app | `docs/plans/2026-11-16-rq3-app-ipad-design.md`, `docs/plans/2026-11-16-rq3-app-ipad.md` |
+| disegno e piano dell'app | `docs/plans/2026-11-16-rq3-app-ipad-design.md`, `docs/plans/2026-11-16-rq3-app-ipad.md`; telefoni e risposte online: `docs/plans/2026-11-18-rq3-qr-online-design.md` |
 | testi dell'app (en, de, it) | `docs/plans/2026-11-16-rq3-testi-app.json` → `rq3_app/texts.json` |
 | opere | `data/rq3/artworks_haum.json`; indagine Wikidata in `data/rq3/haum_wikidata.json` |
 | fonti | `data/wiki/haum_pages_de.jsonl` (tedesco), `data/wiki/haum_pages.jsonl` (traduzione inglese); `docs/analisi/haum-fonti.md` |

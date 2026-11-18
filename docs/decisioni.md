@@ -763,3 +763,16 @@ rapporti con il tetto invariati al centesimo salvo Explorer 0.82 → 0.81 (Qwen3
 0.70 → 0.71 (BGE-M3). Ablazione, con il nuovo riferimento: coseni con il full di qualche
 centesimo diversi (`style_only` 0.964 → 0.960, `no_style` 0.853 → 0.854, `name_only` 0.702 →
 0.708, `need_only` 0.701 → 0.692 con Qwen3); conclusioni invariate.
+
+## 2026-11-18 — RQ3: anche i telefoni, con risposte online
+
+**Decisione.** Allo stand, oltre all'iPad, partecipano il telefono di Massimo (con le sue
+cuffie) e i telefoni dei visitatori che hanno cuffie, da un QR code. Il QR si usa solo con
+Massimo presente, non attaccato ai quadri. Le sessioni di tutti i dispositivi vanno anche in
+un database online (Cloudflare D1); l'informativa torna come schermata dell'app.
+Design in `docs/plans/2026-11-18-rq3-qr-online-design.md`, da approvare e implementare.
+**Motivo.** Scelta di Massimo: con un solo iPad le sessioni al giorno sono poche. Senza
+qualcuno allo stand, quasi nessuno ascolterebbe due guide sullo stesso quadro. Dal telefono
+di un visitatore non si può fare l'export a mano.
+**Effetto.** Nessun dato ancora raccolto. Il campione mescola chi usa l'iPad e chi usa il
+proprio telefono: `device` lo distingue nell'analisi.

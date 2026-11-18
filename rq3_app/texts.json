@@ -3,6 +3,14 @@
     "lang_name": "English",
     "choose_language": "Please choose your language",
     "continue": "Continue",
+    "info_title": "Before we start",
+    "info_body": [
+      "We save your answers and how long you listened to each guide. We do not save your name, your IP address or anything else that identifies you.",
+      "The answers are stored on Cloudflare servers in the European Union and are used only for this thesis.",
+      "Taking part is voluntary. You can stop at any time; the answers you gave until then are kept.",
+      "If you have questions, please ask the researcher at the stand."
+    ],
+    "info_accept": "I agree, continue",
     "intro_title": "Which audio guide do you prefer?",
     "intro_body": [
       "Thank you for your interest! This short study is carried out at the Human-Centred Robotics Lab of Ostfalia University of Applied Sciences, as part of a master's thesis at Roma Tre University. It is about museum audio guides written with artificial intelligence."
@@ -51,6 +59,14 @@
     "lang_name": "Deutsch",
     "choose_language": "Bitte wählen Sie Ihre Sprache",
     "continue": "Weiter",
+    "info_title": "Bevor wir beginnen",
+    "info_body": [
+      "Wir speichern Ihre Antworten und wie lange Sie jeden Audioguide gehört haben. Wir speichern weder Ihren Namen noch Ihre IP-Adresse noch sonst etwas, das Sie identifiziert.",
+      "Die Antworten werden auf Cloudflare-Servern in der Europäischen Union gespeichert und nur für diese Masterarbeit verwendet.",
+      "Die Teilnahme ist freiwillig. Sie können jederzeit aufhören; die bis dahin gegebenen Antworten bleiben erhalten.",
+      "Bei Fragen wenden Sie sich bitte an die Forscherin oder den Forscher am Stand."
+    ],
+    "info_accept": "Ich stimme zu, weiter",
     "intro_title": "Welcher Audioguide gefällt Ihnen besser?",
     "intro_body": [
       "Vielen Dank für Ihr Interesse! Diese kurze Studie wird im Human-Centred Robotics Lab der Ostfalia Hochschule für angewandte Wissenschaften im Rahmen einer Masterarbeit an der Universität Roma Tre durchgeführt. Es geht um Audioguides für Museen, die mit künstlicher Intelligenz geschrieben wurden."
@@ -99,6 +115,14 @@
     "lang_name": "Italiano",
     "choose_language": "Scegli la lingua",
     "continue": "Continua",
+    "info_title": "Prima di cominciare",
+    "info_body": [
+      "Salviamo le tue risposte e per quanto tempo hai ascoltato ogni audioguida. Non salviamo il tuo nome, il tuo indirizzo IP né altro che ti identifichi.",
+      "Le risposte sono conservate su server Cloudflare nell'Unione Europea e sono usate solo per questa tesi.",
+      "La partecipazione è volontaria. Puoi fermarti in qualsiasi momento; le risposte date fino a quel punto vengono conservate.",
+      "Se hai domande, chiedi al ricercatore allo stand."
+    ],
+    "info_accept": "Sono d'accordo, continua",
     "intro_title": "Quale audioguida preferisci?",
     "intro_body": [
       "Grazie per l'interesse! Questo breve studio si svolge allo Human-Centred Robotics Lab della Ostfalia Hochschule für angewandte Wissenschaften, nell'ambito di una tesi magistrale all'Università Roma Tre. Riguarda audioguide per musei scritte con l'intelligenza artificiale."

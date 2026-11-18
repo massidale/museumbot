@@ -79,11 +79,11 @@ export function planSession(manifest, seed) {
   return {descriptionOrder, artworkOrder, firsts};
 }
 
-export function newSession({sessionId, device, appVersion, manifestVersion, seed, lang, now}) {
+export function newSession({sessionId, device, appVersion, manifestVersion, seed, lang, now, consentAt = null}) {
   return {
     session_id: sessionId, device, app_version: appVersion, manifest_version: manifestVersion,
     seed, lang, started_at: now, updated_at: now, finished_at: null,
-    last_step: 'start', completed: false,
+    last_step: 'start', completed: false, consent_at: consentAt,
     categories: null, trials: [],
   };
 }

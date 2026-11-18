@@ -151,12 +151,23 @@ function showLanguage() {
     S.lang = lang;
     T = texts[lang];
     document.documentElement.lang = lang;
-    showIntro();
+    showInfo();
   };
   screen('',
     LANGS.map(l => h('p', {class: 'lead', lang: l}, texts[l].choose_language)),
     h('div', {class: 'stack bottom'},
       LANGS.map(l => h('button', {type: 'button', class: 'big', lang: l, onclick: () => pick(l)}, texts[l].lang_name))));
+}
+
+// Informativa: l'accettazione fissa l'ora del consenso.
+function showInfo() {
+  screen('',
+    h('h1', {}, T.info_title),
+    paras(T.info_body),
+    h('div', {class: 'actions'}, h('button', {type: 'button', onclick: () => {
+      S.consentAt = now();
+      showIntro();
+    }}, T.info_accept)));
 }
 
 function showIntro() {
@@ -174,7 +185,7 @@ function begin() {
   S.record = {
     ...newSession({
       sessionId: S.sessionId, device: S.device, appVersion: APP_VERSION, manifestVersion: S.manifest.version,
-      seed: S.seed, lang: S.lang, now: now(),
+      seed: S.seed, lang: S.lang, now: now(), consentAt: S.consentAt,
     }),
     description_order: [...S.plan.descriptionOrder],
   };

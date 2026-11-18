@@ -79,6 +79,12 @@ test('newSession: niente campo consent, primo passo start', () => {
   assert.equal('consent' in s, false); assert.equal('final' in s, false);
   assert.equal(s.last_step, 'start');
 });
+test('newSession scrive consent_at se dato, altrimenti null', () => {
+  const base = {sessionId: 'x', device: 'ipad-1', appVersion: '0.2.0',
+    manifestVersion: 'v', seed: 1, lang: 'en', now: 'A'};
+  assert.equal(newSession({...base, consentAt: 'C'}).consent_at, 'C');
+  assert.equal(newSession(base).consent_at, null);
+});
 test('answer traduce la posizione nella condizione', () => {
   const t = buildTrial(0, M.artworks[0], 'en', ['recharger'], 'comparison');
   const r = answer(t, {position: 2, strength: 5, why: 'piu\' vivace', now: 'T'});

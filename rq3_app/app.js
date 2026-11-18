@@ -4,7 +4,8 @@ import {
   LANGS, validateManifest, planSession, newSession, buildTrial,
   answerComplete, answer, markStep, abortSession,
 } from './logic.js';
-import {createPlayer} from './player.js';
+import {createPlayer, prefetch} from './player.js';
+import {isQrMode, nextCount} from './qr.js';
 import {APP_VERSION} from './config.js';
 import {putSession, getSetting} from './store.js';
 import {registerServiceWorker} from './swclient.js';
@@ -22,6 +23,26 @@ let cleanups = [];     // da chiamare quando si cambia schermata
 let unmountGate = null;  // angolo dell'operatore sulle schermate del visitatore
 
 const now = () => new Date().toISOString();
+
+// Modo QR (telefono del visitatore): si attiva con ?m=qr e resta per la scheda.
+const QR_SESSIONS_KEY = 'rq3_qr_sessions';
+function detectQr() {
+  let stored = null;
+  try { stored = sessionStorage.getItem('rq3_mode'); } catch (e) { /* niente sessionStorage */ }
+  const qr = isQrMode(location.search, stored);
+  if (qr) { try { sessionStorage.setItem('rq3_mode', 'qr'); } catch (e) { /* ignorato */ } }
+  return qr;
+}
+const QR = detectQr();
+
+// Sessioni precedenti di questo telefono; poi si salva count + 1.
+function earlierSessions() {
+  try {
+    const count = nextCount(localStorage.getItem(QR_SESSIONS_KEY));
+    localStorage.setItem(QR_SESSIONS_KEY, String(count + 1));
+    return count;
+  } catch (e) { return 0; }
+}
 
 // ---- utilita' del DOM ----
 
@@ -114,6 +135,7 @@ function showOperator(message = '') {
 // L'operatore interrompe la sessione (tocco lungo, PIN, conferma). screen() in
 // showOperator ferma l'audio; il record resta incompleto, col passo a cui si era fermato.
 async function abortByOperator() {
+  if (QR) return;
   if (S && S.record && !S.record.completed) {
     S.record = abortSession(S.record, now());
     await save();
@@ -129,19 +151,24 @@ export async function startSession() {
     const errs = validateManifest(manifest);
     if (errs.length) throw new Error(`manifesto non valido: ${errs.slice(0, 3).join('; ')}`);
     if (!texts) texts = await (await fetch('texts.json')).json();
-    let device = DEFAULT_DEVICE;
-    try { device = (await getSetting('device')) || DEFAULT_DEVICE; } catch (e) { console.error(e); }
+    let device = 'qr';
+    if (!QR) {
+      device = DEFAULT_DEVICE;
+      try { device = (await getSetting('device')) || DEFAULT_DEVICE; } catch (e) { console.error(e); }
+    }
     const seed = randomU32();
     const plan = planSession(manifest, seed);
     S = {
       manifest, seed, plan, device, sessionId: newSessionId(), record: null,
       total: Math.min(MAX_ARTWORKS, plan.artworkOrder.length), categories: null,
     };
-    if (!unmountGate) unmountGate = mountAbortGate(abortByOperator);
+    if (!QR && !unmountGate) unmountGate = mountAbortGate(abortByOperator);
     showLanguage();
   } catch (e) {
     console.error(e);
-    showOperator(`Impossibile avviare la sessione: ${e.message || e}`);
+    const message = `Impossibile avviare la sessione: ${e.message || e}`;
+    if (QR) screen('', h('p', {class: 'lead'}, message));   // dal telefono niente operatore
+    else showOperator(message);
   }
 }
 
@@ -182,13 +209,15 @@ function showIntro() {
 
 // Il record nasce quando il visitatore comincia (dopo l'introduzione).
 function begin() {
-  S.record = {
+  const record = {
     ...newSession({
       sessionId: S.sessionId, device: S.device, appVersion: APP_VERSION, manifestVersion: S.manifest.version,
       seed: S.seed, lang: S.lang, now: now(), consentAt: S.consentAt,
     }),
     description_order: [...S.plan.descriptionOrder],
   };
+  if (QR) record.earlier_sessions = earlierSessions();
+  S.record = record;
   save();
   showClassification();
 }
@@ -305,6 +334,10 @@ function showTrial(i) {
                               S.manifest.version, err => playerError(i, pos + 1, err)));
   });
 
+  if (i + 1 < S.total) {   // le guide dell'opera dopo si scaricano mentre si risponde
+    prefetch(buildTrial(i + 1, artwork(i + 1), S.lang, S.categories, S.plan.firsts[i + 1]).audio, S.manifest.version);
+  }
+
   const why = h('textarea', {rows: '3'});
   const next = h('button', {type: 'button'}, T.next);
   const questions = h('div', {class: 'questions'},
@@ -355,6 +388,7 @@ function finish() {
 
 // Saluti; poi, a un tocco o da soli, si torna all'operatore.
 function goodbye(titleKey, bodyKey) {
+  if (QR) { screen('', h('h1', {}, T[titleKey]), h('p', {class: 'lead'}, T[bodyKey])); return; }
   let armed = false;
   const back = () => { if (armed) showOperator(); };
   const timer = setTimeout(() => { armed = true; back(); }, RETURN_MS);
@@ -364,6 +398,11 @@ function goodbye(titleKey, bodyKey) {
   cleanups.push(() => { clearTimeout(timer); clearTimeout(arm); document.removeEventListener('click', back); });
 }
 
-registerServiceWorker(onSwStatus);
-startSync();
-showOperator();
+if (QR) {
+  startSync();
+  startSession();
+} else {
+  registerServiceWorker(onSwStatus);
+  startSync();
+  showOperator();
+}

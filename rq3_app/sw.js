@@ -15,6 +15,7 @@ const SHELL_FILES = [
   'validate.js',
   'swclient.js',
   'operator.js',
+  'qr.js',
   'texts.json',
   'manifest.json',
   'app.webmanifest',

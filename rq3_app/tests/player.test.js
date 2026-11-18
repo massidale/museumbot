@@ -19,3 +19,28 @@ test('mediaUrls: immagini e audio delle opere, senza doppioni', () => {
   assert.deepEqual(mediaUrls(m).sort(),
     ['audio/en/a/flat.mp3', 'img/a.jpg']);
 });
+
+test('prefetch + loadBlob: un solo fetch per lo stesso file', async () => {
+  const {prefetch, loadBlob} = await import('../player.js');
+  let calls = 0;
+  globalThis.fetch = async () => { calls++; return {ok: true, blob: async () => new Blob(['x'], {type: 'audio/mpeg'})}; };
+  prefetch(['audio/a.mp3'], null);
+  const b = await loadBlob('audio/a.mp3', null);
+  assert.equal(b.size, 1);
+  await loadBlob('audio/a.mp3', null);   // la voce e' stata tolta: secondo fetch
+  assert.equal(calls, 2);
+});
+test('prefetch fallito: loadBlob ripiega sul fetch', async () => {
+  const {prefetch, loadBlob} = await import('../player.js');
+  let calls = 0;
+  globalThis.fetch = async () => {
+    calls++;
+    if (calls === 1) throw new Error('rete');
+    return {ok: true, blob: async () => new Blob(['y'], {type: 'audio/mpeg'})};
+  };
+  prefetch(['audio/b.mp3'], null);
+  await new Promise(r => setTimeout(r, 0));
+  const b = await loadBlob('audio/b.mp3', null);
+  assert.equal(b.size, 1);
+  assert.equal(calls, 2);
+});

@@ -63,11 +63,35 @@ export async function checkCache(manifest) {
 
 // Dalla cache della versione; se manca (o la versione non e' data), dalla rete,
 // passando dal service worker, che usa la stessa cache.
-export async function loadBlob(src, version) {
+async function fetchBlob(src, version) {
   const r = (version != null && (await matchMedia(src, version))) || (await fetch(src));
   if (!r.ok) throw new Error(`${src}: HTTP ${r.status}`);
   const blob = await r.blob();
   return blob.type ? blob : new Blob([blob], {type: 'audio/mpeg'});
+}
+
+// Blob gia' richiesti in anticipo (src -> promessa): si usano una volta sola.
+const prefetched = new Map();
+
+// Scarica in anticipo i file (le guide dell'opera dopo); un errore qui non conta:
+// la voce sparisce e loadBlob ripiega sulla rete.
+export function prefetch(srcs, version) {
+  for (const src of srcs) {
+    if (prefetched.has(src)) continue;
+    const p = fetchBlob(src, version);
+    prefetched.set(src, p);
+    p.catch(() => { if (prefetched.get(src) === p) prefetched.delete(src); });
+  }
+}
+
+// Usa prima il blob richiesto in anticipo (e lo toglie dalla memoria).
+export function loadBlob(src, version) {
+  const p = prefetched.get(src);
+  if (p) {
+    prefetched.delete(src);
+    return p.catch(() => fetchBlob(src, version));
+  }
+  return fetchBlob(src, version);
 }
 
 function el(tag, cls, text) {

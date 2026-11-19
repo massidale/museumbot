@@ -764,6 +764,319 @@ rapporti con il tetto invariati al centesimo salvo Explorer 0.82 → 0.81 (Qwen3
 centesimo diversi (`style_only` 0.964 → 0.960, `no_style` 0.853 → 0.854, `name_only` 0.702 →
 0.708, `need_only` 0.701 → 0.692 con Qwen3); conclusioni invariate.
 
+## 2026-10-30 — Perché il tetto è più alto della split-half
+
+**Decisione.** Il report non spiega più la differenza fra tetto e split-half con il numero di
+opere (100 contro 50). La differenza viene soprattutto dal fatto che le stime del tetto usano
+le stesse opere e lo stesso flat, mentre le due metà della split-half hanno opere diverse. Il
+tetto non è quindi una prova "più forte" della split-half. È il riferimento giusto per i
+confronti fatti sulle stesse opere e sullo stesso flat, cioè chain e ablazione.
+**Motivo.** Una verifica fuori dal codice (Qwen3, corpus `main`) lo mostra:
+- con le stesse 50 opere, il tetto resta 0.93–0.98;
+- due repliche diverse su opere diverse concordano quanto la split-half, 0.86–0.95.
+**Effetto.** Cambia solo l'interpretazione. Nessun numero cambia.
+
+## 2026-11-02 — Ritirato il criterio del residuo sui testi misti
+
+**Decisione.** Il residuo dei testi misti fuori dal piano (v_X, v_Y) esce dal report Gemma e
+dalla tesi. Il residuo era misurato testo per testo, con la soglia "mediana a α intermedi
+≤ 1.5 volte quella dei puri". `mixed.py` continua a calcolarlo e lo scrive in
+`results/mixed_*.json`.
+**Motivo.** La misura non è informativa.
+- Il residuo vale al massimo 1, e per i testi puri la mediana è già 0.81–0.84 con Qwen3 e
+  0.85–0.94 con BGE-M3: lo spostamento del singolo testo è dominato dal rumore dell'opera e
+  della generazione, che cade quasi tutto fuori dal piano.
+- Di conseguenza il rapporto con i puri non poteva superare 1.06–1.23, e la soglia di 1.5
+  non poteva fallire.
+**Effetto.** Restano i due criteri sulla posizione: mediana a α = 0.5 e Spearman. La frase
+"i misti non escono dal piano più dei puri" è ritirata.
+
+## 2026-11-03 — Testi misti a percentuale nel prompt, a confronto con la miscela
+
+**Decisione.** Le stesse tre coppie di testi misti (X → Y, α = 0.25, 0.5, 0.75, 100 opere)
+si generano anche con un solo prompt che dichiara le percentuali ("75% Explorer, 25%
+Facilitator"), Gemma 4 31B con la stessa configurazione dei testi puri
+(`data/local/prompted.jsonl`, 900 testi), e si confrontano con la miscela di logit con le
+stesse analisi di RQ1: posizione sul segmento con Spearman per entrambi, probe a 4 classi
+(`mixed.py` e `mixed_space.py` con `--method pct`). Il confronto è descrittivo, senza
+criteri né soglie e senza metodo vincitore. Non si generano testi a α = 0 e 1: i vertici
+sono i testi puri, e un prompt "100% X" aggiungerebbe solo un bias.
+**Motivo.** La spec del profilo continuo aveva scartato "dire i pesi a parole" perché il
+modello non li calibra, senza misurarlo. Il confronto dice se la miscela passo per passo
+aggiunge qualcosa rispetto al prompt a percentuale.
+**Effetto.** Nuovi file `results/mixed_pct_*.json`, `results/mixed_space_pct_*.json`,
+`figures/mixed_compare_*.png`, `figures/mixed_space_pct_qwen.png`; i risultati della
+miscela non cambiano. Dopo 12 tentativi 33 testi restano in violazione del filtro, tutti in
+Facilitator → Professional/Hobbyist: sono esclusi dalle analisi (n = 78, 98, 91 in quella
+coppia).
+
+## 2026-11-04 — Taratura della posizione sul segmento con miscele note
+
+**Decisione.** La posizione dei testi misti sul segmento fra v_X e v_Y si legge rispetto a
+quella di testi a proporzione nota: l'inizio del testo puro di X e la fine del testo puro di
+Y (replica `full_rep`) incollati con circa (1 − α) e α della lunghezza, in due ordini
+(`rq1_embeddings/mixed_calib.py`, spec `docs/plans/2026-11-03-taratura-segmento-design.md`).
+Il confronto è descrittivo, senza criteri né soglie: la curva dei testi incollati è il
+riferimento, non un test di linearità dell'embedding.
+**Motivo.** La diagonale α = posizione non è il riferimento giusto: non sappiamo dove
+l'embedding mette un testo con una quota nota di X e di Y. La geometria del segmento è la
+*semantic projection* di Grand et al. (2022), ma non era mai stata tarata su questi testi.
+Griglia α = 0.1–0.9 a passi di 0.1 (passo vicino al peso di una frase, ~0.09 del testo;
+margine della quota effettiva riportato), tre composizioni (`alt` a frasi alternate,
+`XY`, `YX`); per ogni α dei misti si calcola la quota equivalente sulla curva.
+**Effetto.** I testi incollati stanno sopra la diagonale con Qwen3 nelle coppie contrapposte
+(verso Professional/Hobbyist), sotto con BGE-M3 (verso X), e risentono dell'ordine (conta di
+più la fine con Qwen3, l'inizio con BGE-M3). I misti non li ricalcano: in quota
+equivalente un misto a α = 0.25 vale il 5–8% di Y con Qwen3 (14–30% con BGE-M3) e uno a 0.75
+l'82–94% (94–98%); a α = 0.5 i due embedding non concordano (0.24–0.39 contro 0.60–0.81).
+Nuovi file `results/mixed_calib_*.json`; i risultati dei misti non cambiano.
+
+## 2026-11-04 — Testi a percentuale: rigenerati fino a validità, registro delle violazioni
+
+**Decisione.** I 33 testi a percentuale rimasti in violazione del filtro dopo 12 tentativi
+(tutti Facilitator → Professional/Hobbyist) si rigenerano con seed nuovi, dal 13° tentativo
+fino a un massimo di 200 (`kaggle/pct-retry`, stessa configurazione); tutti sono validi entro
+il 165°. `vllm_gen.generate_rows` registra da ora in `usage.violations` ogni tentativo
+scartato con i suoi motivi; per le righe già scritte si conosce solo la violazione
+dell'ultimo tentativo salvato (il 12° per questi 33).
+**Motivo.** Escludere i testi toglieva fino al 22% di una cella (α = 0.25) e lasciava la
+coppia con n diversi dalle altre.
+**Effetto.** Tutti i 900 testi a percentuale sono nelle analisi (n = 100 per cella). Cambiano
+solo i valori di Facilitator → Prof./Hobbyist a percentuale: posizione a α = 0.75 0.71 (0.81)
+e a 0.25 con BGE-M3 0.26, probe a α = 0.25 X 0.59 (0.71). Nei testi tenuti dopo molti
+tentativi il filtro seleziona: sono i rari in cui il modello non scrive "For those…".
+
+## 2026-11-04 — Miscela con ingresso della minoranza (pilota)
+
+**Decisione.** Variante della miscela dei logit da provare su un pilota: a ogni token, con
+probabilità q(α) il token lo sceglie da solo l'esperto a peso minore, altrimenti la media
+geometrica di sempre. q(α) = (m − s)/(1 − s), con m = min(α, 1 − α) e s = 1/(1 + e^{(1−2m)d*}),
+fa vincere alla minoranza la sua quota m a distanza d* = 4 fra i due esperti; q = 0 a α 0,
+0.5 e 1, q(0.25) = q(0.75) = 0.148. Stessi seed dei misti; opere scelte vicine alla media
+dei misti nello spazio centrato sul flat (`rq1_embeddings/mixed_pick.py`). Criteri nella spec
+`docs/plans/2026-11-04-ingresso-minoranza-design.md`.
+**Motivo.** Nella media geometrica la quota di token contesi vinta dalla minoranza scende in
+modo esponenziale con il disaccordo: con |log p_X − log p_Y| > 4 la minoranza vince il 3–5%
+dei token a α = 0.25 e 0.75, coerente con la polarizzazione nella taratura. Una penalità o
+un premio uguale per i due esperti non cambierebbe chi vince; la media aritmetica toglierebbe
+il veto dell'esperto di maggioranza su tutto il testo.
+**Effetto.** Nessuno sui risultati esistenti: il pilota scrive `data/local/mixed_q.jsonl`
+(variante `mixq`). Con q = 0 la generazione resta identica a prima.
+
+## 2026-11-04 — Ingresso della minoranza con veto della maggioranza (pilota)
+
+**Decisione.** Seconda variante del pilota (`mixqv`, `vllm_mix --veto`): nei passi in cui
+sceglie la minoranza, si pesca solo fra i suoi token che sono anche fra le prime 100 della
+maggioranza; se non ce n'e' nessuno il passo lo fa la miscela. Stesso q (d* = 4), stesse 30
+opere e stessi seed del pilota senza veto.
+**Motivo.** Nella prova a un'opera alcune frasi si rompono a metà: la minoranza mette una
+parola che la maggioranza dà sotto −16 in log-probabilità («breathe», «current», «field»),
+poi la miscela riprende con parole che la minoranza dà sotto −10, e nessuno dei due esperti
+avrebbe scritto la frase. Le parole di registro che entrano bene («Take», «You», «What»)
+sono invece fra le prime 100 della maggioranza.
+**Effetto.** Nessuno sui risultati esistenti: nuovo file `data/local/mixed_qv.jsonl`. Con
+il veto la minoranza vince meno token, quindi con lo stesso q l'effetto è più debole.
+
+
+## 2026-11-05 — Debito della minoranza nella miscela (pilota)
+
+**Decisione.** Terza variante del pilota sulle stesse 30 opere e con gli stessi seed
+(`mixd`, `vllm_mix --debt 0.25`): niente passi decisi dalla sola minoranza, ma un debito che
+tiene conto delle contese già perse. Un passo è conteso se il token scelto ha |margine| ≥ 3
+fra i due esperti; a ogni contesa il debito cresce di m e cala di 1 se vince la minoranza.
+Il peso della minoranza nella media geometrica è min(m + 0.25 · debito, 0.5). Spec:
+`docs/plans/2026-11-05-debito-minoranza-design.md`.
+**Motivo.** L'ingresso con probabilità q forza la minoranza a caso, anche quando nel testo
+ha già avuto la sua quota, e rompe alcune frasi (11 su 785 senza veto, 9 su 799 con il
+veto). Con il tetto a 0.5 ogni passo resta dentro la miscela geometrica, che a α = 0.5 non
+ha frasi rotte. Nei misti esistenti a α = 0.25 e 0.75 i passi contesi sono circa 26 per
+testo e la minoranza ne vince il 5–6%.
+**Effetto.** Nessuno sui risultati esistenti: nuovo file `data/local/mixed_d.jsonl`. Con
+debito zero, o a α = 0, 0.5 e 1, la generazione resta identica a prima.
+
+## 2026-11-09 — Miscela classica a α tarata (0.4 e 0.6): corpus completo
+
+**Decisione.** Si genera la miscela classica, senza opzioni nuove, a α = 0.4 e 0.6 sulle 100
+opere e le tre coppie (`data/local/mixed_46.jsonl`, notebook `kaggle/mix46-a04` e
+`kaggle/mix46-a06`). I 60 testi del pilota a 10 opere per coppia restano. Spec:
+`docs/plans/2026-11-09-miscela-alpha-tarata-corpus.md`.
+**Motivo.** Nel pilota esplorativo α = 0.4 e 0.6 portano i misti più vicini a quota 0.25 e
+0.75 dei misti a 0.25 e 0.75, con entrambi i modelli di embedding e senza frasi rotte.
+Scegliere l'α in ingresso dalla curva di taratura compensa la non linearità della miscela
+senza cambiare metodo. Fra le varianti a token (ingresso, veto, debito) nessuna dà un
+vantaggio chiaro che giustifichi il codice in più. La rilettura dei misti accanto ai due
+puri della stessa opera ha mostrato che le letture precedenti contavano soprattutto le
+formule tipiche della categoria (per esempio l'invito ai compagni). I misti fondono il
+registro e perdono più spesso i tratti discreti; i testi a percentuale tengono le formule
+ma spesso a blocchi. La valutazione dei nuovi testi guarda quindi lo spostamento di stile
+rispetto ai puri.
+**Effetto.** Nessuno sui risultati esistenti: i misti a 0.25, 0.5 e 0.75 restano in
+`data/local/mixed.jsonl`.
+
+## 2026-11-09 — Prove sulla miscela in un report a parte; escluso l'ingresso senza veto
+
+**Decisione.** `docs/report-gemma.md` tiene solo quello che va in tesi: testi puri, corpus
+misto a α = 0.25, 0.5 e 0.75, RQ1 e RQ2 su questi testi, e il corpus a α tarata in corso.
+Testi a percentuale, taratura del segmento, piloti delle varianti della miscela (ingresso,
+veto, debito, α = 0.4 e 0.6 a 10 opere) e proposte non implementate passano in
+`docs/report-prove-miscela.md`. Fra le varianti a token, l'ingresso della minoranza senza
+veto (`mixq`) non si usa più.
+**Motivo.** Queste prove entrano in tesi al più come breve paragrafo sugli approcci
+alternativi e i loro problemi; tenerle nel report della parte 2 lo allontanava dal testo
+della tesi. L'ingresso senza veto spezza alcune frasi (la minoranza mette parole che la
+maggioranza considera quasi impossibili).
+**Effetto.** Nessuno sui risultati: le sezioni passano da un report all'altro senza cambiare
+numeri. I dati di `mixq` restano in `data/local/mixed_q.jsonl`.
+
+## 2026-11-09 — Prova a pagina intera: voce Wikipedia completa e indicazione di contenuto per categoria
+
+**Decisione.** Prova qualitativa su 3 opere (The Descent from the Cross, The Art of Painting,
+Olympia): fonte = voce Wikipedia intera invece dell'intro troncata, e nel prompt
+un'indicazione, per categoria, degli aspetti della voce su cui concentrarsi
+(`prompts.FOCUS`, `prompts.wiki_messages`). Blocco di categoria e indicazione stanno in coda
+al messaggio utente, dopo la voce, invece che nel system prompt. Gemma 4 31B su Kaggle: 5
+testi puri e 10 misti a α = 0.5 per opera. Report in `docs/report-pagina-intera.md`.
+**Motivo.** Con l'intro troncata tutte le categorie hanno gli stessi pochi fatti e possono
+cambiare quasi solo il registro; la prova verifica se con la voce intera cambia anche la
+scelta dei fatti. La posizione in coda fa condividere ai due esperti di un misto il prefisso
+con la voce nella cache di vLLM, che sulle T4 tiene ~6 600 token.
+**Effetto.** Nessuno sui corpus e sui risultati esistenti: dati nuovi in `data/wiki/`, fuori
+da RQ1 e RQ2. `vllm_gen.vllm_backend` e `vllm_mix.vllm_mixer` hanno un parametro `messages`
+con predefinito `local_messages`, quindi gli altri corpus si generano come prima.
+
+## 2026-11-09 — Misti a α tarata: analisi nel codice e frasi rotte contate dai log p
+
+**Decisione.** I 600 misti a α = 0.4 e 0.6 (`data/local/mixed_46.jsonl`) si analizzano con
+`rq1_embeddings/mixed_tuned.py`: quota equivalente della posizione mediana sulla curva `alt`
+della taratura, testi entro 0.15 dall'obiettivo, confronto con i misti a 0.25 e 0.75. Le
+frasi rotte, lette a mano nei piloti, si contano in codice come testi con almeno un token che
+ha log p < log 0.01 sotto entrambi gli esperti; criterio fissato prima di guardare i 540
+testi nuovi.
+**Motivo.** Le misure della spec vanno nel codice e in `results/`, con entrambi i modelli di
+embedding. Su 600 testi la lettura completa non è praticabile.
+**Effetto.** L'α tarata avvicina i misti all'obiettivo in 5 casi su 6 con Qwen3 e in 4 su 6
+con BGE-M3; dove non lo fa, i due embedding non concordano sulla posizione dei misti a 0.25.
+Il conteggio dei token improbabili cresce verso α = 0.5 anche nei misti esistenti, quindi
+misura i token di compromesso e non separa le frasi rotte: resta da leggere un campione.
+
+## 2026-11-10 — α = 0.4 e 0.6 sono valori di prova; la taratura non valuta i misti
+
+**Decisione.** I misti a α = 0.4 e 0.6 (`data/local/mixed_46.jsonl`) si presentano come
+valori di prova, scelti per vedere se α più vicini al centro portano i testi fra le due
+categorie, e si valutano con la posizione sul segmento. Non si dice più che α in ingresso è
+scelto dalla curva di taratura, e la quota equivalente non si usa per valutarli: resta fra le
+prove (`docs/report-prove-miscela.md` §5). In tesi la sezione «Calibrating α» diventa
+«Intermediate values of α»; la taratura entrerà nella Discussione.
+**Motivo.** La taratura dice dove l'embedder mette un testo con quota nota delle due
+categorie; α è un parametro del generatore. Senza il legame fra i due la taratura non serve
+né a scegliere α né a valutarlo, e le stime che se ne leggono non concordano fra Qwen3 e
+BGE-M3 (per la quota 0.25: α ≈ 0.40–0.50 contro 0.21–0.30).
+**Effetto.** Dati e codice invariati. Cambia la lettura: in posizione sul segmento, i misti a
+0.4 e 0.6 stanno più vicini a 0.25 e 0.75 di quelli a 0.25 e 0.75 in 5 casi su 6 con Qwen3 e
+in 3 su 6 con BGE-M3 (prima: 5 su 6 e 4 su 6, in quota equivalente).
+
+## 2026-11-16 — RQ3: autoclassificazione su 1–2 categorie, audioguide, app web su iPad
+
+**Decisione.** Il visitatore legge le 5 descrizioni di Falk e sceglie 1 o 2 categorie
+(con 2, indica la principale). Per ogni opera ascolta due audioguide: con 1 categoria, pura
+contro `flat`; con 2, mista a 0.5 delle due contro pura della principale. Gli stimoli sono
+audio in inglese e tedesco prodotti in anticipo con un sintetizzatore; l'esperimento gira in
+una pagina web installata sull'iPad, offline. Sostituisce la scelta singola con Likert, le
+coppie A/B e il testo scritto del piano originale. Design dell'app in
+`docs/plans/2026-11-16-rq3-app-ipad-design.md`.
+**Motivo.** I misti a 0.5 permettono di servire anche chi si riconosce in due categorie; le
+audioguide si ascoltano, e in museo la rete non e' garantita.
+**Effetto.** Nessun risultato ancora. RQ3 dara' due stime separate: personalizzato contro
+generico (chi sceglie 1 categoria) e misto contro puro della principale (chi ne sceglie 2).
+
+## 2026-11-16 — Audioguide per le 4 opere di Braunschweig: fonti tradotte, flat, tedesco a mano
+
+**Decisione.** Per i 4 dipinti dell'Herzog Anton Ulrich-Museum (RQ3) si usano lo stesso
+prompt e la stessa miscela della prova a pagina intera, con in più il `flat` (stesso system
+prompt, senza blocco di categoria e indicazione). Le voci sono della Wikipedia tedesca, senza
+bibliografia e sezioni di servizio, e si danno a Gemma tradotte in inglese a mano. I 64 testi
+prodotti (24 puri con flat, 40 misti a 0.5) si traducono in tedesco a mano, invece di
+rigenerarli in tedesco. La sintesi vocale (ElevenLabs v4 via OpenRouter, `generation/tts.py`)
+è pronta ma non eseguita, in attesa di conferma.
+**Motivo.** Prompt, filtro dei riferimenti espliciti e pulizia sono in inglese; con la fonte
+tedesca il modello tradurrebbe e sceglierebbe i fatti nello stesso passo. Tradurre l'uscita
+tiene le due lingue sulla stessa audioguida (stessi fatti, stesso ordine) e lascia i testi
+confrontabili con RQ1 e RQ2.
+**Effetto.** Nuovi dati in `data/wiki/haum_*.jsonl`, risultati qualitativi in
+`docs/report-pagina-intera.md` §6. La traduzione tedesca riporta anche gli errori dei testi
+inglesi; vanno corretti prima dell'uso con i visitatori.
+
+## 2026-11-17 — RQ3: niente consenso nell'app, ascolto libero
+
+**Decisione.** L'app per iPad non ha piu' la schermata del consenso: il record della sessione
+nasce quando il visitatore lascia l'introduzione, che dice che la partecipazione e'
+volontaria e anonima. Tolti anche i vincoli di ascolto (Guida 2 attiva solo dopo la fine
+della Guida 1, domande attive solo dopo entrambe, niente salti avanti) e il tasto "da capo";
+il player ha un tasto per tornare indietro di 10 secondi e un cursore per andare a qualsiasi
+secondo. I pulsanti per andare avanti stanno a fondo pagina. Nel record `consent` sparisce e
+`listened_full` diventa `reached_end` (fine raggiunta in qualsiasi modo), con in piu'
+`heard_sec` (secondi ascoltati senza i salti).
+**Motivo.** Scelta di Massimo: un percorso piu' corto e libero per il visitatore.
+**Effetto.** Nessun dato ancora raccolto. Chi ha ascoltato abbastanza si decide
+nell'analisi da `heard_sec` e `reached_end`, con una soglia da fissare prima di guardare le
+risposte. Se il comitato etico chiede un consenso esplicito (o la conferma della maggiore
+eta'), va raccolto fuori dall'app o la schermata va rimessa.
+
+## 2026-11-17 — RQ3: il perche' della preferenza diventa una domanda aperta facoltativa
+
+**Decisione.** Dopo ogni opera, i 7 motivi a scelta multipla (almeno uno obbligatorio) e il
+campo "vuoi aggiungere qualcosa?" diventano una sola domanda aperta facoltativa ("Perche'
+hai preferito questa guida?"). Nel record sparisce `reasons`; resta `why`.
+**Motivo.** Scelta di Massimo: un questionario piu' corto per ogni opera.
+**Effetto.** Nessun dato ancora raccolto. I motivi non si contano piu' per categoria di
+risposta: le risposte libere si analizzano con una codifica tematica, e chi non scrive
+niente non da' un motivo.
+
+## 2026-11-17 — RQ3: niente prova del volume ne' domande finali
+
+**Decisione.** L'app per iPad passa dalla classificazione direttamente alle istruzioni del
+compito, che ora chiedono di mettere le cuffie; dopo l'ultima opera (o "No, finish") si va ai
+saluti. Tolte la prova del volume (e con lei `sample` dal manifesto, da `build_manifest.py` e
+da `demo_stimuli.py`) e le tre domande finali (fascia d'eta', frequenza di visita ai musei,
+lingua madre; il campo `final` del record).
+**Motivo.** Scelta di Massimo: un percorso piu' corto per il visitatore.
+**Effetto.** Nessun dato ancora raccolto. Il volume lo regola l'operatore prima di dare
+l'iPad. Il campione non si potra' descrivere per eta', abitudini di visita o lingua madre, ne'
+usare queste variabili come covariate; resta la lingua scelta nell'app.
+
+## 2026-11-17 — RQ3: tolta la domanda sulla familiarita' con l'opera
+
+**Decisione.** Dopo ogni opera non si chiede piu' se il visitatore conosceva gia' il
+dipinto; restano la guida preferita, la forza della preferenza (1–7) e il perche' aperto
+facoltativo. Nel record sparisce `familiar`.
+**Motivo.** Scelta di Massimo: un questionario piu' corto per ogni opera.
+**Effetto.** Nessun dato ancora raccolto. La familiarita' con l'opera non si potra' usare
+come covariata.
+
+## 2026-11-17 — RQ3: export dell'iPad come file JSON scaricato
+
+**Decisione.** L'export dalla schermata dell'operatore e' un file `.json` (la lista delle
+sessioni, rientrata) invece di un `.jsonl`, con due tasti: "Scarica", che lo salva come un
+download normale (Mac: Download; iPad: File > Download), e "Condividi", che apre il menu di
+condivisione. `collect.py` legge sia la lista JSON sia il vecchio JSONL.
+**Motivo.** Con la sola condivisione, Safari sul Mac lasciava il file in una sua cartella
+temporanea, non apribile; il `.jsonl` non si apriva con le app normali.
+**Effetto.** Nessun dato ancora raccolto. Il record delle sessioni non cambia.
+
+## 2026-11-18 — RQ3: audio con HeyGen gratuito, voce femminile; senza Self-Portrait as David
+
+**Decisione.** La sintesi vocale dei testi di RQ3 usa HeyGen Voice Turbo nella versione
+gratuita su OpenRouter (`heygen/heygen-voice-1-turbo:free`) con la voce femminile `nadine`, in
+inglese e tedesco, al posto di ElevenLabs v4. Self-Portrait as David (Giorgione) resta fuori
+dagli audio: non è fra le opere della guida ufficiale del museo. Si aggiungono The Dying
+Cleopatra (Rosso Fiorentino, voce italiana) e Aurora (Elsheimer, voce spagnola), con lo stesso
+metodo delle altre opere.
+**Motivo.** Scelta di Massimo; costo nullo (gratuito fino al 30
+novembre 2026). Le opere della guida ufficiale hanno testi del museo ("Read along") da usare
+come confronto.
+**Effetto.** 160 audio (5 opere, 16 testi, inglese e tedesco) in `rq3_app/audio/`, dai testi
+non ancora corretti. Testi di Cleopatra e Aurora in `data/wiki/haum2_generations.jsonl`.
+
 ## 2026-11-18 — RQ3: anche i telefoni, con risposte online
 
 **Decisione.** Allo stand, oltre all'iPad, partecipano il telefono di Massimo (con le sue
@@ -777,3 +1090,85 @@ qualcuno allo stand, quasi nessuno ascolterebbe due guide sullo stesso quadro. D
 di un visitatore non si può fare l'export a mano.
 **Effetto.** Nessun dato ancora raccolto. Il campione mescola chi usa l'iPad e chi usa il
 proprio telefono: `device` lo distingue nell'analisi.
+
+## 2026-11-18 — RQ3: testi delle audioguide senza correzione degli errori
+
+**Decisione.** I 96 testi delle opere di Braunschweig (e i loro audio) si usano come li ha
+generati Gemma, senza correggere gli errori trovati nel controllo a mano, in inglese e in
+tedesco. Scartata la proposta di correzione minima con l'originale in `text_orig`.
+**Motivo.** Scelta di Massimo: gli stimoli di RQ3 restano l'uscita del generatore così com'è.
+**Effetto.** Nessun dato cambia. Gli errori (22 testi su 96: 0 nel `flat`, 7 su 30 puri, 15 su
+60 misti) restano negli audio; se ne tiene conto nell'analisi di RQ3 (`report-rq3.md` §4).
+
+## 2026-11-18 — RQ3: telefoni e risposte online in funzione
+
+**Decisione.** Realizzato il disegno del 18 novembre: l'app 0.2.0 funziona su iPad, telefono
+di Massimo e telefoni dei visitatori (`?m=qr`, solo con Massimo presente). L'informativa torna
+come schermata dell'app su tutti i dispositivi e salva `consent_at`. Il record ha `device`
+(`qr` per i telefoni dei visitatori) ed `earlier_sessions` (sessioni già fatte da quel
+browser, solo nel modo QR). Tutte le sessioni vanno anche in un database D1 su Cloudflare
+(UE), con chiave di scrittura per sessione e limiti; l'export a mano resta come alternativa.
+Le opere sono 5 (Self-Portrait as David tolto, Cleopatra e Aurora aggiunte; una sessione ne
+mostra fino a 4), con immagini da Wikimedia Commons (P18 di Wikidata, al massimo 1600 px).
+Pubblicata il 18 novembre 2026 su `https://museumbot.pages.dev`.
+**Motivo.** Con un solo iPad le sessioni al giorno sono poche; dal telefono di un visitatore
+non si può fare l'export a mano.
+**Effetto.** Nessun dato di visitatori raccolto (una sessione di prova nel database). Nel
+campione l'analisi deve usare `device` per separare iPad e telefoni e `earlier_sessions` per
+riconoscere chi ha già fatto la prova.
+
+## 2026-11-18 — RQ3: invio online più robusto dopo la revisione finale
+
+**Decisione.** Il salvataggio sul dispositivo non aspetta più l'invio; l'invio ha un tempo
+massimo di 15 s, parte anche quando la pagina torna visibile o si chiude (`keepalive`) e conta
+come fatto solo con la risposta `{"ok": true}` del server. Una sessione oltre il suo limite
+(429) non blocca più le altre. Il server controlla il record prima di interrogare il database
+e non cambia mai la chiave di scrittura; il record ha controlli di tipo su `completed`,
+`started_at`, `updated_at` e `device`. L'informativa dice che Cloudflare registra gli indirizzi
+IP nei suoi log tecnici. `rq3_app/404.html` fa rispondere 404 ai file mancanti.
+**Motivo.** Revisione finale del codice: con la pagina di accesso di un Wi-Fi una risposta 200
+qualsiasi segnava come inviate sessioni mai arrivate; chiudendo la pagina subito dopo la fine
+l'ultima versione poteva non partire; l'informativa non diceva dei log di Cloudflare.
+**Effetto.** Nessun dato di visitatori raccolto; la sessione di prova nel database non cambia.
+
+## 2026-11-19 — RQ3: voti 1–7 per guida e per categoria, confronto sempre con flat
+
+**Decisione.** Chi sceglie 2 categorie non indica più la principale: dà un voto da 1 a 7 a
+ciascuna categoria scelta (`category_fit`), come chi ne sceglie una. La guida personalizzata
+(pura con 1 categoria, mista a α = 0.5 con 2) si confronta sempre con `flat`, non più con la
+pura della principale. Per ogni opera il visitatore vota ciascuna guida da 1 a 7 (`ratings`)
+prima della scelta forzata; la forza della preferenza (`strength`) è tolta. App 0.3.0.
+**Motivo.** Scelta di Massimo: niente domanda sulla categoria dominante, una misura di quanto
+il visitatore si riconosce in ciascuna descrizione e un voto assoluto per guida.
+**Effetto.** Nessun dato di visitatori raccolto. La seconda stima di RQ3 diventa misto contro
+generico invece di misto contro puro; l'esito secondario è la differenza fra i due voti invece
+della forza. Le guide pure delle sessioni a 2 categorie non si ascoltano più.
+
+## 2026-11-19 — RQ3: il flat è l'audioguida del museo
+
+**Decisione.** Nell'app il riferimento `flat` non è più il testo generato da Gemma senza
+categoria, ma il testo "Read along" del museo per la stessa opera, accorciato alla lunghezza
+dei nostri testi togliendo solo frasi intere (1–9 per opera; per Aurora restano la prima
+strofa e gli ultimi tre versi della poesia di Goethe), tradotto in tedesco con Claude Opus 5.5
+(per Aurora i versi originali di Goethe) e sintetizzato con la stessa voce (HeyGen free,
+`nadine`). Manifesto `haum-2`.
+**Motivo.** Scelta di Massimo.
+**Effetto.** Nessun dato di visitatori raccolto. Le due stime di RQ3 diventano personalizzato
+contro audioguida del museo e misto contro audioguida del museo: insieme alla
+personalizzazione cambiano autore (curatore invece del modello) e fonte (testo del museo invece
+della voce di Wikipedia), quindi la differenza non si attribuisce alla sola personalizzazione.
+I `flat` generati e i loro audio restano (`data/wiki/haum*_generations.jsonl`,
+`data/rq3/flat_gemma_audio/`) ma non sono nell'app; il confronto con RQ2, che usa il `flat`
+generato, non è più sulle stesse coppie.
+
+## 2026-11-19 — RQ3: niente scelta forzata, solo i voti delle due guide
+
+**Decisione.** Per ogni opera il visitatore dà solo un voto da 1 a 7 a ciascuna guida
+(`ratings`); la domanda su quale guida preferisce è tolta, e con lei `choice` e
+`choice_position`. La domanda aperta diventa "cosa ti è piaciuto o no delle due guide". Una
+prova conta come risposta quando ha `answered_at` (app, server, `collect.py`). App 0.4.0.
+**Motivo.** Scelta di Massimo: con un voto per ciascuna guida la scelta forzata è ridondante.
+**Effetto.** Nessun dato di visitatori raccolto. L'esito di RQ3 diventa la differenza fra i
+voti (personalizzata meno `flat`), con pareggi possibili; la numerosità del report è per il
+segno della differenza e va rifatta dopo il pilota. Il gemello LLM si confronta col segno della
+differenza.

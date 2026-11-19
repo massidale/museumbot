@@ -1,9 +1,11 @@
 # Museumbot — parte 2: Gemma 4 31B e il profilo continuo
 
-*Ultimo aggiornamento: 28 ottobre 2026. Il report descrive solo lo stato attuale del codice e
+*Ultimo aggiornamento: 10 novembre 2026. Il report descrive solo lo stato attuale del codice e
 dei risultati; le decisioni nel tempo sono in `docs/decisioni.md`, la spec dell'esperimento
 in `docs/plans/2026-10-06-profilo-continuo-design.md`. Numeri fra parentesi: embedding
-BGE-M3 (fuori: Qwen3).*
+BGE-M3 (fuori: Qwen3). Le prove sulla miscela successive al corpus misto (testi a
+percentuale, taratura del segmento, varianti della miscela) sono in
+`docs/report-prove-miscela.md`.*
 
 **Domanda.** Con un modello aperto, Gemma 4 31B, di cui si controllano le distribuzioni sul
 prossimo token, si possono generare testi *fra* due categorie di Falk, con un peso α. Il
@@ -15,9 +17,10 @@ mezzo (RQ1) e se un giudice con persona li riconosce e li preferisce (RQ2).
 | passo | codice | output |
 |---|---|---|
 | testi puri | `generation/vllm_gen.py`, `kaggle/gen` | `data/local/generations.jsonl`: 600 `full` (5 categorie + flat) e 500 `full_rep` sulle 100 opere di `data/artworks.jsonl`, prompt di `common/prompts.py` più una riga contro il Markdown |
-| testi misti | `generation/mixing.py`, `generation/vllm_mix.py`, `kaggle/mix-*` | `data/local/mixed.jsonl`: 940 testi, tre coppie × α = 0.25, 0.5, 0.75 × 100 opere più 60 del pilota |
-| embedding | `rq1_embeddings/embed.py`, `mixed.py` | `data/emb/local/`, `data/emb/mixed/` |
-| RQ1 | `analyze.py --corpus local`, `lexicon.py`, `repetition.py`, `mixed.py`, `mixed_space.py`, `generation/mix_diag.py` | `results/metrics_*_local.json`, `lexicon.json`, `repetition.json`, `mixed_*`, `mixed_space_*`, `mix_diag.json` |
+| testi misti | `generation/mixing.py`, `generation/vllm_mix.py`, `kaggle/mix-*` | `data/local/mixed.jsonl`: 940 testi, tre coppie × α = 0.25, 0.5, 0.75 × 100 opere più 40 del pilota (α = 0 e 1) |
+| misti a α = 0.4 e 0.6 | `generation/vllm_mix.py`, `kaggle/mix46-a04`, `kaggle/mix46-a06` | `data/local/mixed_46.jsonl`: 600 testi, tre coppie × α = 0.4, 0.6 × 100 opere |
+| embedding | `rq1_embeddings/embed.py`, `mixed.py`, `mixed_tuned.py` | `data/emb/local/`, `data/emb/mixed/`, `data/emb/mixed_46/` |
+| RQ1 | `analyze.py --corpus local`, `lexicon.py`, `repetition.py`, `mixed.py`, `mixed_space.py`, `mixed_tuned.py`, `generation/mix_diag.py` | `results/metrics_*_local.json`, `lexicon.json`, `repetition.json`, `mixed_{qwen,bge-m3}.json`, `mixed_space_{qwen,bge-m3}.json`, `mixed_tuned_{qwen,bge-m3}.json`, `mix_diag.json` |
 | RQ2 | `rq2_judge/judge.py --corpus local`, `analyze.py --corpus local`, `mixed_judge.py`, `mixed_analyze.py` | `data/judgments_local.jsonl`, `data/judgments_mixed.jsonl`, `results/judge_glm-5.3_local.json`, `judge_mixed_glm-5.3.json` |
 | esempi | `rq1_embeddings/mix_examples.py` | `docs/analisi/testi-misti-the-starry-night.{md,html}` |
 
@@ -123,15 +126,14 @@ un token per esperto con le prime 100 log-probabilità, i token assenti dalla li
 esperto prendono il minimo della sua lista (`generation/vllm_mix.py`). Analisi in
 `rq1_embeddings/mixed.py` (`results/mixed_{qwen,bge-m3}.json`): ogni testo, centrato sul
 flat della sua opera, si proietta sul segmento fra gli steering vector v_X e v_Y del corpus
-`local` (posizione 0 su X, 1 su Y), con il residuo fuori dal piano (v_X, v_Y) in rapporto
-alla norma.
+`local` (posizione 0 su X, 1 su Y).
 
 **Corpus misto** (`data/local/mixed.jsonl`, 940 testi, tutti validi): tre coppie scelte
 prima dei dati con il coseno fra gli steering vector (§3), Recharger–Professional/Hobbyist e
 Facilitator–Professional/Hobbyist, dette qui **contrapposte** (coseno più basso: direzioni
 quasi indipendenti, non opposte), ed Explorer–Facilitator, **vicine** (coseno più alto),
-α = 0.25, 0.5, 0.75 sulle 100 opere; più
-60 testi del pilota (Recharger–Professional/Hobbyist, α = 0, 0.5, 1, prime 20 opere). I
+α = 0.25, 0.5, 0.75 sulle 100 opere (900 testi); più i 40 testi del pilota a α = 0 e 1
+(Recharger–Professional/Hobbyist, prime 20 opere), i cui 20 a α = 0.5 sono già fra i 900. I
 vertici delle curve sono i testi puri del corpus `local`. 7 testi rimasti in violazione del
 filtro sono stati rigenerati in una seconda sessione con la stessa configurazione.
 
@@ -149,8 +151,7 @@ stesse opere. Il token scelto è fra le prime 100 di entrambi gli esperti nel 97
 | Facilitator → Prof./Hobbyist | −0.02 (0.00) | 0.10 (0.25) | 0.57 (0.62) | 0.88 (0.86) | 0.99 (0.99) | 0.88 (0.88) | 0.46 (0.20) |
 | Explorer → Facilitator | −0.01 (0.02) | 0.16 (0.25) | 0.30 (0.47) | 0.66 (0.75) | 0.98 (1.01) | 0.82 (0.77) | 0.22 (0.11) |
 
-"Segmento" è |v_Y − v_X|. Il residuo resta fra 0.89 e 1.12 volte quello dei puri in tutte
-le celle.
+"Segmento" è |v_Y − v_X|.
 
 - **Coppie contrapposte: risposta a soglia.** A α = 0.25 il testo resta vicino alla prima
   categoria, a 0.75 vicino alla seconda, il passaggio avviene intorno a 0.5. Tutte le
@@ -162,6 +163,44 @@ le celle.
   (0.30, sotto 0.35) e lo Spearman con BGE-M3 (0.77, sotto 0.8).
 
 ![Posizione dei testi misti per α, Recharger → Professional/Hobbyist](../figures/mixed_qwen_recharger+professional_hobbyist.png)
+
+**Miscela a α = 0.4 e 0.6** (`data/local/mixed_46.jsonl`, `rq1_embeddings/mixed_tuned.py`,
+`results/mixed_tuned_{qwen,bge-m3}.json`; spec
+`docs/plans/2026-11-09-miscela-alpha-tarata-corpus.md`). Stessa miscela, stesse coppie e
+opere, ma α in ingresso 0.4 e 0.6 invece di 0.25 e 0.75: due valori di prova, per vedere
+se valori più vicini al centro portano i misti fra le due categorie. Non sono ricavati dalla
+taratura del segmento (`docs/report-prove-miscela.md` §3), che dice dove l'embedding mette
+un testo con quota nota ma non il legame fra α e quota; la *quota equivalente* che
+`mixed_tuned.py` calcola con la taratura è in `docs/report-prove-miscela.md` §5. Prima di
+cambiare α si sono provate sulla miscela tre varianti a token (ingresso della minoranza, veto
+della maggioranza, debito della minoranza), solo su piloti e con analisi esplorativa: sono in
+`docs/report-prove-miscela.md` §4.
+
+Posizione mediana sul segmento, Qwen3 (BGE-M3):
+
+| coppia | α = 0.25 | α = 0.4 | α = 0.6 | α = 0.75 |
+|---|---|---|---|---|
+| Recharger → Prof./Hobbyist | 0.10 (0.14) | 0.21 (0.28) | 0.83 (0.84) | 0.92 (0.94) |
+| Facilitator → Prof./Hobbyist | 0.10 (0.25) | 0.33 (0.49) | 0.71 (0.72) | 0.88 (0.86) |
+| Explorer → Facilitator | 0.16 (0.25) | 0.23 (0.35) | 0.44 (0.56) | 0.66 (0.75) |
+
+- **Nelle coppie contrapposte 0.4 e 0.6 allontanano i misti dai vertici**, ma il passaggio
+  fra le due categorie resta concentrato fra α = 0.4 e 0.6 (Recharger → Prof./Hobbyist da
+  0.21 a 0.83, Facilitator → Prof./Hobbyist da 0.33 a 0.71).
+- **Posizione mediana più vicina a 0.25 e 0.75 di quella dei misti a 0.25 e 0.75 in 5 casi
+  su 6 con Qwen3 e in 3 su 6 con BGE-M3.** Con Qwen3 fa eccezione la coppia vicina a 0.6
+  (0.44 contro 0.66 dei misti a 0.75). Con BGE-M3 i misti a 0.25 di
+  Facilitator–Professional/Hobbyist ed Explorer–Facilitator stanno già a 0.25, e 0.4 li
+  porta a 0.49 e 0.35; nella coppia vicina anche i misti a 0.75 stanno già a 0.75.
+- **Lo stesso α dà posizioni diverse secondo la coppia e l'embedding**: un solo valore non va
+  bene per tutte le coppie.
+- **Frasi rotte.** Testi con almeno un token improbabile per entrambi gli esperti
+  (log p < log 0.01 sotto tutti e due), per α = 0.25, 0.4, 0.5, 0.6, 0.75: 29, 68, 85, 75,
+  43 su 100 (Recharger–Professional/Hobbyist); 27, 54, 71, 54, 31
+  (Facilitator–Professional/Hobbyist); 11, 20, 19, 28, 16 (Explorer–Facilitator). Il
+  conteggio cresce verso α = 0.5 e i misti a 0.4 e 0.6 stanno fra quelli a 0.25/0.75 e quelli a
+  0.5. Misura i token di compromesso più che le frasi rotte, quindi non le separa: resta da
+  leggere un campione di testi.
 
 **Come si alternano i due esperti nel testo** (`generation/mix_diag.py`,
 `results/mix_diag.json`, testi a α = 0.5). Per ogni token il margine log p_X − log p_Y del
@@ -308,6 +347,10 @@ giudice, senza persone con bisogni misti; nei testi misti un solo ordine A/B per
 
 ## 8. Prossimi passi
 
-1. Estensioni possibili: persona con bisogni misti a α = 0.5; altre opere in
+1. Misti a α = 0.4 e 0.6 (§4): da fare la lettura dello stile accanto ai due testi puri della
+   stessa opera, su testi scelti prima di leggerli, e un campione dei testi con token
+   improbabili per entrambi gli esperti, per le frasi rotte. Le altre prove sulla miscela
+   sono in `docs/report-prove-miscela.md`.
+2. Estensioni possibili: persona con bisogni misti a α = 0.5; altre opere in
    `docs/analisi/`; generalizzazione al generatore della parte 1 (DeepSeek, miscela passo
    per passo da fuori).

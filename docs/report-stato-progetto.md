@@ -1,6 +1,6 @@
 # Museumbot — stato del progetto
 
-*Ultimo aggiornamento: 29 ottobre 2026. Il report descrive solo lo stato attuale del codice e
+*Ultimo aggiornamento: 17 novembre 2026. Il report descrive solo lo stato attuale del codice e
 dei risultati; le decisioni e le correzioni nel tempo sono in `docs/decisioni.md`.*
 
 **Domanda di ricerca.** Quando un LLM genera un'audioguida "personalizzata" su una
@@ -253,12 +253,15 @@ Coseno fra gli steering vector di generazioni indipendenti dello stesso prompt, 
 | Qwen3 | 0.964 | 0.967 | 0.979 | 0.986 | 0.989 |
 | BGE-M3 | 0.937 | 0.900 | 0.973 | 0.975 | 0.985 |
 
-È la prova di stabilità più forte: non divide le stesse generazioni in due metà, ma
-rigenera tutti i testi da capo, e la direzione di ogni categoria torna quasi identica. I
-valori sono più alti della split-half perché ogni stima usa 100 opere invece di 50. Sono
+Guarda un'altra fonte di variazione: tiene fisse le opere e rigenera tutti i testi da
+capo, e la direzione di ogni categoria torna quasi identica. I valori sono più alti della
+split-half soprattutto perché le due stime usano le stesse opere e gli stessi flat: la
+parte dello shift che dipende dalla singola opera e il rumore del suo flat sono comuni
+alle due stime e non abbassano il coseno. Non è quindi una prova più forte della
+split-half, ma il riferimento giusto per i confronti sulle stesse opere e sugli stessi
+flat, come chain (§5) e ablazione (§6). Sono
 più bassi per Explorer e Facilitator, che hanno gli shift più corti (§3.5): a parità di
-rumore, uno shift piccolo ne è disturbato di più. Questi valori sono il tetto usato per
-calibrare il confronto con la chain (§5) e l'ablazione (§6).
+rumore, uno shift piccolo ne è disturbato di più.
 
 ### 3.5 Geometria
 
@@ -673,7 +676,8 @@ Quanto queste preferenze coincidano con quelle di visitatori reali è la domanda
    dalla differenza fra metodi (§5).
 2. RQ2: estensioni possibili (secondo giudice su un campione, persone ricavate dal
    dataset BIRD, compito di riconoscimento); scelta degli stimoli per RQ3.
-3. RQ3: vedi `docs/plans/piano-progetto-tesi.md`.
+3. RQ3: stato, disegno, opere, app e cose da fare in `docs/report-rq3.md`. Nessun dato
+   raccolto.
 
 ## Riferimenti
 

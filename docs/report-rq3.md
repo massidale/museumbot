@@ -313,7 +313,7 @@ finti si ricreano con `demo_stimuli.py` (non sono più in `rq3_app/`).
 Disegno e piano: `docs/plans/2026-11-16-rq3-app-ipad-design.md`,
 `docs/plans/2026-11-16-rq3-app-ipad.md`; telefoni e risposte online:
 `docs/plans/2026-11-18-rq3-qr-online-design.md`, `docs/plans/2026-11-18-rq3-qr-online.md`.
-Versione dell'app 0.4.3 (`config.js`).
+Versione dell'app 0.4.4 (`config.js`).
 
 - **Forma.** Pagina web statica (HTML, CSS e JavaScript senza build). Sull'iPad si installa
   nella Home e un service worker scarica pagina, manifesto, immagini e audio, poi funziona
@@ -329,9 +329,12 @@ Versione dell'app 0.4.3 (`config.js`).
     schermate del visitatore, interrompe la sessione (`aborted_by_operator`).
   - *QR* (telefoni dei visitatori, `https://museumbot.pages.dev/?m=qr`): si parte subito dalla
     scelta della lingua, senza angolo dell'operatore e senza service worker; il modo resta
-    dopo un ricaricamento. L'audio della prova si scarica in anticipo durante la lettura della
-    prova precedente (`prefetch` in `player.js`), per non dipendere dai dati mobili mentre si
-    ascolta. Si usa solo con Massimo presente.
+    dopo un ricaricamento. Il telefono scarica solo le due guide di ogni opera, in anticipo
+    (`prefetch` in `player.js`): il `flat` della prima opera appena scelta la lingua, la sua
+    personalizzata dopo i voti delle categorie, e le due guide dell'opera dopo mentre si
+    risponde alla precedente. Si usa solo con Massimo presente. Il service worker, che all'install
+    scarica tutti i 160 audio (circa 200 MB), c'è solo sui dispositivi che hanno aperto
+    l'indirizzo dell'operatore: aperto lì, controlla anche il modo QR.
 - **Percorso.** (Operatore avvia la sessione →) lingua → informativa → presentazione dello
   studio → classificazione (1 o 2 descrizioni, poi un voto 1–7 per ciascuna) → istruzioni (cuffie) → per
   ogni opera immagine, titolo, Guida 1 e Guida 2 ciascuna col suo voto 1–7 subito sotto, domanda
@@ -417,7 +420,7 @@ Versione dell'app 0.4.3 (`config.js`).
   "Download missing files". Un file che manca dà 404 (`rq3_app/404.html` toglie a Pages il ritorno
   alla pagina principale, che subito dopo un deploy faceva arrivare HTML al posto di un modulo
   e lasciava la pagina bianca); se dopo un deploy la pagina resta bianca, si ricarica.
-- **Stato.** Versione 0.4.3 pubblicata il 19 novembre 2026 con il manifesto `haum-2` (5 opere,
+- **Stato.** Versione 0.4.4 pubblicata il 19 novembre 2026 con il manifesto `haum-2` (5 opere,
   160 audio, `flat` del museo); controllati online la versione del manifesto e i 10 `flat`,
   uguali ai file locali.
   Provata in locale con `wrangler pages dev` (sessioni inviate; una sessione salvata a server

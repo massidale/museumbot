@@ -184,6 +184,8 @@ function showLanguage() {
     S.lang = lang;
     T = texts[lang];
     document.documentElement.lang = lang;
+    // Telefono: il flat della prima opera si scarica subito (e' il confronto per tutti).
+    if (QR) prefetch([artwork(0).audio[lang].flat.src], S.manifest.version);
     showInfo();
   };
   // La parete della galleria con un cartellino per lingua.
@@ -284,6 +286,8 @@ function showFit(chosen) {
     if (!fitComplete(chosen, fit)) return;
     S.categories = chosen;
     step('fit', {categories: [...chosen], category_fit: {...fit}});
+    // Telefono: ora si sa la personalizzata della prima opera (il flat e' gia' richiesto).
+    if (QR) prefetch(buildTrial(0, artwork(0), S.lang, S.categories, S.plan.firsts[0]).audio, S.manifest.version);
     showTask();
   });
   screen('',

@@ -6,3 +6,9 @@ compatibility_date = "2026-11-01"
 binding = "DB"
 database_name = "rq3"
 database_id = "d7c9e278-68f1-491f-a261-53ed5818fe0e"
+
+# Registrazioni a voce di fine giro (chiave = session_id), nell'UE.
+[[r2_buckets]]
+binding = "VOICE"
+bucket_name = "museumbot-voice"
+jurisdiction = "eu"

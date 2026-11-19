@@ -19,6 +19,10 @@ class FakeResp:
     def json(self):
         return self._data
 
+    @property
+    def content(self):
+        return self._data
+
 
 def test_out_path_con_data_fissa():
     p = download.out_path(Path("raw"), datetime(2026, 12, 3, 9, 5))
@@ -63,3 +67,26 @@ def test_token_mancante_esce_con_messaggio(monkeypatch):
     with pytest.raises(SystemExit) as e:
         download.export_token()
     assert "RQ3_EXPORT_TOKEN" in str(e.value)
+
+
+def test_voice_name_dal_tipo():
+    assert download.voice_name({"session_id": "abc123", "type": "audio/mp4"}) == "abc123.m4a"
+    assert download.voice_name({"session_id": "abc123", "type": "audio/webm;codecs=opus"}) == "abc123.webm"
+    assert download.voice_name({"session_id": "abc123", "type": ""}) == "abc123.bin"
+
+
+def test_fetch_voice_scarica_solo_le_mancanti(tmp_path):
+    (tmp_path / "old111.m4a").write_bytes(b"x")
+    lista = [{"session_id": "old111", "type": "audio/mp4"},
+             {"session_id": "new222", "type": "audio/webm;codecs=opus"}]
+    chiesti = []
+
+    def get(url, headers, timeout):
+        chiesti.append(url)
+        assert headers["Authorization"] == "Bearer tok"
+        return FakeResp(lista) if "?id=" not in url else FakeResp(b"audio")
+
+    n = download.fetch_voice("https://x/api/voice", "tok", tmp_path, get=get)
+    assert n == 1
+    assert chiesti == ["https://x/api/voice", "https://x/api/voice?id=new222"]
+    assert (tmp_path / "new222.webm").read_bytes() == b"audio"

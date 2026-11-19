@@ -36,7 +36,7 @@ test('newKey: 32 caratteri esadecimali minuscoli', () => {
   assert.equal(newKey(new Uint8Array(16).fill(255)), 'f'.repeat(32));
 });
 
-import {fetchInit, classify} from '../sync.js';
+import {fetchInit, classify, voiceInit} from '../sync.js';
 
 test('fetchInit: keepalive, nessun redirect, timeout', () => {
   const i = fetchInit({a: 1}, 'k'.repeat(32));
@@ -63,4 +63,16 @@ test('classify: 400 e 403 respinti, 429 saltato, altro stop', async () => {
   assert.equal(await classify(resp('{}', 403)), 'rejected');
   assert.equal(await classify(resp('{}', 429)), 'skip');
   assert.equal(await classify(resp('', 500)), 'stop');
+});
+test('classify: 404 e 409 (registrazione prima del suo record) saltati', async () => {
+  assert.equal(await classify(resp('{}', 404)), 'skip');
+  assert.equal(await classify(resp('{}', 409)), 'skip');
+});
+test('voiceInit: PUT col tipo e la chiave, senza keepalive', () => {
+  const data = new ArrayBuffer(8);
+  const i = voiceInit({data, mime: 'audio/mp4'}, 'k'.repeat(32));
+  assert.equal(i.method, 'PUT'); assert.equal(i.body, data);
+  assert.equal(i.headers['Content-Type'], 'audio/mp4');
+  assert.equal(i.headers['X-Write-Key'], 'k'.repeat(32));
+  assert.equal('keepalive' in i, false); assert.equal(i.redirect, 'error');
 });

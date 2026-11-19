@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {LIMITS, KEY_RE, decideWrite, authorized, precheck} from '../lib/server.js';
-import {MAX_BYTES} from '../../rq3_app/validate.js';
+import {LIMITS, KEY_RE, decideWrite, authorized, precheck, precheckVoice, decideVoice} from '../lib/server.js';
+import {MAX_BYTES, MAX_VOICE_BYTES} from '../../rq3_app/validate.js';
 import {newSession, buildTrial, answer, allConditions, CATEGORIES} from '../../rq3_app/logic.js';
 
 const KEY = 'a'.repeat(32);
@@ -129,4 +129,23 @@ test('precheck: stessi errori 400 di decideWrite', () => {
   assert.equal(precheck('{}', KEY).status, 400);
   assert.equal(precheck(JSON.stringify(rec()), 'zz').error, 'chiave non valida');
   assert.equal(precheck(JSON.stringify(rec()), null).status, 400);
+});
+
+test('precheckVoice: id, chiave, tipo audio e dimensione', () => {
+  const ok = {id: 'abc123', key: KEY, type: 'audio/mp4', size: 1000};
+  assert.equal(precheckVoice(ok), null);
+  assert.equal(precheckVoice({...ok, size: null}), null);   // Content-Length assente
+  assert.equal(precheckVoice({...ok, type: 'audio/webm;codecs=opus'}), null);
+  for (const bad of [{id: 'ABC123'}, {id: null}, {key: 'x'}, {type: 'text/html'}, {type: null},
+                     {size: 0}, {size: MAX_VOICE_BYTES + 1}])
+    assert.equal(precheckVoice({...ok, ...bad}).status, 400, JSON.stringify(bad));
+});
+test('decideVoice: sessione presente, stessa chiave, voice dichiarata', () => {
+  const voice = {sec: 30, mime: 'audio/mp4', recorded_at: 'T'};
+  const row = r => ({write_key: KEY, record: JSON.stringify(r)});
+  assert.equal(decideVoice({existing: row(rec({voice})), key: KEY}).status, 200);
+  assert.equal(decideVoice({existing: null, key: KEY}).status, 404);
+  assert.equal(decideVoice({existing: row(rec({voice})), key: OTHER}).status, 403);
+  assert.equal(decideVoice({existing: row(rec()), key: KEY}).status, 409);
+  assert.equal(decideVoice({existing: row(rec({voice: {skipped: true}})), key: KEY}).status, 409);
 });

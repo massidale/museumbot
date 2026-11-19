@@ -1192,3 +1192,22 @@ QR l'ordine delle opere resta casuale. App 0.4.6.
 **Effetto.** Nessun dato di visitatori raccolto. Con l'ordine fisso la posizione dell'opera nel
 giro coincide con l'opera, quindi l'effetto dell'ordine (stanchezza, abitudine) non si separa
 dall'opera; nell'analisi `tour_order` permette di distinguere le sessioni.
+
+## 2026-11-19 — RQ3: domande finali a voce, in un'unica registrazione
+
+**Decisione.** Alla fine del giro quattro domande a schermo (facilità della classificazione e
+categorie mancanti, comprensibilità delle audioguide, differenza percepita fra le due guide,
+altri commenti), con istruzioni brevi in inglese e tedesco, a cui il visitatore risponde a voce
+in un'unica registrazione, facoltativa ("Concludi senza registrare"). La registrazione resta sul
+dispositivo (IndexedDB) e va in un bucket R2 in giurisdizione UE (`museumbot-voice`); il record
+ha `voice`. L'informativa dice che la voce si registra solo se il visitatore lo fa, che si usa
+solo per la tesi e di non dire il proprio nome; il partecipare non è più detto "anonimo" ma
+"senza nome". App 0.5.0. Le domande inglesi di Massimo sono state rese più idiomatiche (stesso
+contenuto).
+**Motivo.** Richiesta di Massimo: un riscontro qualitativo sull'esperienza, a voce per non far
+scrivere sul tablet. Registrazione facoltativa e informativa aggiornata perché la voce è un dato
+personale.
+**Effetto.** Nessun dato di visitatori raccolto. Si aggiungono dati qualitativi da trascrivere;
+`completed` diventa vero alla fine del giro, prima delle domande a voce, quindi una sessione
+completa non richiede la registrazione. Il comitato etico deve approvare anche la registrazione
+della voce.

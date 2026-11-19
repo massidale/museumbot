@@ -3,7 +3,7 @@
 *Ultimo aggiornamento: 19 novembre 2026. Stato di RQ3: disegno deciso, stimoli testuali
 pronti in inglese e tedesco (senza correzione degli errori), 160 audio e immagini delle 5
 opere (il `flat` è l'audioguida del museo accorciata), app (iPad, telefono di Massimo, telefoni dei visitatori da QR) con risposte salvate
-anche online, pubblicata il 19 novembre 2026 e provata nel browser. Prova sull'iPad e sul
+anche online e domande finali a voce, pubblicata il 19 novembre 2026 e provata nel browser. Prova sull'iPad e sul
 telefono con dati mobili, ascolto degli audio, comitato etico e pilota sono da fare. Nessun
 dato di visitatori raccolto.*
 
@@ -49,9 +49,20 @@ Deciso il 16 novembre 2026 (`docs/decisioni.md`), con le semplificazioni del 17 
 - **Dispositivi.** L'iPad con l'operatore; il telefono di Massimo (con le sue cuffie); i
   telefoni dei visitatori che hanno cuffie, da un QR code (`?m=qr`), solo con Massimo
   presente (§6).
+- **Domande finali a voce.** Alla fine del giro (dopo l'ultima opera o quando il visitatore
+  dice basta) quattro domande a schermo, con istruzioni brevi, a cui si risponde a voce in
+  un'unica registrazione, facoltativa:
+  1. È stato facile scegliere le descrizioni che ti rispecchiano? Mancava qualcosa?
+  2. Le audioguide erano facili da capire?
+  3. Le due guide dello stesso dipinto ti sono sembrate diverse? In che modo?
+  4. Hai altri commenti, richieste o suggerimenti?
+
+  Le risposte servono come dati qualitativi (comprensione, categorie mancanti, differenza
+  percepita fra le guide); vanno trascritte.
 - **Informativa.** Prima dell'introduzione c'è una schermata con le informazioni sui dati
-  (cosa si salva, server nell'Unione europea, partecipazione volontaria, nessuna identità) e
-  un tasto di accordo; l'istante dell'accordo va nel record come `consent_at`.
+  (cosa si salva, registrazione facoltativa della voce, server nell'Unione europea,
+  partecipazione volontaria, nessun nome) e un tasto di accordo; l'istante dell'accordo va nel
+  record come `consent_at`.
 
 Ne escono **due stime separate**: personalizzato contro generico (chi sceglie 1 categoria) e
 misto contro generico (chi ne sceglie 2), ciascuna con la sua numerosità. Il riferimento è
@@ -315,7 +326,7 @@ finti si ricreano con `demo_stimuli.py` (non sono più in `rq3_app/`).
 Disegno e piano: `docs/plans/2026-11-16-rq3-app-ipad-design.md`,
 `docs/plans/2026-11-16-rq3-app-ipad.md`; telefoni e risposte online:
 `docs/plans/2026-11-18-rq3-qr-online-design.md`, `docs/plans/2026-11-18-rq3-qr-online.md`.
-Versione dell'app 0.4.6 (`config.js`).
+Versione dell'app 0.5.0 (`config.js`).
 
 - **Forma.** Pagina web statica (HTML, CSS e JavaScript senza build). Sull'iPad si installa
   nella Home e un service worker scarica pagina, manifesto, immagini e audio, poi funziona
@@ -343,7 +354,7 @@ Versione dell'app 0.4.6 (`config.js`).
 - **Percorso.** (Operatore avvia la sessione →) lingua → informativa → presentazione dello
   studio → classificazione (1 o 2 descrizioni, poi un voto 1–7 per ciascuna) → istruzioni (cuffie) → per
   ogni opera immagine, titolo, Guida 1 e Guida 2 ciascuna col suo voto 1–7 subito sotto, domanda
-  aperta → "un'altra opera?" → saluti. In fondo a ogni schermata del visitatore c'è l'id della
+  aperta → "un'altra opera?" → domande finali a voce → saluti. In fondo a ogni schermata del visitatore c'è l'id della
   sessione (`ID abc123`), per annotare errori ed esclusioni (§8).
   Testi dell'interfaccia in inglese e tedesco, con una versione italiana di riferimento che
   l'app non mostra (`rq3_app/texts.json`, copia di `docs/plans/2026-11-16-rq3-testi-app.json`).
@@ -351,8 +362,10 @@ Versione dell'app 0.4.6 (`config.js`).
   artificiale: il visitatore non vede i nomi delle categorie né sa quale guida è
   personalizzata.
 - **Informativa.** Schermata `info_*` di `texts.json`: cosa si salva (risposte e tempo di
-  ascolto, nessun nome né indirizzo IP; Cloudflare, che ospita il sito, registra gli indirizzi IP
-  nei suoi log tecnici, che non conserviamo né usiamo), dati su server Cloudflare nell'Unione
+  ascolto; non chiediamo il nome e non salviamo l'indirizzo IP; Cloudflare, che ospita il sito,
+  registra gli indirizzi IP nei suoi log tecnici, che non conserviamo né usiamo), la
+  registrazione facoltativa della voce alla fine (ascoltata e trascritta solo per la tesi, non
+  data ad altri; si chiede di non dire il proprio nome), dati su server Cloudflare nell'Unione
   europea e usati solo per la tesi, partecipazione volontaria, domande allo stand. "Accetto, continua" salva
   `consent_at` nel record. Il testo va approvato dal comitato etico (§9).
 - **Manifesto degli stimoli.** `rq3_visitors/build_manifest.py` costruisce
@@ -375,7 +388,11 @@ Versione dell'app 0.4.6 (`config.js`).
   `heard_sec`), `why` (al massimo 2000 caratteri) e `answered_at`; quale guida è la
   personalizzata si legge da `first`.
   Dopo la classificazione `categories` (lista delle 1 o 2 categorie) e `category_fit` (voto
-  1–7 per ciascuna). Nessun dato che identifica il visitatore. L'ora dell'app è strettamente
+  1–7 per ciascuna). Alla fine `voice`: `{sec, mime, recorded_at}` se c'è la registrazione,
+  `{skipped: true}` se il visitatore conclude senza (con `no_mic: true` se il microfono non era
+  disponibile), assente se non ci è arrivato. `completed` diventa vero alla fine del giro, prima
+  delle domande a voce (`last_step: voice`, poi `end`). Nessun nome; la voce è l'unico dato
+  personale, ed è facoltativa. L'ora dell'app è strettamente
   crescente, così due salvataggi ravvicinati hanno sempre `updated_at` diversi.
 - **Invio online** (`sync.js`). Ogni sessione, da qualsiasi dispositivo, è inviata a
   `POST /api/session` dopo ogni salvataggio (senza farlo aspettare), ogni 30 s, quando torna la
@@ -386,7 +403,17 @@ Versione dell'app 0.4.6 (`config.js`).
   di accesso di un Wi-Fi), una risposta d'altro tipo o 15 s senza risposta fermano il giro, che
   si ritenta più tardi. Gli invii rifiutati (400, 403) non si ritentano; una sessione oltre il
   suo limite (429) si salta in quel giro e si passa alla successiva. Lo stato (inviate e rifiutate) è in IndexedDB e la
-  schermata dell'operatore mostra quante sessioni sono state inviate.
+  schermata dell'operatore mostra quante sessioni e quante registrazioni sono state inviate.
+- **Registrazione** (`recorder.js`, schermata `voice` di `app.js`). Microfono con
+  `getUserMedia` e `MediaRecorder` (AAC in `audio/mp4` su Safari, Opus altrove), "Inizia a
+  registrare" → "Ferma" → "Salva e concludi" o "Registra di nuovo"; si ferma da sola dopo 10
+  minuti. "Concludi senza registrare" c'è sempre; senza microfono (permesso negato o browser
+  senza registrazione) resta solo quello. La registrazione salvata va in IndexedDB (store
+  `voice`, chiave `session_id`) e, dopo le sessioni, `sync.js` la invia a
+  `PUT /api/voice?id=<session_id>` con la stessa chiave della sessione, senza `keepalive` e con 120 s
+  di timeout. 404 o 409 (il record con `voice` non è ancora sul server) la fanno saltare a un
+  giro successivo. Su un telefono la registrazione parte solo finché la pagina resta aperta;
+  se il visitatore chiude subito, resta sul telefono e parte alla prossima apertura dell'indirizzo.
 - **Server** (`rq3_pages/`). Cloudflare Pages Functions con database D1 `rq3` (giurisdizione
   UE, binding `DB`, tabella `sessions` in `schema.sql`: record intero più chiave, dispositivo,
   completezza, numero di prove con risposta (`answered_at`), `created_at`, `received_at`, `writes`). Le regole
@@ -398,24 +425,32 @@ Versione dell'app 0.4.6 (`config.js`).
   chiave. Limiti: 300 sessioni nuove in un'ora
   in tutto il sito e 300 scritture per sessione (429). `GET /api/sessions` esporta tutti i
   record solo con il token `EXPORT_TOKEN` (secret del progetto, in `.env` come
-  `RQ3_EXPORT_TOKEN`); senza token 401.
+  `RQ3_EXPORT_TOKEN`); senza token 401. Le registrazioni vanno nel bucket R2
+  `museumbot-voice` (giurisdizione UE, binding `VOICE`, chiave = `session_id`):
+  `PUT /api/voice` accetta solo audio (`audio/mp4`, `webm`, `ogg`, `mpeg`) fino a 25 MB, per una
+  sessione già nel database, con la sua chiave (altrimenti 403) e il cui record dichiara
+  `voice` (altrimenti 409); `GET /api/voice` elenca le registrazioni e `GET /api/voice?id=…` ne
+  dà una, solo col token.
 - **Dove stanno i dati.** Ogni sessione è in due posti: sul dispositivo, in IndexedDB legata
   all'indirizzo da cui si è installata l'app (si perde se si cancellano i dati di Safari o si
   toglie l'app dalla Home prima dell'export; l'app chiede a iOS lo storage persistente), e nel
   database D1. I dati della sessione partono dal dispositivo a ogni salvataggio, quindi la
-  copia online è completa appena c'è rete.
+  copia online è completa appena c'è rete. Lo stesso per la registrazione (IndexedDB e R2); con
+  "Delete exported sessions" si cancellano anche le registrazioni di quelle sessioni già
+  online, mentre quelle non ancora inviate restano sul dispositivo.
 - **Export (alternativa).** Se manca la rete, dalla schermata dell'operatore un file
   `rq3_<device>_<AAAAMMGG-HHMM>.json` con la lista delle sessioni (rientrata, leggibile).
   "Download" lo salva come un download normale (Mac: Download; iPad: File > Download). I record restano sul
   dispositivo finché l'operatore non conferma l'export, e si cancellano solo quelli esportati.
 - **Raccolta.** `rq3_visitors/download.py` scarica le sessioni online da
   `https://museumbot.pages.dev/api/sessions` in `data/rq3/raw/online_<AAAAMMGG-HHMM>.json`
-  (token da `RQ3_EXPORT_TOKEN`). `rq3_visitors/collect.py` legge gli export (online e dell'app;
+  (token da `RQ3_EXPORT_TOKEN`) e le registrazioni che mancano in
+  `data/rq3/raw/voice/<session_id>.m4a` (o `.webm`). `rq3_visitors/collect.py` legge gli export (online e dell'app;
   lista JSON o una riga per sessione), unisce le sessioni in `data/rq3/responses.jsonl`, tiene
   per ogni `session_id` la versione più avanti (completa, poi più risposte, poi più recente) e
   controlla lo schema. `data/rq3/` resta fuori da git.
-- **Test.** 67 test Node (`node --test rq3_app/tests/*.test.js rq3_pages/tests/*.test.js`:
-  logica, player, testi, validazione, invio, QR, regole del server) e 25 test Python
+- **Test.** 78 test Node (`node --test rq3_app/tests/*.test.js rq3_pages/tests/*.test.js`:
+  logica, player, registrazione, testi, validazione, invio, QR, regole del server) e 27 test Python
   (manifesto, raccolta, download, sintesi vocale), tutti passati il 19 novembre 2026.
 - **Pubblicazione.** Il service worker richiede HTTPS, quindi l'iPad non può usare il server
   del Mac: l'app è su Cloudflare Pages (progetto `museumbot`, indirizzo fisso
@@ -427,7 +462,7 @@ Versione dell'app 0.4.6 (`config.js`).
   "Download missing files". Un file che manca dà 404 (`rq3_app/404.html` toglie a Pages il ritorno
   alla pagina principale, che subito dopo un deploy faceva arrivare HTML al posto di un modulo
   e lasciava la pagina bianca); se dopo un deploy la pagina resta bianca, si ricarica.
-- **Stato.** Versione 0.4.6 pubblicata il 19 novembre 2026 con il manifesto `haum-2` (5 opere,
+- **Stato.** Versione 0.5.0 pubblicata il 19 novembre 2026 con il manifesto `haum-2` (5 opere,
   160 audio, `flat` del museo); controllati online la versione del manifesto e i 10 `flat`,
   uguali ai file locali.
   Provata in locale con `wrangler pages dev` (sessioni inviate; una sessione salvata a server
@@ -437,8 +472,11 @@ Versione dell'app 0.4.6 (`config.js`).
   provati: modo operatore in produzione, iPad, telefono con dati mobili. In produzione un
   file mancante dà 404, un corpo non valido 400, e l'informativa compare nel modo QR. I voti
   1–7 sono provati in locale con una sessione QR a una categoria e una a due: nel record
-  `categories`, `category_fit`, i `ratings` della prova e il confronto con `flat`. Il database di
-  produzione è vuoto.
+  `categories`, `category_fit`, i `ratings` della prova e il confronto con `flat`. Le domande a
+  voce sono provate in locale nel browser con un microfono simulato (inglese a tutta larghezza,
+  tedesco a 375 px): registrazione salvata in IndexedDB, record con `voice`, `PUT /api/voice`
+  200 sull'R2 locale; "Concludi senza registrare" scrive `{skipped: true}`. Non ancora provate
+  con un microfono vero né su iPad o telefono.
 
 ## 7. Numerosità
 
@@ -507,11 +545,17 @@ Cohen, pareggi a parte) e tassi di vittoria per categoria, umani contro LLM.
    offline, cursore e −10 s col dito, "Download" in File > Download, invio online dalla
    modalità operatore, anche con la rete tolta e poi tornata.
 4. Prova sul telefono di Massimo con i dati mobili (modo `?m=qr`, audio, invio).
+   Su iPad e telefono anche le domande a voce: permesso del microfono (sull'iPad conviene
+   "Consenti" fisso nelle impostazioni del sito), qualità della registrazione allo stand, arrivo
+   in R2 e download con `download.py`.
 5. Museo: Wi-Fi allo stand, cartello con il QR code.
-6. Comitato etico: informativa e uso di Cloudflare (D1 in giurisdizione UE, Pages Functions)
-   per i dati, eventuale conferma della maggiore età, piano di gestione dei dati.
-7. Cancellare dal database remoto le sessioni delle prove (`DELETE FROM sessions`, §6) prima
-   della raccolta.
+6. Comitato etico: informativa e uso di Cloudflare (D1 e R2 in giurisdizione UE, Pages
+   Functions) per i dati, registrazione della voce (dato personale: conservazione e
+   cancellazione dopo la trascrizione), eventuale conferma della maggiore età, piano di
+   gestione dei dati.
+7. Cancellare dal database remoto le sessioni delle prove (`DELETE FROM sessions`, §6) e
+   dal bucket `museumbot-voice` le loro registrazioni prima della raccolta.
+   Poi, durante la raccolta, trascrivere le registrazioni (da fare: strumento non scelto).
 8. Accordi con il museo tramite il lab: giorni e posto per la raccolta, e i loro testi
    (eyeVisit, audioguida, opuscolo) come fonti più lunghe o come termine di confronto.
 9. Pilota con 10–15 persone (durata, comprensione, categorie scelte), poi numerosità (§7).
@@ -532,8 +576,8 @@ Proposta non implementata: un tasto dell'operatore che segna l'ultima risposta c
 | testi del museo ("Read along") | `docs/analisi/haum-testi-museo.md`, `data/rq3/museum_texts.jsonl` (anche accorciati e in tedesco); screenshot in `data/rq3/museo_readalong/`; audio in `data/rq3/museum_audio/` (input `data/rq3/museum_guides.jsonl`) |
 | testi generati | `kaggle/haum/` → `data/wiki/haum_generations.jsonl` (con `text_de`); `docs/analisi/haum-testi.md` |
 | sintesi vocale | `src/museumbot/generation/tts.py` → `rq3_app/audio/` |
-| app | `rq3_app/` (audio, immagini e `manifest.json` fuori da git; `sync.js`, `qr.js`, `validate.js`); online su `https://museumbot.pages.dev` |
-| server delle risposte | `rq3_pages/` (`wrangler.toml`, `schema.sql`, `functions/api/session.js` e `sessions.js`, `lib/server.js`, `tests/`) |
+| app | `rq3_app/` (audio, immagini e `manifest.json` fuori da git; `sync.js`, `qr.js`, `validate.js`, `recorder.js`); online su `https://museumbot.pages.dev` |
+| server delle risposte | `rq3_pages/` (`wrangler.toml`, `schema.sql`, `functions/api/session.js`, `sessions.js` e `voice.js`, `lib/server.js`, `tests/`) |
 | manifesto, stimoli finti, raccolta | `src/museumbot/rq3_visitors/` (`build_manifest.py`, `demo_stimuli.py`, `collect.py`, `download.py`) |
 | test | `rq3_app/tests/`, `rq3_pages/tests/`, `tests/test_rq3_manifest.py`, `tests/test_rq3_collect.py`, `tests/test_rq3_download.py`, `tests/test_tts.py` |
 

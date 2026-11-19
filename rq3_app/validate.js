@@ -6,6 +6,8 @@ export const MAX_BYTES = 65536;   // lo controlla il server sul corpo
 export const MAX_TRIALS = 5;
 export const MAX_WHY = 2000;
 export const SESSION_ID_RE = /^[0-9a-z]{6}$/;
+export const MAX_VOICE_BYTES = 25 * 1024 * 1024;   // registrazione di fine giro (10 min bastano)
+export const VOICE_TYPE_RE = /^audio\/(mp4|webm|ogg|mpeg)(;.*)?$/;
 const LANGS = ['en', 'de'];
 const isScore = v => Number.isInteger(v) && v >= 1 && v <= 7;
 const DEVICE_RE = /^[A-Za-z0-9_-]{1,40}$/;   // come validDevice di operator.js
@@ -20,6 +22,18 @@ function checkTrial(t, i) {
     out.push(`prova ${i}: why non ammesso`);
   return out;
 }
+
+// voice: null (non ancora), {skipped: true[, no_mic: true]} o {sec, mime, recorded_at}.
+export function voiceOk(v) {
+  if (v == null) return true;
+  if (typeof v !== 'object' || Array.isArray(v)) return false;
+  if (v.skipped === true) return true;
+  return typeof v.sec === 'number' && v.sec >= 0 && typeof v.mime === 'string'
+    && VOICE_TYPE_RE.test(v.mime) && typeof v.recorded_at === 'string';
+}
+
+// La sessione dichiara una registrazione.
+export const hasVoice = rec => !!(rec && rec.voice && typeof rec.voice.sec === 'number');
 
 // Problemi del record, uno per messaggio; vuoto se va bene.
 export function validateRecord(rec) {
@@ -36,6 +50,7 @@ export function validateRecord(rec) {
   const fit = rec.category_fit;
   if (fit != null && !(typeof fit === 'object' && !Array.isArray(fit) && Object.values(fit).every(isScore)))
     out.push('category_fit non ammesso');
+  if (!voiceOk(rec.voice)) out.push('voice non ammessa');
   if ('trials' in rec) {
     if (!Array.isArray(rec.trials)) out.push('trials non e\' una lista');
     else if (rec.trials.length > MAX_TRIALS) out.push(`trials: piu' di ${MAX_TRIALS} prove`);

@@ -1,8 +1,9 @@
 // Invio delle sessioni al database online: dopo ogni salvataggio, ogni 30 s e quando torna
 // la rete. Un giro alla volta; 'sent' e 'rejected' (session_id -> updated_at) in IndexedDB,
 // 'write_keys' (session_id -> chiave) per riconoscere la stessa sessione sul server.
+// Dopo le sessioni, le registrazioni di fine giro ('voice_sent', 'voice_rejected').
 
-import {getAllSessions, getSetting, setSetting} from './store.js';
+import {getAllSessions, getSetting, setSetting, getVoice, getVoiceIds} from './store.js';
 
 // Record da inviare: non gia' inviati (o respinti) con lo stesso updated_at, i piu' vecchi prima.
 export function pending(records, sent) {
@@ -14,6 +15,7 @@ export function pending(records, sent) {
 export const newKey = bytes => Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
 
 let endpoint = 'api/session';
+let voiceEndpoint = 'api/voice';
 let running = false;
 let again = false;
 
@@ -38,13 +40,19 @@ export const fetchInit = (rec, key) => ({method: 'POST', body: JSON.stringify(re
   headers: {'Content-Type': 'application/json', 'X-Write-Key': key},
   keepalive: true, redirect: 'error', signal: AbortSignal.timeout(15000)});
 
+// Registrazione: niente keepalive (limite di 64 KB), timeout lungo.
+export const voiceInit = (v, key) => ({method: 'PUT', body: v.data,
+  headers: {'Content-Type': v.mime, 'X-Write-Key': key},
+  redirect: 'error', signal: AbortSignal.timeout(120000)});
+
 // Esito di una risposta: 'ok' (200 con {ok:true}), 'rejected' (400/403, non si riprova),
-// 'skip' (429: questo record per ora, si va avanti) o 'stop' (rete, portale, altro).
+// 'skip' (429, o 404/409 per una registrazione che arriva prima del suo record: per ora no,
+// si va avanti) o 'stop' (rete, portale, altro).
 export async function classify(res) {
   if (res.status === 200) {
     try { return (await res.json()).ok === true ? 'ok' : 'stop'; } catch (e) { return 'stop'; }
   }
-  if (res.status === 429) return 'skip';
+  if (res.status === 429 || res.status === 404 || res.status === 409) return 'skip';
   if (res.status === 400 || res.status === 403) {
     let err = '';
     try { err = (await res.json()).error || ''; } catch (e) { /* corpo non JSON */ }
@@ -61,6 +69,7 @@ async function sendOne(rec) {
   return classify(res);
 }
 
+// Sessioni, poi registrazioni; 'stop' interrompe il giro.
 async function round() {
   const [all, sent, rejected] = await Promise.all(
     [getAllSessions(), getSetting('sent'), getSetting('rejected')]);
@@ -69,6 +78,26 @@ async function round() {
     if (out === 'stop') return;
     if (out === 'skip') continue;
     await mark(out === 'ok' ? 'sent' : 'rejected', rec.session_id, rec.updated_at);
+  }
+  await voiceRound();
+}
+
+// Registrazioni salvate e non ancora inviate (ne' respinte).
+async function voiceRound() {
+  const [ids, sent, rejected] = await Promise.all(
+    [getVoiceIds(), getSetting('voice_sent'), getSetting('voice_rejected')]);
+  const done = {...(sent || {}), ...(rejected || {})};
+  for (const id of ids.filter(i => !done[i])) {
+    const v = await getVoice(id);
+    if (!v) continue;
+    const key = await keyFor(id);
+    let res;
+    try { res = await fetch(`${voiceEndpoint}?id=${encodeURIComponent(id)}`, voiceInit(v, key)); }
+    catch (e) { return; }
+    const out = await classify(res);
+    if (out === 'stop') return;
+    if (out === 'skip') continue;
+    await mark(out === 'ok' ? 'voice_sent' : 'voice_rejected', id, v.recorded_at);
   }
 }
 
@@ -86,6 +115,7 @@ export async function syncSoon() {
 
 export function startSync(opts = {}) {
   endpoint = opts.endpoint || 'api/session';
+  voiceEndpoint = opts.voiceEndpoint || 'api/voice';
   setInterval(syncSoon, opts.every || 30000);
   window.addEventListener('online', syncSoon);
   window.addEventListener('pagehide', syncSoon);
@@ -95,9 +125,12 @@ export function startSync(opts = {}) {
   syncSoon();
 }
 
-// Sessioni del dispositivo inviate (con l'ultimo updated_at) sul totale.
+// Sessioni del dispositivo inviate (con l'ultimo updated_at) sul totale; lo stesso per le
+// registrazioni.
 export async function syncState() {
-  const [all, sent] = await Promise.all([getAllSessions(), getSetting('sent')]);
-  const s = sent || {};
-  return {sent: all.filter(r => s[r.session_id] === r.updated_at).length, total: all.length};
+  const [all, sent, ids, vsent] = await Promise.all(
+    [getAllSessions(), getSetting('sent'), getVoiceIds(), getSetting('voice_sent')]);
+  const s = sent || {}, v = vsent || {};
+  return {sent: all.filter(r => s[r.session_id] === r.updated_at).length, total: all.length,
+          voiceSent: ids.filter(id => v[id]).length, voiceTotal: ids.length};
 }

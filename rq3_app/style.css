@@ -314,3 +314,24 @@ textarea:focus-visible { outline-offset: 1px; border-color: var(--wall); }
 .op-list { font-size: 0.9rem; max-height: 260px; overflow: auto; margin: 0 0 12px; }
 a.op-download { display: inline-block; margin: 0 0 12px; font-weight: 600; color: var(--wall); }
 .op-status p { margin: 0 0 4px; font-size: 0.95rem; }
+
+/* Domande a voce di fine giro: istruzioni brevi, domande su una scheda, registratore */
+.voice-help { color: var(--muted); font-size: 0.95rem; padding-left: 1.2em; margin: 0 0 20px; }
+.voice-help li { margin-bottom: 4px; }
+.voice-questions {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  margin: 0 0 8px; padding: 18px 22px 18px 2.6em;
+  font-family: var(--serif); font-size: 1.2rem; line-height: 1.45;
+}
+.voice-questions li { margin: 6px 0; padding-left: 4px; }
+.voice-rec .stack { margin-top: 8px; }
+.voice-status { min-height: 1.6em; margin: 16px 0 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+.voice-status.on::before {
+  content: ""; display: inline-block; width: 12px; height: 12px; margin-right: 10px;
+  border-radius: 50%; background: var(--err); vertical-align: 1px;
+  animation: rec-blink 1.2s steps(2, start) infinite;
+}
+@keyframes rec-blink { to { visibility: hidden; } }
+@media (prefers-reduced-motion: reduce) { .voice-status.on::before { animation: none; } }
+button.stop { background: var(--err); border-color: var(--err); }
+button[hidden] { display: none; }

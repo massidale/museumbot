@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   REQUIRED, MAX_BYTES, MAX_TRIALS, MAX_WHY, SESSION_ID_RE,
-  validateRecord, answered, rank, notBehind,
+  validateRecord, answered, rank, notBehind, voiceOk, hasVoice,
 } from '../validate.js';
 import {newSession, buildTrial, answer, allConditions, CATEGORIES} from '../logic.js';
 
@@ -88,4 +88,18 @@ test('device: stringa con il formato dell\'operatore', () => {
   assert.deepEqual(validateRecord({...valid(), device: 7}), ['device non ammesso']);
   assert.deepEqual(validateRecord({...valid(), device: 'a b'}), ['device non ammesso']);
   assert.deepEqual(validateRecord({...valid(), device: 'x'.repeat(41)}), ['device non ammesso']);
+});
+
+test('voice: assente, saltata o registrata; altro no', () => {
+  for (const voice of [undefined, null, {skipped: true}, {skipped: true, no_mic: true},
+                       {sec: 42.5, mime: 'audio/mp4', recorded_at: 'T'},
+                       {sec: 3, mime: 'audio/webm;codecs=opus', recorded_at: 'T'}])
+    assert.deepEqual(validateRecord({...valid(), voice}), [], JSON.stringify(voice));
+  for (const voice of ['x', [], {}, {sec: -1, mime: 'audio/mp4', recorded_at: 'T'},
+                       {sec: 3, mime: 'text/html', recorded_at: 'T'}, {sec: 3, mime: 'audio/mp4'}])
+    assert.deepEqual(validateRecord({...valid(), voice}), ['voice non ammessa'], JSON.stringify(voice));
+  assert.equal(voiceOk(null), true);
+  assert.equal(hasVoice({voice: {sec: 0, mime: 'audio/mp4', recorded_at: 'T'}}), true);
+  assert.equal(hasVoice({voice: {skipped: true}}), false);
+  assert.equal(hasVoice({}), false);
 });

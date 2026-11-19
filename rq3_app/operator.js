@@ -2,7 +2,8 @@
 // "Nuova sessione" e l'area d'angolo; col PIN: nome del dispositivo, conteggi, controllo
 // del materiale, export delle sessioni e cancellazione di quelle esportate.
 import {toJson, deletableIds, validateManifest, tourOrder, moveItem} from './logic.js';
-import {getAllSessions, deleteSessions, getSetting, setSetting, getSaveFailures} from './store.js';
+import {getAllSessions, deleteSessions, getSetting, setSetting, getSaveFailures, getVoiceIds,
+  deleteVoices} from './store.js';
 import {checkCache, mediaUrls} from './player.js';
 import {fillMissing} from './swclient.js';
 import {syncState} from './sync.js';
@@ -306,7 +307,8 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
       exportBtn.disabled = all.length === 0;
       const st = await syncState();
       if (closed) return;
-      online.textContent = `Online: ${st.sent} of ${st.total} sessions sent`;
+      online.textContent = `Online: ${st.sent} of ${st.total} sessions sent; `
+        + `${st.voiceSent} of ${st.voiceTotal} recordings sent`;
     } catch (e) {
       console.error(e);
       if (closed) return;
@@ -445,7 +447,13 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
       }
       await deleteSessions(ids);
       await setSetting('last_export_ids', []);
-      say(deleteMsg, `Deleted ${ids.length} sessions.`);
+      // registrazioni: si cancellano solo quelle gia' online; le altre restano e si inviano
+      const [vids, vsent] = await Promise.all([getVoiceIds(), getSetting('voice_sent')]);
+      const gone = vids.filter(id => ids.includes(id) && (vsent || {})[id]);
+      const kept = vids.filter(id => ids.includes(id) && !(vsent || {})[id]).length;
+      await deleteVoices(gone);
+      say(deleteMsg, `Deleted ${ids.length} sessions and ${gone.length} recordings.`
+        + (kept ? ` ${kept} recordings not yet online were kept.` : ''));
     } catch (e) {
       console.error(e);
       say(deleteMsg, `Deletion failed: ${errText(e)}`, true);

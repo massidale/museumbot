@@ -1,4 +1,5 @@
-"""Download delle sessioni online di RQ3 dal database: salva un export in data/rq3/raw."""
+"""Download delle sessioni online di RQ3 dal database: salva un export in data/rq3/raw e le
+registrazioni di fine giro in data/rq3/raw/voice (solo quelle che mancano)."""
 import argparse
 import json
 import os
@@ -10,6 +11,8 @@ import requests
 from museumbot.common.config import ROOT
 
 URL = "https://museumbot.pages.dev/api/sessions"
+VOICE_URL = "https://museumbot.pages.dev/api/voice"
+EXT = {"audio/mp4": "m4a", "audio/webm": "webm", "audio/ogg": "ogg", "audio/mpeg": "mp3"}
 RAW = ROOT / "data" / "rq3" / "raw"
 
 
@@ -45,15 +48,43 @@ def save(records: list[dict], raw_dir: Path, now: datetime) -> Path:
     return path
 
 
+def voice_name(item: dict) -> str:
+    """File della registrazione: <session_id>.<estensione dal tipo, senza parametri>."""
+    base = str(item.get("type", "")).split(";")[0].strip()
+    return f"{item['session_id']}.{EXT.get(base, 'bin')}"
+
+
+def fetch_voice(url: str, token: str, voice_dir: Path, get=requests.get) -> int:
+    """Scarica le registrazioni non ancora in voice_dir; restituisce quante."""
+    auth = {"Authorization": f"Bearer {token}"}
+    resp = get(url, headers=auth, timeout=30)
+    resp.raise_for_status()
+    items = resp.json()
+    if not isinstance(items, list):
+        raise ValueError("la risposta non e' una lista di registrazioni")
+    voice_dir = Path(voice_dir)
+    nuove = [it for it in items if not (voice_dir / voice_name(it)).exists()]
+    for it in nuove:
+        r = get(f"{url}?id={it['session_id']}", headers=auth, timeout=120)
+        r.raise_for_status()
+        voice_dir.mkdir(parents=True, exist_ok=True)
+        (voice_dir / voice_name(it)).write_bytes(r.content)
+    return len(nuove)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--url", default=URL)
+    ap.add_argument("--voice-url", default=VOICE_URL)
     ap.add_argument("--out-dir", type=Path, default=RAW)
     args = ap.parse_args()
-    records = fetch(args.url, export_token())
+    token = export_token()
+    records = fetch(args.url, token)
     path = save(records, args.out_dir, datetime.now())
     print(f"scritto: {path}")
     print(f"sessioni: {len(records)}")
+    n = fetch_voice(args.voice_url, token, args.out_dir / "voice")
+    print(f"registrazioni nuove: {n} (in {args.out_dir / 'voice'})")
 
 
 if __name__ == "__main__":

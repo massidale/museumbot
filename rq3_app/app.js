@@ -330,12 +330,17 @@ function showTrial(i) {
     return {...t, plays: upd(t.plays, s.plays), reached_end: upd(t.reached_end, t.reached_end[pos] || s.ended),
             heard_sec: upd(t.heard_sec, s.heard)};
   };
+  // Il voto di ogni guida subito sotto il suo player.
+  const rating = pos => h('div', {class: 'question'},
+    h('p', {class: 'q'}, fmt(T.q_rating, {guide: guideLabel(pos + 1)})),
+    scale(v => { ans.ratings[pos] = v; refresh(); }, T.rating_low, T.rating_high));
   [0, 1].forEach(pos => {
     const box = h('div', {class: 'guide'});
     guides.append(box);
     players.push(createPlayer(box, trial.audio[pos], guideLabel(pos + 1),
                               s => { trial = withStats(trial, pos, s); putTrial(trial); }, labels,
                               S.manifest.version, err => playerError(i, pos + 1, err)));
+    box.append(rating(pos));
   });
 
   if (i + 1 < S.total) {   // le guide dell'opera dopo si scaricano mentre si risponde
@@ -344,11 +349,7 @@ function showTrial(i) {
 
   const why = h('textarea', {rows: '3', maxlength: String(MAX_WHY)});
   const next = h('button', {type: 'button'}, T.next);
-  const rating = pos => h('div', {class: 'question'},
-    h('p', {class: 'q'}, fmt(T.q_rating, {guide: guideLabel(pos + 1)})),
-    scale(v => { ans.ratings[pos] = v; refresh(); }, T.rating_low, T.rating_high));
   const questions = h('div', {class: 'questions'},
-    rating(0), rating(1),
     h('div', {class: 'question'}, h('label', {class: 'q'}, T.q_why_text, why)));
 
   const refresh = () => { next.disabled = !answerComplete(ans); };

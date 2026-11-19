@@ -213,6 +213,9 @@ button.card:disabled::after { border-color: var(--line); }
 .scale-ends { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 0.95rem; margin-top: 8px; }
 
 /* Domande */
+/* Ogni guida: player e, subito sotto, il suo voto; fra le due guide un divisore */
+.guide .question { margin: 4px 0 0; }
+.guide + .guide { margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--line); }
 .questions { margin: 28px 0 0; padding-top: 24px; border-top: 1px solid var(--line); }
 .question { margin: 0 0 28px; }
 .q { font-weight: 600; margin: 0 0 12px; display: block; }

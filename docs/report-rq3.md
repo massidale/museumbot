@@ -313,7 +313,7 @@ finti si ricreano con `demo_stimuli.py` (non sono più in `rq3_app/`).
 Disegno e piano: `docs/plans/2026-11-16-rq3-app-ipad-design.md`,
 `docs/plans/2026-11-16-rq3-app-ipad.md`; telefoni e risposte online:
 `docs/plans/2026-11-18-rq3-qr-online-design.md`, `docs/plans/2026-11-18-rq3-qr-online.md`.
-Versione dell'app 0.4.2 (`config.js`).
+Versione dell'app 0.4.3 (`config.js`).
 
 - **Forma.** Pagina web statica (HTML, CSS e JavaScript senza build). Sull'iPad si installa
   nella Home e un service worker scarica pagina, manifesto, immagini e audio, poi funziona
@@ -322,9 +322,9 @@ Versione dell'app 0.4.2 (`config.js`).
   stesso su iPad e telefono. La scelta della lingua è la parete verde della galleria con un
   cartellino per lingua (nome della lingua e "Continue in English" / "Auf Deutsch weiter").
 - **Modi.**
-  - *Operatore* (iPad e telefono di Massimo): schermata protetta da PIN (`config.js`; si apre
+  - *Operatore* (iPad e telefono di Massimo): schermata in inglese, protetta da PIN (`config.js`; si apre
     tenendo premuto 2 s l'angolo in alto a destra) con nome del dispositivo, controllo del
-    materiale in cache, stato dell'invio online ed export. "Nuova sessione", a fondo pagina, resta disattivata
+    materiale in cache, stato dell'invio online ed export. "New session", a fondo pagina, resta disattivata
     finché il nome non è impostato e il materiale non è tutto in cache. Lo stesso angolo, sulle
     schermate del visitatore, interrompe la sessione (`aborted_by_operator`).
   - *QR* (telefoni dei visitatori, `https://museumbot.pages.dev/?m=qr`): si parte subito dalla
@@ -335,7 +335,8 @@ Versione dell'app 0.4.2 (`config.js`).
 - **Percorso.** (Operatore avvia la sessione →) lingua → informativa → presentazione dello
   studio → classificazione (1 o 2 descrizioni, poi un voto 1–7 per ciascuna) → istruzioni (cuffie) → per
   ogni opera immagine, titolo, Guida 1 e Guida 2 ciascuna col suo voto 1–7 subito sotto, domanda
-  aperta → "un'altra opera?" → saluti.
+  aperta → "un'altra opera?" → saluti. In fondo a ogni schermata del visitatore c'è l'id della
+  sessione (`ID abc123`), per annotare errori ed esclusioni (§8).
   Testi dell'interfaccia in inglese e tedesco, con una versione italiana di riferimento che
   l'app non mostra (`rq3_app/texts.json`, copia di `docs/plans/2026-11-16-rq3-testi-app.json`).
   Lo studio è presentato come confronto fra due audioguide scritte con l'intelligenza
@@ -395,7 +396,7 @@ Versione dell'app 0.4.2 (`config.js`).
   copia online è completa appena c'è rete.
 - **Export (alternativa).** Se manca la rete, dalla schermata dell'operatore un file
   `rq3_<device>_<AAAAMMGG-HHMM>.json` con la lista delle sessioni (rientrata, leggibile).
-  "Scarica" lo salva come un download normale (Mac: Download; iPad: File > Download). I record restano sul
+  "Download" lo salva come un download normale (Mac: Download; iPad: File > Download). I record restano sul
   dispositivo finché l'operatore non conferma l'export, e si cancellano solo quelli esportati.
 - **Raccolta.** `rq3_visitors/download.py` scarica le sessioni online da
   `https://museumbot.pages.dev/api/sessions` in `data/rq3/raw/online_<AAAAMMGG-HHMM>.json`
@@ -413,10 +414,10 @@ Versione dell'app 0.4.2 (`config.js`).
   audio), le risposte no. Si usa sempre l'indirizzo fisso: gli indirizzi dei singoli deploy
   sono siti diversi, ciascuno con la sua memoria. A ogni modifica di `rq3_app/` si
   ripubblica; se cambiano gli audio, con una nuova versione del manifesto, e sull'iPad
-  "Scarica i mancanti". Un file che manca dà 404 (`rq3_app/404.html` toglie a Pages il ritorno
+  "Download missing files". Un file che manca dà 404 (`rq3_app/404.html` toglie a Pages il ritorno
   alla pagina principale, che subito dopo un deploy faceva arrivare HTML al posto di un modulo
   e lasciava la pagina bianca); se dopo un deploy la pagina resta bianca, si ricarica.
-- **Stato.** Versione 0.4.2 pubblicata il 19 novembre 2026 con il manifesto `haum-2` (5 opere,
+- **Stato.** Versione 0.4.3 pubblicata il 19 novembre 2026 con il manifesto `haum-2` (5 opere,
   160 audio, `flat` del museo); controllati online la versione del manifesto e i 10 `flat`,
   uguali ai file locali.
   Provata in locale con `wrangler pages dev` (sessioni inviate; una sessione salvata a server
@@ -493,7 +494,7 @@ Cohen, pareggi a parte) e tassi di vittoria per categoria, umani contro LLM.
 1. Rilettura del tedesco da un madrelingua.
 2. Sintesi vocale: ascolto dei 160 audio di HeyGen (§5).
 3. Prova sull'iPad: installazione nella Home, circa 100 MB di audio in cache, riproduzione
-   offline, cursore e −10 s col dito, "Scarica" in File > Download, invio online dalla
+   offline, cursore e −10 s col dito, "Download" in File > Download, invio online dalla
    modalità operatore, anche con la rete tolta e poi tornata.
 4. Prova sul telefono di Massimo con i dati mobili (modo `?m=qr`, audio, invio).
 5. Museo: Wi-Fi allo stand, cartello con il QR code.

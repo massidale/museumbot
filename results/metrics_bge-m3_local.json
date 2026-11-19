@@ -121,5 +121,9 @@
     "Experience Seeker": 0.9896705150604248,
     "Professional/Hobbyist": 0.9861128330230713,
     "Recharger": 0.9926506280899048
-  }
+  },
+  "ceiling_runs": [
+    "full",
+    "full_rep"
+  ]
 }

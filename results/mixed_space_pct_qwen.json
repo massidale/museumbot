@@ -1,0 +1,288 @@
+{
+  "model": "qwen",
+  "categories": [
+    "explorer",
+    "facilitator",
+    "professional_hobbyist",
+    "recharger"
+  ],
+  "probe4_accuracy": 1.0,
+  "pairs": {
+    "recharger+professional_hobbyist": {
+      "0": {
+        "n": 100,
+        "probs": {
+          "explorer": 0.098,
+          "facilitator": 0.067,
+          "professional_hobbyist": 0.038,
+          "recharger": 0.797
+        },
+        "assigned": {
+          "explorer": 0.0,
+          "facilitator": 0.0,
+          "professional_hobbyist": 0.0,
+          "recharger": 1.0
+        },
+        "p_x": 0.797,
+        "p_y": 0.038,
+        "p_other": 0.165
+      },
+      "0.25": {
+        "n": 100,
+        "probs": {
+          "explorer": 0.19,
+          "facilitator": 0.108,
+          "professional_hobbyist": 0.14,
+          "recharger": 0.562
+        },
+        "assigned": {
+          "explorer": 0.03,
+          "facilitator": 0.0,
+          "professional_hobbyist": 0.02,
+          "recharger": 0.95
+        },
+        "p_x": 0.562,
+        "p_y": 0.14,
+        "p_other": 0.297
+      },
+      "0.5": {
+        "n": 100,
+        "probs": {
+          "explorer": 0.228,
+          "facilitator": 0.13,
+          "professional_hobbyist": 0.276,
+          "recharger": 0.365
+        },
+        "assigned": {
+          "explorer": 0.17,
+          "facilitator": 0.0,
+          "professional_hobbyist": 0.3,
+          "recharger": 0.53
+        },
+        "p_x": 0.365,
+        "p_y": 0.276,
+        "p_other": 0.359
+      },
+      "0.75": {
+        "n": 100,
+        "probs": {
+          "explorer": 0.212,
+          "facilitator": 0.116,
+          "professional_hobbyist": 0.475,
+          "recharger": 0.197
+        },
+        "assigned": {
+          "explorer": 0.03,
+          "facilitator": 0.0,
+          "professional_hobbyist": 0.89,
+          "recharger": 0.08
+        },
+        "p_x": 0.197,
+        "p_y": 0.475,
+        "p_other": 0.328
+      },
+      "1": {
+        "n": 100,
+        "probs": {
+          "explorer": 0.109,
+          "facilitator": 0.077,
+          "professional_hobbyist": 0.775,
+          "recharger": 0.039
+        },
+        "assigned": {
+          "explorer": 0.0,
+          "facilitator": 0.0,
+          "professional_hobbyist": 1.0,
+          "recharger": 0.0
+        },
+        "p_x": 0.039,
+        "p_y": 0.775,
+        "p_other": 0.185
+      }
+    },
+    "facilitator+professional_hobbyist": {
+      "0": {
+        "n": 100,
+        "probs": {
+          "explorer": 0.23,
+          "facilitator": 0.625,
+          "professional_hobbyist": 0.078,
+          "recharger": 0.067
+        },
+        "assigned": {
+          "explorer": 0.0,
+          "facilitator": 1.0,
+          "professional_hobbyist": 0.0,
+          "recharger": 0.0
+        },
+        "p_x": 0.625,
+        "p_y": 0.078,
+        "p_other": 0.297
+      },
+      "0.25": {
+        "n": 100,
+        "probs": {
+          "explorer": 0.27,
+          "facilitator": 0.39,
+          "professional_hobbyist": 0.255,
+          "recharger": 0.085
+        },
+        "assigned": {
+          "explorer": 0.16,
+          "facilitator": 0.59,
+          "professional_hobbyist": 0.25,
+          "recharger": 0.0
+        },
+        "p_x": 0.39,
+        "p_y": 0.255,
+        "p_other": 0.355
+      },
+      "0.5": {
+        "n": 100,
+        "probs": {
+          "explorer": 0.23,
+          "facilitator": 0.257,
+          "professional_hobbyist": 0.432,
+          "recharger": 0.082
+        },
+        "assigned": {
+          "explorer": 0.08,
+          "facilitator": 0.24,
+          "professional_hobbyist": 0.68,
+          "recharger": 0.0
+        },
+        "p_x": 0.257,
+        "p_y": 0.432,
+        "p_other": 0.311
+      },
+      "0.75": {
+        "n": 100,
+        "probs": {
+          "explorer": 0.192,
+          "facilitator": 0.179,
+          "professional_hobbyist": 0.563,
+          "recharger": 0.066
+        },
+        "assigned": {
+          "explorer": 0.04,
+          "facilitator": 0.03,
+          "professional_hobbyist": 0.93,
+          "recharger": 0.0
+        },
+        "p_x": 0.179,
+        "p_y": 0.563,
+        "p_other": 0.258
+      },
+      "1": {
+        "n": 100,
+        "probs": {
+          "explorer": 0.109,
+          "facilitator": 0.077,
+          "professional_hobbyist": 0.775,
+          "recharger": 0.039
+        },
+        "assigned": {
+          "explorer": 0.0,
+          "facilitator": 0.0,
+          "professional_hobbyist": 1.0,
+          "recharger": 0.0
+        },
+        "p_x": 0.077,
+        "p_y": 0.775,
+        "p_other": 0.148
+      }
+    },
+    "explorer+facilitator": {
+      "0": {
+        "n": 100,
+        "probs": {
+          "explorer": 0.563,
+          "facilitator": 0.234,
+          "professional_hobbyist": 0.107,
+          "recharger": 0.096
+        },
+        "assigned": {
+          "explorer": 1.0,
+          "facilitator": 0.0,
+          "professional_hobbyist": 0.0,
+          "recharger": 0.0
+        },
+        "p_x": 0.563,
+        "p_y": 0.234,
+        "p_other": 0.203
+      },
+      "0.25": {
+        "n": 100,
+        "probs": {
+          "explorer": 0.412,
+          "facilitator": 0.406,
+          "professional_hobbyist": 0.083,
+          "recharger": 0.1
+        },
+        "assigned": {
+          "explorer": 0.49,
+          "facilitator": 0.5,
+          "professional_hobbyist": 0.01,
+          "recharger": 0.0
+        },
+        "p_x": 0.412,
+        "p_y": 0.406,
+        "p_other": 0.183
+      },
+      "0.5": {
+        "n": 100,
+        "probs": {
+          "explorer": 0.35,
+          "facilitator": 0.487,
+          "professional_hobbyist": 0.081,
+          "recharger": 0.082
+        },
+        "assigned": {
+          "explorer": 0.26,
+          "facilitator": 0.74,
+          "professional_hobbyist": 0.0,
+          "recharger": 0.0
+        },
+        "p_x": 0.35,
+        "p_y": 0.487,
+        "p_other": 0.163
+      },
+      "0.75": {
+        "n": 100,
+        "probs": {
+          "explorer": 0.23,
+          "facilitator": 0.61,
+          "professional_hobbyist": 0.081,
+          "recharger": 0.079
+        },
+        "assigned": {
+          "explorer": 0.03,
+          "facilitator": 0.97,
+          "professional_hobbyist": 0.0,
+          "recharger": 0.0
+        },
+        "p_x": 0.23,
+        "p_y": 0.61,
+        "p_other": 0.159
+      },
+      "1": {
+        "n": 100,
+        "probs": {
+          "explorer": 0.23,
+          "facilitator": 0.625,
+          "professional_hobbyist": 0.078,
+          "recharger": 0.067
+        },
+        "assigned": {
+          "explorer": 0.0,
+          "facilitator": 1.0,
+          "professional_hobbyist": 0.0,
+          "recharger": 0.0
+        },
+        "p_x": 0.23,
+        "p_y": 0.625,
+        "p_other": 0.145
+      }
+    }
+  }
+}

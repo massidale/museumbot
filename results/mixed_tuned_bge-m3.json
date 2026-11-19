@@ -1,0 +1,170 @@
+{
+  "model": "bge-m3",
+  "near": 0.15,
+  "low_logp": -4.605,
+  "pairs": {
+    "recharger+professional_hobbyist": {
+      "by_alpha": {
+        "0.25": {
+          "n": 100,
+          "target": 0.25,
+          "position_median": 0.136,
+          "share_of_median": 0.139,
+          "near_target": 51,
+          "off_curve": 22,
+          "with_unlikely_token": 29
+        },
+        "0.4": {
+          "n": 100,
+          "target": 0.25,
+          "position_median": 0.277,
+          "share_of_median": 0.263,
+          "near_target": 51,
+          "off_curve": 2,
+          "with_unlikely_token": 68
+        },
+        "0.5": {
+          "n": 100,
+          "target": 0.5,
+          "position_median": 0.572,
+          "share_of_median": 0.69,
+          "near_target": 25,
+          "off_curve": 1,
+          "with_unlikely_token": 85
+        },
+        "0.6": {
+          "n": 100,
+          "target": 0.75,
+          "position_median": 0.835,
+          "share_of_median": 0.942,
+          "near_target": 20,
+          "off_curve": 18,
+          "with_unlikely_token": 75
+        },
+        "0.75": {
+          "n": 100,
+          "target": 0.75,
+          "position_median": 0.94,
+          "share_of_median": 0.982,
+          "near_target": 2,
+          "off_curve": 39,
+          "with_unlikely_token": 43
+        }
+      },
+      "tuned_closer": {
+        "0.4_vs_0.25": true,
+        "0.6_vs_0.75": true
+      }
+    },
+    "facilitator+professional_hobbyist": {
+      "by_alpha": {
+        "0.25": {
+          "n": 100,
+          "target": 0.25,
+          "position_median": 0.251,
+          "share_of_median": 0.303,
+          "near_target": 38,
+          "off_curve": 16,
+          "with_unlikely_token": 27
+        },
+        "0.4": {
+          "n": 100,
+          "target": 0.25,
+          "position_median": 0.49,
+          "share_of_median": 0.645,
+          "near_target": 19,
+          "off_curve": 0,
+          "with_unlikely_token": 54
+        },
+        "0.5": {
+          "n": 100,
+          "target": 0.5,
+          "position_median": 0.616,
+          "share_of_median": 0.811,
+          "near_target": 20,
+          "off_curve": 3,
+          "with_unlikely_token": 71
+        },
+        "0.6": {
+          "n": 100,
+          "target": 0.75,
+          "position_median": 0.72,
+          "share_of_median": 0.889,
+          "near_target": 47,
+          "off_curve": 10,
+          "with_unlikely_token": 54
+        },
+        "0.75": {
+          "n": 100,
+          "target": 0.75,
+          "position_median": 0.858,
+          "share_of_median": 0.952,
+          "near_target": 26,
+          "off_curve": 27,
+          "with_unlikely_token": 31
+        }
+      },
+      "tuned_closer": {
+        "0.4_vs_0.25": false,
+        "0.6_vs_0.75": true
+      }
+    },
+    "explorer+facilitator": {
+      "by_alpha": {
+        "0.25": {
+          "n": 100,
+          "target": 0.25,
+          "position_median": 0.249,
+          "share_of_median": 0.237,
+          "near_target": 29,
+          "off_curve": 30,
+          "with_unlikely_token": 11
+        },
+        "0.4": {
+          "n": 100,
+          "target": 0.25,
+          "position_median": 0.348,
+          "share_of_median": 0.368,
+          "near_target": 23,
+          "off_curve": 28,
+          "with_unlikely_token": 20
+        },
+        "0.5": {
+          "n": 100,
+          "target": 0.5,
+          "position_median": 0.465,
+          "share_of_median": 0.596,
+          "near_target": 25,
+          "off_curve": 19,
+          "with_unlikely_token": 19
+        },
+        "0.6": {
+          "n": 100,
+          "target": 0.75,
+          "position_median": 0.559,
+          "share_of_median": 0.802,
+          "near_target": 21,
+          "off_curve": 14,
+          "with_unlikely_token": 28
+        },
+        "0.75": {
+          "n": 100,
+          "target": 0.75,
+          "position_median": 0.75,
+          "share_of_median": 0.938,
+          "near_target": 16,
+          "off_curve": 20,
+          "with_unlikely_token": 16
+        }
+      },
+      "tuned_closer": {
+        "0.4_vs_0.25": false,
+        "0.6_vs_0.75": true
+      }
+    }
+  },
+  "tuned_closer_count": {
+    "0.4_vs_0.25": 1,
+    "0.6_vs_0.75": 3
+  }
+}

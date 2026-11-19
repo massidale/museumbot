@@ -1,5 +1,7 @@
 {
   "alpha": 0.5,
+  "method": "mix",
+  "source": "diag",
   "pairs": {
     "explorer+facilitator": {
       "n": 100,

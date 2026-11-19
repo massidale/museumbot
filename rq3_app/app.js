@@ -63,12 +63,16 @@ function h(tag, props = {}, ...kids) {
 // Sostituisce {n}, {i}, ... con i valori dati.
 const fmt = (s, vars) => s.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k]) : m));
 
+// Id della sessione in fondo a ogni schermata del visitatore (per segnare errori e esclusioni).
+const sessionTag = cls => (cls !== 'operator' && S && S.sessionId
+  ? h('p', {class: 'session-id', lang: 'en'}, `ID ${S.sessionId}`) : null);
+
 // Nuova schermata: chiude la precedente (audio, timer) e torna in cima.
 function screen(cls, ...kids) {
   for (const f of cleanups) { try { f(); } catch (e) { console.error(e); } }
   cleanups = [];
   app.className = cls || '';
-  app.replaceChildren(...kids.flat().filter(Boolean));
+  app.replaceChildren(...kids.flat().filter(Boolean), ...[sessionTag(cls)].filter(Boolean));
   window.scrollTo(0, 0);
 }
 
@@ -151,7 +155,7 @@ export async function startSession() {
   try {
     const manifest = await (await fetch('manifest.json')).json();
     const errs = validateManifest(manifest);
-    if (errs.length) throw new Error(`manifesto non valido: ${errs.slice(0, 3).join('; ')}`);
+    if (errs.length) throw new Error(`manifest not valid: ${errs.slice(0, 3).join('; ')}`);
     if (!texts) texts = await (await fetch('texts.json')).json();
     let device = 'qr';
     if (!QR) {
@@ -168,7 +172,7 @@ export async function startSession() {
     showLanguage();
   } catch (e) {
     console.error(e);
-    const message = `Impossibile avviare la sessione: ${e.message || e}`;
+    const message = `Could not start the session: ${e.message || e}`;
     if (QR) screen('', h('p', {class: 'lead'}, message));   // dal telefono niente operatore
     else showOperator(message);
   }

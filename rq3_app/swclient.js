@@ -21,7 +21,7 @@ function settle(err) {
 // Un worker in install che diventa 'redundant' e' un install fallito.
 function onState(state) {
   if (state === 'redundant') {
-    report('installazione fallita: alcuni file non sono stati scaricati; riprovare con "Scarica i mancanti"', true);
+    report('install failed: some files were not downloaded; try "Download missing files"', true);
     settle(new Error('installazione del service worker fallita'));
     return;
   }
@@ -40,8 +40,8 @@ function onMessage(ev) {
   if (!ev.data || ev.data.type !== 'filled') return;
   if (ev.data.ok) settle();
   else {
-    report(`scaricamento non riuscito: ${ev.data.error}`, true);
-    settle(new Error(`scaricamento non riuscito: ${ev.data.error}`));
+    report(`download failed: ${ev.data.error}`, true);
+    settle(new Error(`download failed: ${ev.data.error}`));
   }
 }
 
@@ -57,10 +57,10 @@ async function register() {
 export async function registerServiceWorker(onStatus) {
   report = onStatus || (() => {});
   if (navigator.storage && navigator.storage.persist) {
-    navigator.storage.persist().then(ok => report(`storage persistente: ${ok}`, !ok));
-  } else report('storage persistente: non disponibile', true);
+    navigator.storage.persist().then(ok => report(`persistent storage: ${ok}`, !ok));
+  } else report('persistent storage: not available', true);
 
-  if (!('serviceWorker' in navigator)) { report('service worker: non disponibile', true); return null; }
+  if (!('serviceWorker' in navigator)) { report('service worker: not available', true); return null; }
   if (!listening) {
     navigator.serviceWorker.addEventListener('message', onMessage);
     listening = true;
@@ -68,7 +68,7 @@ export async function registerServiceWorker(onStatus) {
   try {
     await register();
     if (reg.active && !reg.installing)
-      report(`service worker: attivo (${navigator.serviceWorker.controller ? 'controlla la pagina' : 'non ancora in controllo'})`, false);
+      report(`service worker: active (${navigator.serviceWorker.controller ? 'controls the page' : 'not yet in control'})`, false);
     return reg;
   } catch (e) {
     report(`service worker: ${e}`, true);
@@ -80,12 +80,12 @@ export async function registerServiceWorker(onStatus) {
 // senza (install fallito) si registra di nuovo, che rifa' l'install da dove si era fermato.
 // Si risolve a scaricamento concluso; rifiuta su errore o dopo FILL_TIMEOUT_MS.
 export async function fillMissing(manifest) {
-  if (!('serviceWorker' in navigator)) throw new Error('service worker non disponibile');
+  if (!('serviceWorker' in navigator)) throw new Error('service worker not available');
   if (manifest && (await checkCache(manifest)).missing.length === 0) return;
   if (pending) throw new Error('scaricamento gia\' in corso');
   const done = new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
-      report('nessuna risposta dal service worker: scaricamento non concluso', true);
+      report('no answer from the service worker: download not finished', true);
       settle(new Error('nessuna risposta dal service worker'));
     }, FILL_TIMEOUT_MS);
     pending = {resolve, reject, timer};

@@ -133,6 +133,10 @@ pre {
 
 /* Percorso del visitatore */
 .lead { font-size: 1.15rem; }
+/* Id della sessione: piccolo, sotto i tasti */
+.session-id { margin: 14px 0 0; font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; letter-spacing: 0.04em; }
+main.lang .session-id { color: rgba(255, 255, 255, 0.6); }
+
 /* Scelta della lingua: la parete verde della galleria, le due lingue come cartellini delle
    opere (angoli piccoli, niente ombra), diversi dai tasti dell'app */
 html:has(main.lang), body:has(main.lang) { background: var(--wall); }

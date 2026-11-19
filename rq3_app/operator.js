@@ -1,4 +1,4 @@
-// Schermata dell'operatore (solo per chi conduce lo studio, in italiano). Senza PIN: solo
+// Schermata dell'operatore (solo per chi conduce lo studio, in inglese). Senza PIN: solo
 // "Nuova sessione" e l'area d'angolo; col PIN: nome del dispositivo, conteggi, controllo
 // del materiale, export delle sessioni e cancellazione di quelle esportate.
 import {toJson, deletableIds, validateManifest} from './logic.js';
@@ -70,13 +70,13 @@ export function longPress(el, ms, onFire) {
 function pinForm(onOk, onCancel = null) {
   const input = h('input', {type: 'password', inputmode: 'numeric', autocomplete: 'off', 'aria-label': 'PIN'});
   const msg = h('p', {class: 'err'});
-  const cancel = onCancel && h('button', {type: 'button', class: 'secondary'}, 'Annulla');
-  const form = h('form', {class: 'op-row op-pin', hidden: true}, input, h('button', {type: 'submit'}, 'Apri'), cancel, msg);
+  const cancel = onCancel && h('button', {type: 'button', class: 'secondary'}, 'Cancel');
+  const form = h('form', {class: 'op-row op-pin', hidden: true}, input, h('button', {type: 'submit'}, 'Open'), cancel, msg);
   const reset = () => { input.value = ''; msg.textContent = ''; form.hidden = true; };
   form.addEventListener('submit', e => {
     e.preventDefault();
     if (input.value === PIN) { reset(); onOk(); }
-    else { input.value = ''; msg.textContent = 'PIN errato.'; }
+    else { input.value = ''; msg.textContent = 'Wrong PIN.'; }
   });
   if (cancel) cancel.addEventListener('click', () => { reset(); onCancel(); });
   const open = () => { form.hidden = false; input.focus(); };
@@ -87,12 +87,12 @@ function pinForm(onOk, onCancel = null) {
 // poi onAbort. Gli elementi stanno fuori da #app (le schermate non li toccano).
 // Restituisce la funzione che li toglie.
 export function mountAbortGate(onAbort) {
-  const corner = h('div', {class: 'op-corner', id: 'op-abort-corner', 'aria-label': 'Area operatore'});
-  const box = h('div', {class: 'op-overlay', id: 'op-abort', lang: 'it', hidden: true}, h('p', {}, 'Operatore: PIN'));
+  const corner = h('div', {class: 'op-corner', id: 'op-abort-corner', 'aria-label': 'Operator area'});
+  const box = h('div', {class: 'op-overlay', id: 'op-abort', lang: 'en', hidden: true}, h('p', {}, 'Operator: PIN'));
   const close = () => { pin.reset(); box.hidden = true; };
   const pin = pinForm(() => {
     box.hidden = true;
-    if (window.confirm('Interrompere la sessione?')) onAbort();
+    if (window.confirm('Stop this session?')) onAbort();
   }, close);
   box.append(pin.form);
   const cancelHold = longPress(corner, HOLD_MS, () => { box.hidden = false; pin.open(); });
@@ -119,8 +119,8 @@ function saveWarning() {
   if (!f.length) return null;
   const ids = [...new Set(f.map(x => x.session_id))].join(', ');
   return h('p', {class: 'err', id: 'op-save-errors'},
-    `Attenzione: ${f.length} salvataggi non riusciti (sessioni ${ids}); `
-    + `l'ultimo al passo ${f[f.length - 1].last_step}: ${f[f.length - 1].error}`);
+    `Warning: ${f.length} saves failed (sessions ${ids}); `
+    + `the last one at step ${f[f.length - 1].last_step}: ${f[f.length - 1].error}`);
 }
 
 // ---- schermata ----
@@ -136,7 +136,7 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
   let blobUrl = null;
 
   // -- nuova sessione --
-  const start = h('button', {type: 'button', id: 'op-start', disabled: true}, 'Nuova sessione');
+  const start = h('button', {type: 'button', id: 'op-start', disabled: true}, 'New session');
   const startBar = h('div', {class: 'actions'}, start);   // a fondo pagina, come nelle altre schermate
   const startNote = h('p', {class: 'muted', id: 'op-start-note'});
   start.addEventListener('click', () => { if (canStart()) onStart(); });
@@ -144,44 +144,44 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
   function updateStart() {
     start.disabled = !canStart();
     const why = [];
-    if (device == null) why.push('nome del dispositivo non impostato');
-    if (check.state === 'pending') why.push('controllo del materiale in corso');
-    if (check.state === 'error') why.push(check.sw === false ? 'materiale incompleto o service worker non attivo'
-                                                              : 'materiale incompleto o non valido');
-    startNote.textContent = why.length ? `Nuova sessione disattivata: ${why.join('; ')}.` : '';
+    if (device == null) why.push('device name not set');
+    if (check.state === 'pending') why.push('checking the media');
+    if (check.state === 'error') why.push(check.sw === false ? 'media incomplete or service worker not active'
+                                                              : 'media incomplete or not valid');
+    startNote.textContent = why.length ? `New session disabled: ${why.join('; ')}.` : '';
     startNote.className = check.state === 'error' ? 'err' : 'muted';
   }
 
   // -- PIN --
-  const corner = h('div', {class: 'op-corner', id: 'op-corner', 'aria-label': 'Area operatore'});
+  const corner = h('div', {class: 'op-corner', id: 'op-corner', 'aria-label': 'Operator area'});
   const pin = pinForm(() => openPanel());
   pin.input.id = 'op-pin';
   const cancelHold = longPress(corner, HOLD_MS, () => { if (panel.hidden) pin.open(); });
 
   // -- dispositivo --
   const devInput = h('input', {type: 'text', id: 'op-device', autocomplete: 'off', autocapitalize: 'off',
-                               spellcheck: 'false', placeholder: 'es. ipad-1'});
+                               spellcheck: 'false', placeholder: 'e.g. ipad-1'});
   const devMsg = h('p', {class: 'muted'});
-  const devForm = h('form', {class: 'op-row'}, devInput, h('button', {type: 'submit'}, 'Salva nome'));
+  const devForm = h('form', {class: 'op-row'}, devInput, h('button', {type: 'submit'}, 'Save name'));
   devForm.addEventListener('submit', async e => {
     e.preventDefault();
     const v = devInput.value.trim();
     if (!validDevice(v)) {
-      say(devMsg, 'Nome non valido: solo lettere, cifre, "-" e "_" (es. ipad-1).', true);
+      say(devMsg, 'Invalid name: only letters, digits, "-" and "_" (e.g. ipad-1).', true);
       return;
     }
     try {
       await setSetting('device', v);
-      say(devMsg, `Nome salvato: ${v}.`);
+      say(devMsg, `Name saved: ${v}.`);
       await refresh();
-    } catch (err) { say(devMsg, `Nome non salvato: ${errText(err)}`, true); }
+    } catch (err) { say(devMsg, `Name not saved: ${errText(err)}`, true); }
   });
 
   // -- sessioni, export, cancellazione --
-  const counts = h('p', {id: 'op-counts'}, 'Lettura delle sessioni...');
+  const counts = h('p', {id: 'op-counts'}, 'Reading sessions...');
   const online = h('p', {class: 'muted', id: 'op-online'});
-  const exportBtn = h('button', {type: 'button', id: 'op-export'}, 'Scarica');
-  const deleteBtn = h('button', {type: 'button', class: 'secondary', id: 'op-delete'}, 'Cancella le sessioni esportate');
+  const exportBtn = h('button', {type: 'button', id: 'op-export'}, 'Download');
+  const deleteBtn = h('button', {type: 'button', class: 'secondary', id: 'op-delete'}, 'Delete exported sessions');
   const exportMsg = h('p', {class: 'muted', id: 'op-export-msg'});
   const linkBox = h('div', {id: 'op-download'});
   const deleteMsg = h('p', {class: 'muted', id: 'op-delete-msg'});
@@ -189,8 +189,8 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
   deleteBtn.addEventListener('click', doDelete);
 
   // -- materiale --
-  const checkBtn = h('button', {type: 'button', id: 'op-check'}, 'Controlla materiale');
-  const fillBtn = h('button', {type: 'button', class: 'secondary', id: 'op-fill', hidden: true}, 'Scarica i mancanti');
+  const checkBtn = h('button', {type: 'button', id: 'op-check'}, 'Check media');
+  const fillBtn = h('button', {type: 'button', class: 'secondary', id: 'op-fill', hidden: true}, 'Download missing files');
   const checkBox = h('div', {class: 'op-check', id: 'op-check-result'});
   checkBtn.addEventListener('click', () => runCheck());
   fillBtn.addEventListener('click', doFill);
@@ -206,21 +206,21 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
   };
 
   const panel = h('section', {class: 'op-panel', id: 'op-panel', hidden: true},
-    h('h2', {}, 'Dispositivo'),
+    h('h2', {}, 'Device'),
     devForm, devMsg,
-    h('h2', {}, 'Sessioni'),
+    h('h2', {}, 'Sessions'),
     counts,
     online,
     h('div', {class: 'op-row'}, exportBtn, deleteBtn),
     exportMsg, linkBox, deleteMsg,
-    h('p', {class: 'note'}, 'Cancellare solo dopo aver controllato che il file sia arrivato sul Mac.'),
-    h('h2', {}, 'Materiale'),
+    h('p', {class: 'note'}, 'Delete only after checking that the file has reached the Mac.'),
+    h('h2', {}, 'Media'),
     h('div', {class: 'op-row'}, checkBtn, fillBtn),
     checkBox,
     h('h2', {}, 'Service worker'),
     swBox,
     h('div', {class: 'actions'},
-      h('button', {type: 'button', class: 'secondary', onclick: closePanel}, 'Chiudi pannello')));
+      h('button', {type: 'button', class: 'secondary', onclick: closePanel}, 'Close panel')));
 
   function say(el, text, isErr = false) {
     el.textContent = text;
@@ -256,17 +256,17 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
       const complete = all.filter(r => r.completed === true).length;
       const inExport = deletableIds(all, exported || []).length;
       prepared = {text: toJson(all), ids: all.map(r => r.session_id)};
-      counts.textContent = `${all.length} sessioni nel dispositivo: ${complete} complete, `
-        + `${all.length - complete} interrotte. Gia' esportate (ultimo export): ${inExport}.`;
+      counts.textContent = `${all.length} sessions on this device: ${complete} complete, `
+        + `${all.length - complete} incomplete. Already exported (last export): ${inExport}.`;
       exportBtn.disabled = all.length === 0;
       const st = await syncState();
       if (closed) return;
-      online.textContent = `Online: ${st.sent} di ${st.total} sessioni inviate`;
+      online.textContent = `Online: ${st.sent} of ${st.total} sessions sent`;
     } catch (e) {
       console.error(e);
       if (closed) return;
       prepared = null;
-      say(counts, `Lettura delle sessioni non riuscita: ${errText(e)}`, true);
+      say(counts, `Could not read sessions: ${errText(e)}`, true);
     }
     updateStart();
   }
@@ -276,7 +276,7 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
     const seq = ++checkSeq;
     check = {state: 'pending'};
     checkBtn.disabled = true;
-    checkBox.replaceChildren(h('p', {class: 'muted'}, 'Controllo in corso...'));
+    checkBox.replaceChildren(h('p', {class: 'muted'}, 'Checking...'));
     updateStart();
     let next;
     try {
@@ -288,7 +288,7 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
       next = {state: errors.length || missing.length || !sw ? 'error' : 'ok', manifest, errors, missing, bytes, total, sw};
     } catch (e) {
       console.error(e);
-      next = {state: 'error', manifest: null, errors: [`controllo non riuscito: ${errText(e)}`], missing: [], sw: swControls()};
+      next = {state: 'error', manifest: null, errors: [`check failed: ${errText(e)}`], missing: [], sw: swControls()};
     }
     if (closed || seq !== checkSeq) return;
     check = next;
@@ -301,24 +301,24 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
     const {state, manifest, errors, missing, bytes, total, sw} = check;
     const out = [];
     if (!sw) {
-      out.push(h('p', {class: 'err', id: 'op-sw-missing'}, 'Il service worker non controlla la pagina: '
-        + 'senza, l\'app non funziona offline. Ricaricare la pagina con la rete e ripetere il controllo.'));
+      out.push(h('p', {class: 'err', id: 'op-sw-missing'}, 'The service worker does not control the page: '
+        + 'without it the app does not work offline. Reload the page with a connection and check again.'));
     }
     if (state === 'ok') {
-      out.push(h('p', {class: 'ok'}, `Materiale completo: manifesto ${manifest.version}, `
-        + `${total} file in cache (${(bytes / 1e6).toFixed(1)} MB).`));
+      out.push(h('p', {class: 'ok'}, `Media complete: manifest ${manifest.version}, `
+        + `${total} files cached (${(bytes / 1e6).toFixed(1)} MB).`));
     }
     if (errors.length) {
-      out.push(h('p', {class: 'err'}, `Manifesto non valido (${errors.length} errori):`),
+      out.push(h('p', {class: 'err'}, `Manifest not valid (${errors.length} errors):`),
         h('ul', {class: 'op-list err'}, errors.slice(0, MAX_LISTED).map(s => h('li', {}, s))));
     }
     if (missing.length) {
-      out.push(h('p', {class: 'err'}, `Mancano ${missing.length} file su ${total} `
-        + `(manifesto ${manifest.version}):`),
+      out.push(h('p', {class: 'err'}, `${missing.length} of ${total} files missing `
+        + `(manifest ${manifest.version}):`),
         h('ul', {class: 'op-list err', id: 'op-missing'}, missing.slice(0, MAX_LISTED).map(s => h('li', {}, s))));
-      if (missing.length > MAX_LISTED) out.push(h('p', {class: 'err'}, `... e altri ${missing.length - MAX_LISTED}.`));
+      if (missing.length > MAX_LISTED) out.push(h('p', {class: 'err'}, `... and ${missing.length - MAX_LISTED} more.`));
     }
-    if (errors.length > MAX_LISTED) out.push(h('p', {class: 'err'}, `... e altri ${errors.length - MAX_LISTED} errori.`));
+    if (errors.length > MAX_LISTED) out.push(h('p', {class: 'err'}, `... and ${errors.length - MAX_LISTED} more errors.`));
     checkBox.replaceChildren(...out);
     fillBtn.hidden = !(missing.length && manifest);
   }
@@ -326,12 +326,12 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
   async function doFill() {
     if (!check.manifest) return;
     fillBtn.disabled = checkBtn.disabled = true;
-    checkBox.prepend(h('p', {class: 'muted'}, 'Scaricamento in corso...'));
+    checkBox.prepend(h('p', {class: 'muted'}, 'Downloading...'));
     try {
       await fillMissing(check.manifest);
     } catch (e) {
       console.error(e);
-      if (!closed) checkBox.prepend(h('p', {class: 'err'}, `Scaricamento non riuscito: ${errText(e)}`));
+      if (!closed) checkBox.prepend(h('p', {class: 'err'}, `Download failed: ${errText(e)}`));
     }
     fillBtn.disabled = false;
     if (!closed) await runCheck();
@@ -347,10 +347,10 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
   async function markExported(ids, name) {
     try {
       await setSetting('last_export_ids', ids);
-      say(exportMsg, `Esportate ${ids.length} sessioni in ${name}.`);
+      say(exportMsg, `Exported ${ids.length} sessions to ${name}.`);
     } catch (e) {
-      say(exportMsg, `File creato, ma l'export non e' stato registrato (${errText(e)}): `
-        + 'le sessioni non verranno cancellate.', true);
+      say(exportMsg, `File created, but the export was not recorded (${errText(e)}): `
+        + 'the sessions will not be deleted.', true);
     }
     await refresh();
   }
@@ -359,14 +359,14 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
     clearLink();
     blobUrl = URL.createObjectURL(file);
     const a = h('a', {href: blobUrl, download: file.name, class: 'op-download'},
-      `Scarica ${file.name} (${ids.length} sessioni)`);
+      `Download ${file.name} (${ids.length} sessions)`);
     a.addEventListener('click', () => markExported(ids, file.name));
     linkBox.append(a);
   }
 
   // Il file dell'export: tutte le sessioni del dispositivo, preparate in refresh().
   function exportFile() {
-    if (!prepared || prepared.ids.length === 0) { say(exportMsg, 'Nessuna sessione da esportare.'); return null; }
+    if (!prepared || prepared.ids.length === 0) { say(exportMsg, 'No sessions to export.'); return null; }
     return {file: new File([prepared.text], exportFileName(device || DEFAULT_DEVICE), {type: 'application/json'}),
             ids: prepared.ids};
   }
@@ -389,21 +389,21 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
       const [all, exported] = await Promise.all([getAllSessions(), getSetting('last_export_ids')]);
       const ids = deletableIds(all, exported || []);
       if (ids.length === 0) {
-        say(deleteMsg, 'Nessuna sessione esportata da cancellare: prima esportare.');
+        say(deleteMsg, 'No exported sessions to delete: export first.');
         return;
       }
       const left = all.length - ids.length;
-      if (!window.confirm(`Cancellare definitivamente ${ids.length} sessioni esportate? `
-        + `Ne restano ${left} non esportate. L'operazione non si puo' annullare.`)) {
-        say(deleteMsg, 'Cancellazione annullata.');
+      if (!window.confirm(`Permanently delete ${ids.length} exported sessions? `
+        + `${left} not exported will remain. This cannot be undone.`)) {
+        say(deleteMsg, 'Deletion cancelled.');
         return;
       }
       await deleteSessions(ids);
       await setSetting('last_export_ids', []);
-      say(deleteMsg, `Cancellate ${ids.length} sessioni.`);
+      say(deleteMsg, `Deleted ${ids.length} sessions.`);
     } catch (e) {
       console.error(e);
-      say(deleteMsg, `Cancellazione non riuscita: ${errText(e)}`, true);
+      say(deleteMsg, `Deletion failed: ${errText(e)}`, true);
     } finally {
       if (!closed) {
         deleteBtn.disabled = false;
@@ -414,7 +414,7 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
 
   root.replaceChildren(...[
     corner,
-    h('h1', {}, 'Audioguide: operatore'),
+    h('h1', {}, 'Audio guides: operator'),
     h('p', {class: 'muted'}, `app ${APP_VERSION}`),
     message && h('p', {class: 'err'}, message),
     saveWarning(),

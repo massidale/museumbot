@@ -34,8 +34,8 @@ Deciso il 16 novembre 2026 (`docs/decisioni.md`), con le semplificazioni del 17 
 - **Domande per opera.** Quanto è piaciuta ciascuna guida, da 1 (per niente) a 7 (moltissimo),
   e cosa è piaciuto o no delle due (aperta, facoltativa). Nessuna scelta forzata: la
   preferenza è la differenza fra i due voti (personalizzata meno `flat`), con pareggi possibili.
-- **Opere.** Le 5 del §3 hanno gli audio; una sessione ne mostra fino a 4, in ordine casuale
-  (`MAX_ARTWORKS` in `app.js`). Il visitatore può fermarsi dopo ognuna, quindi da 1 a 4
+- **Opere.** Le 5 del §3 hanno gli audio; una sessione le mostra tutte e 5, in ordine casuale
+  (`MAX_ARTWORKS` in `app.js`). Il visitatore può fermarsi dopo ognuna, quindi da 1 a 5
   prove per sessione. Ogni sessione è indipendente (nessun bilanciamento fra visitatori).
 - **Lingua.** Inglese o tedesco, scelta all'inizio.
 - **Ascolto libero.** Play, pausa, −10 s e cursore; l'app non impone l'ordine né l'ascolto
@@ -126,8 +126,8 @@ del museo ha una voce di lunghezza paragonabile in una delle quattro lingue.
 **Opere aggiunte e tolte** (18 novembre 2026): si aggiungono *The Dying Cleopatra* (Rosso
 Fiorentino, voce italiana) e *Aurora* (Elsheimer, voce spagnola), che hanno un testo "Read along"
 del museo; *Self-Portrait as David* resta fra i testi generati ma non ha audio, perché non è
-nella guida ufficiale del museo. Gli audio sono quindi per 5 opere; una sessione ne
-mostra fino a 4, in ordine casuale.
+nella guida ufficiale del museo. Gli audio sono quindi per 5 opere; una sessione le
+mostra tutte e 5, in ordine casuale.
 
 ### 3.3 Le opere dell'app del museo
 
@@ -266,7 +266,7 @@ museo. Durata dei 150 di Gemma: inglese mediana 85 s (75–98), tedesco 95 s (78
 15.2 e 17.4 caratteri al secondo, quindi nessun audio troncato; del museo: inglese 76–87 s,
 tedesco 79–86 s. Ascolto da fare.
 Una prova (due guide) dura così circa 3–3,5 minuti, una sessione da circa 5 (1 opera) a circa
-15 minuti (4 opere), senza contare le domande.
+18 minuti (5 opere), senza contare le domande.
 
 ### 5.1 Scelta del modello
 
@@ -313,7 +313,7 @@ finti si ricreano con `demo_stimuli.py` (non sono più in `rq3_app/`).
 Disegno e piano: `docs/plans/2026-11-16-rq3-app-ipad-design.md`,
 `docs/plans/2026-11-16-rq3-app-ipad.md`; telefoni e risposte online:
 `docs/plans/2026-11-18-rq3-qr-online-design.md`, `docs/plans/2026-11-18-rq3-qr-online.md`.
-Versione dell'app 0.4.4 (`config.js`).
+Versione dell'app 0.4.5 (`config.js`).
 
 - **Forma.** Pagina web statica (HTML, CSS e JavaScript senza build). Sull'iPad si installa
   nella Home e un service worker scarica pagina, manifesto, immagini e audio, poi funziona
@@ -361,7 +361,7 @@ Versione dell'app 0.4.4 (`config.js`).
   `completed: false` e il passo raggiunto. Campi obbligatori (`validate.js`, gli stessi di
   `collect.py`): `session_id` (6 caratteri minuscoli e cifre), `device`, `app_version`,
   `manifest_version`, `seed`, `lang`, `started_at`, `updated_at`, `completed`, `last_step`,
-  `trials` (al massimo 4); `completed` è vero o falso, `started_at` e `updated_at` sono
+  `trials` (al massimo 5); `completed` è vero o falso, `started_at` e `updated_at` sono
   stringhe, `device` ha da 1 a 40 lettere, cifre, `-` o `_`. Con l'informativa `consent_at`; nel modo QR `device: qr` ed
   `earlier_sessions`, il numero di sessioni già fatte da quel browser (0 la prima volta). Per
   prova `ratings` (voti 1–7 di Guida 1 e Guida 2, nell'ordine di ascolto come `plays` e
@@ -420,7 +420,7 @@ Versione dell'app 0.4.4 (`config.js`).
   "Download missing files". Un file che manca dà 404 (`rq3_app/404.html` toglie a Pages il ritorno
   alla pagina principale, che subito dopo un deploy faceva arrivare HTML al posto di un modulo
   e lasciava la pagina bianca); se dopo un deploy la pagina resta bianca, si ricarica.
-- **Stato.** Versione 0.4.4 pubblicata il 19 novembre 2026 con il manifesto `haum-2` (5 opere,
+- **Stato.** Versione 0.4.5 pubblicata il 19 novembre 2026 con il manifesto `haum-2` (5 opere,
   160 audio, `flat` del museo); controllati online la versione del manifesto e i 10 `flat`,
   uguali ai file locali.
   Provata in locale con `wrangler pages dev` (sessioni inviate; una sessione salvata a server

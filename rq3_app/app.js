@@ -13,7 +13,7 @@ import {startSync, syncSoon} from './sync.js';
 import {MAX_WHY} from './validate.js';
 import {showOperator as operatorScreen, onSwStatus, mountAbortGate, DEFAULT_DEVICE} from './operator.js';
 
-const MAX_ARTWORKS = 4;
+const MAX_ARTWORKS = 5;
 const RETURN_MS = 30 * 1000;    // dopo i saluti si torna da soli all'operatore
 
 const app = document.getElementById('app');

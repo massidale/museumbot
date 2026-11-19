@@ -1172,3 +1172,12 @@ prova conta come risposta quando ha `answered_at` (app, server, `collect.py`). A
 voti (personalizzata meno `flat`), con pareggi possibili; la numerosità del report è per il
 segno della differenza e va rifatta dopo il pilota. Il gemello LLM si confronta col segno della
 differenza.
+
+## 2026-11-19 — RQ3: una sessione mostra tutte e 5 le opere
+
+**Decisione.** Una sessione mostra fino a 5 opere invece di 4 (`MAX_ARTWORKS` in `app.js`,
+`MAX_TRIALS` in `validate.js`, quindi anche il server); i testi dell'introduzione dicono "fino a
+cinque". App 0.4.5.
+**Motivo.** Indicazione di Massimo: le opere con gli audio sono 5 e vanno mostrate tutte.
+**Effetto.** Nessun dato di visitatori raccolto. Fino a 5 prove per sessione; una sessione
+completa dura circa 18 minuti invece di 15.

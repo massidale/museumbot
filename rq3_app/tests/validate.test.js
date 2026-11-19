@@ -26,7 +26,7 @@ function valid() {
 const withTrial = (rec, patch) => ({...rec, trials: [{...rec.trials[0], ...patch}]});
 
 test('costanti', () => {
-  assert.equal(MAX_BYTES, 65536); assert.equal(MAX_TRIALS, 4); assert.equal(MAX_WHY, 2000);
+  assert.equal(MAX_BYTES, 65536); assert.equal(MAX_TRIALS, 5); assert.equal(MAX_WHY, 2000);
   assert.ok(SESSION_ID_RE.test('a1b2c3'));
   assert.equal(REQUIRED.length, 11);
 });
@@ -41,7 +41,7 @@ test('un problema per ogni errore', () => {
   assert.equal(validateRecord(noSeed).length, 1);
   assert.equal(validateRecord({...r, session_id: 'ABC123'}).length, 1);
   assert.equal(validateRecord({...r, lang: 'fr'}).length, 1);
-  assert.equal(validateRecord({...r, trials: Array(5).fill(r.trials[0])}).length, 1);
+  assert.equal(validateRecord({...r, trials: Array(6).fill(r.trials[0])}).length, 1);
   for (const ratings of [[8, 1], [2.5, 3], [1], 'x'])
     assert.equal(validateRecord(withTrial(r, {ratings})).length, 1, String(ratings));
   for (const category_fit of [{explorer: 9}, {explorer: 2.5}, 'x'])

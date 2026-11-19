@@ -3,7 +3,7 @@
 export const REQUIRED = ['session_id', 'device', 'app_version', 'manifest_version', 'seed',
   'lang', 'started_at', 'updated_at', 'completed', 'last_step', 'trials'];
 export const MAX_BYTES = 65536;   // lo controlla il server sul corpo
-export const MAX_TRIALS = 4;
+export const MAX_TRIALS = 5;
 export const MAX_WHY = 2000;
 export const SESSION_ID_RE = /^[0-9a-z]{6}$/;
 const LANGS = ['en', 'de'];

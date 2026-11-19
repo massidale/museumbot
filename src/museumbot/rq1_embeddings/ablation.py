@@ -145,13 +145,12 @@ def fig_bars(res: dict, path: Path) -> None:
               w, color=COLORS[c], label=LABELS[c])
     if ceil:
         b.axhline(np.mean(list(ceil.values())), color="#444", ls="--", lw=1,
-                  label="tetto (corpus principale)")
+                  label="ceiling")
     b.axhline(0, color="#ccc", lw=0.8)
-    b.set_ylabel("cos(v_variante, v_full)")
+    b.set_ylabel("cosine with full")
     b.set_ylim(-0.2, 1.05)
     b.set_xticks(x, vs, rotation=30, ha="right")
     b.legend(frameon=False, fontsize=8, ncol=5, loc="lower left")
-    b.set_title("Quanto ogni variante conserva la direzione del blocco completo", fontsize=11)
     b.spines[["top", "right"]].set_visible(False)
     fig.tight_layout()
     fig.savefig(path, dpi=160)

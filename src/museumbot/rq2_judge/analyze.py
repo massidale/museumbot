@@ -166,9 +166,8 @@ def fig_matrix(ex: dict, path) -> None:
         for j in range(len(lab)):
             ax.text(j, i, f"{M[i, j]:.2f}", ha="center", va="center", fontsize=9,
                     color="white" if M[i, j] > 0.55 else "black")
-    ax.set_xlabel("categoria per cui e' scritto il testo")
-    ax.set_ylabel("persona del giudice")
-    ax.set_title("Vittoria sul flat (diagonale: coppie A; fuori: coppie C)", fontsize=11)
+    ax.set_xlabel("text written for")
+    ax.set_ylabel("judge persona")
     fig.colorbar(im, shrink=0.8)
     fig.tight_layout()
     fig.savefig(path, dpi=160)
@@ -177,9 +176,9 @@ def fig_matrix(ex: dict, path) -> None:
 
 def fig_rates(res: dict, path) -> None:
     groups = [*FALK_CATEGORIES, "overall"]
-    names = [LABELS[k] for k in FALK_CATEGORIES] + ["Totale"]
+    names = [LABELS[k] for k in FALK_CATEGORIES] + ["Overall"]
     colors = {"A": "#1F77B4", "B": "#E8743B", "C": "#9E9E9E", "N": "#19A979"}
-    desc = {"A": "A: k vs flat", "B": "B: k vs j", "C": "C: j vs flat", "N": "N: k vs flat, senza persona"}
+    desc = {"A": "A: k vs flat", "B": "B: k vs j", "C": "C: j vs flat", "N": "N: k vs flat, no persona"}
     x = np.arange(len(groups))
     w = 0.2
     fig, ax = plt.subplots(figsize=(10, 5.6))
@@ -190,8 +189,7 @@ def fig_rates(res: dict, path) -> None:
     ax.axhline(0.5, color="#444", ls=":", lw=1)
     ax.set_xticks(x, names, rotation=20, ha="right")
     ax.set_ylim(0, 1.05)
-    ax.set_ylabel("tasso di vittoria dell'elemento di interesse")
-    ax.set_title(f"RQ2 — giudice {MODEL} con persona", fontsize=11)
+    ax.set_ylabel("win rate")
     ax.legend(frameon=False, fontsize=8, ncol=4, loc="upper center", bbox_to_anchor=(0.5, -0.22))
     ax.spines[["top", "right"]].set_visible(False)
     fig.tight_layout()

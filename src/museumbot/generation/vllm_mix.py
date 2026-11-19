@@ -109,8 +109,9 @@ def read_done(path: Path) -> set:
 
 
 def vllm_mixer(llm, group: int = GROUP, dstar: float | None = None, veto: bool = False,
-               debt: float | None = None):
-    """Backend vero: (opera, coppia, alpha, tentativo) -> (testo grezzo, extra)."""
+               debt: float | None = None, messages=local_messages):
+    """Backend vero: (opera, coppia, alpha, tentativo) -> (testo grezzo, extra).
+    `messages` costruisce i messaggi di un esperto (firma di `prompts.local_messages`)."""
     from transformers import GenerationConfig
     from vllm import SamplingParams
     from vllm.inputs import TokensPrompt
@@ -121,7 +122,7 @@ def vllm_mixer(llm, group: int = GROUP, dstar: float | None = None, veto: bool =
     params = SamplingParams(max_tokens=1, logprobs=TOP, temperature=1.0, seed=0)
 
     def ids(cond, art):
-        msgs = local_messages(cond, art["title"], art["artist"], art["source_text"])
+        msgs = messages(cond, art["title"], art["artist"], art["source_text"])
         text = tok.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True,
                                        enable_thinking=False)
         return tok.encode(text, add_special_tokens=False)

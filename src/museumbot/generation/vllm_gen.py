@@ -84,9 +84,9 @@ def replace_rows(rows: list[dict], new: list[dict], key=key) -> list[dict]:
     return [by.get(key(r), r) for r in rows]
 
 
-def vllm_backend(llm):
+def vllm_backend(llm, messages=local_messages):
     """Backend vero: prompt con il chat template, ragionamento disattivato, un seed per
-    richiesta."""
+    richiesta. `messages` costruisce i messaggi (firma di `prompts.local_messages`)."""
     from vllm import SamplingParams
     from vllm.inputs import TokensPrompt
 
@@ -95,7 +95,7 @@ def vllm_backend(llm):
     def gen(requests):
         prompts, params = [], []
         for a, c, v, k in requests:
-            msgs = local_messages(c, a["title"], a["artist"], a["source_text"], prompt_variant(v))
+            msgs = messages(c, a["title"], a["artist"], a["source_text"], prompt_variant(v))
             text = tok.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True,
                                            enable_thinking=False)
             prompts.append(TokensPrompt(prompt_token_ids=tok.encode(text, add_special_tokens=False)))

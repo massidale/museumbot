@@ -66,20 +66,19 @@ def plot(out) -> None:
     for j, (x, y) in enumerate(PAIRS):
         s = out["pairs"][f"{x}+{y}"]
         ax = axes[0, j]
-        ax.plot(ALPHAS, s["curve"]["rate_x"], "o-", label=f"persona {LABELS[x]} (vs {LABELS[y]} puro)")
-        ax.plot(ALPHAS, s["curve"]["rate_y"], "s-", label=f"persona {LABELS[y]} (vs {LABELS[x]} puro)")
-        ax.set_title(f"{LABELS[x]} → {LABELS[y]}: preferenza")
+        ax.plot(ALPHAS, s["curve"]["rate_x"], "o-", label=f"persona {LABELS[x]} (vs pure {LABELS[y]})")
+        ax.plot(ALPHAS, s["curve"]["rate_y"], "s-", label=f"persona {LABELS[y]} (vs pure {LABELS[x]})")
+        ax.set_title(f"{LABELS[x]} → {LABELS[y]}", fontsize=10)
         ax = axes[1, j]
         ax.plot(ALPHAS, s["double"]["rate_x"], "o-", label=f"persona {LABELS[x]}")
         ax.plot(ALPHAS, s["double"]["rate_y"], "s-", label=f"persona {LABELS[y]}")
-        ax.plot(ALPHAS, s["double"]["min"], "k--", label="minimo")
-        ax.set_title("contro il flat (doppio visitatore)")
+        ax.plot(ALPHAS, s["double"]["min"], "k--", label="minimum")
         for a in axes[:, j]:
             a.axhline(0.5, color="grey", lw=0.5)
-            a.set_xlabel("alpha")
+            a.set_xlabel("α")
             a.legend(fontsize=7)
-    axes[0, 0].set_ylabel("tasso di preferenza del testo-alpha")
-    axes[1, 0].set_ylabel("tasso di preferenza sul flat")
+    axes[0, 0].set_ylabel("preference for the mixed text")
+    axes[1, 0].set_ylabel("preference over the flat text")
     fig.tight_layout()
     FIGS.mkdir(exist_ok=True)
     fig.savefig(FIGS / f"judge_mixed_{TAG}.png", dpi=150)

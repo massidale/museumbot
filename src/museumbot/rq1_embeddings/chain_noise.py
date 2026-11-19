@@ -169,16 +169,14 @@ def steering_level(E, idx, ceiling=None) -> dict:
 def fig_dissimilarity(df: pd.DataFrame, path) -> None:
     fig, ax = plt.subplots(figsize=(8, 4.8))
     bins = np.linspace(0, max(1 - df[["within", "between"]].min().min(), 0.01), 40)
-    series = [("within", "rumore: singolo vs singolo", "#1F77B4"),
-              ("between", "chain vs singolo", "#E8743B")]
+    series = [("within", "single vs single (noise)", "#1F77B4"),
+              ("between", "chain vs single", "#E8743B")]
     for col, lab, color in series:
         d = 1 - df[col].dropna()
-        ax.hist(d, bins=bins, alpha=0.45, color=color, label=f"{lab} — media {d.mean():.3f}")
+        ax.hist(d, bins=bins, alpha=0.45, color=color, label=f"{lab}, mean {d.mean():.3f}")
         ax.axvline(d.mean(), color=color, lw=1.5)
-    ax.set_xlabel("dissimilarità coseno 1 − cos, per cella (opera × categoria)")
-    ax.set_ylabel("celle")
-    ax.set_title("Chain vs prompt singolo: differenza fra metodi e rumore di generazione",
-                 fontsize=11)
+    ax.set_xlabel("1 − cosine")
+    ax.set_ylabel("cells")
     ax.legend(frameon=False, fontsize=8)
     ax.spines[["top", "right"]].set_visible(False)
     fig.tight_layout()

@@ -249,6 +249,84 @@ def pct_messages(
     return msgs
 
 
+# Prova "pagina intera" (docs/report-pagina-intera.md): la fonte e' tutta la voce Wikipedia e
+# il prompt dice su quali aspetti concentrarsi per categoria. Il system prompt e' uguale per
+# tutte le categorie; blocco di categoria e indicazione stanno in coda al messaggio utente,
+# dopo la voce, cosi' i due esperti di un testo misto condividono il prefisso (voce compresa)
+# nella cache di vLLM.
+WIKI_SYSTEM = """\
+You are a museum audio guide writer. You are familiar with John H. Falk's five visitor \
+identity categories — Explorer, Facilitator, Experience Seeker, Professional/Hobbyist and \
+Recharger — and with the distinct informational and emotional needs each category brings to \
+an encounter with an artwork.
+
+Write a 250-word audio guide for the artwork described below, drawing only on the factual \
+material provided. The source is the full encyclopedia article on the artwork and holds far \
+more than 250 words can cover: select from it the material that suits your listener, \
+following the focus given at the end of the message. Use a style appropriate to your listener.
+
+Do not use phrases like "For those", "For who" or "As a", and do not otherwise refer \
+explicitly to the listener's category or profile. No headings, no bullet points, no stage \
+directions. Output only the spoken text.
+
+""" + LOCAL_SUFFIX
+
+WIKI_USER = """\
+Artwork: {title}
+Artist: {artist}
+
+Source (full encyclopedia article):
+{source_text}"""
+
+# Coda del messaggio utente per le categorie di Falk; il flat non ce l'ha.
+WIKI_LISTENER = """
+
+Listener:
+{block}
+Focus: {focus}"""
+
+# Aspetti della voce su cui concentrarsi, per categoria: dal bisogno della categoria (paper,
+# Appendice A.1) alle sezioni tipiche di una voce su un dipinto.
+FOCUS = {
+    "explorer": "pick the surprising and lesser-known material: details in the picture that "
+                "are easy to miss, curious episodes in its making or later history, open "
+                "questions and competing readings. Point the listener's eye to specific "
+                "things to look for.",
+    "facilitator": "pick what a group of companions of different ages and backgrounds can "
+                   "see and share: who and what is depicted and the story behind the scene, a "
+                   "few clear facts about the artist and the time, details everyone can spot. "
+                   "Leave out technical analysis and specialist debates, and close with a "
+                   "question the group can discuss together.",
+    "experience_seeker": "pick why this work is famous: its place in art history, the "
+                         "reactions it caused, its influence on later artists and on popular "
+                         "culture, and the one or two facts no visitor should leave without.",
+    "professional_hobbyist": "pick the specialist material: technique, materials and "
+                             "composition, dating and attribution, sources and models, "
+                             "provenance and condition, and the scholarly interpretations "
+                             "and debates the article reports, with related works by the "
+                             "artist or by others.",
+    "recharger": "pick the mood of the picture: light, colour, stillness or emotion, and the "
+                 "human or spiritual themes it opens. Use few dates, names and figures, and "
+                 "leave out provenance, prices and scholarly disputes.",
+}
+
+
+def wiki_messages(
+    condition: str, title: str, artist: str, source_text: str, variant: str = "full"
+) -> list[dict]:
+    """Messaggi della prova a pagina intera: system comune, in coda all'utente il blocco di
+    categoria completo e l'indicazione FOCUS. Il flat ha lo stesso system e il messaggio
+    utente senza la coda (come nei corpus principali cambia solo la parte di categoria).
+    `variant` c'e' per la firma di `local_messages` ed e' ignorata."""
+    if condition != "flat" and condition not in FOCUS:
+        raise ValueError(f"unknown condition {condition!r}")
+    user = WIKI_USER.format(title=title, artist=artist, source_text=source_text)
+    if condition != "flat":
+        user += WIKI_LISTENER.format(block=build_block(condition, "full"),
+                                     focus=FOCUS[condition])
+    return [{"role": "system", "content": WIKI_SYSTEM}, {"role": "user", "content": user}]
+
+
 if __name__ == "__main__":
     # Ispezione a occhio dei 6 prompt: `python -m museumbot.common.prompts`
     for cond in CONDITIONS:

@@ -29,3 +29,23 @@ def test_fold_probs_pure_out_of_fold_and_halfway_point_splits_two_classes():
     avg = p_mix.mean(axis=0)
     assert avg[0] + avg[1] > 0.9
     assert avg[0] == pytest.approx(avg[1], abs=0.2)
+
+
+def test_method_trajectories_share_pure_endpoints():
+    from museumbot.rq1_embeddings.mixed_space import CATS, INNER, method_trajectories
+    from museumbot.rq2_judge.mixed_judge import PAIRS
+
+    rng = np.random.default_rng(1)
+    Zp = rng.normal(size=(6, len(CATS), 2))
+
+    def sets(shift):
+        rows = [{"condition": f"{x}+{y}", "alpha": al} for x, y in PAIRS for al in INNER
+                for _ in range(2)]
+        return rng.normal(size=(len(rows), 2)) + shift, rows, np.ones(len(rows), bool)
+
+    tr = method_trajectories(Zp, {"mix": sets(0), "pct": sets(5)})
+    for name in tr["mix"]:
+        assert tr["mix"][name].shape == (len(INNER) + 2, 2)
+        assert np.allclose(tr["mix"][name][0], tr["pct"][name][0])
+        assert np.allclose(tr["mix"][name][-1], tr["pct"][name][-1])
+        assert not np.allclose(tr["mix"][name][1], tr["pct"][name][1])

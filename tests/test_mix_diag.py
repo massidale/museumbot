@@ -64,3 +64,32 @@ def test_split_sentences_skips_abbreviations_and_initials():
     ids = [7, 8, 4, 9, 2, 13, 4, 10, 4, 11, 12, 13, 14]  # "Then St. Peter measures it. W. Mellon gave it!"
     out = split_sentences(ids, np.arange(13.0), decode2, min_tokens=2)
     assert [len(s) for s in out] == [7, 6]
+
+
+def test_scored_margins_are_expert_difference_at_alpha():
+    from museumbot.generation.mix_diag import scored_margins
+
+    rows = [{"condition": "a+b", "alpha": 0.5, "ids": [1, 4], "logp": [[-1.0, -2.0], [-3.0, -1.0]]},
+            {"condition": "a+b", "alpha": 0.25, "ids": [1], "logp": [[0.0], [0.0]]}]
+    out = list(scored_margins(rows, 0.5))
+    assert len(out) == 1 and out[0][0] == "a+b" and out[0][1] == [1, 4]
+    assert out[0][2].tolist() == [2.0, -1.0]
+
+
+def test_pair_stats_averages_texts_per_pair():
+    from museumbot.generation.mix_diag import pair_stats
+
+    items = [("a+b", [1, 2, 3, 4, 5, 6, 7, 8], np.array([1.0] * 4 + [-1.0] * 4)),
+             ("a+b", [1, 2, 3, 4, 5, 6, 7, 8], np.array([2.0] * 8))]
+    out = pair_stats(items, decode)["a+b"]
+    assert out["n"] == 2 and out["sentences_mean"] == 2.0
+    assert out["sentence_sum_max_mean"] == 6.0 and out["sign_changes_observed"] == 0.5
+
+
+def test_result_name_and_diag_only_for_mix():
+    from museumbot.generation.mix_diag import result_name, run
+
+    assert result_name("mix", "diag") == "mix_diag"
+    assert result_name("pct", "scores") == "mix_diag_pct_scores"
+    with pytest.raises(ValueError):
+        run(method="pct", source="diag")

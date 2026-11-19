@@ -15,8 +15,14 @@ frasi (tokenizer del generatore); ogni frase ha la somma dei margini dei suoi to
   - cambi di segno fra frasi consecutive, contro l'atteso con le stesse frasi in ordine
     casuale (2pq/n, esatto): meno cambi del caso = blocchi di frasi dello stesso esperto.
 
-Limiti: solo il token scelto, non le distribuzioni intere; nei token assenti dalle prime
-100 di un esperto il valore e' il minimo della sua lista. Scrive results/mix_diag.json.
+Con `--source scores` i margini vengono dalla rilettura dei testi con i due prompt puri
+(`vllm_score`, data/local/scores_<metodo>.jsonl): stessa quantita', calcolata sul testo gia'
+scritto invece che durante la generazione, e senza troncamento alle prime 100. E' l'unica
+fonte per i testi a percentuale (`--method pct`), e per il confronto si usa per entrambi.
+
+Limiti: solo il token scelto, non le distribuzioni intere; nei misti, nei token assenti dalle
+prime 100 di un esperto il valore e' il minimo della sua lista. Scrive
+results/mix_diag.json (diagnostica dei misti) e results/mix_diag_<metodo>_scores.json.
 """
 
 import argparse
@@ -27,6 +33,7 @@ import numpy as np
 
 from museumbot.common.config import ROOT
 from museumbot.generation.vllm_gen import MODEL
+from museumbot.generation.vllm_score import scores_path
 
 MIXED = ROOT / "data" / "local" / "mixed.jsonl"
 RESULTS = ROOT / "results"
@@ -72,26 +79,35 @@ def sentence_stats(sents: list[np.ndarray]) -> dict:
             "changes": sign_changes(v), "expected": expected_sign_changes(v)}
 
 
-def run(alpha: float = 0.5) -> dict:
-    from transformers import AutoTokenizer
+def mix_margins(rows, alpha, encode):
+    """(coppia, token, margini) dei misti a `alpha`, dalla diagnostica della generazione."""
+    for r in rows:
+        if r["alpha"] != alpha or r["usage"]["failed"]:
+            continue
+        ids = encode(r["usage"]["raw"])
+        d = r["usage"]["diag"]
+        if len(ids) != len(d):
+            continue  # ritokenizzazione diversa dalla generazione
+        yield r["condition"], ids, np.array([t["logp"][0] - t["logp"][1] for t in d])
 
-    tok = AutoTokenizer.from_pretrained(MODEL)
-    decode = lambda ids: tok.decode(ids)
-    rows = [json.loads(l) for l in MIXED.open()]
-    out = {"alpha": alpha, "pairs": {}}
-    for pair in sorted({r["condition"] for r in rows}):
-        stats = []
-        for r in rows:
-            if r["condition"] != pair or r["alpha"] != alpha or r["usage"]["failed"]:
-                continue
-            ids = tok.encode(r["usage"]["raw"], add_special_tokens=False)
-            d = r["usage"]["diag"]
-            if len(ids) != len(d):
-                continue  # ritokenizzazione diversa dalla generazione
-            m = np.array([t["logp"][0] - t["logp"][1] for t in d])
-            stats.append(sentence_stats(split_sentences(ids, m, decode)))
+
+def scored_margins(rows, alpha):
+    """(coppia, token, margini) dalle riletture di `vllm_score`."""
+    for r in rows:
+        if r["alpha"] == alpha:
+            yield r["condition"], r["ids"], np.array(r["logp"][0]) - np.array(r["logp"][1])
+
+
+def pair_stats(items, decode) -> dict:
+    """Medie sui testi delle statistiche per frase, per coppia."""
+    by = {}
+    for pair, ids, m in items:
+        by.setdefault(pair, []).append(sentence_stats(split_sentences(ids, m, decode)))
+    out = {}
+    for pair in sorted(by):
+        stats = by[pair]
         mean = lambda k: float(np.mean([st[k] for st in stats]))
-        out["pairs"][pair] = {
+        out[pair] = {
             "n": len(stats),
             "sentences_mean": round(mean("n_sentences"), 2),
             "sentence_sum_max_mean": round(mean("max"), 2),
@@ -102,13 +118,35 @@ def run(alpha: float = 0.5) -> dict:
     return out
 
 
+def result_name(method: str, source: str) -> str:
+    return "mix_diag" if source == "diag" else f"mix_diag_{method}_scores"
+
+
+def run(alpha: float = 0.5, method: str = "mix", source: str = "diag") -> dict:
+    from transformers import AutoTokenizer
+
+    if source == "diag" and method != "mix":
+        raise ValueError("la diagnostica per token c'e' solo nei misti")
+    tok = AutoTokenizer.from_pretrained(MODEL)
+    decode = lambda ids: tok.decode(ids)
+    if source == "diag":
+        rows = [json.loads(l) for l in MIXED.open()]
+        items = mix_margins(rows, alpha, lambda raw: tok.encode(raw, add_special_tokens=False))
+    else:
+        items = scored_margins(map(json.loads, scores_path(method).open()), alpha)
+    return {"alpha": alpha, "method": method, "source": source,
+            "pairs": pair_stats(items, decode)}
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--alpha", type=float, default=0.5)
+    ap.add_argument("--method", choices=["mix", "pct"], default="mix")
+    ap.add_argument("--source", choices=["diag", "scores"], default="diag")
     args = ap.parse_args()
-    out = run(args.alpha)
+    out = run(args.alpha, args.method, args.source)
     RESULTS.mkdir(exist_ok=True)
-    (RESULTS / "mix_diag.json").write_text(json.dumps(out, indent=2))
+    (RESULTS / f"{result_name(args.method, args.source)}.json").write_text(json.dumps(out, indent=2))
     print(json.dumps(out, indent=2))
 
 

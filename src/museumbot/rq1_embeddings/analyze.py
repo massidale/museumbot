@@ -211,8 +211,6 @@ def fig_lda(Xc, arts, path):
                    edgecolors="white", linewidths=1.8, zorder=5)
     ax.set_xlabel("LD1")
     ax.set_ylabel("LD2")
-    ax.set_title("LDA — addestrata su meta' delle opere, proiettata sull'altra meta'\n"
-                 "(embedding centrati per opera)", fontsize=11)
     ax.legend(frameon=False, fontsize=9)
     ax.spines[["top", "right"]].set_visible(False)
     fig.tight_layout()
@@ -238,8 +236,6 @@ def fig_pca(Xc, path):
     ax.axvline(0, color="#ccc", lw=0.8, zorder=0)
     ax.set_xlabel("PC1")
     ax.set_ylabel("PC2")
-    ax.set_title("PCA sui dati centrati per opera\n"
-                 "le frecce sono i vettori di steering v[c], dal centroide del flat", fontsize=11)
     ax.legend(frameon=False, fontsize=9)
     ax.spines[["top", "right"]].set_visible(False)
     fig.tight_layout()
@@ -257,7 +253,6 @@ def fig_cosine(M, path):
         for j in range(len(labs)):
             ax.text(j, i, f"{M[i, j]:.2f}", ha="center", va="center", fontsize=8,
                     color="white" if abs(M[i, j]) > 0.55 else "black")
-    ax.set_title("Coseno fra gli steering vector v[c] (riferimento: flat)", fontsize=11)
     fig.colorbar(im, shrink=0.8)
     fig.tight_layout()
     fig.savefig(path, dpi=160)
@@ -279,8 +274,6 @@ def fig_distance(d2, path):
                 continue
             ax.text(j, i, f"{d2[i, j]:.1f}", ha="center", va="center", fontsize=8,
                     color="black" if d2[i, j] > 0.6 * hi else "white")
-    ax.set_title("Distanza quadrata cross-validata fra condizioni (x100)\n"
-                 "split-half, indipendente dal riferimento; ~0 = indistinguibili", fontsize=11)
     fig.colorbar(im, shrink=0.8)
     fig.tight_layout()
     fig.savefig(path, dpi=160)
@@ -298,10 +291,8 @@ def fig_confusion(cm, acc, path):
         for j in range(len(labs)):
             ax.text(j, i, f"{cmn[i, j]:.2f}", ha="center", va="center", fontsize=8,
                     color="white" if cmn[i, j] > 0.5 else "black")
-    ax.set_xlabel("predetta")
-    ax.set_ylabel("vera")
-    ax.set_title(f"Probe lineare — accuracy {acc:.1%} (chance {1 / len(CONDITIONS):.1%})",
-                 fontsize=11)
+    ax.set_xlabel("predicted")
+    ax.set_ylabel("true")
     fig.colorbar(im, shrink=0.8)
     fig.tight_layout()
     fig.savefig(path, dpi=160)

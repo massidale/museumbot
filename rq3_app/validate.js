@@ -8,14 +8,16 @@ export const MAX_WHY = 2000;
 export const SESSION_ID_RE = /^[0-9a-z]{6}$/;
 const LANGS = ['en', 'de'];
 const CHOICES = ['personal', 'comparison'];
+const isScore = v => Number.isInteger(v) && v >= 1 && v <= 7;
 const DEVICE_RE = /^[A-Za-z0-9_-]{1,40}$/;   // come validDevice di operator.js
 
 function checkTrial(t, i) {
   if (t === null || typeof t !== 'object' || Array.isArray(t)) return [`prova ${i}: non e' un oggetto`];
   const out = [];
   if (t.choice != null && !CHOICES.includes(t.choice)) out.push(`prova ${i}: choice non ammessa`);
-  const s = t.strength;
-  if (s != null && !(Number.isInteger(s) && s >= 1 && s <= 7)) out.push(`prova ${i}: strength non ammessa`);
+  const r = t.ratings;
+  if (r != null && !(Array.isArray(r) && r.length === 2 && r.every(v => v === null || isScore(v))))
+    out.push(`prova ${i}: ratings non ammessi`);
   if (t.why != null && (typeof t.why !== 'string' || t.why.length > MAX_WHY))
     out.push(`prova ${i}: why non ammesso`);
   return out;
@@ -33,6 +35,9 @@ export function validateRecord(rec) {
   if ('device' in rec && !(typeof rec.device === 'string' && DEVICE_RE.test(rec.device)))
     out.push('device non ammesso');
   if ('lang' in rec && !LANGS.includes(rec.lang)) out.push('lang non ammessa');
+  const fit = rec.category_fit;
+  if (fit != null && !(typeof fit === 'object' && !Array.isArray(fit) && Object.values(fit).every(isScore)))
+    out.push('category_fit non ammesso');
   if ('trials' in rec) {
     if (!Array.isArray(rec.trials)) out.push('trials non e\' una lista');
     else if (rec.trials.length > MAX_TRIALS) out.push(`trials: piu' di ${MAX_TRIALS} prove`);

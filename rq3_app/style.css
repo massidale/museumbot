@@ -190,6 +190,8 @@ button.card:disabled::after { border-color: var(--line); }
 
 .choices { display: flex; gap: 12px; }
 .choices button { flex: 1 1 0; }
+/* Descrizione scelta sopra la sua scala */
+.fit-desc { margin: 0 0 14px; padding: 4px 0 4px 16px; border-left: 4px solid var(--wall); line-height: 1.45; }
 .scale { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
 .scale button { min-width: 0; padding: 8px 0; font-variant-numeric: tabular-nums; }
 .scale-ends { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 0.95rem; margin-top: 8px; }

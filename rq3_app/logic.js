@@ -20,14 +20,14 @@ export function allConditions() {
   return out;
 }
 
-// [k] -> k contro flat; [k, j] (principale prima) -> misto contro k.
+// [k] -> k contro flat; [k, j] (in qualsiasi ordine) -> misto contro flat.
 export function pairFor(categories) {
   if (!Array.isArray(categories) || categories.length < 1 || categories.length > 2)
     throw new Error('servono una o due categorie');
   for (const c of categories)
     if (!CATEGORIES.includes(c)) throw new Error(`categoria ignota: ${c}`);
   if (categories.length === 1) return {personal: categories[0], comparison: 'flat'};
-  return {personal: mixKey(categories[0], categories[1]), comparison: categories[0]};
+  return {personal: mixKey(categories[0], categories[1]), comparison: 'flat'};
 }
 
 // mulberry32: valori in [0, 1).
@@ -84,7 +84,7 @@ export function newSession({sessionId, device, appVersion, manifestVersion, seed
     session_id: sessionId, device, app_version: appVersion, manifest_version: manifestVersion,
     seed, lang, started_at: now, updated_at: now, finished_at: null,
     last_step: 'start', completed: false, consent_at: consentAt,
-    categories: null, trials: [],
+    categories: null, category_fit: null, trials: [],
   };
 }
 
@@ -96,23 +96,28 @@ export function buildTrial(index, artwork, lang, categories, first) {
   return {
     index, artwork_id: artwork.id, personal, comparison, first, audio,
     plays: [0, 0], reached_end: [false, false], heard_sec: [0, 0],
-    choice: null, choice_position: null, strength: null,
+    ratings: [null, null], choice: null, choice_position: null,
     why: '', shown_at: null, answered_at: null,
   };
 }
 
-// Il perche' e' una domanda aperta facoltativa: non conta.
-export function answerComplete({position, strength}) {
+const isScore = v => Number.isInteger(v) && v >= 1 && v <= 7;
+
+// Un voto 1-7 per guida e la guida preferita; il perche' e' facoltativo.
+export function answerComplete({position, ratings}) {
   return (position === 1 || position === 2)
-    && Number.isInteger(strength) && strength >= 1 && strength <= 7;
+    && Array.isArray(ratings) && ratings.length === 2 && ratings.every(isScore);
 }
 
+// Un voto 1-7 per ogni categoria scelta.
+export const fitComplete = (chosen, fit) => chosen.every(c => isScore(fit[c]));
+
 // La posizione (1|2) diventa la condizione scelta, secondo l'ordine di ascolto.
-export function answer(trial, {position, strength, why, now}) {
+export function answer(trial, {position, ratings, why, now}) {
   const second = trial.first === 'personal' ? 'comparison' : 'personal';
   const choice = position === 1 ? trial.first : second;
   return {
-    ...trial, choice, choice_position: position, strength, why: why || '', answered_at: now,
+    ...trial, ratings: [...ratings], choice, choice_position: position, why: why || '', answered_at: now,
   };
 }
 

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   CATEGORIES, mixKey, allConditions, pairFor, rng, shuffle, validateManifest,
   planSession, newSession, buildTrial, answerComplete,
-  answer, markStep, abortSession, toJson, deletableIds,
+  answer, fitComplete, markStep, abortSession, toJson, deletableIds,
 } from '../logic.js';
 
 // Manifesto finto di 4 opere, stessa forma del Task 2.
@@ -34,10 +34,11 @@ test('16 condizioni', () => {
   assert.equal(c.length, 16); assert.equal(new Set(c).size, 16);
   assert.ok(c.includes('flat') && c.includes('experience_seeker+recharger'));
 });
-test('pairFor: una categoria contro flat, due contro la principale', () => {
+test('pairFor: la personalizzata (pura o mista) sempre contro flat', () => {
   assert.deepEqual(pairFor(['recharger']), {personal: 'recharger', comparison: 'flat'});
   assert.deepEqual(pairFor(['recharger', 'explorer']),
-                   {personal: 'explorer+recharger', comparison: 'recharger'});
+                   {personal: 'explorer+recharger', comparison: 'flat'});
+  assert.deepEqual(pairFor(['explorer', 'recharger']), pairFor(['recharger', 'explorer']));
   for (const bad of [[], ['explorer', 'explorer'], ['a'], ['explorer', 'facilitator', 'recharger']])
     assert.throws(() => pairFor(bad));
 });
@@ -63,15 +64,16 @@ test('rng e shuffle', () => {
 });
 test('buildTrial mette gli audio nell\'ordine di ascolto', () => {
   const t = buildTrial(0, M.artworks[0], 'de', ['explorer', 'facilitator'], 'comparison');
-  assert.equal(t.personal, 'explorer+facilitator'); assert.equal(t.comparison, 'explorer');
-  assert.deepEqual(t.audio, [M.artworks[0].audio.de.explorer.src,
+  assert.equal(t.personal, 'explorer+facilitator'); assert.equal(t.comparison, 'flat');
+  assert.deepEqual(t.audio, [M.artworks[0].audio.de.flat.src,
                              M.artworks[0].audio.de['explorer+facilitator'].src]);
 });
 test('buildTrial parte con contatori di ascolto a zero', () => {
   const t = buildTrial(0, M.artworks[0], 'en', ['recharger'], 'personal');
   assert.deepEqual(t.plays, [0, 0]); assert.deepEqual(t.reached_end, [false, false]);
   assert.deepEqual(t.heard_sec, [0, 0]);
-  assert.equal('listened_full' in t, false);
+  assert.deepEqual(t.ratings, [null, null]);
+  assert.equal('listened_full' in t, false); assert.equal('strength' in t, false);
 });
 test('newSession: niente campo consent, primo passo start', () => {
   const s = newSession({sessionId: 'x', device: 'ipad-1', appVersion: '0.1.0',
@@ -87,18 +89,27 @@ test('newSession scrive consent_at se dato, altrimenti null', () => {
 });
 test('answer traduce la posizione nella condizione', () => {
   const t = buildTrial(0, M.artworks[0], 'en', ['recharger'], 'comparison');
-  const r = answer(t, {position: 2, strength: 5, why: 'piu\' vivace', now: 'T'});
+  const r = answer(t, {position: 2, ratings: [3, 6], why: 'piu\' vivace', now: 'T'});
   assert.equal(r.choice, 'personal'); assert.equal(r.choice_position, 2);
+  assert.deepEqual(r.ratings, [3, 6]); assert.equal('strength' in r, false);
   assert.equal(r.why, 'piu\' vivace'); assert.equal(r.answered_at, 'T');
   assert.equal('reasons' in r, false); assert.equal('familiar' in r, false);
   assert.equal(t.choice, null);
 });
-test('answerComplete chiede posizione e forza; il perche\' e\' facoltativo', () => {
-  const ok = {position: 1, strength: 7};
+test('answerComplete chiede i due voti e la posizione; il perche\' e\' facoltativo', () => {
+  const ok = {position: 1, ratings: [4, 7]};
   assert.equal(answerComplete(ok), true);
   assert.equal(answerComplete({...ok, position: null}), false);
-  assert.equal(answerComplete({...ok, strength: 0}), false);
-  assert.equal(answerComplete({...ok, strength: 7.5}), false);
+  for (const ratings of [[4, null], [0, 7], [4, 7.5], [8, 1], [4], undefined])
+    assert.equal(answerComplete({...ok, ratings}), false, String(ratings));
+});
+test('fitComplete chiede un voto 1-7 per ogni categoria scelta', () => {
+  assert.equal(fitComplete(['explorer'], {explorer: 5}), true);
+  assert.equal(fitComplete(['explorer', 'recharger'], {explorer: 5, recharger: 1}), true);
+  assert.equal(fitComplete(['explorer', 'recharger'], {explorer: 5}), false);
+  assert.equal(fitComplete(['explorer'], {explorer: 0}), false);
+  assert.equal(fitComplete(['explorer'], {explorer: 2.5}), false);
+  assert.equal(fitComplete(['explorer'], {}), false);
 });
 test('markStep aggiorna passo e ora', () => {
   const s0 = newSession({sessionId: 'x', device: 'ipad-1', appVersion: '0.1.0',

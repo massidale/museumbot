@@ -2,7 +2,7 @@
 // salvato in IndexedDB dopo ogni passo. Tutti i testi per il visitatore vengono da texts.json.
 import {
   LANGS, validateManifest, planSession, newSession, buildTrial,
-  answerComplete, answer, markStep, abortSession, nextTime,
+  answerComplete, fitComplete, answer, markStep, abortSession, nextTime,
 } from './logic.js';
 import {createPlayer, prefetch} from './player.js';
 import {isQrMode, nextCount} from './qr.js';
@@ -256,8 +256,7 @@ function showClassification() {
     // le scelte nell'ordine in cui sono mostrate
     const chosen = S.plan.descriptionOrder.filter(c => selected.includes(c));
     step('classification', {chosen: [...selected]});  // nel record: nell'ordine in cui sono state toccate
-    if (chosen.length === 1) setCategories(chosen[0], null);
-    else showMain(chosen);
+    showFit(chosen);
   });
   refresh();
   screen('',
@@ -267,25 +266,23 @@ function showClassification() {
     h('div', {class: 'actions'}, counter, next));
 }
 
-function showMain(chosen) {
-  let main = null;
+// Quanto descrive il visitatore ogni descrizione scelta (1-7); nessuna principale.
+function showFit(chosen) {
+  const fit = {};
   const next = h('button', {type: 'button', disabled: true}, T.continue);
-  const cards = descriptionCards(chosen, (c, b) => {
-    main = c;
-    press(cards, b);
-    next.disabled = false;
+  const items = chosen.map(c => h('div', {class: 'question'},
+    h('p', {class: 'fit-desc'}, T.falk[c]),
+    scale(v => { fit[c] = v; next.disabled = !fitComplete(chosen, fit); }, T.fit_low, T.fit_high)));
+  next.addEventListener('click', () => {
+    if (!fitComplete(chosen, fit)) return;
+    S.categories = chosen;
+    step('fit', {categories: [...chosen], category_fit: {...fit}});
+    showTask();
   });
-  next.addEventListener('click', () => setCategories(main, chosen.find(c => c !== main)));
   screen('',
-    h('h1', {}, T.main_title),
-    h('div', {class: 'stack'}, cards),
+    h('h1', {}, chosen.length === 1 ? T.fit_title_one : T.fit_title_two),
+    h('div', {class: 'stack'}, items),
     h('div', {class: 'actions'}, next));
-}
-
-function setCategories(main, secondary) {
-  S.categories = secondary ? [main, secondary] : [main];
-  step('main', {categories: {main, secondary}});
-  showTask();
 }
 
 function showTask() {
@@ -306,6 +303,11 @@ function choiceButtons(items, onPick, cls = 'choices') {
   return h('div', {class: cls}, buttons);
 }
 
+// Scala 1-7 con le etichette agli estremi.
+const scale = (onPick, low, high) => h('div', {},
+  choiceButtons([1, 2, 3, 4, 5, 6, 7].map(n => [n, String(n)]), onPick, 'scale'),
+  h('div', {class: 'scale-ends'}, h('span', {}, low), h('span', {}, high)));
+
 // Gli stessi con la loro domanda.
 const choiceGroup = (question, items, onPick, cls) =>
   h('div', {class: 'question'}, h('p', {class: 'q'}, question), choiceButtons(items, onPick, cls));
@@ -316,7 +318,7 @@ function showTrial(i) {
   S.record = markStep({...S.record, trials: [...S.record.trials.slice(0, i), trial]}, `trial_${i}`, now());
   save();
 
-  const ans = {position: null, strength: null};
+  const ans = {position: null, ratings: [null, null]};
   const labels = {play: T.play, pause: T.pause, back10: T.back10, seek: T.seek, error: T.player_error};
   const guideLabel = n => fmt(T.guide_label, {n});
 
@@ -342,12 +344,12 @@ function showTrial(i) {
 
   const why = h('textarea', {rows: '3', maxlength: String(MAX_WHY)});
   const next = h('button', {type: 'button'}, T.next);
+  const rating = pos => h('div', {class: 'question'},
+    h('p', {class: 'q'}, fmt(T.q_rating, {guide: guideLabel(pos + 1)})),
+    scale(v => { ans.ratings[pos] = v; refresh(); }, T.rating_low, T.rating_high));
   const questions = h('div', {class: 'questions'},
+    rating(0), rating(1),
     choiceGroup(T.q_choice, [[1, guideLabel(1)], [2, guideLabel(2)]], v => { ans.position = v; refresh(); }),
-    h('div', {class: 'question'},
-      h('p', {class: 'q'}, T.q_strength),
-      choiceButtons([1, 2, 3, 4, 5, 6, 7].map(n => [n, String(n)]), v => { ans.strength = v; refresh(); }, 'scale'),
-      h('div', {class: 'scale-ends'}, h('span', {}, T.strength_low), h('span', {}, T.strength_high))),
     h('div', {class: 'question'}, h('label', {class: 'q'}, T.q_why_text, why)));
 
   const refresh = () => { next.disabled = !answerComplete(ans); };

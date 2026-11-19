@@ -42,8 +42,8 @@ main {
 main.wide { max-width: 1240px; }
 
 /* Schermate del visitatore: i pulsanti per andare avanti stanno a fondo pagina */
-main:not(.operator) { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
-main:not(.operator) > .actions, main:not(.operator) > .bottom { margin-top: auto; padding-top: 32px; }
+main { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
+main > .actions, main > .bottom { margin-top: auto; padding-top: 32px; }
 
 h1, h2 { font-family: var(--serif); font-weight: 600; color: var(--fg); }
 h1 { font-size: 1.85rem; line-height: 1.2; margin: 0 0 20px; letter-spacing: -0.01em; }
@@ -133,8 +133,24 @@ pre {
 
 /* Percorso del visitatore */
 .lead { font-size: 1.15rem; }
-/* Scelta della lingua: le due frasi (con lang) fanno da titolo */
-main > .lead[lang] { font-family: var(--serif); font-weight: 600; font-size: 1.6rem; line-height: 1.25; margin-bottom: 20px; }
+/* Scelta della lingua: la parete verde della galleria, le due lingue come cartellini delle
+   opere (angoli piccoli, niente ombra), diversi dai tasti dell'app */
+html:has(main.lang), body:has(main.lang) { background: var(--wall); }
+main.lang :focus-visible { outline-color: var(--wall-fg); }
+.lang-head { margin-top: 8vh; }
+.lang-prompt {
+  font-family: var(--serif); font-weight: 600; line-height: 1.15;
+  font-size: clamp(1.9rem, 5.6vw, 3rem); margin: 0 0 8px; color: var(--wall-fg); max-width: 18em;
+}
+.lang-prompt + .lang-prompt { color: rgba(255, 255, 255, 0.72); }
+.lang-labels { margin-top: auto; padding-top: 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+button.lang-label {
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 6px;
+  min-height: 160px; padding: 24px 26px; text-align: left; font-weight: 400;
+  background: var(--bg); color: var(--fg); border: 0; border-radius: 4px;
+}
+.lang-name { font-family: var(--serif); font-weight: 600; font-size: 2rem; line-height: 1.1; }
+.lang-go { color: var(--muted); font-size: 1rem; }
 .note { color: var(--muted); font-size: 0.95rem; border-left: 3px solid var(--line); padding-left: 14px; }
 .stack { display: flex; flex-direction: column; gap: 14px; margin: 24px 0; }
 
@@ -243,6 +259,9 @@ textarea:focus-visible { outline-offset: 1px; border-color: var(--wall); }
   button.card::after { top: 14px; right: 14px; }
   .choices { gap: 10px; }
   .choices button { padding: 8px 10px; }
+  .lang-head { margin-top: 4vh; }
+  .lang-labels { grid-template-columns: 1fr; gap: 12px; padding-top: 32px; }
+  button.lang-label { min-height: 96px; padding: 18px 20px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -251,7 +270,6 @@ textarea:focus-visible { outline-offset: 1px; border-color: var(--wall); }
 }
 
 /* Operatore */
-main.operator button.big { max-width: 420px; margin: 16px 0 8px; }
 .op-corner {
   position: fixed; top: env(safe-area-inset-top, 0); right: env(safe-area-inset-right, 0);
   width: 80px; height: 80px;
@@ -262,7 +280,7 @@ main.operator button.big { max-width: 420px; margin: 16px 0 8px; }
   border-radius: 50%; border: 2px solid var(--line);
 }
 .op-corner.holding::after { background: var(--wall); border-color: var(--wall); transition: background 2s linear; }
-.op-corner[hidden], .op-panel[hidden], form[hidden], .op-overlay[hidden] { display: none; }
+.op-corner[hidden], .op-panel[hidden], form[hidden], .op-overlay[hidden], .actions[hidden] { display: none; }
 #op-abort-corner { z-index: 10; }
 /* PIN dell'operatore sopra una schermata del visitatore */
 .op-overlay {

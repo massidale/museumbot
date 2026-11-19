@@ -182,10 +182,13 @@ function showLanguage() {
     document.documentElement.lang = lang;
     showInfo();
   };
-  screen('',
-    LANGS.map(l => h('p', {class: 'lead', lang: l}, texts[l].choose_language)),
-    h('div', {class: 'stack bottom'},
-      LANGS.map(l => h('button', {type: 'button', class: 'big', lang: l, onclick: () => pick(l)}, texts[l].lang_name))));
+  // La parete della galleria con un cartellino per lingua.
+  screen('lang',
+    h('div', {class: 'lang-head'}, LANGS.map(l => h('p', {class: 'lang-prompt', lang: l}, texts[l].choose_language))),
+    h('div', {class: 'lang-labels'}, LANGS.map(l =>
+      h('button', {type: 'button', class: 'lang-label', lang: l, onclick: () => pick(l)},
+        h('span', {class: 'lang-name'}, texts[l].lang_name),
+        h('span', {class: 'lang-go'}, texts[l].lang_go)))));
 }
 
 // Informativa: l'accettazione fissa l'ora del consenso.

@@ -1,6 +1,7 @@
 {
   "en": {
     "lang_name": "English",
+    "lang_go": "Continue in English",
     "choose_language": "Please choose your language",
     "continue": "Continue",
     "info_title": "Before we start",
@@ -59,6 +60,7 @@
   },
   "de": {
     "lang_name": "Deutsch",
+    "lang_go": "Auf Deutsch weiter",
     "choose_language": "Bitte wählen Sie Ihre Sprache",
     "continue": "Weiter",
     "info_title": "Bevor wir beginnen",
@@ -117,6 +119,7 @@
   },
   "it": {
     "lang_name": "Italiano",
+    "lang_go": "Continua in italiano",
     "choose_language": "Scegli la lingua",
     "continue": "Continua",
     "info_title": "Prima di cominciare",

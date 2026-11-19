@@ -5,7 +5,7 @@ import {toJson, deletableIds, validateManifest} from './logic.js';
 import {getAllSessions, deleteSessions, getSetting, setSetting, getSaveFailures} from './store.js';
 import {checkCache, mediaUrls} from './player.js';
 import {fillMissing} from './swclient.js';
-import {syncSoon, syncState} from './sync.js';
+import {syncState} from './sync.js';
 import {APP_VERSION, PIN} from './config.js';
 
 export const DEFAULT_DEVICE = 'non-impostato';
@@ -136,7 +136,8 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
   let blobUrl = null;
 
   // -- nuova sessione --
-  const start = h('button', {type: 'button', class: 'big', id: 'op-start', disabled: true}, 'Nuova sessione');
+  const start = h('button', {type: 'button', id: 'op-start', disabled: true}, 'Nuova sessione');
+  const startBar = h('div', {class: 'actions'}, start);   // a fondo pagina, come nelle altre schermate
   const startNote = h('p', {class: 'muted', id: 'op-start-note'});
   start.addEventListener('click', () => { if (canStart()) onStart(); });
   const canStart = () => device != null && check.state === 'ok';
@@ -179,20 +180,12 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
   // -- sessioni, export, cancellazione --
   const counts = h('p', {id: 'op-counts'}, 'Lettura delle sessioni...');
   const online = h('p', {class: 'muted', id: 'op-online'});
-  const syncBtn = h('button', {type: 'button', class: 'secondary', id: 'op-sync'}, 'Invia ora');
   const exportBtn = h('button', {type: 'button', id: 'op-export'}, 'Scarica');
-  const shareBtn = h('button', {type: 'button', class: 'secondary', id: 'op-share'}, 'Condividi');
   const deleteBtn = h('button', {type: 'button', class: 'secondary', id: 'op-delete'}, 'Cancella le sessioni esportate');
   const exportMsg = h('p', {class: 'muted', id: 'op-export-msg'});
   const linkBox = h('div', {id: 'op-download'});
   const deleteMsg = h('p', {class: 'muted', id: 'op-delete-msg'});
-  syncBtn.addEventListener('click', async () => {
-    syncBtn.disabled = true;
-    try { await syncSoon(); } finally { syncBtn.disabled = false; }
-    await refresh();
-  });
   exportBtn.addEventListener('click', doDownload);
-  shareBtn.addEventListener('click', doShare);
   deleteBtn.addEventListener('click', doDelete);
 
   // -- materiale --
@@ -218,8 +211,7 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
     h('h2', {}, 'Sessioni'),
     counts,
     online,
-    h('div', {class: 'op-row'}, syncBtn),
-    h('div', {class: 'op-row'}, exportBtn, shareBtn, deleteBtn),
+    h('div', {class: 'op-row'}, exportBtn, deleteBtn),
     exportMsg, linkBox, deleteMsg,
     h('p', {class: 'note'}, 'Cancellare solo dopo aver controllato che il file sia arrivato sul Mac.'),
     h('h2', {}, 'Materiale'),
@@ -238,6 +230,7 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
   function openPanel() {
     panel.hidden = false;
     corner.hidden = true;
+    startBar.hidden = startNote.hidden = true;
     renderSw();
     refresh();
     runCheck();
@@ -246,6 +239,7 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
   function closePanel() {
     panel.hidden = true;
     corner.hidden = false;
+    startBar.hidden = startNote.hidden = false;
     clearLink();
     for (const el of [devMsg, exportMsg, deleteMsg]) el.textContent = '';
     window.scrollTo(0, 0);
@@ -264,7 +258,7 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
       prepared = {text: toJson(all), ids: all.map(r => r.session_id)};
       counts.textContent = `${all.length} sessioni nel dispositivo: ${complete} complete, `
         + `${all.length - complete} interrotte. Gia' esportate (ultimo export): ${inExport}.`;
-      exportBtn.disabled = shareBtn.disabled = all.length === 0;
+      exportBtn.disabled = all.length === 0;
       const st = await syncState();
       if (closed) return;
       online.textContent = `Online: ${st.sent} di ${st.total} sessioni inviate`;
@@ -388,35 +382,6 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
     a.click();
   }
 
-  // Menu di condivisione (AirDrop, mail, Salva su File): share() va chiamato subito, nel tocco.
-  function doShare() {
-    clearLink();
-    const ex = exportFile();
-    if (!ex) return;
-    const {file, ids} = ex;
-    let canShare = false;
-    try { canShare = !!(navigator.canShare && navigator.canShare({files: [file]})); } catch (e) { canShare = false; }
-    if (!canShare) {
-      say(exportMsg, 'Condivisione non disponibile: scaricare il file dal link.');
-      offerDownload(file, ids);
-      return;
-    }
-    shareBtn.disabled = true;
-    say(exportMsg, 'Condivisione in corso...');
-    navigator.share({files: [file]}).then(
-      () => markExported(ids, file.name),
-      e => {
-        if (closed) return;
-        if (e && e.name === 'AbortError') {
-          say(exportMsg, 'Condivisione annullata: le sessioni non risultano esportate.');
-        } else {
-          console.error(e);
-          say(exportMsg, `Condivisione non riuscita (${errText(e)}): scaricare il file dal link.`, true);
-          offerDownload(file, ids);
-        }
-      }).finally(() => { if (!closed) shareBtn.disabled = prepared == null || prepared.ids.length === 0; });
-  }
-
   // Cancella solo le sessioni dell'ultimo export ancora presenti; poi l'export si azzera.
   async function doDelete() {
     deleteBtn.disabled = true;
@@ -453,9 +418,10 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
     h('p', {class: 'muted'}, `app ${APP_VERSION}`),
     message && h('p', {class: 'err'}, message),
     saveWarning(),
-    start, startNote,
     pin.form,
     panel,
+    startNote,
+    startBar,
   ].filter(Boolean));
 
   // Anche senza PIN: "Nuova sessione" dipende dal nome e dal materiale.

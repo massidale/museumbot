@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   CATEGORIES, mixKey, allConditions, pairFor, rng, shuffle, validateManifest,
   planSession, newSession, buildTrial, answerComplete,
-  answer, fitComplete, markStep, abortSession, toJson, deletableIds,
+  answer, fitComplete, markStep, abortSession, toJson, deletableIds, tourOrder, moveItem,
 } from '../logic.js';
 
 // Manifesto finto di 4 opere, stessa forma del Task 2.
@@ -155,4 +155,21 @@ test('nextTime: orologio strettamente crescente', async () => {
   const seen = [];
   for (let k = 0; k < 5; k++) { t = nextTime(t, 1000); seen.push(t); }
   assert.deepEqual(seen, [1000, 1001, 1002, 1003, 1004]);
+});
+
+test('tourOrder: ordine dell\'operatore, in coda le opere mancanti; senza, quello casuale', () => {
+  const rnd = ['a3', 'a1', 'a4', 'a2'];
+  assert.deepEqual(tourOrder(rnd, null), rnd);
+  assert.deepEqual(tourOrder(rnd, []), rnd);
+  assert.deepEqual(tourOrder(rnd, ['a1', 'a2', 'a3', 'a4']), ['a1', 'a2', 'a3', 'a4']);
+  assert.deepEqual(tourOrder(rnd, ['a2', 'zz', 'a1', 'a2']), ['a2', 'a1', 'a3', 'a4']);
+  assert.notEqual(tourOrder(rnd, null), rnd);
+});
+test('moveItem scambia con il vicino e non esce dai bordi', () => {
+  const l = ['a', 'b', 'c'];
+  assert.deepEqual(moveItem(l, 1, -1), ['b', 'a', 'c']);
+  assert.deepEqual(moveItem(l, 1, 1), ['a', 'c', 'b']);
+  assert.deepEqual(moveItem(l, 0, -1), l);
+  assert.deepEqual(moveItem(l, 2, 1), l);
+  assert.deepEqual(l, ['a', 'b', 'c']);
 });

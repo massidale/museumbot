@@ -79,6 +79,22 @@ export function planSession(manifest, seed) {
   return {descriptionOrder, artworkOrder, firsts};
 }
 
+// Ordine del giro: quello fissato dall'operatore (id del manifesto) e in coda le opere che non
+// ci sono, nell'ordine casuale; senza ordine fissato, quello casuale.
+export function tourOrder(randomOrder, fixed) {
+  if (!Array.isArray(fixed) || !fixed.length) return [...randomOrder];
+  const head = fixed.filter((id, i) => randomOrder.includes(id) && fixed.indexOf(id) === i);
+  return [...head, ...randomOrder.filter(id => !head.includes(id))];
+}
+
+// Sposta l'elemento i di d posti (-1 su, +1 giu'); fuori dai bordi la lista resta uguale.
+export function moveItem(list, i, d) {
+  const j = i + d, out = [...list];
+  if (i < 0 || i >= list.length || j < 0 || j >= list.length) return out;
+  [out[i], out[j]] = [out[j], out[i]];
+  return out;
+}
+
 export function newSession({sessionId, device, appVersion, manifestVersion, seed, lang, now, consentAt = null}) {
   return {
     session_id: sessionId, device, app_version: appVersion, manifest_version: manifestVersion,

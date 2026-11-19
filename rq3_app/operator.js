@@ -1,7 +1,7 @@
 // Schermata dell'operatore (solo per chi conduce lo studio, in inglese). Senza PIN: solo
 // "Nuova sessione" e l'area d'angolo; col PIN: nome del dispositivo, conteggi, controllo
 // del materiale, export delle sessioni e cancellazione di quelle esportate.
-import {toJson, deletableIds, validateManifest} from './logic.js';
+import {toJson, deletableIds, validateManifest, tourOrder, moveItem} from './logic.js';
 import {getAllSessions, deleteSessions, getSetting, setSetting, getSaveFailures} from './store.js';
 import {checkCache, mediaUrls} from './player.js';
 import {fillMissing} from './swclient.js';
@@ -177,6 +177,47 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
     } catch (err) { say(devMsg, `Name not saved: ${errText(err)}`, true); }
   });
 
+  // -- ordine del giro: casuale, o fisso per tutte le nuove sessioni di questo iPad --
+  let tourIds = null;   // ordine mostrato (id del manifesto)
+  let titles = {};
+  const tourFixed = h('input', {type: 'checkbox', id: 'op-tour-fixed'});
+  const tourList = h('ol', {class: 'op-tour', id: 'op-tour'});
+  const tourMsg = h('p', {class: 'muted', id: 'op-tour-msg'});
+  tourFixed.addEventListener('change', saveTour);
+
+  async function loadTour() {
+    try {
+      const [manifest, saved] = await Promise.all(
+        [fetch('manifest.json').then(r => r.json()), getSetting('tour_order')]);
+      if (closed) return;
+      titles = Object.fromEntries(manifest.artworks.map(a => [a.id, a.title.en]));
+      tourFixed.checked = Array.isArray(saved) && saved.length > 0;
+      tourIds = tourOrder(manifest.artworks.map(a => a.id), tourFixed.checked ? saved : null);
+      renderTour();
+    } catch (e) { say(tourMsg, `Tour order not read: ${errText(e)}`, true); }
+  }
+
+  function renderTour() {
+    if (!tourIds) return;
+    const on = tourFixed.checked, last = tourIds.length - 1;
+    const arrow = (i, d, label) => h('button', {type: 'button', class: 'secondary',
+      'aria-label': `Move ${titles[tourIds[i]]} ${label}`, disabled: !on || i + d < 0 || i + d > last,
+      onclick: () => { tourIds = moveItem(tourIds, i, d); saveTour(); }}, d < 0 ? '↑' : '↓');
+    tourList.classList.toggle('off', !on);
+    tourList.replaceChildren(...tourIds.map((id, i) =>
+      h('li', {}, h('span', {}, `${i + 1}. ${titles[id] || id}`), arrow(i, -1, 'up'), arrow(i, 1, 'down'))));
+  }
+
+  async function saveTour() {
+    if (!tourIds) return;
+    renderTour();
+    try {
+      await setSetting('tour_order', tourFixed.checked ? tourIds : null);
+      say(tourMsg, tourFixed.checked ? 'Fixed order saved: new sessions follow it.'
+                                     : 'Random order: each new session shuffles the paintings.');
+    } catch (e) { say(tourMsg, `Tour order not saved: ${errText(e)}`, true); }
+  }
+
   // -- sessioni, export, cancellazione --
   const counts = h('p', {id: 'op-counts'}, 'Reading sessions...');
   const online = h('p', {class: 'muted', id: 'op-online'});
@@ -208,6 +249,9 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
   const panel = h('section', {class: 'op-panel', id: 'op-panel', hidden: true},
     h('h2', {}, 'Device'),
     devForm, devMsg,
+    h('h2', {}, 'Tour order'),
+    h('label', {class: 'op-toggle'}, tourFixed, 'Use a fixed order (otherwise random for each session)'),
+    tourList, tourMsg,
     h('h2', {}, 'Sessions'),
     counts,
     online,
@@ -234,6 +278,7 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
     renderSw();
     refresh();
     runCheck();
+    loadTour();
   }
 
   function closePanel() {
@@ -241,7 +286,7 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
     corner.hidden = false;
     startBar.hidden = startNote.hidden = false;
     clearLink();
-    for (const el of [devMsg, exportMsg, deleteMsg]) el.textContent = '';
+    for (const el of [devMsg, tourMsg, exportMsg, deleteMsg]) el.textContent = '';
     window.scrollTo(0, 0);
   }
 

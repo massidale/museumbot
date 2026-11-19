@@ -1181,3 +1181,14 @@ cinque". App 0.4.5.
 **Motivo.** Indicazione di Massimo: le opere con gli audio sono 5 e vanno mostrate tutte.
 **Effetto.** Nessun dato di visitatori raccolto. Fino a 5 prove per sessione; una sessione
 completa dura circa 18 minuti invece di 15.
+
+## 2026-11-19 — RQ3: l'operatore può fissare l'ordine del giro
+
+**Decisione.** Nel pannello dell'operatore l'ordine delle opere è casuale per ogni sessione
+(come prima) oppure fisso, scelto con le frecce; vale per tutte le nuove sessioni dell'iPad. Il
+record ha `tour_order` (`random` o `operator`). L'ordine delle due guide resta casuale; nel modo
+QR l'ordine delle opere resta casuale. App 0.4.6.
+**Motivo.** Richiesta di Massimo: al museo il giro deve poter seguire il percorso nelle sale.
+**Effetto.** Nessun dato di visitatori raccolto. Con l'ordine fisso la posizione dell'opera nel
+giro coincide con l'opera, quindi l'effetto dell'ordine (stanchezza, abitudine) non si separa
+dall'opera; nell'analisi `tour_order` permette di distinguere le sessioni.

@@ -34,9 +34,11 @@ Deciso il 16 novembre 2026 (`docs/decisioni.md`), con le semplificazioni del 17 
 - **Domande per opera.** Quanto è piaciuta ciascuna guida, da 1 (per niente) a 7 (moltissimo),
   e cosa è piaciuto o no delle due (aperta, facoltativa). Nessuna scelta forzata: la
   preferenza è la differenza fra i due voti (personalizzata meno `flat`), con pareggi possibili.
-- **Opere.** Le 5 del §3 hanno gli audio; una sessione le mostra tutte e 5, in ordine casuale
-  (`MAX_ARTWORKS` in `app.js`). Il visitatore può fermarsi dopo ognuna, quindi da 1 a 5
+- **Opere.** Le 5 del §3 hanno gli audio; una sessione le mostra tutte e 5 (`MAX_ARTWORKS` in
+  `app.js`), in ordine casuale o, sull'iPad, nell'ordine fisso del giro scelto dall'operatore
+  (per seguire il percorso nelle sale). Il visitatore può fermarsi dopo ognuna, quindi da 1 a 5
   prove per sessione. Ogni sessione è indipendente (nessun bilanciamento fra visitatori).
+  L'ordine delle due guide resta casuale anche con il giro fisso.
 - **Lingua.** Inglese o tedesco, scelta all'inizio.
 - **Ascolto libero.** Play, pausa, −10 s e cursore; l'app non impone l'ordine né l'ascolto
   completo, ma registra per ogni guida `plays`, `reached_end` e `heard_sec` (secondi
@@ -127,7 +129,7 @@ del museo ha una voce di lunghezza paragonabile in una delle quattro lingue.
 Fiorentino, voce italiana) e *Aurora* (Elsheimer, voce spagnola), che hanno un testo "Read along"
 del museo; *Self-Portrait as David* resta fra i testi generati ma non ha audio, perché non è
 nella guida ufficiale del museo. Gli audio sono quindi per 5 opere; una sessione le
-mostra tutte e 5, in ordine casuale.
+mostra tutte e 5.
 
 ### 3.3 Le opere dell'app del museo
 
@@ -313,7 +315,7 @@ finti si ricreano con `demo_stimuli.py` (non sono più in `rq3_app/`).
 Disegno e piano: `docs/plans/2026-11-16-rq3-app-ipad-design.md`,
 `docs/plans/2026-11-16-rq3-app-ipad.md`; telefoni e risposte online:
 `docs/plans/2026-11-18-rq3-qr-online-design.md`, `docs/plans/2026-11-18-rq3-qr-online.md`.
-Versione dell'app 0.4.5 (`config.js`).
+Versione dell'app 0.4.6 (`config.js`).
 
 - **Forma.** Pagina web statica (HTML, CSS e JavaScript senza build). Sull'iPad si installa
   nella Home e un service worker scarica pagina, manifesto, immagini e audio, poi funziona
@@ -323,8 +325,11 @@ Versione dell'app 0.4.5 (`config.js`).
   cartellino per lingua (nome della lingua e "Continue in English" / "Auf Deutsch weiter").
 - **Modi.**
   - *Operatore* (iPad e telefono di Massimo): schermata in inglese, protetta da PIN (`config.js`; si apre
-    tenendo premuto 2 s l'angolo in alto a destra) con nome del dispositivo, controllo del
-    materiale in cache, stato dell'invio online ed export. "New session", a fondo pagina, resta disattivata
+    tenendo premuto 2 s l'angolo in alto a destra) con nome del dispositivo, ordine del giro,
+    controllo del materiale in cache, stato dell'invio online ed export. L'ordine del giro è
+    casuale per ogni sessione oppure fisso: l'operatore spunta "Use a fixed order" e sposta le
+    opere con le frecce; vale per tutte le nuove sessioni di quell'iPad (impostazione
+    `tour_order` in IndexedDB, `tourOrder` in `logic.js`). Nel modo QR l'ordine è sempre casuale. "New session", a fondo pagina, resta disattivata
     finché il nome non è impostato e il materiale non è tutto in cache. Lo stesso angolo, sulle
     schermate del visitatore, interrompe la sessione (`aborted_by_operator`).
   - *QR* (telefoni dei visitatori, `https://museumbot.pages.dev/?m=qr`): si parte subito dalla
@@ -363,7 +368,9 @@ Versione dell'app 0.4.5 (`config.js`).
   `manifest_version`, `seed`, `lang`, `started_at`, `updated_at`, `completed`, `last_step`,
   `trials` (al massimo 5); `completed` è vero o falso, `started_at` e `updated_at` sono
   stringhe, `device` ha da 1 a 40 lettere, cifre, `-` o `_`. Con l'informativa `consent_at`; nel modo QR `device: qr` ed
-  `earlier_sessions`, il numero di sessioni già fatte da quel browser (0 la prima volta). Per
+  `earlier_sessions`, il numero di sessioni già fatte da quel browser (0 la prima volta).
+  `tour_order` dice se le opere erano nell'ordine casuale (`random`) o in quello
+  dell'operatore (`operator`); l'ordine effettivo si legge dagli `artwork_id` delle prove. Per
   prova `ratings` (voti 1–7 di Guida 1 e Guida 2, nell'ordine di ascolto come `plays` e
   `heard_sec`), `why` (al massimo 2000 caratteri) e `answered_at`; quale guida è la
   personalizzata si legge da `first`.
@@ -420,7 +427,7 @@ Versione dell'app 0.4.5 (`config.js`).
   "Download missing files". Un file che manca dà 404 (`rq3_app/404.html` toglie a Pages il ritorno
   alla pagina principale, che subito dopo un deploy faceva arrivare HTML al posto di un modulo
   e lasciava la pagina bianca); se dopo un deploy la pagina resta bianca, si ricarica.
-- **Stato.** Versione 0.4.5 pubblicata il 19 novembre 2026 con il manifesto `haum-2` (5 opere,
+- **Stato.** Versione 0.4.6 pubblicata il 19 novembre 2026 con il manifesto `haum-2` (5 opere,
   160 audio, `flat` del museo); controllati online la versione del manifesto e i 10 `flat`,
   uguali ai file locali.
   Provata in locale con `wrangler pages dev` (sessioni inviate; una sessione salvata a server

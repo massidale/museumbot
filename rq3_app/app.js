@@ -1,7 +1,7 @@
 // Percorso del visitatore: dalla lingua ai ringraziamenti, con il record della sessione
 // salvato in IndexedDB dopo ogni passo. Tutti i testi per il visitatore vengono da texts.json.
 import {
-  LANGS, validateManifest, planSession, newSession, buildTrial,
+  LANGS, validateManifest, planSession, tourOrder, newSession, buildTrial,
   answerComplete, fitComplete, answer, markStep, abortSession, nextTime,
 } from './logic.js';
 import {createPlayer, prefetch} from './player.js';
@@ -157,15 +157,18 @@ export async function startSession() {
     const errs = validateManifest(manifest);
     if (errs.length) throw new Error(`manifest not valid: ${errs.slice(0, 3).join('; ')}`);
     if (!texts) texts = await (await fetch('texts.json')).json();
-    let device = 'qr';
+    let device = 'qr', fixed = null;   // fixed: ordine del giro dell'operatore (solo iPad)
     if (!QR) {
       device = DEFAULT_DEVICE;
       try { device = (await getSetting('device')) || DEFAULT_DEVICE; } catch (e) { console.error(e); }
+      try { fixed = await getSetting('tour_order'); } catch (e) { console.error(e); }
     }
     const seed = randomU32();
-    const plan = planSession(manifest, seed);
+    const random = planSession(manifest, seed);
+    const plan = {...random, artworkOrder: tourOrder(random.artworkOrder, fixed)};
+    const tour = Array.isArray(fixed) && fixed.length ? 'operator' : 'random';
     S = {
-      manifest, seed, plan, device, sessionId: newSessionId(), record: null,
+      manifest, seed, plan, tour, device, sessionId: newSessionId(), record: null,
       total: Math.min(MAX_ARTWORKS, plan.artworkOrder.length), categories: null,
     };
     if (!QR && !unmountGate) unmountGate = mountAbortGate(abortByOperator);
@@ -226,6 +229,7 @@ function begin() {
       seed: S.seed, lang: S.lang, now: now(), consentAt: S.consentAt,
     }),
     description_order: [...S.plan.descriptionOrder],
+    tour_order: S.tour,
   };
   if (QR) record.earlier_sessions = earlierSessions();
   S.record = record;

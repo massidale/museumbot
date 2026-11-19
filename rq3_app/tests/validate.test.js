@@ -20,7 +20,7 @@ function valid() {
   const s = newSession({sessionId: 'abc123', device: 'qr', appVersion: '0.1.0',
     manifestVersion: 'v', seed: 1, lang: 'en', now: '2026-11-18T10:00:00Z'});
   const t = answer(buildTrial(0, artwork(), 'en', [CATEGORIES[0]], 'personal'),
-    {position: 1, ratings: [4, 6], why: 'perche', now: '2026-11-18T10:01:00Z'});
+    {ratings: [4, 6], why: 'perche', now: '2026-11-18T10:01:00Z'});
   return {...s, trials: [t]};
 }
 const withTrial = (rec, patch) => ({...rec, trials: [{...rec.trials[0], ...patch}]});
@@ -42,7 +42,6 @@ test('un problema per ogni errore', () => {
   assert.equal(validateRecord({...r, session_id: 'ABC123'}).length, 1);
   assert.equal(validateRecord({...r, lang: 'fr'}).length, 1);
   assert.equal(validateRecord({...r, trials: Array(5).fill(r.trials[0])}).length, 1);
-  assert.equal(validateRecord(withTrial(r, {choice: 'x'})).length, 1);
   for (const ratings of [[8, 1], [2.5, 3], [1], 'x'])
     assert.equal(validateRecord(withTrial(r, {ratings})).length, 1, String(ratings));
   for (const category_fit of [{explorer: 9}, {explorer: 2.5}, 'x'])
@@ -50,8 +49,8 @@ test('un problema per ogni errore', () => {
   assert.equal(validateRecord(withTrial(r, {why: 'a'.repeat(2001)})).length, 1);
   assert.equal(validateRecord({...r, trials: 'no'}).length, 1);
 });
-test('prova non risposta: choice e voti null vanno bene', () => {
-  const r = withTrial(valid(), {choice: null, ratings: [null, null]});
+test('prova non risposta: voti e answered_at null vanno bene', () => {
+  const r = withTrial(valid(), {ratings: [null, null], answered_at: null});
   assert.deepEqual(validateRecord(r), []);
   assert.deepEqual(validateRecord({...valid(), category_fit: null}), []);
   assert.deepEqual(validateRecord({...valid(), category_fit: {explorer: 7, recharger: 1}}), []);

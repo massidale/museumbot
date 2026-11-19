@@ -308,9 +308,6 @@ const scale = (onPick, low, high) => h('div', {},
   choiceButtons([1, 2, 3, 4, 5, 6, 7].map(n => [n, String(n)]), onPick, 'scale'),
   h('div', {class: 'scale-ends'}, h('span', {}, low), h('span', {}, high)));
 
-// Gli stessi con la loro domanda.
-const choiceGroup = (question, items, onPick, cls) =>
-  h('div', {class: 'question'}, h('p', {class: 'q'}, question), choiceButtons(items, onPick, cls));
 
 function showTrial(i) {
   const art = artwork(i);
@@ -318,7 +315,7 @@ function showTrial(i) {
   S.record = markStep({...S.record, trials: [...S.record.trials.slice(0, i), trial]}, `trial_${i}`, now());
   save();
 
-  const ans = {position: null, ratings: [null, null]};
+  const ans = {ratings: [null, null]};
   const labels = {play: T.play, pause: T.pause, back10: T.back10, seek: T.seek, error: T.player_error};
   const guideLabel = n => fmt(T.guide_label, {n});
 
@@ -349,7 +346,6 @@ function showTrial(i) {
     scale(v => { ans.ratings[pos] = v; refresh(); }, T.rating_low, T.rating_high));
   const questions = h('div', {class: 'questions'},
     rating(0), rating(1),
-    choiceGroup(T.q_choice, [[1, guideLabel(1)], [2, guideLabel(2)]], v => { ans.position = v; refresh(); }),
     h('div', {class: 'question'}, h('label', {class: 'q'}, T.q_why_text, why)));
 
   const refresh = () => { next.disabled = !answerComplete(ans); };

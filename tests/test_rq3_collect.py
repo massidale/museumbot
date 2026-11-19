@@ -6,7 +6,8 @@ from museumbot.rq3_visitors.collect import load_file, merge, validate
 def rec(sid, completed=False, answered=1, updated="2026-12-01T10:00"):
     trials = [{"index": i, "artwork_id": f"a{i}", "personal": "explorer", "comparison": "flat",
                "first": "personal",
-               "choice": "personal" if i < answered else None,
+               "ratings": [5, 3] if i < answered else [None, None],
+               "answered_at": "2026-12-01T10:01" if i < answered else None,
                "why": "piu' vivace" if i < answered else ""}
               for i in range(2)]
     return {"session_id": sid, "device": "ipad1", "app_version": "1", "manifest_version": "m1",
@@ -32,7 +33,7 @@ def test_validate_campi_e_scelte():
     assert validate(rec("s1")) == []
     bad = rec("s1")
     del bad["seed"]
-    bad["trials"][0]["choice"] = "left"
+    bad["trials"][0]["ratings"] = [8, 1]
     assert len(validate(bad)) == 2
 
 

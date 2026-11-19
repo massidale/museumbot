@@ -7,14 +7,12 @@ export const MAX_TRIALS = 4;
 export const MAX_WHY = 2000;
 export const SESSION_ID_RE = /^[0-9a-z]{6}$/;
 const LANGS = ['en', 'de'];
-const CHOICES = ['personal', 'comparison'];
 const isScore = v => Number.isInteger(v) && v >= 1 && v <= 7;
 const DEVICE_RE = /^[A-Za-z0-9_-]{1,40}$/;   // come validDevice di operator.js
 
 function checkTrial(t, i) {
   if (t === null || typeof t !== 'object' || Array.isArray(t)) return [`prova ${i}: non e' un oggetto`];
   const out = [];
-  if (t.choice != null && !CHOICES.includes(t.choice)) out.push(`prova ${i}: choice non ammessa`);
   const r = t.ratings;
   if (r != null && !(Array.isArray(r) && r.length === 2 && r.every(v => v === null || isScore(v))))
     out.push(`prova ${i}: ratings non ammessi`);
@@ -46,9 +44,9 @@ export function validateRecord(rec) {
   return out;
 }
 
-// Prove con una scelta.
+// Prove con risposta (i due voti dati).
 export const answered = rec =>
-  (Array.isArray(rec.trials) ? rec.trials : []).filter(t => t && t.choice != null).length;
+  (Array.isArray(rec.trials) ? rec.trials : []).filter(t => t && t.answered_at != null).length;
 
 // Come collect._rank: completo, piu' risposte, piu' recente.
 export const rank = rec => [rec.completed ? 1 : 0, answered(rec), rec.updated_at || ''];

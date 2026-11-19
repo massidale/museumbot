@@ -19,7 +19,7 @@
     "intro_steps": [
       "Read five short descriptions of why people visit museums, and choose the one or two that fit you best. Then say how well each one fits you.",
       "Look at a painting from this museum and listen to two different audio guides about it with the headphones. Please listen to both until the end.",
-      "Rate each guide, then tell us which one you preferred and why.",
+      "Rate each guide and, if you like, tell us why.",
       "You can then continue with another painting, up to four in total. Each painting takes about 4 minutes, and you can stop after any painting."
     ],
     "intro_note": "Taking part is voluntary and anonymous. There are no right or wrong answers: we are interested in your personal opinion.",
@@ -49,8 +49,7 @@
     "q_rating": "How much did you like {guide}?",
     "rating_low": "Not at all",
     "rating_high": "Very much",
-    "q_choice": "Which guide did you prefer?",
-    "q_why_text": "Why did you prefer this guide? (optional)",
+    "q_why_text": "What did you like or not like about the two guides? (optional)",
     "next": "Next",
     "more_title": "Would you like to listen to another painting?",
     "more_yes": "Yes, another painting",
@@ -78,7 +77,7 @@
     "intro_steps": [
       "Sie lesen fünf kurze Beschreibungen, warum Menschen ins Museum gehen, und wählen die eine oder die zwei aus, die am besten zu Ihnen passen. Dann geben Sie an, wie gut jede davon zu Ihnen passt.",
       "Sie sehen ein Gemälde aus diesem Museum und hören über die Kopfhörer zwei verschiedene Audioguides dazu. Bitte hören Sie beide bis zum Ende.",
-      "Sie bewerten jeden Audioguide und sagen uns, welcher Ihnen besser gefallen hat und warum.",
+      "Sie bewerten jeden Audioguide und sagen uns, wenn Sie möchten, warum.",
       "Danach können Sie mit einem weiteren Gemälde fortfahren, insgesamt bis zu vier. Ein Gemälde dauert etwa 4 Minuten, und Sie können nach jedem Gemälde aufhören."
     ],
     "intro_note": "Die Teilnahme ist freiwillig und anonym. Es gibt keine richtigen oder falschen Antworten: Uns interessiert Ihre persönliche Meinung.",
@@ -108,8 +107,7 @@
     "q_rating": "Wie hat Ihnen {guide} gefallen?",
     "rating_low": "Gar nicht",
     "rating_high": "Sehr gut",
-    "q_choice": "Welcher Audioguide hat Ihnen besser gefallen?",
-    "q_why_text": "Warum hat Ihnen dieser Audioguide besser gefallen? (optional)",
+    "q_why_text": "Was hat Ihnen an den beiden Audioguides gefallen oder nicht gefallen? (optional)",
     "next": "Weiter",
     "more_title": "Möchten Sie ein weiteres Gemälde hören?",
     "more_yes": "Ja, ein weiteres Gemälde",
@@ -137,7 +135,7 @@
     "intro_steps": [
       "Leggi cinque brevi descrizioni dei motivi per cui le persone vanno al museo e scegli la o le due che ti descrivono meglio. Poi dici quanto ciascuna ti rispecchia.",
       "Guardi un dipinto di questo museo e ascolti in cuffia due audioguide diverse su quel dipinto. Ascoltale entrambe fino alla fine.",
-      "Dai un voto a ciascuna audioguida e ci dici quale hai preferito e perché.",
+      "Dai un voto a ciascuna audioguida e, se vuoi, ci dici perché.",
       "Poi puoi continuare con un altro dipinto, fino a quattro in tutto. Ogni dipinto richiede circa 4 minuti, e puoi fermarti dopo ognuno."
     ],
     "intro_note": "La partecipazione è volontaria e anonima. Non ci sono risposte giuste o sbagliate: ci interessa la tua opinione personale.",
@@ -167,8 +165,7 @@
     "q_rating": "Quanto ti è piaciuta la {guide}?",
     "rating_low": "Per niente",
     "rating_high": "Moltissimo",
-    "q_choice": "Quale guida hai preferito?",
-    "q_why_text": "Perché hai preferito questa guida? (facoltativo)",
+    "q_why_text": "Cosa ti è piaciuto o non ti è piaciuto delle due guide? (facoltativo)",
     "next": "Avanti",
     "more_title": "Vuoi ascoltare un altro dipinto?",
     "more_yes": "Sì, un altro dipinto",

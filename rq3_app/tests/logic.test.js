@@ -74,6 +74,7 @@ test('buildTrial parte con contatori di ascolto a zero', () => {
   assert.deepEqual(t.heard_sec, [0, 0]);
   assert.deepEqual(t.ratings, [null, null]);
   assert.equal('listened_full' in t, false); assert.equal('strength' in t, false);
+  assert.equal('choice' in t, false); assert.equal('choice_position' in t, false);
 });
 test('newSession: niente campo consent, primo passo start', () => {
   const s = newSession({sessionId: 'x', device: 'ipad-1', appVersion: '0.1.0',
@@ -87,19 +88,19 @@ test('newSession scrive consent_at se dato, altrimenti null', () => {
   assert.equal(newSession({...base, consentAt: 'C'}).consent_at, 'C');
   assert.equal(newSession(base).consent_at, null);
 });
-test('answer traduce la posizione nella condizione', () => {
+test('answer salva i due voti, il perche\' e l\'ora', () => {
   const t = buildTrial(0, M.artworks[0], 'en', ['recharger'], 'comparison');
-  const r = answer(t, {position: 2, ratings: [3, 6], why: 'piu\' vivace', now: 'T'});
-  assert.equal(r.choice, 'personal'); assert.equal(r.choice_position, 2);
+  const r = answer(t, {ratings: [3, 6], why: 'piu\' vivace', now: 'T'});
   assert.deepEqual(r.ratings, [3, 6]); assert.equal('strength' in r, false);
+  assert.equal('choice' in r, false);
   assert.equal(r.why, 'piu\' vivace'); assert.equal(r.answered_at, 'T');
   assert.equal('reasons' in r, false); assert.equal('familiar' in r, false);
-  assert.equal(t.choice, null);
+  assert.deepEqual(t.ratings, [null, null]);
 });
-test('answerComplete chiede i due voti e la posizione; il perche\' e\' facoltativo', () => {
-  const ok = {position: 1, ratings: [4, 7]};
+test('answerComplete chiede i due voti; il perche\' e\' facoltativo', () => {
+  const ok = {ratings: [4, 7]};
   assert.equal(answerComplete(ok), true);
-  assert.equal(answerComplete({...ok, position: null}), false);
+  assert.equal(answerComplete({ratings: [4, 4]}), true);
   for (const ratings of [[4, null], [0, 7], [4, 7.5], [8, 1], [4], undefined])
     assert.equal(answerComplete({...ok, ratings}), false, String(ratings));
 });

@@ -7,12 +7,11 @@ from museumbot.common.config import ROOT
 
 REQUIRED = ("session_id", "device", "app_version", "manifest_version", "seed", "lang",
             "started_at", "updated_at", "completed", "last_step", "trials")
-CHOICES = ("personal", "comparison")
 OUT = ROOT / "data" / "rq3" / "responses.jsonl"
 
 
 def validate(rec: dict) -> list[str]:
-    """Problemi del record: campi mancanti, scelte o motivi non ammessi."""
+    """Problemi del record: campi mancanti, voti o motivi non ammessi."""
     errori = [f"manca {k}" for k in REQUIRED if k not in rec]
     trials = rec.get("trials")
     if not isinstance(trials, list):
@@ -21,16 +20,24 @@ def validate(rec: dict) -> list[str]:
         if not isinstance(t, dict):
             errori.append(f"prova {i}: non e' un oggetto")
             continue
-        if t.get("choice") not in (None, *CHOICES):
-            errori.append(f"prova {i}: choice {t.get('choice')!r}")
+        if not _ratings_ok(t.get("ratings")):
+            errori.append(f"prova {i}: ratings {t.get('ratings')!r}")
         if not isinstance(t.get("why", ""), str):
             errori.append(f"prova {i}: why {t.get('why')!r}")
     return errori
 
 
+def _ratings_ok(r) -> bool:
+    """Due voti, ciascuno None o intero 1-7 (assenti vanno bene)."""
+    if r is None:
+        return True
+    ok = lambda v: v is None or (type(v) is int and 1 <= v <= 7)
+    return isinstance(r, list) and len(r) == 2 and all(ok(v) for v in r)
+
+
 def answered(rec: dict) -> int:
-    """Numero di prove con risposta."""
-    return sum(1 for t in rec.get("trials", []) if t.get("choice") is not None)
+    """Numero di prove con risposta (i due voti dati)."""
+    return sum(1 for t in rec.get("trials", []) if t.get("answered_at") is not None)
 
 
 def _rank(rec: dict) -> tuple:

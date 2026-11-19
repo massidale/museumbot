@@ -22,7 +22,7 @@ function rec(patch = {}) {
   const s = newSession({sessionId: 'abc123', device: 'qr', appVersion: '0.2.0',
     manifestVersion: 'v', seed: 1, lang: 'en', now: '2026-11-18T10:00:00Z'});
   const t = answer(buildTrial(0, artwork(), 'en', [CATEGORIES[0]], 'personal'),
-    {position: 1, ratings: [4, 6], why: 'perche', now: '2026-11-18T10:01:00Z'});
+    {ratings: [4, 6], why: 'perche', now: '2026-11-18T10:01:00Z'});
   return {...s, trials: [t], ...patch};
 }
 const call = (r, over = {}) =>

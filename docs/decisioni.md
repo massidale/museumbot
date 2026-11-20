@@ -1226,3 +1226,17 @@ niente servizi di trascrizione esterni.
 su questi dati: inventa testo su una registrazione quasi muta (`6youru`, lasciata vuota con una
 nota) e può saltare un tratto (`cgofvw_opera1`, 5–30 s, trascritto a parte e reinserito); le
 trascrizioni vanno rilette ascoltando.
+
+## 2026-11-20 — RQ3: dataset pulito e regole minime di esclusione
+
+**Decisione.** `rq3_visitors/dataset.py` produce il dataset pulito in `data/rq3/clean/`
+(`trials.csv` una riga per opera, `sessions.csv` una per sessione, `excluded.csv` con il motivo
+di ogni esclusione), con i commenti scritti e le trascrizioni delle registrazioni. Regole: fuori
+le sessioni di prova elencate a mano in `data/rq3/exclusions.json` (`kut5mg`, e `q1pb6j`,
+`vvprxv`, `84fu9e` che restano negli export vecchi); fuori le opere senza i due voti e quelle
+con una guida a 0 s di ascolto; fuori le sessioni rimaste senza opere.
+**Motivo.** Le esclusioni erano applicate solo nei conti fatti in conversazione; scritte nel
+codice e in un file, si rifanno sempre uguali. Una guida a 0 s vuol dire che il voto è stato dato
+senza ascoltarla (opera saltata, o `swo9jg`, che se n'è dovuto andare dopo la prima guida).
+**Effetto.** Prima giornata: 11 sessioni e 31 opere nel dataset (13 esclusioni). La soglia di
+ascolto vera (§8 di `report-rq3.md`) non è ancora fissata; queste regole sono il minimo.

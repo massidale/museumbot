@@ -5,7 +5,7 @@ pronti in inglese e tedesco (senza correzione degli errori), 160 audio e immagin
 opere (il `flat` è l'audioguida del museo accorciata), app (iPad, telefono di Massimo, telefoni dei visitatori da QR) con risposte salvate
 anche online e domande finali a voce, pubblicata il 19 novembre 2026. Prima giornata al museo
 il 20 novembre 2026: 14 sessioni nel database, prove comprese, e 9 registrazioni finali,
-trascritte (§6). Comitato etico e analisi sono da fare.*
+trascritte; dataset pulito con 11 sessioni e 31 opere (§6). Comitato etico e analisi sono da fare.*
 
 **Domanda.** Un visitatore reale preferisce l'audioguida scritta per la sua categoria di
 Falk? RQ2 lo chiede a un giudice LLM con persona; RQ3 lo chiede alle persone, sulle stesse
@@ -455,10 +455,28 @@ Versione dell'app 0.5.0 (`config.js`).
   che non sono nell'export e quelli in `--exclude`). Un file `<session_id>_<suffisso>.m4a` è una
   registrazione in più della stessa sessione, fatta fuori dall'app (`voice/extra.json` dice
   quale e perché). Le trascrizioni con la traduzione italiana, l'ordine delle guide e i voti di
-  ogni opera sono in `data/rq3/trascrizioni.md`. `data/rq3/` resta fuori da git.
+  ogni opera sono in `data/rq3/trascrizioni.md`; la traduzione è anche in `text_it` di
+  `transcripts.jsonl`. `data/rq3/` resta fuori da git.
+- **Dataset pulito.** `rq3_visitors/dataset.py` unisce tutti gli export online (come
+  `collect.py`) e scrive in `data/rq3/clean/` tre CSV:
+  - `trials.csv`, una riga per opera valida: sessione, giorno, dispositivo, lingua, categorie,
+    posizione nel giro, opera, quale guida era la personalizzata (`personal_guide`, 1 o 2),
+    voti e secondi di ascolto della personalizzata e del confronto, `diff` (personalizzata
+    meno confronto), commento scritto (`comment`) e, se c'è, il commento a voce su
+    quell'opera (`oral_file`, `oral_text`, `oral_text_it`);
+  - `sessions.csv`, una riga per sessione con almeno un'opera valida: categorie e
+    `category_fit`, opere valide e totali, com'è andata la registrazione finale (`voice`) e la
+    sua trascrizione (`final_text`, `final_text_it`, `final_note`);
+  - `excluded.csv`: ogni sessione o opera tolta, con il motivo.
+
+  Fuori: le sessioni in `data/rq3/exclusions.json` (prove, scritte a mano con il motivo), le
+  opere senza i due voti, quelle con una guida a 0 s di ascolto (saltate, o una guida votata
+  senza ascoltarla) e le sessioni rimaste senza opere. È solo la pulizia minima: la soglia di
+  ascolto e le altre esclusioni del §8 sono ancora da fissare.
 - **Test.** 78 test Node (`node --test rq3_app/tests/*.test.js rq3_pages/tests/*.test.js`:
-  logica, player, registrazione, testi, validazione, invio, QR, regole del server) e 30 test Python
-  (manifesto, raccolta, download, sintesi vocale), tutti passati il 19 novembre 2026.
+  logica, player, registrazione, testi, validazione, invio, QR, regole del server) e 33 test Python
+  (manifesto, raccolta, download, trascrizione, dataset, sintesi vocale), tutti passati il 20
+  novembre 2026.
 - **Pubblicazione.** Il service worker richiede HTTPS, quindi l'iPad non può usare il server
   del Mac: l'app è su Cloudflare Pages (progetto `museumbot`, indirizzo fisso
   `https://museumbot.pages.dev`), pubblicata da `rq3_pages/` con `wrangler pages deploy`, che
@@ -485,8 +503,11 @@ Versione dell'app 0.5.0 (`config.js`).
   200 sull'R2 locale; "Concludi senza registrare" scrive `{skipped: true}`.
 - **Prima giornata al museo** (20 novembre 2026, versione 0.5.0). Nel database 14 sessioni
   (`ipad-max` 9, `Ibrahim` 3, `iphone` 1, `qr` 1; 12 in tedesco, 2 in inglese), 13 complete,
-  38 opere votate. Da escludere: la prova `kut5mg` e le 6 opere votate con 0 s di ascolto
-  (saltate). Registrazioni finali: 9 in R2, tutte trascritte; quella di `6youru` è muta
+  38 opere votate. Nel dataset pulito restano 11 sessioni e 31 opere. Tolte: la prova
+  `kut5mg`; `qux99m` (modo QR, aperta e lasciata alla prima opera senza voti); 5 opere saltate
+  (0 s di ascolto per tutte e due le guide); l'unica opera di `swo9jg`, che ha ascoltato la
+  prima guida e se n'è dovuto andare prima della seconda (votata 1 senza ascoltarla, come dice il
+  commento dell'operatore). Registrazioni finali: 9 in R2, tutte trascritte; quella di `6youru` è muta
   (l'iPad ha registrato dal microfono delle cuffie Bluetooth rimaste collegate, in mano
   all'operatore: prima delle domande a voce le cuffie vanno staccate o date al visitatore). In `ujakv7` il microfono era stato negato per sbaglio: la
   risposta è stata registrata a parte, come quella di `cgofvw` dopo la prima opera. In R2
@@ -542,7 +563,8 @@ data senza ascoltare) si esclude con regole fissate prima di guardare i voti:
 - risposta troppo rapida: `answered_at` − `shown_at` sotto una soglia;
 - sessione interrotta dall'operatore: valgono solo le opere già risposte;
 - errori segnalati dal visitatore: id della sessione, numero dell'opera e motivo in un
-  registro a parte (`data/rq3/esclusioni.csv`, da creare), senza toccare l'export.
+  registro a parte, senza toccare l'export. Per ora `data/rq3/exclusions.json` registra solo
+  sessioni intere (le prove), letto da `dataset.py`.
 
 Nella tesi si danno i risultati con le esclusioni e, come controllo, senza.
 
@@ -570,7 +592,8 @@ Cohen, pareggi a parte) e tassi di vittoria per categoria, umani contro LLM.
    gestione dei dati.
 7. Cancellare dal database remoto le sessioni delle prove (`DELETE FROM sessions`, §6) e
    dal bucket `museumbot-voice` le loro registrazioni prima della raccolta.
-   Durante la raccolta, trascrivere le registrazioni nuove con `transcribe.py`.
+   Durante la raccolta, trascrivere le registrazioni nuove con `transcribe.py` e rifare il
+   dataset pulito con `dataset.py`.
 8. Accordi con il museo tramite il lab: giorni e posto per la raccolta, e i loro testi
    (eyeVisit, audioguida, opuscolo) come fonti più lunghe o come termine di confronto.
 9. Pilota con 10–15 persone (durata, comprensione, categorie scelte), poi numerosità (§7).
@@ -593,12 +616,13 @@ Proposta non implementata: un tasto dell'operatore che segna l'ultima risposta c
 | sintesi vocale | `src/museumbot/generation/tts.py` → `rq3_app/audio/` |
 | app | `rq3_app/` (audio, immagini e `manifest.json` fuori da git; `sync.js`, `qr.js`, `validate.js`, `recorder.js`); online su `https://museumbot.pages.dev` |
 | server delle risposte | `rq3_pages/` (`wrangler.toml`, `schema.sql`, `functions/api/session.js`, `sessions.js` e `voice.js`, `lib/server.js`, `tests/`) |
-| manifesto, stimoli finti, raccolta | `src/museumbot/rq3_visitors/` (`build_manifest.py`, `demo_stimuli.py`, `collect.py`, `download.py`, `transcribe.py`) |
-| test | `rq3_app/tests/`, `rq3_pages/tests/`, `tests/test_rq3_manifest.py`, `tests/test_rq3_collect.py`, `tests/test_rq3_download.py`, `tests/test_rq3_transcribe.py`, `tests/test_tts.py` |
+| manifesto, stimoli finti, raccolta | `src/museumbot/rq3_visitors/` (`build_manifest.py`, `demo_stimuli.py`, `collect.py`, `download.py`, `transcribe.py`, `dataset.py`) |
+| test | `rq3_app/tests/`, `rq3_pages/tests/`, `tests/test_rq3_manifest.py`, `tests/test_rq3_collect.py`, `tests/test_rq3_download.py`, `tests/test_rq3_transcribe.py`, `tests/test_rq3_dataset.py`, `tests/test_tts.py` |
 
 ```bash
 node --test rq3_app/tests/*.test.js rq3_pages/tests/*.test.js
-.venv/bin/python -m pytest -q tests/test_rq3_manifest.py tests/test_rq3_collect.py tests/test_rq3_download.py tests/test_rq3_transcribe.py tests/test_tts.py
+.venv/bin/python -m pytest -q tests/test_rq3_manifest.py tests/test_rq3_collect.py tests/test_rq3_download.py tests/test_rq3_transcribe.py tests/test_rq3_dataset.py tests/test_tts.py
+PYTHONPATH=src .venv/bin/python -m museumbot.rq3_visitors.dataset        # dataset pulito -> data/rq3/clean/
 PYTHONPATH=src .venv/bin/python -m museumbot.generation.tts --in data/wiki/haum_generations.jsonl --limit 1
 PYTHONPATH=src .venv/bin/python -m museumbot.rq3_visitors.build_manifest --artworks data/rq3/artworks_haum.json --app-root rq3_app --version <v>
 PYTHONPATH=src .venv/bin/python -m museumbot.rq3_visitors.demo_stimuli --app-root rq3_app

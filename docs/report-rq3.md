@@ -1,11 +1,11 @@
 # RQ3: visitatori reali all'Herzog Anton Ulrich-Museum
 
-*Ultimo aggiornamento: 19 novembre 2026. Stato di RQ3: disegno deciso, stimoli testuali
+*Ultimo aggiornamento: 20 novembre 2026. Stato di RQ3: disegno deciso, stimoli testuali
 pronti in inglese e tedesco (senza correzione degli errori), 160 audio e immagini delle 5
 opere (il `flat` è l'audioguida del museo accorciata), app (iPad, telefono di Massimo, telefoni dei visitatori da QR) con risposte salvate
-anche online e domande finali a voce, pubblicata il 19 novembre 2026 e provata nel browser. Prova sull'iPad e sul
-telefono con dati mobili, ascolto degli audio, comitato etico e pilota sono da fare. Nessun
-dato di visitatori raccolto.*
+anche online e domande finali a voce, pubblicata il 19 novembre 2026. Prima giornata al museo
+il 20 novembre 2026: 14 sessioni nel database, prove comprese, e 9 registrazioni finali,
+trascritte (§6). Comitato etico e analisi sono da fare.*
 
 **Domanda.** Un visitatore reale preferisce l'audioguida scritta per la sua categoria di
 Falk? RQ2 lo chiede a un giudice LLM con persona; RQ3 lo chiede alle persone, sulle stesse
@@ -448,9 +448,16 @@ Versione dell'app 0.5.0 (`config.js`).
   `data/rq3/raw/voice/<session_id>.m4a` (o `.webm`). `rq3_visitors/collect.py` legge gli export (online e dell'app;
   lista JSON o una riga per sessione), unisce le sessioni in `data/rq3/responses.jsonl`, tiene
   per ogni `session_id` la versione più avanti (completa, poi più risposte, poi più recente) e
-  controlla lo schema. `data/rq3/` resta fuori da git.
+  controlla lo schema. `rq3_visitors/transcribe.py` trascrive sul Mac le registrazioni di
+  `data/rq3/raw/voice/` con Whisper (`openai/whisper-large-v3-turbo` con `transformers`, sulla
+  GPU del Mac; nessun servizio esterno), nella lingua della sessione, in
+  `data/rq3/transcripts.jsonl` (un file per riga; salta i file già fatti, quelli di sessioni
+  che non sono nell'export e quelli in `--exclude`). Un file `<session_id>_<suffisso>.m4a` è una
+  registrazione in più della stessa sessione, fatta fuori dall'app (`voice/extra.json` dice
+  quale e perché). Le trascrizioni con la traduzione italiana, l'ordine delle guide e i voti di
+  ogni opera sono in `data/rq3/trascrizioni.md`. `data/rq3/` resta fuori da git.
 - **Test.** 78 test Node (`node --test rq3_app/tests/*.test.js rq3_pages/tests/*.test.js`:
-  logica, player, registrazione, testi, validazione, invio, QR, regole del server) e 27 test Python
+  logica, player, registrazione, testi, validazione, invio, QR, regole del server) e 30 test Python
   (manifesto, raccolta, download, sintesi vocale), tutti passati il 19 novembre 2026.
 - **Pubblicazione.** Il service worker richiede HTTPS, quindi l'iPad non può usare il server
   del Mac: l'app è su Cloudflare Pages (progetto `museumbot`, indirizzo fisso
@@ -475,8 +482,15 @@ Versione dell'app 0.5.0 (`config.js`).
   `categories`, `category_fit`, i `ratings` della prova e il confronto con `flat`. Le domande a
   voce sono provate in locale nel browser con un microfono simulato (inglese a tutta larghezza,
   tedesco a 375 px): registrazione salvata in IndexedDB, record con `voice`, `PUT /api/voice`
-  200 sull'R2 locale; "Concludi senza registrare" scrive `{skipped: true}`. Non ancora provate
-  con un microfono vero né su iPad o telefono.
+  200 sull'R2 locale; "Concludi senza registrare" scrive `{skipped: true}`.
+- **Prima giornata al museo** (20 novembre 2026, versione 0.5.0). Nel database 14 sessioni
+  (`ipad-max` 9, `Ibrahim` 3, `iphone` 1, `qr` 1; 12 in tedesco, 2 in inglese), 13 complete,
+  38 opere votate. Da escludere: la prova `kut5mg` e le 6 opere votate con 0 s di ascolto
+  (saltate). Registrazioni finali: 9 in R2, tutte trascritte; quella di `6youru` è quasi muta
+  (nessun parlato riconoscibile). In `ujakv7` il microfono era stato negato per sbaglio: la
+  risposta è stata registrata a parte, come quella di `cgofvw` dopo la prima opera. In R2
+  restano anche `q1pb6j` e `vvprxv`, registrazioni di prova la cui sessione non è più nel
+  database.
 
 ## 7. Numerosità
 
@@ -555,7 +569,7 @@ Cohen, pareggi a parte) e tassi di vittoria per categoria, umani contro LLM.
    gestione dei dati.
 7. Cancellare dal database remoto le sessioni delle prove (`DELETE FROM sessions`, §6) e
    dal bucket `museumbot-voice` le loro registrazioni prima della raccolta.
-   Poi, durante la raccolta, trascrivere le registrazioni (da fare: strumento non scelto).
+   Durante la raccolta, trascrivere le registrazioni nuove con `transcribe.py`.
 8. Accordi con il museo tramite il lab: giorni e posto per la raccolta, e i loro testi
    (eyeVisit, audioguida, opuscolo) come fonti più lunghe o come termine di confronto.
 9. Pilota con 10–15 persone (durata, comprensione, categorie scelte), poi numerosità (§7).
@@ -578,12 +592,12 @@ Proposta non implementata: un tasto dell'operatore che segna l'ultima risposta c
 | sintesi vocale | `src/museumbot/generation/tts.py` → `rq3_app/audio/` |
 | app | `rq3_app/` (audio, immagini e `manifest.json` fuori da git; `sync.js`, `qr.js`, `validate.js`, `recorder.js`); online su `https://museumbot.pages.dev` |
 | server delle risposte | `rq3_pages/` (`wrangler.toml`, `schema.sql`, `functions/api/session.js`, `sessions.js` e `voice.js`, `lib/server.js`, `tests/`) |
-| manifesto, stimoli finti, raccolta | `src/museumbot/rq3_visitors/` (`build_manifest.py`, `demo_stimuli.py`, `collect.py`, `download.py`) |
-| test | `rq3_app/tests/`, `rq3_pages/tests/`, `tests/test_rq3_manifest.py`, `tests/test_rq3_collect.py`, `tests/test_rq3_download.py`, `tests/test_tts.py` |
+| manifesto, stimoli finti, raccolta | `src/museumbot/rq3_visitors/` (`build_manifest.py`, `demo_stimuli.py`, `collect.py`, `download.py`, `transcribe.py`) |
+| test | `rq3_app/tests/`, `rq3_pages/tests/`, `tests/test_rq3_manifest.py`, `tests/test_rq3_collect.py`, `tests/test_rq3_download.py`, `tests/test_rq3_transcribe.py`, `tests/test_tts.py` |
 
 ```bash
 node --test rq3_app/tests/*.test.js rq3_pages/tests/*.test.js
-.venv/bin/python -m pytest -q tests/test_rq3_manifest.py tests/test_rq3_collect.py tests/test_rq3_download.py tests/test_tts.py
+.venv/bin/python -m pytest -q tests/test_rq3_manifest.py tests/test_rq3_collect.py tests/test_rq3_download.py tests/test_rq3_transcribe.py tests/test_tts.py
 PYTHONPATH=src .venv/bin/python -m museumbot.generation.tts --in data/wiki/haum_generations.jsonl --limit 1
 PYTHONPATH=src .venv/bin/python -m museumbot.rq3_visitors.build_manifest --artworks data/rq3/artworks_haum.json --app-root rq3_app --version <v>
 PYTHONPATH=src .venv/bin/python -m museumbot.rq3_visitors.demo_stimuli --app-root rq3_app

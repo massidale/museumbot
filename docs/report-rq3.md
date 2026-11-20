@@ -4,8 +4,8 @@
 pronti in inglese e tedesco (senza correzione degli errori), 160 audio e immagini delle 5
 opere (il `flat` è l'audioguida del museo accorciata), app (iPad, telefono di Massimo, telefoni dei visitatori da QR) con risposte salvate
 anche online e domande finali a voce, pubblicata il 19 novembre 2026. Prima giornata al museo
-il 20 novembre 2026: 14 sessioni nel database, prove comprese, e 9 registrazioni finali,
-trascritte; dataset pulito con 11 sessioni e 31 opere (§6). Comitato etico e analisi sono da fare.*
+il 20 novembre 2026: 14 sessioni nel database, prove comprese, e 9 registrazioni finali
+nell'app più 3 fatte a parte, tutte trascritte; dataset pulito con 11 sessioni e 31 opere (§6). Comitato etico e analisi sono da fare.*
 
 **Domanda.** Un visitatore reale preferisce l'audioguida scritta per la sua categoria di
 Falk? RQ2 lo chiede a un giudice LLM con persona; RQ3 lo chiede alle persone, sulle stesse
@@ -509,8 +509,10 @@ Versione dell'app 0.5.0 (`config.js`).
   prima guida e se n'è dovuto andare prima della seconda (votata 1 senza ascoltarla, come dice il
   commento dell'operatore). Registrazioni finali: 9 in R2, tutte trascritte; quella di `6youru` è muta
   (l'iPad ha registrato dal microfono delle cuffie Bluetooth rimaste collegate, in mano
-  all'operatore: prima delle domande a voce le cuffie vanno staccate o date al visitatore). In `ujakv7` il microfono era stato negato per sbaglio: la
-  risposta è stata registrata a parte, come quella di `cgofvw` dopo la prima opera. In R2
+  all'operatore: prima delle domande a voce le cuffie vanno staccate o date al visitatore). Registrate a parte, fuori dall'app, e
+  collegate alla sessione dall'ora: le risposte finali di `zxut5q` (registrazione saltata
+  nell'app) e di `ujakv7` (microfono negato per sbaglio) e il parere di `cgofvw` dopo la prima
+  opera. In R2
   restano anche `q1pb6j` e `vvprxv`, registrazioni di prova la cui sessione non è più nel
   database.
 

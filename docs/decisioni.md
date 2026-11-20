@@ -1217,12 +1217,13 @@ della voce.
 **Decisione.** Le registrazioni finali si trascrivono sul Mac con Whisper
 (`openai/whisper-large-v3-turbo`, `rq3_visitors/transcribe.py`), forzando la lingua della
 sessione; la traduzione italiana per la lettura è fatta da Claude. Si escludono le prove e le
-registrazioni di sessioni non più nel database. Due registrazioni fatte fuori dall'app nella
-prima giornata (`ujakv7`, microfono negato per sbaglio; `cgofvw`, parere dopo la prima opera)
+registrazioni di sessioni non più nel database. Tre registrazioni fatte fuori dall'app nella
+prima giornata (`zxut5q`, registrazione saltata nell'app; `ujakv7`, microfono negato per sbaglio;
+`cgofvw`, parere dopo la prima opera)
 sono state collegate alla sessione dall'ora del file.
 **Motivo.** L'informativa promette che la voce si usa solo per la tesi e non si dà ad altri:
 niente servizi di trascrizione esterni.
-**Effetto.** 11 file trascritti in `data/rq3/transcripts.jsonl`. Whisper ha due difetti visti
+**Effetto.** 12 file trascritti in `data/rq3/transcripts.jsonl`. Whisper ha due difetti visti
 su questi dati: inventa testo su una registrazione quasi muta (`6youru`, lasciata vuota con una
 nota) e può saltare un tratto (`cgofvw_opera1`, 5–30 s, trascritto a parte e reinserito); le
 trascrizioni vanno rilette ascoltando.

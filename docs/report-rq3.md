@@ -487,7 +487,8 @@ Versione dell'app 0.5.0 (`config.js`).
   (`ipad-max` 9, `Ibrahim` 3, `iphone` 1, `qr` 1; 12 in tedesco, 2 in inglese), 13 complete,
   38 opere votate. Da escludere: la prova `kut5mg` e le 6 opere votate con 0 s di ascolto
   (saltate). Registrazioni finali: 9 in R2, tutte trascritte; quella di `6youru` è muta
-  (confermato all'ascolto; probabilmente il microfono interno dell'iPad invece di quello delle cuffie). In `ujakv7` il microfono era stato negato per sbaglio: la
+  (l'iPad ha registrato dal microfono delle cuffie Bluetooth rimaste collegate, in mano
+  all'operatore: prima delle domande a voce le cuffie vanno staccate o date al visitatore). In `ujakv7` il microfono era stato negato per sbaglio: la
   risposta è stata registrata a parte, come quella di `cgofvw` dopo la prima opera. In R2
   restano anche `q1pb6j` e `vvprxv`, registrazioni di prova la cui sessione non è più nel
   database.

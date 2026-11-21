@@ -50,7 +50,7 @@ def test_build_esclusioni_e_commenti():
         ("s2", "", "nessuna opera valida")]
     s1, s3 = sessions
     assert (s1["trials_valid"], s1["trials_total"], s1["voice"], s1["final_text_it"]) == (1, 3, "registrata nell'app", "Ciao")
-    assert (s3["voice"], s3["final_text"], s3["final_note"]) == ("registrata fuori dall'app", "Ja", "fuori dall'app")
+    assert (s3["voice"], s3["final_text"], s3["final_note"]) == ("microfono non disponibile", "Ja", "fuori dall'app")
 
 
 def test_build_app_060_registrazione_per_opera_e_tasto_salta():
@@ -66,3 +66,26 @@ def test_build_app_060_registrazione_per_opera_e_tasto_salta():
         ("a", "s1_1.m4a", "La seconda"), ("c", "", "")]
     assert excluded == [{"session_id": "s1", "artwork_id": "b", "reason": "opera saltata col tasto"}]
     assert (sessions[0]["voice"], sessions[0]["final_file"]) == ("saltata", "")
+
+
+def test_build_scambio_inutilizzabili_e_nota_su_sessione_senza_opere():
+    voice = {"sec": 10, "mime": "audio/mp4", "recorded_at": "x"}
+    recs = [_rec("ma", [{**_trial(0, "a"), "voice": voice}], voice=voice),
+            _rec("fi", [{**_trial(0, "a"), "skipped": True, "ratings": [None, None]}], voice=voice),
+            _rec("op", [_trial(0, "a")], voice={"skipped": True})]
+    transcripts = {"ma.m4a": {"file": "ma.m4a", "text": "detto da fi"},
+                   "fi.m4a": {"file": "fi.m4a", "text": "detto da ma"},
+                   "op_operatore.m4a": {"file": "op_operatore.m4a", "text": "nota", "text_it": "nota"}}
+    extra = {"ma.m4a": {"file": "ma.m4a", "session_id": "fi", "source": "scambio"},
+             "fi.m4a": {"file": "fi.m4a", "session_id": "ma", "source": "scambio"},
+             "op_operatore.m4a": {"file": "op_operatore.m4a", "session_id": "op", "source": "operatore"}}
+    unusable = {"ma_1.m4a": "cuffie"}
+    trials, sessions, excluded = dataset.build(recs, {}, transcripts, extra, unusable)
+    by = {s["session_id"]: s for s in sessions}
+    assert (by["ma"]["final_file"], by["ma"]["final_text"]) == ("fi.m4a", "detto da ma")
+    assert (by["fi"]["final_file"], by["fi"]["final_text"], by["fi"]["trials_valid"]) == ("ma.m4a", "detto da fi", 0)
+    assert ("fi", "", "nessuna opera valida (resta il commento finale)") in [
+        (e["session_id"], e["artwork_id"], e["reason"]) for e in excluded]
+    assert (by["op"]["final_text_it"], by["op"]["final_note"]) == ("nota", "operatore")
+    ma_trial = [t for t in trials if t["session_id"] == "ma"][0]
+    assert (ma_trial["oral_file"], ma_trial["oral_note"]) == ("", "ma_1.m4a inutilizzabile: cuffie")

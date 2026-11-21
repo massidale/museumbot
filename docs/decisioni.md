@@ -1257,3 +1257,22 @@ un'opera votando senza ascoltare (5 opere così nella prima giornata, prove escl
 **Effetto.** Le sessioni della 0.5.0 restano valide (`why` accettato, `dataset.py` legge
 entrambi i formati). Nelle nuove sessioni le opere saltate sono riconoscibili senza guardare i
 secondi di ascolto; il dataset le esclude con il motivo "opera saltata col tasto".
+
+## 2026-11-21 — RQ3: registrazioni dell'iPad inutilizzabili, recuperi e file scambiati
+
+**Decisione.** Le 12 registrazioni dell'iPad del 21 novembre fino alle 14:25 (ora locale)
+sono inutilizzabili e sono segnate in `data/rq3/exclusions.json` (`voice`); `transcribe.py` le
+salta e `dataset.py` le riporta solo come nota. Le registrazioni fatte a parte vanno in
+`data/rq3/raw/voice/` con un nome `<session_id>_<suffisso>` e una voce in `extra.json`: le
+risposte di `dyu9bg` e `oodswo` registrate di nuovo sull'iPhone (`_recupero`) e i riassunti in
+italiano dell'operatore per tre visitatori che non volevano essere registrati (`_operatore`,
+`lang: it`). `extra.json` sposta anche le registrazioni finali di `tyetwa` e `zk9nrd` l'una
+sull'altra sessione. Una sessione senza opere valide ma con un commento finale resta in
+`sessions.csv`.
+**Motivo.** L'iPad registrava dal microfono delle cuffie Bluetooth collegate (le registrazioni
+sono quasi mute, circa −54 dB di media contro −20/−35 dB di quelle buone). Madre e figlia si
+sono scambiate i dispositivi prima delle domande finali. I file originali restano com'erano;
+le correzioni sono tutte in file scritti a mano, così si rifanno.
+**Effetto.** Persi i commenti per opera di 4 sessioni (8 registrazioni) e 4 registrazioni
+finali; di queste, 2 sostituite dal recupero. I voti non sono toccati. Dataset delle due
+giornate: 25 sessioni e 52 opere.

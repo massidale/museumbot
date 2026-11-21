@@ -6,7 +6,10 @@ opere (il `flat` è l'audioguida del museo accorciata), app (iPad, telefono di M
 anche online e domande a voce dopo ogni opera e alla fine (versione 0.6.0, pubblicata il 21
 novembre 2026). Prima giornata al museo, con la versione 0.5.0
 il 20 novembre 2026: 14 sessioni nel database, prove comprese, e 9 registrazioni finali
-nell'app più 3 fatte a parte, tutte trascritte; dataset pulito con 11 sessioni e 31 opere (§6). Comitato etico e analisi sono da fare.*
+nell'app più 3 fatte a parte, tutte trascritte. Seconda giornata il 21 novembre, con la 0.6.0:
+18 sessioni; 12 registrazioni dell'iPad inutilizzabili (microfono delle cuffie Bluetooth),
+in parte sostituite da registrazioni a parte. Dataset pulito delle due giornate: 25 sessioni
+e 52 opere (§6). Comitato etico e analisi sono da fare.*
 
 **Domanda.** Un visitatore reale preferisce l'audioguida scritta per la sua categoria di
 Falk? RQ2 lo chiede a un giudice LLM con persona; RQ3 lo chiede alle persone, sulle stesse
@@ -463,9 +466,13 @@ Versione dell'app 0.6.0 (`config.js`).
   `data/rq3/raw/voice/` con Whisper (`openai/whisper-large-v3-turbo` con `transformers`, sulla
   GPU del Mac; nessun servizio esterno), nella lingua della sessione, in
   `data/rq3/transcripts.jsonl` (un file per riga; salta i file già fatti, quelli di sessioni
-  che non sono nell'export e quelli in `--exclude`). `<session_id>_<n>` è la registrazione
-  dell'opera n; un altro suffisso (`cgofvw_opera1`) è una registrazione fatta fuori dall'app,
-  e `voice/extra.json` dice di quale sessione, eventualmente di quale opera, e perché. Le trascrizioni con la traduzione italiana, l'ordine delle guide e i voti di
+  che non sono nell'export, quelli in `--exclude` e quelli inutilizzabili). `<session_id>_<n>` è
+  la registrazione dell'opera n; un altro suffisso (`cgofvw_opera1`, `dyu9bg_recupero`,
+  `is449e_operatore`) è una registrazione fatta fuori dall'app. `voice/extra.json` dice per
+  questi file e per quelli da spostare (dispositivi scambiati) a quale sessione vanno,
+  eventualmente a quale opera, perché, e la lingua se non è quella della sessione (`it` per i
+  riassunti dell'operatore). I file inutilizzabili sono in `data/rq3/exclusions.json`
+  (`voice`, con il motivo) e non si trascrivono. Le trascrizioni con la traduzione italiana, l'ordine delle guide e i voti di
   ogni opera sono in `data/rq3/trascrizioni.md`; la traduzione è anche in `text_it` di
   `transcripts.jsonl`. `data/rq3/` resta fuori da git.
 - **Dataset pulito.** `rq3_visitors/dataset.py` unisce tutti gli export online (come
@@ -474,11 +481,13 @@ Versione dell'app 0.6.0 (`config.js`).
     posizione nel giro, opera, quale guida era la personalizzata (`personal_guide`, 1 o 2),
     voti e secondi di ascolto della personalizzata e del confronto, `diff` (personalizzata
     meno confronto), commento scritto (`comment`, solo nella 0.5.0) e, se c'è, il commento a
-    voce su quell'opera (`oral_file`, `oral_text`, `oral_text_it`: il file `<session_id>_<n>`
-    o, per la 0.5.0, quello di `extra.json`);
-  - `sessions.csv`, una riga per sessione con almeno un'opera valida: categorie e
-    `category_fit`, opere valide e totali, com'è andata la registrazione finale (`voice`) e la
-    sua trascrizione (`final_text`, `final_text_it`, `final_note`);
+    voce su quell'opera (`oral_file`, `oral_text`, `oral_text_it`, `oral_note`: il file
+    `<session_id>_<n>` o quello indicato in `extra.json`);
+  - `sessions.csv`, una riga per sessione con almeno un'opera valida o con un commento finale
+    utilizzabile: categorie e `category_fit`, opere valide e totali, com'è andata la
+    registrazione finale nell'app (`voice`) e le trascrizioni finali (`final_file`,
+    `final_text`, `final_text_it`, `final_note`: registrazione dell'app, registrazioni fatte a
+    parte, riassunti dell'operatore, con il motivo dei file inutilizzabili);
   - `excluded.csv`: ogni sessione o opera tolta, con il motivo.
 
   Fuori: le sessioni in `data/rq3/exclusions.json` (prove, scritte a mano con il motivo), le
@@ -486,7 +495,7 @@ Versione dell'app 0.6.0 (`config.js`).
   senza ascoltarla) e le sessioni rimaste senza opere. È solo la pulizia minima: la soglia di
   ascolto e le altre esclusioni del §8 sono ancora da fissare.
 - **Test.** 83 test Node (`node --test rq3_app/tests/*.test.js rq3_pages/tests/*.test.js`:
-  logica, player, registrazione, testi, validazione, invio, QR, regole del server) e 34 test Python
+  logica, player, registrazione, testi, validazione, invio, QR, regole del server) e 37 test Python
   (manifesto, raccolta, download, trascrizione, dataset, sintesi vocale), tutti passati il 21
   novembre 2026.
 - **Pubblicazione.** Il service worker richiede HTTPS, quindi l'iPad non può usare il server
@@ -533,6 +542,18 @@ Versione dell'app 0.6.0 (`config.js`).
   opera. In R2
   restano anche `q1pb6j` e `vvprxv`, registrazioni di prova la cui sessione non è più nel
   database.
+- **Seconda giornata al museo** (21 novembre 2026, versione 0.6.0). Nel database 18 sessioni
+  (`ipad` 15, `iphone` 3; 15 in tedesco, 3 in inglese), tutte complete; 21 opere votate e 9
+  saltate col tasto. Nel dataset pulito 14 sessioni e 21 opere: le altre 4 sessioni hanno solo
+  opere saltate (`3ap10u`, `ydlgvr`, `lxtczf`, `unzq8y`); `zk9nrd` non ha opere valide ma resta
+  per il commento finale. Registrazioni nell'app: 21, di cui le 12 dell'iPad fino alle 14:25
+  (ora locale) inutilizzabili, registrate dal microfono delle cuffie Bluetooth (sessioni
+  `nv7x8b`, `mndv3z`, `dyu9bg`, `oodswo`). Al posto di quelle di `dyu9bg` e `oodswo` ci sono
+  le risposte dei visitatori registrate di nuovo sull'iPhone dell'operatore; tre visitatori che
+  non volevano essere registrati (`is449e`, `9p0r1b`, `m3p4yx`) hanno un riassunto in italiano
+  dell'operatore. Madre e figlia (`tyetwa` e `zk9nrd`, solo Aurora) si sono scambiate i
+  dispositivi alla fine: le due registrazioni finali sono attribuite alla persona che parla.
+  Trascritte 14 registrazioni (9 dell'app, 5 a parte); commenti per opera utilizzabili: 4.
 
 ## 7. Numerosità
 

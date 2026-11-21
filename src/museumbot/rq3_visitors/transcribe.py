@@ -2,9 +2,10 @@
 
 Legge data/rq3/raw/voice/<session_id>[_<suffisso>].<m4a|webm|ogg|mp3> (il suffisso e' n per
 la registrazione dell'opera n, o un nome per i file fatti fuori dall'app), usa la lingua della sessione
-dall'export online e scrive una riga per file in data/rq3/transcripts.jsonl. I file gia'
-trascritti si saltano; quelli di sessioni assenti dall'export (prove cancellate) o in
---exclude non si trascrivono.
+dall'export online (o quella scritta in raw/voice/extra.json, per esempio "it" per le note
+dell'operatore) e scrive una riga per file in data/rq3/transcripts.jsonl. I file gia'
+trascritti si saltano; quelli di sessioni assenti dall'export (prove cancellate), in --exclude o
+segnati come inutilizzabili in data/rq3/exclusions.json ("voice") non si trascrivono.
 """
 import argparse
 import json
@@ -15,8 +16,9 @@ from museumbot.common.config import ROOT
 
 RAW = ROOT / "data" / "rq3" / "raw"
 OUT = ROOT / "data" / "rq3" / "transcripts.jsonl"
+EXCLUSIONS = ROOT / "data" / "rq3" / "exclusions.json"
 MODEL = "openai/whisper-large-v3-turbo"
-WHISPER_LANG = {"de": "german", "en": "english"}
+WHISPER_LANG = {"de": "german", "en": "english", "it": "italian"}
 AUDIO = {".m4a", ".webm", ".ogg", ".mp3"}
 
 
@@ -25,14 +27,28 @@ def session_of(path: Path) -> str:
     return Path(path).stem.split("_")[0]
 
 
-def to_do(files: list[Path], langs: dict[str, str], exclude: set[str], done: set[str]) -> list[tuple[Path, str]]:
-    """(file, lingua) da trascrivere: sessione nota, non esclusa, file non ancora fatto."""
+def to_do(files: list[Path], langs: dict[str, str], exclude: set[str], done: set[str],
+          lang_of: dict[str, str] | None = None, skip: set[str] = frozenset()) -> list[tuple[Path, str]]:
+    """(file, lingua) da trascrivere: sessione nota, non esclusa, file non ancora fatto ne' in
+    skip (inutilizzabili). lang_of: lingua per nome del file, al posto di quella della sessione."""
+    lang_of = lang_of or {}
     out = []
     for f in sorted(files):
         sid = session_of(f)
-        if sid in langs and sid not in exclude and f.name not in done:
-            out.append((f, langs[sid]))
+        if sid in langs and sid not in exclude and f.name not in done and f.name not in skip:
+            out.append((f, lang_of.get(f.name, langs[sid])))
     return out
+
+
+def load_extra(voice_dir: Path) -> dict[str, dict]:
+    """Voci di extra.json per nome del file."""
+    p = Path(voice_dir) / "extra.json"
+    return {e["file"]: e for e in json.loads(p.read_text(encoding="utf-8"))} if p.exists() else {}
+
+
+def load_unusable(path: Path) -> dict[str, str]:
+    """File inutilizzabili (nome -> motivo), da exclusions.json."""
+    return json.loads(Path(path).read_text(encoding="utf-8")).get("voice", {}) if Path(path).exists() else {}
 
 
 def load_langs(export: Path) -> dict[str, str]:
@@ -74,8 +90,9 @@ def main():
     args = ap.parse_args()
     export = args.export or sorted(RAW.glob("online_*.json"))[-1]
     files = [f for f in args.voice_dir.iterdir() if f.suffix in AUDIO]
-    jobs = to_do(files, load_langs(export), set(args.exclude),
-                 load_done(args.out))
+    lang_of = {f: e["lang"] for f, e in load_extra(args.voice_dir).items() if e.get("lang")}
+    jobs = to_do(files, load_langs(export), set(args.exclude), load_done(args.out),
+                 lang_of, set(load_unusable(EXCLUSIONS)))
     print(f"export: {export.name}; da trascrivere: {len(jobs)}")
     if not jobs:
         return
@@ -86,6 +103,8 @@ def main():
                     generate_kwargs={"language": WHISPER_LANG[lang], "task": "transcribe"})
             row = {"file": f.name, "session_id": session_of(f), "lang": lang,
                    "model": args.model, "text": r["text"].strip()}
+            if lang == "it":
+                row["text_it"] = row["text"]
             fh.write(json.dumps(row, ensure_ascii=False) + "\n")
             fh.flush()
             print(f"{f.name}: {len(row['text'])} caratteri")

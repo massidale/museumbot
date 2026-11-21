@@ -11,8 +11,12 @@ Regole: fuori le sessioni in exclusions.json (prove); fuori le opere saltate col
 dell'app, quelle senza i due voti e quelle con una guida a 0 s di ascolto (saltata prima che ci
 fosse il tasto, o una guida votata senza ascoltarla); fuori le sessioni senza opere valide.
 
-Commenti a voce su un'opera: dall'app 0.6.0 il file <session_id>_<n> (n = posizione nel giro);
-prima, i file di extra.json con artwork_id. Risposte finali: <session_id>.
+Registrazioni: <session_id>_<n> e' il commento sull'opera n del giro (app 0.6.0), <session_id>
+le risposte finali. extra.json puo' spostare un file su un'altra sessione (dispositivi
+scambiati) o su un'opera (artwork_id); senza artwork_id va con le risposte finali (registrazioni
+fatte fuori dall'app, note dell'operatore). I file in exclusions.json "voice" sono inutilizzabili:
+restano solo come nota. Una sessione senza opere valide ma con un commento finale resta in
+sessions.csv (trials_valid 0).
 """
 import argparse
 import csv
@@ -30,7 +34,7 @@ TRIAL_COLS = ["session_id", "day", "device", "lang", "categories", "n_categories
               "artwork_id", "personal", "comparison", "personal_guide", "rating_personal",
               "rating_comparison", "diff", "heard_personal", "heard_comparison",
               "plays_personal", "plays_comparison", "comment", "oral_file", "oral_text",
-              "oral_text_it"]
+              "oral_text_it", "oral_note"]
 SESSION_COLS = ["session_id", "day", "started_at", "device", "lang", "categories",
                 "category_fit", "trials_valid", "trials_total", "completed", "voice",
                 "final_file", "final_text", "final_text_it", "final_note"]
@@ -72,17 +76,15 @@ def trial_row(rec: dict, t: dict, oral: dict | None = None) -> dict:
         "plays_personal": t["plays"][p], "plays_comparison": t["plays"][c],
         "comment": (t.get("why") or "").strip(),
         "oral_file": oral.get("file", ""), "oral_text": oral.get("text", ""),
-        "oral_text_it": oral.get("text_it", ""),
+        "oral_text_it": oral.get("text_it", ""), "oral_note": oral.get("note", ""),
     }
 
 
-def voice_status(rec: dict, final_extra: dict | None) -> str:
-    """Com'e' andata la registrazione finale."""
+def voice_status(rec: dict) -> str:
+    """Com'e' andata la registrazione finale nell'app (le altre sono in final_note)."""
     v = rec.get("voice") or {}
     if isinstance(v.get("sec"), (int, float)):
         return "registrata nell'app"
-    if final_extra:
-        return "registrata fuori dall'app"
     if v.get("no_mic"):
         return "microfono non disponibile"
     if v.get("skipped"):
@@ -90,47 +92,82 @@ def voice_status(rec: dict, final_extra: dict | None) -> str:
     return "assente"
 
 
-def session_row(rec: dict, n_valid: int, final: dict | None, final_extra: dict | None) -> dict:
+def session_row(rec: dict, n_valid: int, final: dict | None) -> dict:
     final = final or {}
-    note = "; ".join(x for x in [(final_extra or {}).get("source", ""), final.get("note", "")] if x)
     fit = rec.get("category_fit") or {}
     return {
         "session_id": rec["session_id"], "day": rec["started_at"][:10],
         "started_at": rec["started_at"], "device": rec["device"], "lang": rec["lang"],
         "categories": _cats(rec), "category_fit": " ".join(f"{k}:{v}" for k, v in fit.items()),
         "trials_valid": n_valid, "trials_total": len(rec.get("trials") or []),
-        "completed": bool(rec.get("completed")), "voice": voice_status(rec, final_extra),
+        "completed": bool(rec.get("completed")), "voice": voice_status(rec),
         "final_file": final.get("file", ""), "final_text": final.get("text", ""),
-        "final_text_it": final.get("text_it", ""), "final_note": note,
+        "final_text_it": final.get("text_it", ""), "final_note": final.get("note", ""),
     }
 
 
+def slot_of(file: str, extra: dict[str, dict]) -> tuple[str, str | int | None]:
+    """(session_id, posto) di una registrazione: posto = n (opera n del giro) o artwork_id per un
+    commento su un'opera, None per le risposte finali."""
+    e = extra.get(file)
+    if e:
+        return e["session_id"], e.get("artwork_id")
+    sid, _, suf = Path(file).stem.partition("_")
+    return sid, (int(suf) if suf.isdigit() else None)
+
+
+def combine(parts: list[dict]) -> dict:
+    """Piu' registrazioni nello stesso posto: file con '; ', testi separati da una riga vuota."""
+    join = lambda k, sep: sep.join(p[k] for p in parts if p.get(k))
+    return {"file": join("file", "; "), "text": join("text", "\n\n"),
+            "text_it": join("text_it", "\n\n"), "note": join("note", "; ")}
+
+
+def gather(transcripts: dict[str, dict], extra: dict[str, dict],
+           unusable: dict[str, str]) -> dict[tuple, list[dict]]:
+    """Registrazioni per posto. Un file inutilizzabile porta solo la nota."""
+    slots: dict[tuple, list[dict]] = {}
+    for f in sorted(set(transcripts) | set(unusable)):
+        if f in unusable:
+            part = {"note": f"{f} inutilizzabile: {unusable[f]}"}
+        else:
+            r = transcripts[f]
+            note = "; ".join(x for x in [extra.get(f, {}).get("source", ""), r.get("note", "")] if x)
+            part = {"file": f, "text": r.get("text", ""), "text_it": r.get("text_it", ""), "note": note}
+        slots.setdefault(slot_of(f, extra), []).append(part)
+    return slots
+
+
 def build(records: list[dict], exclusions: dict[str, str], transcripts: dict[str, dict],
-          extra: dict[str, dict]) -> tuple[list[dict], list[dict], list[dict]]:
-    """(opere, sessioni, escluse). transcripts ed extra sono indicizzati per nome del file;
-    le trascrizioni si cercano per nome senza estensione (m4a, webm, ...)."""
-    by_stem = {Path(f).stem: r for f, r in transcripts.items()}
+          extra: dict[str, dict], unusable: dict[str, str] | None = None
+          ) -> tuple[list[dict], list[dict], list[dict]]:
+    """(opere, sessioni, escluse). transcripts, extra e unusable sono indicizzati per nome del
+    file."""
+    slots = gather(transcripts, extra, unusable or {})
     trials, sessions, excluded = [], [], []
     for rec in records:
         sid = rec["session_id"]
         if sid in exclusions:
             excluded.append({"session_id": sid, "artwork_id": "", "reason": exclusions[sid]})
             continue
-        oral = {e["artwork_id"]: transcripts.get(f, {"file": f})
-                for f, e in extra.items() if e["session_id"] == sid and e.get("artwork_id")}
         valid = []
         for t in rec.get("trials") or []:
             why = trial_problem(t)
             if why:
                 excluded.append({"session_id": sid, "artwork_id": t["artwork_id"], "reason": why})
             else:
-                said = by_stem.get(f"{sid}_{t['index'] + 1}") or oral.get(t["artwork_id"])
-                valid.append(trial_row(rec, t, said))
+                said = slots.get((sid, t["index"] + 1), []) + slots.get((sid, t["artwork_id"]), [])
+                valid.append(trial_row(rec, t, combine(said) if said else None))
+        final = combine(slots[(sid, None)]) if (sid, None) in slots else None
         if not valid:
-            excluded.append({"session_id": sid, "artwork_id": "", "reason": "nessuna opera valida"})
+            if final and final["text"]:
+                excluded.append({"session_id": sid, "artwork_id": "",
+                                 "reason": "nessuna opera valida (resta il commento finale)"})
+                sessions.append(session_row(rec, 0, final))
+            else:
+                excluded.append({"session_id": sid, "artwork_id": "", "reason": "nessuna opera valida"})
             continue
-        final = by_stem.get(sid)
-        sessions.append(session_row(rec, len(valid), final, extra.get(f"{sid}.m4a")))
+        sessions.append(session_row(rec, len(valid), final))
         trials += valid
     return trials, sessions, excluded
 
@@ -172,9 +209,10 @@ def main():
     ap.add_argument("--out", type=Path, default=OUT)
     args = ap.parse_args()
     files = args.exports or sorted(RAW.glob("online_*.json"))
-    excl = load_json(args.exclusions, {}).get("sessions", {})
+    excl = load_json(args.exclusions, {})
     extra = {e["file"]: e for e in load_json(args.extra, [])}
-    trials, sessions, excluded = build(load_records(files), excl, load_jsonl(args.transcripts), extra)
+    trials, sessions, excluded = build(load_records(files), excl.get("sessions", {}),
+                                       load_jsonl(args.transcripts), extra, excl.get("voice", {}))
     args.out.mkdir(parents=True, exist_ok=True)
     write_csv(args.out / "trials.csv", trials, TRIAL_COLS)
     write_csv(args.out / "sessions.csv", sessions, SESSION_COLS)

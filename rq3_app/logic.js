@@ -112,23 +112,28 @@ export function buildTrial(index, artwork, lang, categories, first) {
   return {
     index, artwork_id: artwork.id, personal, comparison, first, audio,
     plays: [0, 0], reached_end: [false, false], heard_sec: [0, 0],
-    ratings: [null, null],
-    why: '', shown_at: null, answered_at: null,
+    ratings: [null, null], voice: null,
+    shown_at: null, answered_at: null,
   };
 }
 
 const isScore = v => Number.isInteger(v) && v >= 1 && v <= 7;
 
-// Un voto 1-7 per guida; il perche' e' facoltativo.
+// Un voto 1-7 per guida; la registrazione e' facoltativa.
 export const answerComplete = ({ratings}) =>
   Array.isArray(ratings) && ratings.length === 2 && ratings.every(isScore);
 
 // Un voto 1-7 per ogni categoria scelta.
 export const fitComplete = (chosen, fit) => chosen.every(c => isScore(fit[c]));
 
-// I voti nell'ordine di ascolto (Guida 1, Guida 2), come plays e heard_sec.
-export const answer = (trial, {ratings, why, now}) =>
-  ({...trial, ratings: [...ratings], why: why || '', answered_at: now});
+// I voti nell'ordine di ascolto (Guida 1, Guida 2), come plays e heard_sec; voice come quella
+// finale: {sec, mime, recorded_at} o {skipped: true[, no_mic: true]}.
+export const answer = (trial, {ratings, voice, now}) =>
+  ({...trial, ratings: [...ratings], voice: voice ?? null, answered_at: now});
+
+// Opera saltata dal visitatore: niente voti, si passa oltre.
+export const skipTrial = (trial, now) =>
+  ({...trial, ratings: [null, null], voice: null, skipped: true, skipped_at: now});
 
 export const markStep = (session, step, now) => ({...session, last_step: step, updated_at: now});
 

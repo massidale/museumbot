@@ -7,7 +7,7 @@
     "info_title": "Before we start",
     "info_body": [
       "We save your answers and how long you listened to each guide. We do not ask for your name and do not save your IP address. Cloudflare, which hosts this site, records IP addresses in its own technical logs; we do not store or use them.",
-      "At the end you can also answer four short questions aloud. This is optional. If you do, we save the recording of your voice together with your answers; it is listened to and transcribed only for this thesis and not passed on. Please do not say your name in the recording.",
+      "After each painting and at the end you can also answer a few short questions aloud. This is optional. If you do, we save the recording of your voice together with your answers; it is listened to and transcribed only for this thesis and not passed on. Please do not say your name in the recording.",
       "The answers are stored on Cloudflare servers in the European Union and are used only for this thesis.",
       "Taking part is voluntary. You can stop at any time; the answers you gave until then are kept.",
       "If you have questions, please ask the researcher at the stand."
@@ -21,9 +21,9 @@
     "intro_steps": [
       "Read five short descriptions of why people visit museums, and choose the one or two that fit you best. Then say how well each one fits you.",
       "Look at a painting from this museum and listen to two different audio guides about it with the headphones. Please listen to both until the end.",
-      "Rate each guide and, if you like, tell us why.",
-      "You can then continue with another painting, up to five in total. Each painting takes about 4 minutes, and you can stop after any painting.",
-      "At the end, if you like, answer four short questions aloud in a single recording."
+      "Rate each guide and, if you like, tell us aloud how they differ and which one suits you better.",
+      "You can then continue with another painting, up to five in total. Each painting takes about 4 minutes, and you can stop after any painting. You can also skip a painting.",
+      "At the end, if you like, answer three short questions aloud in a single recording."
     ],
     "intro_note": "Taking part is voluntary and we do not ask for your name. There are no right or wrong answers: we are interested in your personal opinion.",
     "class_title": "Why are you visiting a museum today?",
@@ -52,14 +52,13 @@
     "q_rating": "How much did you like {guide}?",
     "rating_low": "Not at all",
     "rating_high": "Very much",
-    "q_why_text": "What did you like or not like about the two guides? (optional)",
     "next": "Next",
     "more_title": "Would you like to listen to another painting?",
     "more_yes": "Yes, another painting",
     "more_no": "No, finish",
     "end_title": "Thank you!",
     "end_body": "Your answers have been saved. You can take off the headphones now.",
-    "voice_title": "Four last questions",
+    "voice_title": "Three last questions",
     "voice_help": [
       "If you like, answer these questions aloud, all in a single recording. It is optional.",
       "Tap “Start recording” and answer the questions one after the other. Speak normally, close to the device.",
@@ -69,7 +68,6 @@
     "voice_questions": [
       "Was it easy to choose the descriptions that fit you? Was anything missing?",
       "Were the audio guides easy to understand?",
-      "Did the two guides for the same painting feel different to you? How?",
       "Do you have any other comments, requests or feedback?"
     ],
     "voice_start": "Start recording",
@@ -81,7 +79,10 @@
     "voice_skip": "Finish without recording",
     "voice_no_mic": "The microphone is not available. You can finish without recording.",
     "voice_limit": "The recording stopped after 10 minutes.",
-    "voice_save_error": "The recording could not be saved. You can try again or finish without recording."
+    "voice_save_error": "The recording could not be saved. You can try again or finish without recording.",
+    "trial_voice_q": "Did the two guides for this painting feel different to you? How? Which one do you think suits you better?",
+    "trial_voice_help": "Optional: answer aloud. Tap “Start recording” and, when you have finished, “Stop”.",
+    "skip_artwork": "Skip this painting"
   },
   "de": {
     "lang_name": "Deutsch",
@@ -91,7 +92,7 @@
     "info_title": "Bevor wir beginnen",
     "info_body": [
       "Wir speichern Ihre Antworten und wie lange Sie jeden Audioguide gehört haben. Wir fragen nicht nach Ihrem Namen und speichern Ihre IP-Adresse nicht. Cloudflare, das diese Website hostet, erfasst IP-Adressen in eigenen technischen Protokollen; wir speichern oder verwenden sie nicht.",
-      "Am Ende können Sie außerdem vier kurze Fragen mündlich beantworten. Das ist freiwillig. Wenn Sie es tun, speichern wir die Aufnahme Ihrer Stimme zusammen mit Ihren Antworten; sie wird nur für diese Masterarbeit angehört und abgeschrieben und nicht weitergegeben. Bitte nennen Sie in der Aufnahme nicht Ihren Namen.",
+      "Nach jedem Gemälde und am Ende können Sie außerdem einige kurze Fragen mündlich beantworten. Das ist freiwillig. Wenn Sie es tun, speichern wir die Aufnahme Ihrer Stimme zusammen mit Ihren Antworten; sie wird nur für diese Masterarbeit angehört und abgeschrieben und nicht weitergegeben. Bitte nennen Sie in der Aufnahme nicht Ihren Namen.",
       "Die Antworten werden auf Cloudflare-Servern in der Europäischen Union gespeichert und nur für diese Masterarbeit verwendet.",
       "Die Teilnahme ist freiwillig. Sie können jederzeit aufhören; die bis dahin gegebenen Antworten bleiben erhalten.",
       "Bei Fragen wenden Sie sich bitte an die Forscherin oder den Forscher am Stand."
@@ -105,9 +106,9 @@
     "intro_steps": [
       "Sie lesen fünf kurze Beschreibungen, warum Menschen ins Museum gehen, und wählen die eine oder die zwei aus, die am besten zu Ihnen passen. Dann geben Sie an, wie gut jede davon zu Ihnen passt.",
       "Sie sehen ein Gemälde aus diesem Museum und hören über die Kopfhörer zwei verschiedene Audioguides dazu. Bitte hören Sie beide bis zum Ende.",
-      "Sie bewerten jeden Audioguide und sagen uns, wenn Sie möchten, warum.",
-      "Danach können Sie mit einem weiteren Gemälde fortfahren, insgesamt bis zu fünf. Ein Gemälde dauert etwa 4 Minuten, und Sie können nach jedem Gemälde aufhören.",
-      "Am Ende können Sie, wenn Sie möchten, vier kurze Fragen mündlich in einer einzigen Aufnahme beantworten."
+      "Sie bewerten jeden Audioguide und sagen uns, wenn Sie möchten, mündlich, wie sie sich unterscheiden und welcher besser zu Ihnen passt.",
+      "Danach können Sie mit einem weiteren Gemälde fortfahren, insgesamt bis zu fünf. Ein Gemälde dauert etwa 4 Minuten, und Sie können nach jedem Gemälde aufhören. Sie können ein Gemälde auch überspringen.",
+      "Am Ende können Sie, wenn Sie möchten, drei kurze Fragen mündlich in einer einzigen Aufnahme beantworten."
     ],
     "intro_note": "Die Teilnahme ist freiwillig, und wir fragen nicht nach Ihrem Namen. Es gibt keine richtigen oder falschen Antworten: Uns interessiert Ihre persönliche Meinung.",
     "class_title": "Warum besuchen Sie heute ein Museum?",
@@ -136,14 +137,13 @@
     "q_rating": "Wie hat Ihnen {guide} gefallen?",
     "rating_low": "Gar nicht",
     "rating_high": "Sehr gut",
-    "q_why_text": "Was hat Ihnen an den beiden Audioguides gefallen oder nicht gefallen? (optional)",
     "next": "Weiter",
     "more_title": "Möchten Sie ein weiteres Gemälde hören?",
     "more_yes": "Ja, ein weiteres Gemälde",
     "more_no": "Nein, abschließen",
     "end_title": "Vielen Dank!",
     "end_body": "Ihre Antworten wurden gespeichert. Sie können die Kopfhörer jetzt abnehmen.",
-    "voice_title": "Noch vier letzte Fragen",
+    "voice_title": "Noch drei letzte Fragen",
     "voice_help": [
       "Wenn Sie möchten, beantworten Sie diese Fragen mündlich, alle in einer einzigen Aufnahme. Das ist freiwillig.",
       "Tippen Sie auf „Aufnahme starten“ und beantworten Sie die Fragen nacheinander. Sprechen Sie ganz normal und nah am Gerät.",
@@ -153,7 +153,6 @@
     "voice_questions": [
       "War es leicht, die Beschreibungen auszuwählen, die zu Ihnen passen? Hat etwas gefehlt?",
       "Waren die Audioguides gut verständlich?",
-      "Haben sich die beiden Audioguides zum selben Gemälde für Sie unterschiedlich angefühlt? Wie?",
       "Haben Sie weitere Anmerkungen, Wünsche oder Rückmeldungen?"
     ],
     "voice_start": "Aufnahme starten",
@@ -165,7 +164,10 @@
     "voice_skip": "Ohne Aufnahme abschließen",
     "voice_no_mic": "Das Mikrofon ist nicht verfügbar. Sie können ohne Aufnahme abschließen.",
     "voice_limit": "Die Aufnahme wurde nach 10 Minuten beendet.",
-    "voice_save_error": "Die Aufnahme konnte nicht gespeichert werden. Sie können es erneut versuchen oder ohne Aufnahme abschließen."
+    "voice_save_error": "Die Aufnahme konnte nicht gespeichert werden. Sie können es erneut versuchen oder ohne Aufnahme abschließen.",
+    "trial_voice_q": "Haben sich die beiden Audioguides zu diesem Gemälde für Sie unterschiedlich angefühlt? Wie? Welcher passt Ihrer Meinung nach besser zu Ihnen?",
+    "trial_voice_help": "Freiwillig: Antworten Sie mündlich. Tippen Sie auf „Aufnahme starten“ und, wenn Sie fertig sind, auf „Stopp“.",
+    "skip_artwork": "Dieses Gemälde überspringen"
   },
   "it": {
     "lang_name": "Italiano",
@@ -175,7 +177,7 @@
     "info_title": "Prima di cominciare",
     "info_body": [
       "Salviamo le tue risposte e per quanto tempo hai ascoltato ogni audioguida. Non ti chiediamo il nome e non salviamo il tuo indirizzo IP. Cloudflare, che ospita questo sito, registra gli indirizzi IP nei propri log tecnici; noi non li conserviamo né li usiamo.",
-      "Alla fine puoi anche rispondere a voce a quattro brevi domande. È facoltativo. Se lo fai, salviamo la registrazione della tua voce insieme alle tue risposte; viene ascoltata e trascritta solo per questa tesi e non viene data ad altri. Per favore non dire il tuo nome nella registrazione.",
+      "Dopo ogni dipinto e alla fine puoi anche rispondere a voce ad alcune brevi domande. È facoltativo. Se lo fai, salviamo la registrazione della tua voce insieme alle tue risposte; viene ascoltata e trascritta solo per questa tesi e non viene data ad altri. Per favore non dire il tuo nome nella registrazione.",
       "Le risposte sono conservate su server Cloudflare nell'Unione Europea e sono usate solo per questa tesi.",
       "La partecipazione è volontaria. Puoi fermarti in qualsiasi momento; le risposte date fino a quel punto vengono conservate.",
       "Se hai domande, chiedi al ricercatore allo stand."
@@ -189,9 +191,9 @@
     "intro_steps": [
       "Leggi cinque brevi descrizioni dei motivi per cui le persone vanno al museo e scegli la o le due che ti descrivono meglio. Poi dici quanto ciascuna ti rispecchia.",
       "Guardi un dipinto di questo museo e ascolti in cuffia due audioguide diverse su quel dipinto. Ascoltale entrambe fino alla fine.",
-      "Dai un voto a ciascuna audioguida e, se vuoi, ci dici perché.",
-      "Poi puoi continuare con un altro dipinto, fino a cinque in tutto. Ogni dipinto richiede circa 4 minuti, e puoi fermarti dopo ognuno.",
-      "Alla fine, se vuoi, rispondi a voce a quattro brevi domande, in un'unica registrazione."
+      "Dai un voto a ciascuna audioguida e, se vuoi, ci dici a voce in cosa sono diverse e quale ti è più adatta.",
+      "Poi puoi continuare con un altro dipinto, fino a cinque in tutto. Ogni dipinto richiede circa 4 minuti, e puoi fermarti dopo ognuno. Puoi anche saltare un dipinto.",
+      "Alla fine, se vuoi, rispondi a voce a tre brevi domande, in un'unica registrazione."
     ],
     "intro_note": "La partecipazione è volontaria e non ti chiediamo il nome. Non ci sono risposte giuste o sbagliate: ci interessa la tua opinione personale.",
     "class_title": "Perché visiti un museo oggi?",
@@ -220,14 +222,13 @@
     "q_rating": "Quanto ti è piaciuta la {guide}?",
     "rating_low": "Per niente",
     "rating_high": "Moltissimo",
-    "q_why_text": "Cosa ti è piaciuto o non ti è piaciuto delle due guide? (facoltativo)",
     "next": "Avanti",
     "more_title": "Vuoi ascoltare un altro dipinto?",
     "more_yes": "Sì, un altro dipinto",
     "more_no": "No, concludi",
     "end_title": "Grazie!",
     "end_body": "Le tue risposte sono state salvate. Ora puoi togliere le cuffie.",
-    "voice_title": "Ultime quattro domande",
+    "voice_title": "Ultime tre domande",
     "voice_help": [
       "Se vuoi, rispondi a voce a queste domande, tutte in un'unica registrazione. È facoltativo.",
       "Tocca “Inizia a registrare” e rispondi alle domande una dopo l'altra. Parla normalmente, vicino al dispositivo.",
@@ -237,7 +238,6 @@
     "voice_questions": [
       "È stato facile scegliere le descrizioni che ti rispecchiano? Mancava qualcosa?",
       "Le audioguide erano facili da capire?",
-      "Le due guide dello stesso dipinto ti sono sembrate diverse? In che modo?",
       "Hai altri commenti, richieste o suggerimenti?"
     ],
     "voice_start": "Inizia a registrare",
@@ -249,6 +249,9 @@
     "voice_skip": "Concludi senza registrare",
     "voice_no_mic": "Il microfono non è disponibile. Puoi concludere senza registrare.",
     "voice_limit": "La registrazione si è fermata dopo 10 minuti.",
-    "voice_save_error": "Non è stato possibile salvare la registrazione. Puoi riprovare o concludere senza registrare."
+    "voice_save_error": "Non è stato possibile salvare la registrazione. Puoi riprovare o concludere senza registrare.",
+    "trial_voice_q": "Le due guide di questo dipinto ti sono sembrate diverse? In che modo? Quale pensi che sia la più adatta a te?",
+    "trial_voice_help": "Facoltativo: rispondi a voce. Tocca “Inizia a registrare” e, quando hai finito, “Ferma”.",
+    "skip_artwork": "Salta questo dipinto"
   }
 }

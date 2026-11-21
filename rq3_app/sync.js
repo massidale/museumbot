@@ -1,9 +1,11 @@
 // Invio delle sessioni al database online: dopo ogni salvataggio, ogni 30 s e quando torna
 // la rete. Un giro alla volta; 'sent' e 'rejected' (session_id -> updated_at) in IndexedDB,
 // 'write_keys' (session_id -> chiave) per riconoscere la stessa sessione sul server.
-// Dopo le sessioni, le registrazioni di fine giro ('voice_sent', 'voice_rejected').
+// Dopo le sessioni, le registrazioni ('voice_sent', 'voice_rejected'), con la chiave della
+// loro sessione.
 
 import {getAllSessions, getSetting, setSetting, getVoice, getVoiceIds} from './store.js';
+import {voiceSession} from './validate.js';
 
 // Record da inviare: non gia' inviati (o respinti) con lo stesso updated_at, i piu' vecchi prima.
 export function pending(records, sent) {
@@ -90,7 +92,7 @@ async function voiceRound() {
   for (const id of ids.filter(i => !done[i])) {
     const v = await getVoice(id);
     if (!v) continue;
-    const key = await keyFor(id);
+    const key = await keyFor(voiceSession(id));
     let res;
     try { res = await fetch(`${voiceEndpoint}?id=${encodeURIComponent(id)}`, voiceInit(v, key)); }
     catch (e) { return; }

@@ -1,6 +1,7 @@
 // Salvataggio in IndexedDB: database 'rq3', store 'sessions' (chiave session_id),
-// 'settings' (chiave libera: device, last_export_ids, ...) e 'voice' (registrazione di fine
-// giro: {session_id, data: ArrayBuffer, mime, sec, recorded_at}).
+// 'settings' (chiave libera: device, last_export_ids, ...) e 'voice' (registrazioni:
+// {session_id, data: ArrayBuffer, mime, sec, recorded_at}, dove session_id e' l'id della
+// registrazione, voiceId di validate.js: la sessione o la sessione con _<n> per l'opera n).
 
 const DB_NAME = 'rq3';
 const DB_VERSION = 2;
@@ -70,7 +71,7 @@ export async function setSetting(key, value) {
   await run('settings', 'readwrite', s => s.put(value, key));
 }
 
-// Registrazioni di fine giro: una per sessione (una nuova sostituisce la vecchia).
+// Registrazioni: una per id (una nuova sostituisce la vecchia).
 export const putVoice = v => run('voice', 'readwrite', s => s.put(v));
 export const getVoice = id => run('voice', 'readonly', s => s.get(id));
 export const getVoiceIds = () => run('voice', 'readonly', s => s.getAllKeys());

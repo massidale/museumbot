@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   CATEGORIES, mixKey, allConditions, pairFor, rng, shuffle, validateManifest,
   planSession, newSession, buildTrial, answerComplete,
-  answer, fitComplete, markStep, abortSession, toJson, deletableIds, tourOrder, moveItem,
+  answer, skipTrial, fitComplete, markStep, abortSession, toJson, deletableIds, tourOrder, moveItem,
 } from '../logic.js';
 
 // Manifesto finto di 4 opere, stessa forma del Task 2.
@@ -88,12 +88,13 @@ test('newSession scrive consent_at se dato, altrimenti null', () => {
   assert.equal(newSession({...base, consentAt: 'C'}).consent_at, 'C');
   assert.equal(newSession(base).consent_at, null);
 });
-test('answer salva i due voti, il perche\' e l\'ora', () => {
+test('answer salva i due voti, la registrazione e l\'ora', () => {
   const t = buildTrial(0, M.artworks[0], 'en', ['recharger'], 'comparison');
-  const r = answer(t, {ratings: [3, 6], why: 'piu\' vivace', now: 'T'});
+  const voice = {sec: 12, mime: 'audio/mp4', recorded_at: 'T'};
+  const r = answer(t, {ratings: [3, 6], voice, now: 'T'});
   assert.deepEqual(r.ratings, [3, 6]); assert.equal('strength' in r, false);
-  assert.equal('choice' in r, false);
-  assert.equal(r.why, 'piu\' vivace'); assert.equal(r.answered_at, 'T');
+  assert.equal('choice' in r, false); assert.equal('why' in t, false);
+  assert.deepEqual(r.voice, voice); assert.equal(r.answered_at, 'T');
   assert.equal('reasons' in r, false); assert.equal('familiar' in r, false);
   assert.deepEqual(t.ratings, [null, null]);
 });
@@ -172,4 +173,12 @@ test('moveItem scambia con il vicino e non esce dai bordi', () => {
   assert.deepEqual(moveItem(l, 0, -1), l);
   assert.deepEqual(moveItem(l, 2, 1), l);
   assert.deepEqual(l, ['a', 'b', 'c']);
+});
+
+test('skipTrial: opera saltata, senza voti ne\' registrazione, non risposta', () => {
+  const t = {...buildTrial(0, M.artworks[0], 'en', ['recharger'], 'personal'), heard_sec: [12, 0]};
+  const r = skipTrial(t, 'T');
+  assert.equal(r.skipped, true); assert.equal(r.skipped_at, 'T');
+  assert.deepEqual(r.ratings, [null, null]); assert.equal(r.voice, null);
+  assert.equal(r.answered_at, null); assert.deepEqual(r.heard_sec, [12, 0]);
 });

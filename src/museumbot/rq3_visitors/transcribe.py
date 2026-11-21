@@ -1,6 +1,7 @@
 """Trascrizione locale delle registrazioni di RQ3 (Whisper sul Mac, niente servizi esterni).
 
-Legge data/rq3/raw/voice/<session_id>[_<suffisso>].m4a, usa la lingua della sessione
+Legge data/rq3/raw/voice/<session_id>[_<suffisso>].<m4a|webm|ogg|mp3> (il suffisso e' n per
+la registrazione dell'opera n, o un nome per i file fatti fuori dall'app), usa la lingua della sessione
 dall'export online e scrive una riga per file in data/rq3/transcripts.jsonl. I file gia'
 trascritti si saltano; quelli di sessioni assenti dall'export (prove cancellate) o in
 --exclude non si trascrivono.
@@ -16,6 +17,7 @@ RAW = ROOT / "data" / "rq3" / "raw"
 OUT = ROOT / "data" / "rq3" / "transcripts.jsonl"
 MODEL = "openai/whisper-large-v3-turbo"
 WHISPER_LANG = {"de": "german", "en": "english"}
+AUDIO = {".m4a", ".webm", ".ogg", ".mp3"}
 
 
 def session_of(path: Path) -> str:
@@ -71,7 +73,8 @@ def main():
     ap.add_argument("--model", default=MODEL)
     args = ap.parse_args()
     export = args.export or sorted(RAW.glob("online_*.json"))[-1]
-    jobs = to_do(list(args.voice_dir.glob("*.m4a")), load_langs(export), set(args.exclude),
+    files = [f for f in args.voice_dir.iterdir() if f.suffix in AUDIO]
+    jobs = to_do(files, load_langs(export), set(args.exclude),
                  load_done(args.out))
     print(f"export: {export.name}; da trascrivere: {len(jobs)}")
     if not jobs:

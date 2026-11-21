@@ -7,9 +7,12 @@ esclusioni scritte a mano (data/rq3/exclusions.json), le trascrizioni
 Scrive in data/rq3/clean/ trials.csv, sessions.csv ed excluded.csv (cosa e' stato tolto e
 perche').
 
-Regole: fuori le sessioni in exclusions.json (prove); fuori le opere senza i due voti o con
-una guida a 0 s di ascolto (opera saltata, o una guida votata senza ascoltarla); fuori le
-sessioni senza opere valide.
+Regole: fuori le sessioni in exclusions.json (prove); fuori le opere saltate col tasto
+dell'app, quelle senza i due voti e quelle con una guida a 0 s di ascolto (saltata prima che ci
+fosse il tasto, o una guida votata senza ascoltarla); fuori le sessioni senza opere valide.
+
+Commenti a voce su un'opera: dall'app 0.6.0 il file <session_id>_<n> (n = posizione nel giro);
+prima, i file di extra.json con artwork_id. Risposte finali: <session_id>.
 """
 import argparse
 import csv
@@ -36,6 +39,8 @@ EXCLUDED_COLS = ["session_id", "artwork_id", "reason"]
 
 def trial_problem(t: dict) -> str | None:
     """Perche' l'opera non entra nel dataset, o None se e' valida."""
+    if t.get("skipped"):
+        return "opera saltata col tasto"
     r = t.get("ratings") or [None, None]
     if r[0] is None or r[1] is None:
         return "senza voti"
@@ -102,9 +107,9 @@ def session_row(rec: dict, n_valid: int, final: dict | None, final_extra: dict |
 
 def build(records: list[dict], exclusions: dict[str, str], transcripts: dict[str, dict],
           extra: dict[str, dict]) -> tuple[list[dict], list[dict], list[dict]]:
-    """(opere, sessioni, escluse). transcripts ed extra sono indicizzati per nome del file.
-    Un file di extra con artwork_id e' un commento a voce su quell'opera; gli altri file
-    <session_id>.m4a sono le risposte finali."""
+    """(opere, sessioni, escluse). transcripts ed extra sono indicizzati per nome del file;
+    le trascrizioni si cercano per nome senza estensione (m4a, webm, ...)."""
+    by_stem = {Path(f).stem: r for f, r in transcripts.items()}
     trials, sessions, excluded = [], [], []
     for rec in records:
         sid = rec["session_id"]
@@ -119,13 +124,13 @@ def build(records: list[dict], exclusions: dict[str, str], transcripts: dict[str
             if why:
                 excluded.append({"session_id": sid, "artwork_id": t["artwork_id"], "reason": why})
             else:
-                valid.append(trial_row(rec, t, oral.get(t["artwork_id"])))
+                said = by_stem.get(f"{sid}_{t['index'] + 1}") or oral.get(t["artwork_id"])
+                valid.append(trial_row(rec, t, said))
         if not valid:
             excluded.append({"session_id": sid, "artwork_id": "", "reason": "nessuna opera valida"})
             continue
-        f = f"{sid}.m4a"
-        final = transcripts.get(f)
-        sessions.append(session_row(rec, len(valid), final, extra.get(f)))
+        final = by_stem.get(sid)
+        sessions.append(session_row(rec, len(valid), final, extra.get(f"{sid}.m4a")))
         trials += valid
     return trials, sessions, excluded
 

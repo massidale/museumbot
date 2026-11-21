@@ -1,6 +1,7 @@
-// PUT /api/voice?id=<session_id>: registrazione di fine giro, in R2 (chiave = session_id).
-// GET /api/voice (solo col token): elenco; GET /api/voice?id=<session_id>: il file.
+// PUT /api/voice?id=<id>: registrazione in R2 (chiave = id: <session_id> per le domande finali,
+// <session_id>_<n> per l'opera n). GET /api/voice (solo col token): elenco; GET ?id=<id>: il file.
 import {precheckVoice, decideVoice, authorized} from '../../lib/server.js';
+import {voiceSession} from '../../../rq3_app/validate.js';
 
 const json = (obj, status) => new Response(JSON.stringify(obj), {
   status, headers: {'content-type': 'application/json'}});
@@ -13,8 +14,8 @@ export async function onRequestPut({request, env}) {
   const bad = precheckVoice({id, key, type, size: length == null ? null : Number(length)});
   if (bad) return json({ok: false, error: bad.error}, bad.status);
   const existing = await env.DB.prepare('SELECT write_key, record FROM sessions WHERE session_id = ?')
-    .bind(id).first();
-  const out = decideVoice({existing, key});
+    .bind(voiceSession(id)).first();
+  const out = decideVoice({existing, key, id});
   if (out.status !== 200) return json({ok: false, error: out.error}, out.status);
   const body = await request.arrayBuffer();
   const late = precheckVoice({id, key, type, size: body.byteLength});

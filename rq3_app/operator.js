@@ -6,6 +6,7 @@ import {getAllSessions, deleteSessions, getSetting, setSetting, getSaveFailures,
   deleteVoices} from './store.js';
 import {checkCache, mediaUrls} from './player.js';
 import {fillMissing} from './swclient.js';
+import {voiceSession} from './validate.js';
 import {syncState} from './sync.js';
 import {APP_VERSION, PIN} from './config.js';
 
@@ -449,8 +450,9 @@ export function showOperator(root, {onStart = () => {}, message = ''} = {}) {
       await setSetting('last_export_ids', []);
       // registrazioni: si cancellano solo quelle gia' online; le altre restano e si inviano
       const [vids, vsent] = await Promise.all([getVoiceIds(), getSetting('voice_sent')]);
-      const gone = vids.filter(id => ids.includes(id) && (vsent || {})[id]);
-      const kept = vids.filter(id => ids.includes(id) && !(vsent || {})[id]).length;
+      const mine = vids.filter(id => ids.includes(voiceSession(id)));
+      const gone = mine.filter(id => (vsent || {})[id]);
+      const kept = mine.length - gone.length;
       await deleteVoices(gone);
       say(deleteMsg, `Deleted ${ids.length} sessions and ${gone.length} recordings.`
         + (kept ? ` ${kept} recordings not yet online were kept.` : ''));

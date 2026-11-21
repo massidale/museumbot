@@ -1,9 +1,10 @@
 # RQ3: visitatori reali all'Herzog Anton Ulrich-Museum
 
-*Ultimo aggiornamento: 20 novembre 2026. Stato di RQ3: disegno deciso, stimoli testuali
+*Ultimo aggiornamento: 21 novembre 2026. Stato di RQ3: disegno deciso, stimoli testuali
 pronti in inglese e tedesco (senza correzione degli errori), 160 audio e immagini delle 5
 opere (il `flat` è l'audioguida del museo accorciata), app (iPad, telefono di Massimo, telefoni dei visitatori da QR) con risposte salvate
-anche online e domande finali a voce, pubblicata il 19 novembre 2026. Prima giornata al museo
+anche online e domande a voce dopo ogni opera e alla fine (versione 0.6.0, pubblicata il 21
+novembre 2026). Prima giornata al museo, con la versione 0.5.0
 il 20 novembre 2026: 14 sessioni nel database, prove comprese, e 9 registrazioni finali
 nell'app più 3 fatte a parte, tutte trascritte; dataset pulito con 11 sessioni e 31 opere (§6). Comitato etico e analisi sono da fare.*
 
@@ -31,13 +32,16 @@ Deciso il 16 novembre 2026 (`docs/decisioni.md`), con le semplificazioni del 17 
 
   Nell'app `flat` è il testo "Read along" del museo per quell'opera, accorciato alla lunghezza
   dei nostri testi togliendo solo frasi intere (§3.1), non il `flat` generato da Gemma.
-- **Domande per opera.** Quanto è piaciuta ciascuna guida, da 1 (per niente) a 7 (moltissimo),
-  e cosa è piaciuto o no delle due (aperta, facoltativa). Nessuna scelta forzata: la
-  preferenza è la differenza fra i due voti (personalizzata meno `flat`), con pareggi possibili.
+- **Domande per opera.** Quanto è piaciuta ciascuna guida, da 1 (per niente) a 7 (moltissimo).
+  Poi, a voce in una registrazione facoltativa per quell'opera: "Le due guide di questo dipinto
+  ti sono sembrate diverse? In che modo? Quale pensi che sia la più adatta a te?". Così ogni
+  coppia ha il suo commento, e "la prima" o "la seconda" si riferiscono a guide note. Nessuna
+  scelta forzata: la preferenza è la differenza fra i due voti (personalizzata meno `flat`),
+  con pareggi possibili. Un tasto "Salta questo dipinto" passa oltre senza voti.
 - **Opere.** Le 5 del §3 hanno gli audio; una sessione le mostra tutte e 5 (`MAX_ARTWORKS` in
   `app.js`), in ordine casuale o, sull'iPad, nell'ordine fisso del giro scelto dall'operatore
-  (per seguire il percorso nelle sale). Il visitatore può fermarsi dopo ognuna, quindi da 1 a 5
-  prove per sessione. Ogni sessione è indipendente (nessun bilanciamento fra visitatori).
+  (per seguire il percorso nelle sale). Il visitatore può fermarsi dopo ognuna o saltarne una,
+  quindi da 1 a 5 prove per sessione. Ogni sessione è indipendente (nessun bilanciamento fra visitatori).
   L'ordine delle due guide resta casuale anche con il giro fisso.
 - **Lingua.** Inglese o tedesco, scelta all'inizio.
 - **Ascolto libero.** Play, pausa, −10 s e cursore; l'app non impone l'ordine né l'ascolto
@@ -50,15 +54,14 @@ Deciso il 16 novembre 2026 (`docs/decisioni.md`), con le semplificazioni del 17 
   telefoni dei visitatori che hanno cuffie, da un QR code (`?m=qr`), solo con Massimo
   presente (§6).
 - **Domande finali a voce.** Alla fine del giro (dopo l'ultima opera o quando il visitatore
-  dice basta) quattro domande a schermo, con istruzioni brevi, a cui si risponde a voce in
+  dice basta) tre domande a schermo, con istruzioni brevi, a cui si risponde a voce in
   un'unica registrazione, facoltativa:
   1. È stato facile scegliere le descrizioni che ti rispecchiano? Mancava qualcosa?
   2. Le audioguide erano facili da capire?
-  3. Le due guide dello stesso dipinto ti sono sembrate diverse? In che modo?
-  4. Hai altri commenti, richieste o suggerimenti?
+  3. Hai altri commenti, richieste o suggerimenti?
 
-  Le risposte servono come dati qualitativi (comprensione, categorie mancanti, differenza
-  percepita fra le guide); vanno trascritte.
+  Le risposte, come quelle per opera, servono come dati qualitativi (comprensione, categorie
+  mancanti, differenza percepita fra le guide); vanno trascritte.
 - **Informativa.** Prima dell'introduzione c'è una schermata con le informazioni sui dati
   (cosa si salva, registrazione facoltativa della voce, server nell'Unione europea,
   partecipazione volontaria, nessun nome) e un tasto di accordo; l'istante dell'accordo va nel
@@ -326,7 +329,7 @@ finti si ricreano con `demo_stimuli.py` (non sono più in `rq3_app/`).
 Disegno e piano: `docs/plans/2026-11-16-rq3-app-ipad-design.md`,
 `docs/plans/2026-11-16-rq3-app-ipad.md`; telefoni e risposte online:
 `docs/plans/2026-11-18-rq3-qr-online-design.md`, `docs/plans/2026-11-18-rq3-qr-online.md`.
-Versione dell'app 0.5.0 (`config.js`).
+Versione dell'app 0.6.0 (`config.js`).
 
 - **Forma.** Pagina web statica (HTML, CSS e JavaScript senza build). Sull'iPad si installa
   nella Home e un service worker scarica pagina, manifesto, immagini e audio, poi funziona
@@ -354,7 +357,8 @@ Versione dell'app 0.5.0 (`config.js`).
 - **Percorso.** (Operatore avvia la sessione →) lingua → informativa → presentazione dello
   studio → classificazione (1 o 2 descrizioni, poi un voto 1–7 per ciascuna) → istruzioni (cuffie) → per
   ogni opera immagine, titolo, Guida 1 e Guida 2 ciascuna col suo voto 1–7 subito sotto, domanda
-  aperta → "un'altra opera?" → domande finali a voce → saluti. In fondo a ogni schermata del visitatore c'è l'id della
+  a voce sulla coppia; "Avanti" o "Salta questo dipinto" → "un'altra opera?" → domande finali a
+  voce → saluti. In fondo a ogni schermata del visitatore c'è l'id della
   sessione (`ID abc123`), per annotare errori ed esclusioni (§8).
   Testi dell'interfaccia in inglese e tedesco, con una versione italiana di riferimento che
   l'app non mostra (`rq3_app/texts.json`, copia di `docs/plans/2026-11-16-rq3-testi-app.json`).
@@ -364,7 +368,7 @@ Versione dell'app 0.5.0 (`config.js`).
 - **Informativa.** Schermata `info_*` di `texts.json`: cosa si salva (risposte e tempo di
   ascolto; non chiediamo il nome e non salviamo l'indirizzo IP; Cloudflare, che ospita il sito,
   registra gli indirizzi IP nei suoi log tecnici, che non conserviamo né usiamo), la
-  registrazione facoltativa della voce alla fine (ascoltata e trascritta solo per la tesi, non
+  registrazione facoltativa della voce dopo ogni opera e alla fine (ascoltata e trascritta solo per la tesi, non
   data ad altri; si chiede di non dire il proprio nome), dati su server Cloudflare nell'Unione
   europea e usati solo per la tesi, partecipazione volontaria, domande allo stand. "Accetto, continua" salva
   `consent_at` nel record. Il testo va approvato dal comitato etico (§9).
@@ -385,8 +389,11 @@ Versione dell'app 0.5.0 (`config.js`).
   `tour_order` dice se le opere erano nell'ordine casuale (`random`) o in quello
   dell'operatore (`operator`); l'ordine effettivo si legge dagli `artwork_id` delle prove. Per
   prova `ratings` (voti 1–7 di Guida 1 e Guida 2, nell'ordine di ascolto come `plays` e
-  `heard_sec`), `why` (al massimo 2000 caratteri) e `answered_at`; quale guida è la
-  personalizzata si legge da `first`.
+  `heard_sec`), `voice` (la registrazione sulla coppia, nella stessa forma di quella finale qui
+  sotto) e `answered_at`; un'opera saltata ha `skipped: true`, `skipped_at`, voti nulli e niente
+  `answered_at`. Quale guida è la personalizzata si legge da `first`. Le sessioni della 0.5.0
+  hanno al posto di `voice` il commento scritto `why` (al massimo 2000 caratteri), che il
+  server accetta ancora.
   Dopo la classificazione `categories` (lista delle 1 o 2 categorie) e `category_fit` (voto
   1–7 per ciascuna). Alla fine `voice`: `{sec, mime, recorded_at}` se c'è la registrazione,
   `{skipped: true}` se il visitatore conclude senza (con `no_mic: true` se il microfono non era
@@ -404,13 +411,17 @@ Versione dell'app 0.5.0 (`config.js`).
   si ritenta più tardi. Gli invii rifiutati (400, 403) non si ritentano; una sessione oltre il
   suo limite (429) si salta in quel giro e si passa alla successiva. Lo stato (inviate e rifiutate) è in IndexedDB e la
   schermata dell'operatore mostra quante sessioni e quante registrazioni sono state inviate.
-- **Registrazione** (`recorder.js`, schermata `voice` di `app.js`). Microfono con
-  `getUserMedia` e `MediaRecorder` (AAC in `audio/mp4` su Safari, Opus altrove), "Inizia a
-  registrare" → "Ferma" → "Salva e concludi" o "Registra di nuovo"; si ferma da sola dopo 10
-  minuti. "Concludi senza registrare" c'è sempre; senza microfono (permesso negato o browser
-  senza registrazione) resta solo quello. La registrazione salvata va in IndexedDB (store
-  `voice`, chiave `session_id`) e, dopo le sessioni, `sync.js` la invia a
-  `PUT /api/voice?id=<session_id>` con la stessa chiave della sessione, senza `keepalive` e con 120 s
+- **Registrazione** (`recorder.js`, `voiceRecorder` in `app.js`, lo stesso registratore per
+  le opere e per la fine). Microfono con `getUserMedia` e `MediaRecorder` (AAC in `audio/mp4`
+  su Safari, Opus altrove), "Inizia a registrare" → "Ferma" → "Registra di nuovo" se serve; si
+  ferma da sola dopo 10 minuti. Sulla pagina dell'opera la registrazione si salva con
+  "Avanti", che resta disattivato mentre si registra; "Salta questo dipinto" la scarta. Alla
+  fine "Salva e concludi" o "Concludi senza registrare". Senza microfono (permesso negato o
+  browser senza registrazione) i pulsanti di registrazione spariscono e la `voice` è
+  `{skipped: true, no_mic: true}`. Ogni registrazione ha un id (`voiceId` in `validate.js`):
+  `<session_id>` per le domande finali, `<session_id>_<n>` per l'opera n del giro. Va in
+  IndexedDB (store `voice`, chiave = id) e, dopo le sessioni, `sync.js` la invia a
+  `PUT /api/voice?id=<id>` con la chiave della sua sessione, senza `keepalive` e con 120 s
   di timeout. 404 o 409 (il record con `voice` non è ancora sul server) la fanno saltare a un
   giro successivo. Su un telefono la registrazione parte solo finché la pagina resta aperta;
   se il visitatore chiude subito, resta sul telefono e parte alla prossima apertura dell'indirizzo.
@@ -426,10 +437,10 @@ Versione dell'app 0.5.0 (`config.js`).
   in tutto il sito e 300 scritture per sessione (429). `GET /api/sessions` esporta tutti i
   record solo con il token `EXPORT_TOKEN` (secret del progetto, in `.env` come
   `RQ3_EXPORT_TOKEN`); senza token 401. Le registrazioni vanno nel bucket R2
-  `museumbot-voice` (giurisdizione UE, binding `VOICE`, chiave = `session_id`):
+  `museumbot-voice` (giurisdizione UE, binding `VOICE`, chiave = id della registrazione):
   `PUT /api/voice` accetta solo audio (`audio/mp4`, `webm`, `ogg`, `mpeg`) fino a 25 MB, per una
-  sessione già nel database, con la sua chiave (altrimenti 403) e il cui record dichiara
-  `voice` (altrimenti 409); `GET /api/voice` elenca le registrazioni e `GET /api/voice?id=…` ne
+  sessione già nel database, con la sua chiave (altrimenti 403) e il cui record dichiara quella
+  registrazione, nella `voice` finale o in quella della prova n (altrimenti 409); `GET /api/voice` elenca le registrazioni e `GET /api/voice?id=…` ne
   dà una, solo col token.
 - **Dove stanno i dati.** Ogni sessione è in due posti: sul dispositivo, in IndexedDB legata
   all'indirizzo da cui si è installata l'app (si perde se si cancellano i dati di Safari o si
@@ -445,16 +456,16 @@ Versione dell'app 0.5.0 (`config.js`).
 - **Raccolta.** `rq3_visitors/download.py` scarica le sessioni online da
   `https://museumbot.pages.dev/api/sessions` in `data/rq3/raw/online_<AAAAMMGG-HHMM>.json`
   (token da `RQ3_EXPORT_TOKEN`) e le registrazioni che mancano in
-  `data/rq3/raw/voice/<session_id>.m4a` (o `.webm`). `rq3_visitors/collect.py` legge gli export (online e dell'app;
+  `data/rq3/raw/voice/<id>.m4a` (o `.webm`), con l'id della registrazione. `rq3_visitors/collect.py` legge gli export (online e dell'app;
   lista JSON o una riga per sessione), unisce le sessioni in `data/rq3/responses.jsonl`, tiene
   per ogni `session_id` la versione più avanti (completa, poi più risposte, poi più recente) e
   controlla lo schema. `rq3_visitors/transcribe.py` trascrive sul Mac le registrazioni di
   `data/rq3/raw/voice/` con Whisper (`openai/whisper-large-v3-turbo` con `transformers`, sulla
   GPU del Mac; nessun servizio esterno), nella lingua della sessione, in
   `data/rq3/transcripts.jsonl` (un file per riga; salta i file già fatti, quelli di sessioni
-  che non sono nell'export e quelli in `--exclude`). Un file `<session_id>_<suffisso>.m4a` è una
-  registrazione in più della stessa sessione, fatta fuori dall'app (`voice/extra.json` dice
-  quale e perché). Le trascrizioni con la traduzione italiana, l'ordine delle guide e i voti di
+  che non sono nell'export e quelli in `--exclude`). `<session_id>_<n>` è la registrazione
+  dell'opera n; un altro suffisso (`cgofvw_opera1`) è una registrazione fatta fuori dall'app,
+  e `voice/extra.json` dice di quale sessione, eventualmente di quale opera, e perché. Le trascrizioni con la traduzione italiana, l'ordine delle guide e i voti di
   ogni opera sono in `data/rq3/trascrizioni.md`; la traduzione è anche in `text_it` di
   `transcripts.jsonl`. `data/rq3/` resta fuori da git.
 - **Dataset pulito.** `rq3_visitors/dataset.py` unisce tutti gli export online (come
@@ -462,20 +473,21 @@ Versione dell'app 0.5.0 (`config.js`).
   - `trials.csv`, una riga per opera valida: sessione, giorno, dispositivo, lingua, categorie,
     posizione nel giro, opera, quale guida era la personalizzata (`personal_guide`, 1 o 2),
     voti e secondi di ascolto della personalizzata e del confronto, `diff` (personalizzata
-    meno confronto), commento scritto (`comment`) e, se c'è, il commento a voce su
-    quell'opera (`oral_file`, `oral_text`, `oral_text_it`);
+    meno confronto), commento scritto (`comment`, solo nella 0.5.0) e, se c'è, il commento a
+    voce su quell'opera (`oral_file`, `oral_text`, `oral_text_it`: il file `<session_id>_<n>`
+    o, per la 0.5.0, quello di `extra.json`);
   - `sessions.csv`, una riga per sessione con almeno un'opera valida: categorie e
     `category_fit`, opere valide e totali, com'è andata la registrazione finale (`voice`) e la
     sua trascrizione (`final_text`, `final_text_it`, `final_note`);
   - `excluded.csv`: ogni sessione o opera tolta, con il motivo.
 
   Fuori: le sessioni in `data/rq3/exclusions.json` (prove, scritte a mano con il motivo), le
-  opere senza i due voti, quelle con una guida a 0 s di ascolto (saltate, o una guida votata
+  opere saltate col tasto, quelle senza i due voti, quelle con una guida a 0 s di ascolto (saltate, o una guida votata
   senza ascoltarla) e le sessioni rimaste senza opere. È solo la pulizia minima: la soglia di
   ascolto e le altre esclusioni del §8 sono ancora da fissare.
-- **Test.** 78 test Node (`node --test rq3_app/tests/*.test.js rq3_pages/tests/*.test.js`:
-  logica, player, registrazione, testi, validazione, invio, QR, regole del server) e 33 test Python
-  (manifesto, raccolta, download, trascrizione, dataset, sintesi vocale), tutti passati il 20
+- **Test.** 83 test Node (`node --test rq3_app/tests/*.test.js rq3_pages/tests/*.test.js`:
+  logica, player, registrazione, testi, validazione, invio, QR, regole del server) e 34 test Python
+  (manifesto, raccolta, download, trascrizione, dataset, sintesi vocale), tutti passati il 21
   novembre 2026.
 - **Pubblicazione.** Il service worker richiede HTTPS, quindi l'iPad non può usare il server
   del Mac: l'app è su Cloudflare Pages (progetto `museumbot`, indirizzo fisso
@@ -487,9 +499,10 @@ Versione dell'app 0.5.0 (`config.js`).
   "Download missing files". Un file che manca dà 404 (`rq3_app/404.html` toglie a Pages il ritorno
   alla pagina principale, che subito dopo un deploy faceva arrivare HTML al posto di un modulo
   e lasciava la pagina bianca); se dopo un deploy la pagina resta bianca, si ricarica.
-- **Stato.** Versione 0.5.0 pubblicata il 19 novembre 2026 con il manifesto `haum-2` (5 opere,
+- **Stato.** Versione 0.6.0 pubblicata il 21 novembre 2026 con il manifesto `haum-2` (5 opere,
   160 audio, `flat` del museo); controllati online la versione del manifesto e i 10 `flat`,
-  uguali ai file locali.
+  uguali ai file locali, e dopo la 0.6.0 la versione, i testi nuovi e il 400 del server per un
+  id di registrazione non ammesso.
   Provata in locale con `wrangler pages dev` (sessioni inviate; una sessione salvata a server
   spento inviata dal timer di 30 s al ritorno; modo QR, ricaricamento, `earlier_sessions` 0 poi
   1) e in produzione con una sessione QR completa a 375×667, arrivata in D1, scaricata da
@@ -500,7 +513,12 @@ Versione dell'app 0.5.0 (`config.js`).
   `categories`, `category_fit`, i `ratings` della prova e il confronto con `flat`. Le domande a
   voce sono provate in locale nel browser con un microfono simulato (inglese a tutta larghezza,
   tedesco a 375 px): registrazione salvata in IndexedDB, record con `voice`, `PUT /api/voice`
-  200 sull'R2 locale; "Concludi senza registrare" scrive `{skipped: true}`.
+  200 sull'R2 locale; "Concludi senza registrare" scrive `{skipped: true}`. La 0.6.0 è provata
+  in locale con `wrangler pages dev`, modo QR e microfono simulato: un'opera con registrazione
+  (`voice` nella prova, file `<id>_1` in IndexedDB e `PUT /api/voice` 200), una saltata col tasto
+  (`skipped: true`, voti nulli), una senza registrazione (`{skipped: true}`), poi la
+  registrazione finale; "Avanti" disattivato mentre si registra; pagina dell'opera a 375 px
+  (tedesco) e a 1180×820.
 - **Prima giornata al museo** (20 novembre 2026, versione 0.5.0). Nel database 14 sessioni
   (`ipad-max` 9, `Ibrahim` 3, `iphone` 1, `qr` 1; 12 in tedesco, 2 in inglese), 13 complete,
   38 opere votate. Nel dataset pulito restano 11 sessioni e 31 opere. Tolte: la prova

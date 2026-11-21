@@ -1,6 +1,6 @@
 // Decisioni del server per le sessioni online: pure, senza D1 ne' Request.
 import {validateRecord, notBehind, answered, hasVoice, MAX_BYTES, MAX_VOICE_BYTES, VOICE_TYPE_RE,
-  SESSION_ID_RE} from '../../rq3_app/validate.js';
+  VOICE_ID_RE} from '../../rq3_app/validate.js';
 
 export const LIMITS = {newPerHour: 300, writesPerSession: 300};
 export const KEY_RE = /^[0-9a-f]{32}$/;
@@ -39,10 +39,10 @@ export function decideWrite({body, key, existing, newLastHour, now}) {
 export const authorized = (header, token) =>
   typeof token === 'string' && token !== '' && header === 'Bearer ' + token;
 
-// Registrazione di fine giro, controlli senza D1: errore {status, error} o null se va bene.
-// size null = dimensione non ancora nota (manca Content-Length).
+// Registrazione (finale o di un'opera), controlli senza D1: errore {status, error} o null se
+// va bene. size null = dimensione non ancora nota (manca Content-Length).
 export function precheckVoice({id, key, type, size}) {
-  if (typeof id !== 'string' || !SESSION_ID_RE.test(id)) return {status: 400, error: 'session_id non ammesso'};
+  if (typeof id !== 'string' || !VOICE_ID_RE.test(id)) return {status: 400, error: 'id non ammesso'};
   if (typeof key !== 'string' || !KEY_RE.test(key)) return {status: 400, error: 'chiave non valida'};
   if (typeof type !== 'string' || !VOICE_TYPE_RE.test(type)) return {status: 400, error: 'tipo non ammesso'};
   if (size != null && !(size > 0 && size <= MAX_VOICE_BYTES)) return {status: 400, error: 'dimensione non ammessa'};
@@ -51,9 +51,9 @@ export function precheckVoice({id, key, type, size}) {
 
 // Con la riga della sessione: si salva solo con la stessa chiave e se il record la dichiara.
 // 404 e 409 vogliono dire "non ancora" (il record con voice arriva prima): l'app riprova.
-export function decideVoice({existing, key}) {
+export function decideVoice({existing, key, id}) {
   if (!existing) return {status: 404, error: 'sessione non trovata'};
   if (existing.write_key !== key) return {status: 403, error: 'chiave diversa'};
-  if (!hasVoice(JSON.parse(existing.record))) return {status: 409, error: 'registrazione non dichiarata'};
+  if (!hasVoice(JSON.parse(existing.record), id)) return {status: 409, error: 'registrazione non dichiarata'};
   return {status: 200, error: null};
 }

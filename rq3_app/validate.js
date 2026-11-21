@@ -6,7 +6,12 @@ export const MAX_BYTES = 65536;   // lo controlla il server sul corpo
 export const MAX_TRIALS = 5;
 export const MAX_WHY = 2000;
 export const SESSION_ID_RE = /^[0-9a-z]{6}$/;
-export const MAX_VOICE_BYTES = 25 * 1024 * 1024;   // registrazione di fine giro (10 min bastano)
+export const MAX_VOICE_BYTES = 25 * 1024 * 1024;   // una registrazione (10 min bastano)
+// Id di una registrazione: <session_id> per le domande finali, <session_id>_<n> per l'opera n
+// (1-5, la posizione nel giro).
+export const VOICE_ID_RE = /^[0-9a-z]{6}(_[1-5])?$/;
+export const voiceId = (sessionId, pos = null) => (pos ? `${sessionId}_${pos}` : sessionId);
+export const voiceSession = id => String(id).split('_')[0];
 export const VOICE_TYPE_RE = /^audio\/(mp4|webm|ogg|mpeg)(;.*)?$/;
 const LANGS = ['en', 'de'];
 const isScore = v => Number.isInteger(v) && v >= 1 && v <= 7;
@@ -20,6 +25,8 @@ function checkTrial(t, i) {
     out.push(`prova ${i}: ratings non ammessi`);
   if (t.why != null && (typeof t.why !== 'string' || t.why.length > MAX_WHY))
     out.push(`prova ${i}: why non ammesso`);
+  if (!voiceOk(t.voice)) out.push(`prova ${i}: voice non ammessa`);
+  if (t.skipped != null && typeof t.skipped !== 'boolean') out.push(`prova ${i}: skipped non ammesso`);
   return out;
 }
 
@@ -32,8 +39,16 @@ export function voiceOk(v) {
     && VOICE_TYPE_RE.test(v.mime) && typeof v.recorded_at === 'string';
 }
 
-// La sessione dichiara una registrazione.
-export const hasVoice = rec => !!(rec && rec.voice && typeof rec.voice.sec === 'number');
+const recorded = v => !!(v && typeof v.sec === 'number');
+
+// Il record dichiara la registrazione con questo id (finale o di un'opera).
+export function hasVoice(rec, id) {
+  if (!rec) return false;
+  const pos = Number(String(id || '').split('_')[1] || 0);
+  if (!pos) return recorded(rec.voice);
+  const t = Array.isArray(rec.trials) ? rec.trials[pos - 1] : null;
+  return recorded(t && t.voice);
+}
 
 // Problemi del record, uno per messaggio; vuoto se va bene.
 export function validateRecord(rec) {

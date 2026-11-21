@@ -2,9 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   REQUIRED, MAX_BYTES, MAX_TRIALS, MAX_WHY, SESSION_ID_RE,
-  validateRecord, answered, rank, notBehind, voiceOk, hasVoice,
+  validateRecord, answered, rank, notBehind, voiceOk, hasVoice, VOICE_ID_RE, voiceId, voiceSession,
 } from '../validate.js';
-import {newSession, buildTrial, answer, allConditions, CATEGORIES} from '../logic.js';
+import {newSession, buildTrial, answer, skipTrial, allConditions, CATEGORIES} from '../logic.js';
 
 function artwork() {
   const audio = {};
@@ -102,4 +102,29 @@ test('voice: assente, saltata o registrata; altro no', () => {
   assert.equal(hasVoice({voice: {sec: 0, mime: 'audio/mp4', recorded_at: 'T'}}), true);
   assert.equal(hasVoice({voice: {skipped: true}}), false);
   assert.equal(hasVoice({}), false);
+});
+
+test('registrazione di un\'opera: voice e skipped nella prova', () => {
+  const voice = {sec: 20, mime: 'audio/mp4', recorded_at: 'T'};
+  assert.deepEqual(validateRecord(withTrial(valid(), {voice})), []);
+  assert.deepEqual(validateRecord(withTrial(valid(), {voice: {skipped: true, no_mic: true}})), []);
+  assert.deepEqual(validateRecord(withTrial(valid(), {voice: 'x'})), ['prova 0: voice non ammessa']);
+  assert.deepEqual(validateRecord({...valid(), trials: [skipTrial(valid().trials[0], 'T')]}), []);
+  assert.deepEqual(validateRecord(withTrial(valid(), {skipped: 'si'})), ['prova 0: skipped non ammesso']);
+});
+test('id delle registrazioni: finale <sessione>, opera n <sessione>_<n>', () => {
+  assert.equal(voiceId('abc123'), 'abc123'); assert.equal(voiceId('abc123', 2), 'abc123_2');
+  assert.equal(voiceSession('abc123_2'), 'abc123'); assert.equal(voiceSession('abc123'), 'abc123');
+  for (const ok of ['abc123', 'abc123_1', 'abc123_5']) assert.ok(VOICE_ID_RE.test(ok), ok);
+  for (const bad of ['abc123_0', 'abc123_6', 'abc123_12', 'abc123_', 'ABC123_1', 'abc12_1'])
+    assert.ok(!VOICE_ID_RE.test(bad), bad);
+});
+test('hasVoice con id: la registrazione dell\'opera n e\' nella prova n-1', () => {
+  const voice = {sec: 20, mime: 'audio/mp4', recorded_at: 'T'};
+  const r = {...valid(), trials: [{...valid().trials[0], voice}, {...valid().trials[0], voice: {skipped: true}}]};
+  assert.equal(hasVoice(r, 'abc123_1'), true);
+  assert.equal(hasVoice(r, 'abc123_2'), false);
+  assert.equal(hasVoice(r, 'abc123_3'), false);
+  assert.equal(hasVoice(r, 'abc123'), false);
+  assert.equal(hasVoice({...r, voice}, 'abc123'), true);
 });

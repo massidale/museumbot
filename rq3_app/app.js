@@ -2,7 +2,7 @@
 // salvato in IndexedDB dopo ogni passo. Tutti i testi per il visitatore vengono da texts.json.
 import {
   LANGS, validateManifest, planSession, tourOrder, newSession, buildTrial,
-  answerComplete, fitComplete, answer, markStep, abortSession, nextTime,
+  answerComplete, fitComplete, answer, skipTrial, markStep, abortSession, nextTime,
 } from './logic.js';
 import {createPlayer, prefetch} from './player.js';
 import {isQrMode, nextCount} from './qr.js';
@@ -11,7 +11,7 @@ import {putSession, putVoice, getSetting} from './store.js';
 import {startRecording, canRecord, clock} from './recorder.js';
 import {registerServiceWorker} from './swclient.js';
 import {startSync, syncSoon} from './sync.js';
-import {MAX_WHY} from './validate.js';
+import {voiceId} from './validate.js';
 import {showOperator as operatorScreen, onSwStatus, mountAbortGate, DEFAULT_DEVICE} from './operator.js';
 
 const MAX_ARTWORKS = 5;
@@ -360,21 +360,38 @@ function showTrial(i) {
     prefetch(buildTrial(i + 1, artwork(i + 1), S.lang, S.categories, S.plan.firsts[i + 1]).audio, S.manifest.version);
   }
 
-  const why = h('textarea', {rows: '3', maxlength: String(MAX_WHY)});
+  // Domanda a voce sulla coppia, facoltativa: si salva con "Avanti".
+  const voice = voiceRecorder(() => refresh());
   const next = h('button', {type: 'button'}, T.next);
+  const skip = h('button', {type: 'button', class: 'secondary'}, T.skip_artwork);
   const questions = h('div', {class: 'questions'},
-    h('div', {class: 'question'}, h('label', {class: 'q'}, T.q_why_text, why)));
+    h('div', {class: 'question voice-rec'},
+      h('p', {class: 'q'}, T.trial_voice_q),
+      h('p', {class: 'voice-hint'}, T.trial_voice_help),
+      voice.status, h('div', {class: 'voice-buttons'}, voice.buttons)));
 
-  const refresh = () => { next.disabled = !answerComplete(ans); };
+  const refresh = () => { next.disabled = !answerComplete(ans) || voice.recording; };
+  const listened = () => players.forEach((p, pos) => { trial = withStats(trial, pos, p.stats()); });
+  const onward = () => (i + 1 < S.total ? showMore(i) : finish());
 
-  next.addEventListener('click', () => {
-    if (!answerComplete(ans)) return;
+  next.addEventListener('click', async () => {
+    if (!answerComplete(ans) || voice.recording) return;
+    next.disabled = true;
+    const v = await voice.save(voiceId(S.sessionId, i + 1));
+    if (!v) { refresh(); return; }   // salvataggio non riuscito: il messaggio e' a schermo
     // lo stato dei player in questo momento (un audio puo' stare ancora suonando)
-    players.forEach((p, pos) => { trial = withStats(trial, pos, p.stats()); });
-    trial = answer(trial, {...ans, why: why.value.trim(), now: now()});
+    listened();
+    trial = answer(trial, {...ans, voice: v, now: now()});
     putTrial(trial);
-    if (i + 1 < S.total) showMore(i);
-    else finish();
+    onward();
+  });
+
+  skip.addEventListener('click', () => {
+    voice.cancel();
+    listened();
+    trial = skipTrial(trial, now());
+    putTrial(trial);
+    onward();
   });
 
   screen('wide',
@@ -384,8 +401,9 @@ function showTrial(i) {
         h('img', {src: art.image, alt: art.title[S.lang]}),
         h('figcaption', {}, h('h1', {}, art.title[S.lang]), h('p', {class: 'artist'}, art.artist))),
       h('div', {class: 'panel'}, guides, questions)),
-    h('div', {class: 'actions'}, next));
-  cleanups.push(() => players.forEach(p => p.destroy()));  // dopo screen()
+    h('div', {class: 'actions'}, skip, next));
+  cleanups.push(() => players.forEach(p => p.destroy()), voice.cancel);  // dopo screen()
+  voice.init();
   refresh();
 }
 
@@ -404,21 +422,25 @@ function finish() {
   showVoice();
 }
 
-// Quattro domande a schermo e un'unica registrazione per tutte le risposte.
-// Nel record voice = {sec, mime, recorded_at} oppure {skipped: true[, no_mic: true]}.
-function showVoice() {
+// Registratore a schermo: stato e pulsanti Registra / Ferma / Registra di nuovo.
+// onChange() a ogni cambio di stato. save(id) salva la registrazione fatta e restituisce la
+// voice del record: {sec, mime, recorded_at}, {skipped: true[, no_mic: true]} se non c'e',
+// null se il salvataggio non riesce; skipped() quella di chi non registra. Il chiamante mette cancel fra i cleanups e chiama init().
+function voiceRecorder(onChange = () => {}) {
   let rec = null;       // registrazione in corso
   let take = null;      // {data, mime, sec}: registrata, non ancora salvata
   let noMic = false;
   const status = h('p', {class: 'voice-status', 'aria-live': 'polite'});
   const startBtn = h('button', {type: 'button', class: 'big'}, T.voice_start);
   const stopBtn = h('button', {type: 'button', class: 'big stop', hidden: true}, T.voice_stop);
-  const saveBtn = h('button', {type: 'button', class: 'big', hidden: true}, T.voice_save);
-  const skipBtn = h('button', {type: 'button', class: 'secondary'}, T.voice_skip);
-  const show = (...on) => { for (const b of [startBtn, stopBtn, saveBtn]) b.hidden = !on.includes(b); };
   const say = (text, cls = '') => { status.textContent = text; status.className = `voice-status ${cls}`; };
 
-  function micMissing() { noMic = true; show(); say(T.voice_no_mic, 'err'); }
+  function micMissing() {
+    noMic = true;
+    startBtn.hidden = stopBtn.hidden = true;
+    say(T.voice_no_mic, 'err');
+    onChange();
+  }
 
   async function start() {
     startBtn.disabled = true;
@@ -430,7 +452,9 @@ function showVoice() {
     take = null;
     startBtn.disabled = false;
     say(fmt(T.voice_recording, {t: clock(0)}), 'on');
-    show(stopBtn);
+    startBtn.hidden = true;
+    stopBtn.hidden = false;
+    onChange();
   }
 
   async function stop(limit = false) {
@@ -440,46 +464,68 @@ function showVoice() {
     try { take = await r.stop(); } catch (e) { console.error(e); take = null; }
     startBtn.textContent = T.voice_again;
     startBtn.className = 'big secondary';
-    if (!take) { show(startBtn); say(T.voice_save_error, 'err'); return; }
-    say(fmt(T.voice_recorded, {t: clock(take.sec)}) + (limit ? ` ${T.voice_limit}` : ''));
-    show(saveBtn, startBtn);
+    startBtn.hidden = false;
+    stopBtn.hidden = true;
+    if (take) say(fmt(T.voice_recorded, {t: clock(take.sec)}) + (limit ? ` ${T.voice_limit}` : ''));
+    else say(T.voice_save_error, 'err');
+    onChange();
   }
 
-  async function saveTake() {
-    saveBtn.disabled = true;
+  const skipped = () => (noMic ? {skipped: true, no_mic: true} : {skipped: true});
+
+  async function save(id) {
+    if (!take) return skipped();
     const at = now();
     try {
-      await putVoice({session_id: S.sessionId, data: take.data, mime: take.mime, sec: take.sec, recorded_at: at});
+      await putVoice({session_id: id, data: take.data, mime: take.mime, sec: take.sec, recorded_at: at});
     } catch (e) {
       console.error(e);
-      saveBtn.disabled = false;
       say(T.voice_save_error, 'err');
-      return;
+      return null;
     }
-    end({sec: take.sec, mime: take.mime, recorded_at: at});
+    return {sec: take.sec, mime: take.mime, recorded_at: at};
   }
 
-  function end(voice) {
-    step('end', {voice});
-    goodbye('end_title', 'end_body');
-  }
-
+  const cancel = () => { if (rec) { rec.cancel(); rec = null; } };
   startBtn.addEventListener('click', start);
   stopBtn.addEventListener('click', () => stop());
-  saveBtn.addEventListener('click', saveTake);
+  return {
+    status, buttons: [startBtn, stopBtn], save, skipped, cancel,
+    get recording() { return !!rec; }, get take() { return take; },
+    init() { if (!canRecord()) micMissing(); },
+  };
+}
+
+// Domande finali a schermo e un'unica registrazione per tutte le risposte.
+// Nel record voice = {sec, mime, recorded_at} oppure {skipped: true[, no_mic: true]}.
+function showVoice() {
+  const saveBtn = h('button', {type: 'button', class: 'big', hidden: true}, T.voice_save);
+  const skipBtn = h('button', {type: 'button', class: 'secondary'}, T.voice_skip);
+  const voice = voiceRecorder(() => { saveBtn.hidden = !voice.take || voice.recording; });
+
+  const end = v => {
+    step('end', {voice: v});
+    goodbye('end_title', 'end_body');
+  };
+
+  saveBtn.addEventListener('click', async () => {
+    saveBtn.disabled = true;
+    const v = await voice.save(voiceId(S.sessionId));
+    if (v) end(v); else saveBtn.disabled = false;
+  });
   skipBtn.addEventListener('click', () => {
-    if (rec) { rec.cancel(); rec = null; }
-    end(noMic ? {skipped: true, no_mic: true} : {skipped: true});
+    voice.cancel();
+    end(voice.skipped());
   });
 
   screen('voice',
     h('h1', {}, T.voice_title),
     h('ul', {class: 'voice-help'}, T.voice_help.map(x => h('li', {}, x))),
     h('ol', {class: 'voice-questions'}, T.voice_questions.map(q => h('li', {}, q))),
-    h('div', {class: 'voice-rec'}, status, h('div', {class: 'stack'}, saveBtn, startBtn, stopBtn)),
+    h('div', {class: 'voice-rec'}, voice.status, h('div', {class: 'stack'}, saveBtn, voice.buttons)),
     h('div', {class: 'actions'}, skipBtn));
-  cleanups.push(() => { if (rec) { rec.cancel(); rec = null; } });   // dopo screen()
-  if (!canRecord()) micMissing();
+  cleanups.push(voice.cancel);   // dopo screen()
+  voice.init();
 }
 
 // Saluti; poi, a un tocco o da soli, si torna all'operatore.

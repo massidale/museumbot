@@ -51,3 +51,18 @@ def test_build_esclusioni_e_commenti():
     s1, s3 = sessions
     assert (s1["trials_valid"], s1["trials_total"], s1["voice"], s1["final_text_it"]) == (1, 3, "registrata nell'app", "Ciao")
     assert (s3["voice"], s3["final_text"], s3["final_note"]) == ("registrata fuori dall'app", "Ja", "fuori dall'app")
+
+
+def test_build_app_060_registrazione_per_opera_e_tasto_salta():
+    voice = {"sec": 20, "mime": "audio/mp4", "recorded_at": "x"}
+    t0 = {**_trial(0, "a"), "voice": voice}
+    t1 = {**_trial(1, "b"), "skipped": True, "ratings": [None, None], "heard_sec": [10, 0]}
+    t2 = {**_trial(2, "c"), "voice": {"skipped": True}}
+    recs = [_rec("s1", [t0, t1, t2], voice={"skipped": True})]
+    transcripts = {"s1_1.m4a": {"file": "s1_1.m4a", "text": "Die zweite", "text_it": "La seconda"},
+                   "s1_9.webm": {"file": "s1_9.webm", "text": "altro"}}
+    trials, sessions, excluded = dataset.build(recs, {}, transcripts, {})
+    assert [(t["artwork_id"], t["oral_file"], t["oral_text_it"]) for t in trials] == [
+        ("a", "s1_1.m4a", "La seconda"), ("c", "", "")]
+    assert excluded == [{"session_id": "s1", "artwork_id": "b", "reason": "opera saltata col tasto"}]
+    assert (sessions[0]["voice"], sessions[0]["final_file"]) == ("saltata", "")

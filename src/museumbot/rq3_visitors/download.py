@@ -49,7 +49,8 @@ def save(records: list[dict], raw_dir: Path, now: datetime) -> Path:
 
 
 def voice_name(item: dict) -> str:
-    """File della registrazione: <session_id>.<estensione dal tipo, senza parametri>."""
+    """File della registrazione: <id>.<estensione dal tipo, senza parametri>; id e' la chiave in
+    R2 (campo session_id dell'elenco): <session_id>, o <session_id>_<n> per l'opera n."""
     base = str(item.get("type", "")).split(";")[0].strip()
     return f"{item['session_id']}.{EXT.get(base, 'bin')}"
 

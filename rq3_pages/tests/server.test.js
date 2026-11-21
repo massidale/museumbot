@@ -136,7 +136,8 @@ test('precheckVoice: id, chiave, tipo audio e dimensione', () => {
   assert.equal(precheckVoice(ok), null);
   assert.equal(precheckVoice({...ok, size: null}), null);   // Content-Length assente
   assert.equal(precheckVoice({...ok, type: 'audio/webm;codecs=opus'}), null);
-  for (const bad of [{id: 'ABC123'}, {id: null}, {key: 'x'}, {type: 'text/html'}, {type: null},
+  assert.equal(precheckVoice({...ok, id: 'abc123_3'}), null);   // registrazione dell'opera 3
+  for (const bad of [{id: 'ABC123'}, {id: null}, {id: 'abc123_9'}, {id: 'abc123_x'}, {key: 'x'}, {type: 'text/html'}, {type: null},
                      {size: 0}, {size: MAX_VOICE_BYTES + 1}])
     assert.equal(precheckVoice({...ok, ...bad}).status, 400, JSON.stringify(bad));
 });
@@ -148,4 +149,14 @@ test('decideVoice: sessione presente, stessa chiave, voice dichiarata', () => {
   assert.equal(decideVoice({existing: row(rec({voice})), key: OTHER}).status, 403);
   assert.equal(decideVoice({existing: row(rec()), key: KEY}).status, 409);
   assert.equal(decideVoice({existing: row(rec({voice: {skipped: true}})), key: KEY}).status, 409);
+});
+
+test('decideVoice: la registrazione di un\'opera va dichiarata nella sua prova', () => {
+  const voice = {sec: 30, mime: 'audio/mp4', recorded_at: 'T'};
+  const row = r => ({write_key: KEY, record: JSON.stringify(r)});
+  const r = rec();
+  const withVoice = {...r, trials: [{...r.trials[0], voice}]};
+  assert.equal(decideVoice({existing: row(withVoice), key: KEY, id: 'abc123_1'}).status, 200);
+  assert.equal(decideVoice({existing: row(withVoice), key: KEY, id: 'abc123_2'}).status, 409);
+  assert.equal(decideVoice({existing: row(withVoice), key: KEY, id: 'abc123'}).status, 409);
 });

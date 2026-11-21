@@ -1241,3 +1241,19 @@ codice e in un file, si rifanno sempre uguali. Una guida a 0 s vuol dire che il 
 senza ascoltarla (opera saltata, o `swo9jg`, che se n'è dovuto andare dopo la prima guida).
 **Effetto.** Prima giornata: 11 sessioni e 31 opere nel dataset (13 esclusioni). La soglia di
 ascolto vera (§8 di `report-rq3.md`) non è ancora fissata; queste regole sono il minimo.
+
+## 2026-11-21 — RQ3: domanda a voce dopo ogni opera e tasto per saltarla (app 0.6.0)
+
+**Decisione.** La domanda sulle due guide esce dalle domande finali e va dopo ogni opera, a
+voce in una registrazione facoltativa per quell'opera, con una parte in più: "Le due guide di
+questo dipinto ti sono sembrate diverse? In che modo? Quale pensi che sia la più adatta a te?".
+Il commento scritto per opera (`why`) è tolto. Le domande finali restano tre. Un tasto "Salta
+questo dipinto", sempre visibile, salva l'opera come saltata (`skipped: true`, senza voti) e
+passa oltre. Registrazioni con id `<session_id>_<n>` per l'opera n; informativa e
+presentazione aggiornate (voce "dopo ogni dipinto e alla fine").
+**Motivo.** Richiesta di Massimo dopo la prima giornata: un commento per ogni coppia, in cui
+"la prima" e "la seconda" si riferiscono a guide note. Il tasto sostituisce il saltare
+un'opera votando senza ascoltare (5 opere così nella prima giornata, prove escluse).
+**Effetto.** Le sessioni della 0.5.0 restano valide (`why` accettato, `dataset.py` legge
+entrambi i formati). Nelle nuove sessioni le opere saltate sono riconoscibili senza guardare i
+secondi di ascolto; il dataset le esclude con il motivo "opera saltata col tasto".

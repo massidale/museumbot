@@ -1,6 +1,6 @@
 # RQ3: visitatori reali all'Herzog Anton Ulrich-Museum
 
-*Ultimo aggiornamento: 21 novembre 2026. Stato di RQ3: disegno deciso, stimoli testuali
+*Ultimo aggiornamento: 24 novembre 2026. Stato di RQ3: disegno deciso, stimoli testuali
 pronti in inglese e tedesco (senza correzione degli errori), 160 audio e immagini delle 5
 opere (il `flat` è l'audioguida del museo accorciata), app (iPad, telefono di Massimo, telefoni dei visitatori da QR) con risposte salvate
 anche online e domande a voce dopo ogni opera e alla fine (versione 0.6.0, pubblicata il 21
@@ -8,8 +8,10 @@ novembre 2026). Prima giornata al museo, con la versione 0.5.0
 il 20 novembre 2026: 14 sessioni nel database, prove comprese, e 9 registrazioni finali
 nell'app più 3 fatte a parte, tutte trascritte. Seconda giornata il 21 novembre, con la 0.6.0:
 18 sessioni; 12 registrazioni dell'iPad inutilizzabili (microfono delle cuffie Bluetooth),
-in parte sostituite da registrazioni a parte. Dataset pulito delle due giornate: 25 sessioni
-e 52 opere (§6). Comitato etico e analisi sono da fare.*
+in parte sostituite da registrazioni a parte. Terza giornata il 22 novembre: 15 sessioni.
+Dataset pulito delle tre giornate: 36 sessioni e 78 opere (§6). Analisi esplorativa delle tre
+giornate fatta (§8, `docs/analisi/rq3-esplorativa.md`); gemello LLM su tutte le 78 prove, confrontato
+con i visitatori (§8); comitato etico e analisi prevista sono da fare.*
 
 **Domanda.** Un visitatore reale preferisce l'audioguida scritta per la sua categoria di
 Falk? RQ2 lo chiede a un giudice LLM con persona; RQ3 lo chiede alle persone, sulle stesse
@@ -490,6 +492,12 @@ Versione dell'app 0.6.0 (`config.js`).
     parte, riassunti dell'operatore, con il motivo dei file inutilizzabili);
   - `excluded.csv`: ogni sessione o opera tolta, con il motivo.
 
+  `data/rq3/operator.json` tiene le annotazioni scritte dall'operatore: pareri riferiti da chi
+  non voleva essere registrato (`notes`, in `oral_text_it` o `final_text_it`) e i voti di
+  un'opera saltata per errore col tasto (`ratings`, colonna `note` di `trials.csv`). Queste e i riassunti
+  a voce dell'operatore portano la nota "annotazione dell'operatore, tradotta dall'inglese: da
+  non citare letteralmente".
+
   Fuori: le sessioni in `data/rq3/exclusions.json` (prove, scritte a mano con il motivo), le
   opere saltate col tasto, quelle senza i due voti, quelle con una guida a 0 s di ascolto (saltate, o una guida votata
   senza ascoltarla) e le sessioni rimaste senza opere. È solo la pulizia minima: la soglia di
@@ -544,9 +552,10 @@ Versione dell'app 0.6.0 (`config.js`).
   database.
 - **Seconda giornata al museo** (21 novembre 2026, versione 0.6.0). Nel database 18 sessioni
   (`ipad` 15, `iphone` 3; 15 in tedesco, 3 in inglese), tutte complete; 21 opere votate e 9
-  saltate col tasto. Nel dataset pulito 14 sessioni e 21 opere: le altre 4 sessioni hanno solo
-  opere saltate (`3ap10u`, `ydlgvr`, `lxtczf`, `unzq8y`); `zk9nrd` non ha opere valide ma resta
-  per il commento finale. Registrazioni nell'app: 21, di cui le 12 dell'iPad fino alle 14:25
+  saltate col tasto. Nel dataset pulito 14 sessioni e 22 opere: le altre 4 sessioni hanno solo
+  opere saltate (`3ap10u`, `ydlgvr`, `lxtczf`, `unzq8y`). Aurora di `zk9nrd`, saltata per errore
+  col tasto durante lo scambio dei dispositivi dopo l'ascolto, rientra con i voti 6 / 4
+  riportati dall'operatore. Registrazioni nell'app: 21, di cui le 12 dell'iPad fino alle 14:25
   (ora locale) inutilizzabili, registrate dal microfono delle cuffie Bluetooth (sessioni
   `nv7x8b`, `mndv3z`, `dyu9bg`, `oodswo`). Al posto di quelle di `dyu9bg` e `oodswo` ci sono
   le risposte dei visitatori registrate di nuovo sull'iPhone dell'operatore; tre visitatori che
@@ -554,6 +563,13 @@ Versione dell'app 0.6.0 (`config.js`).
   dell'operatore. Madre e figlia (`tyetwa` e `zk9nrd`, solo Aurora) si sono scambiate i
   dispositivi alla fine: le due registrazioni finali sono attribuite alla persona che parla.
   Trascritte 14 registrazioni (9 dell'app, 5 a parte); commenti per opera utilizzabili: 4.
+- **Terza giornata al museo** (22 novembre 2026, versione 0.6.0). Nel database 15 sessioni
+  (`ipad` 14, `iphone` 1). Nel dataset pulito 11 sessioni e 25 opere, 24 registrazioni
+  trascritte. Tolte: `lz29rf` e `hiooyf` (nessuna opera valida); `zaba33` e `hf9n4p`, stessa
+  persona di `tfhvt3` tornata per le altre opere con categorie diverse (lo dicono le
+  trascrizioni). Aurora di `u5oi3e`, saltata per sbaglio col tasto dopo l'ascolto, rientra con
+  i voti 6 / 6 annotati dall'operatore; il suo commento a voce non è stato salvato. `kp8igf` e
+  `r56v63` (16:09) non volevano essere registrati: hanno le annotazioni scritte dell'operatore.
 
 ## 7. Numerosità
 
@@ -590,7 +606,14 @@ Il pilota misura le sessioni al giorno, le opere per visitatore, la quota di chi
 
 ## 8. Analisi prevista e gemello LLM
 
-Da fare (`rq3_visitors/analyze.py` non esiste). Per ciascuna delle due stime: differenza fra
+**Analisi esplorativa** delle giornate del 20–22 novembre: `docs/analisi/rq3-esplorativa.md`,
+con i numeri in `results/rq3_summary.json` (`rq3_visitors/summary.py`), i temi dei commenti
+codificati a mano in `data/rq3/temi.json` e le voci Wikipedia e i testi del museo classificati
+frase per frase in `data/wiki/haum_codifica.jsonl`. Nel complesso diff +0.24 [−0.17, +0.66];
+puri −0.23 [−0.96, +0.33], misti +0.55 [+0.06, +1.08]; Aurora +1.09, Cleopatra −1.27. La
+discussione nasce da questi dati e va verificata su dati nuovi.
+
+**Analisi prevista:** da fare (`rq3_visitors/analyze.py` non esiste). Per ciascuna delle due stime: differenza fra
 i voti 1–7 della guida personalizzata (o mista) e di `flat`, con effetti casuali per
 partecipante e opera, posizione della guida personalizzata (1 o 2), differenza di durata e
 voti delle categorie scelte (`category_fit`) come covariate; segno della differenza come
@@ -609,11 +632,67 @@ data senza ascoltare) si esclude con regole fissate prima di guardare i voti:
 
 Nella tesi si danno i risultati con le esclusioni e, come controllo, senza.
 
-**Gemello LLM** (fase 4 del piano): per ogni visitatore, il giudice di RQ2 con la persona
-delle categorie del visitatore giudica esattamente le stesse coppie, sui testi (con il testo del
-museo accorciato, `text_short` in `data/rq3/museum_texts.jsonl`, come `flat`). Accordo item per
-item fra la scelta del giudice e il segno della differenza dei voti del visitatore (κ di
-Cohen, pareggi a parte) e tassi di vittoria per categoria, umani contro LLM.
+**Gemello LLM** (`rq3_visitors/twin.py`, disegno in `docs/decisioni.md`, 23 novembre 2026):
+GLM-5.3 su Ollama Cloud, con le impostazioni del giudice di RQ2 (`judge_one`), rifà ogni
+prova del dataset pulito.
+
+- Persona: le descrizioni dell'app scelte dal visitatore, nell'ordine di scelta, con il voto
+  di aderenza 1–7; niente nome della categoria.
+- Coppia: titolo e artista, testo di Gemma e testo del museo accorciato (`text_short`, o
+  `text_short_de` per le sessioni in tedesco), chiamati come nell'app ("Audioguide 1" / "Guide 1").
+  Tutto il prompt è nella lingua della sessione.
+- Domande: la domanda a voce dell'app, poi "Wie hat Ihnen Audioguide 1 gefallen?" (e per la 2)
+  da 1 a 7, pareggi ammessi; risposta in JSON (`comment`, `guide1`, `guide2`).
+- Due ordini (quello del visitatore e l'inverso) e due modi (`persona` e `neutral`, senza
+  descrizioni): 4 chiamate per prova, una per opera, senza memoria.
+- Uscita in `data/rq3/twin.jsonl`, una riga per (sessione, opera, modo, ordine), con
+  `rating_personal` e `rating_comparison` già riportati alla guida.
+
+Giro su tutte le 78 prove: 312 risposte valide, spesa $0.61. Le chiamate
+fallite per il limite mensile di Ollama Cloud (HTTP 429) restano nel file con `valid: false` e
+sono state rifatte; l'analisi tiene solo le valide, una per (sessione, opera, modo, ordine).
+Risposte nella lingua del prompt (un commento tedesco passa al "du").
+
+**Risultati** (`rq3_visitors/twin_summary.py` → `results/rq3_twin.json`; voti del gemello = media
+dei due ordini; 78 prove, le stesse dei visitatori):
+
+| | voto personalizzata | voto museo | diff [IC 95%] | personalizzata / pari / museo |
+|---|---|---|---|---|
+| visitatori | 5.46 | 5.22 | +0.24 [−0.17, +0.66] | 36 / 13 / 29 |
+| gemello con persona | 6.33 | 5.13 | +1.19 [+1.00, +1.41] | 70 / 6 / 2 |
+| gemello senza persona | 5.73 | 5.76 | −0.03 [−0.28, +0.23] | 33 / 19 / 26 |
+
+- La preferenza del gemello viene dalla persona: con persona meno senza, +1.22 [+0.88, +1.61].
+- Puri e misti vanno al contrario dei visitatori: il gemello con persona dà +1.53 ai
+  puri e +0.97 ai misti, i visitatori −0.23 e +0.55.
+  Su Cleopatra il gemello dà +1.53, i visitatori −1.27.
+- Segno prova per prova (personalizzata / pari / museo): il gemello con persona coincide con il
+  visitatore in 32 prove su 78, κ di Cohen −0.05; nelle 29 prove in cui il visitatore preferisce
+  il museo è d'accordo 0 volte. Senza persona coincide in 33, κ 0.10. Senza le prove pari per
+  uno dei due: con persona 32 su 59, κ 0.00 (il gemello dice sempre "personalizzata"); senza
+  persona 29 su 50, κ 0.15.
+- Posizione: Guida 1 meno Guida 2 nelle singole chiamate −0.22 [−0.36, −0.08] con persona,
+  −0.42 [−0.52, −0.34] senza; stesso segno nei due ordini in 60 prove su
+  78 con persona, 31 senza; chiamate pari 16 e 37 su 156.
+- Commenti: il gemello nota le stesse differenze dei visitatori (una guida più informativa,
+  l'altra che fa cercare dettagli o invita alla calma) e sceglie quella che corrisponde alla
+  descrizione ("passt besser zu mir, weil…").
+- Temi dei commenti (`data/rq3/temi_gemello.json`: 579 affermazioni sui 156 commenti nell'ordine
+  del visitatore, con i temi dei visitatori e tre nuovi). I visitatori si contano per persona
+  (commenti, domande a voce e finali), il gemello per commento (uno per prova e modo, 78 per modo):
+  - `adatta_a_me` (nuovo): con persona la guida personalizzata "passt zu mir" in 73 commenti su 78.
+    I visitatori che dicono che una guida "passt besser" lo motivano con il testo ("weil er
+    weniger stark wertet", qz12x0), non con la propria motivazione o con chi è con loro.
+  - Domande e inviti a guardare: lodati nella personalizzata in 44 commenti con persona e
+    35 senza; fra i visitatori ne parlano 3, con giudizi discordi.
+  - Più informazioni: 8 visitatori le trovano nella personalizzata; il gemello loda le
+    informazioni del museo (22 commenti con persona, 33 senza).
+  - Racconto: 4 visitatori lo lodano nel museo; il gemello nella personalizzata (13 e 12).
+  - Goethe (Aurora): 4 visitatori su 5 contro; il gemello a favore in 14 commenti in entrambi i modi.
+  - `lezione` (nuovo): il testo del museo sembra una lezione in 14 commenti con persona e 8 senza.
+  - Emozioni e calma: senza persona il gemello le critica nella personalizzata in 9 commenti
+    ("schwülstig"), con persona mai.
+  - Mancano nel gemello i temi `unire` (8 visitatori), voce e scelta delle categorie.
 
 ## 9. Da fare, in ordine
 
@@ -639,7 +718,7 @@ Cohen, pareggi a parte) e tassi di vittoria per categoria, umani contro LLM.
    (eyeVisit, audioguida, opuscolo) come fonti più lunghe o come termine di confronto.
 9. Pilota con 10–15 persone (durata, comprensione, categorie scelte), poi numerosità (§7).
 10. Soglie delle esclusioni (§8) fissate e scritte prima della raccolta.
-11. Raccolta, `analyze.py`, gemello LLM.
+11. Raccolta, `analyze.py`; rilettura della codifica dei commenti del gemello (§8).
 
 Proposta non implementata: un tasto dell'operatore che segna l'ultima risposta come errore
 (nel record, senza chiudere la sessione).
@@ -658,12 +737,17 @@ Proposta non implementata: un tasto dell'operatore che segna l'ultima risposta c
 | app | `rq3_app/` (audio, immagini e `manifest.json` fuori da git; `sync.js`, `qr.js`, `validate.js`, `recorder.js`); online su `https://museumbot.pages.dev` |
 | server delle risposte | `rq3_pages/` (`wrangler.toml`, `schema.sql`, `functions/api/session.js`, `sessions.js` e `voice.js`, `lib/server.js`, `tests/`) |
 | manifesto, stimoli finti, raccolta | `src/museumbot/rq3_visitors/` (`build_manifest.py`, `demo_stimuli.py`, `collect.py`, `download.py`, `transcribe.py`, `dataset.py`) |
-| test | `rq3_app/tests/`, `rq3_pages/tests/`, `tests/test_rq3_manifest.py`, `tests/test_rq3_collect.py`, `tests/test_rq3_download.py`, `tests/test_rq3_transcribe.py`, `tests/test_rq3_dataset.py`, `tests/test_tts.py` |
+| analisi esplorativa | `src/museumbot/rq3_visitors/summary.py` → `results/rq3_summary.json`; temi in `data/rq3/temi.json`; codifica delle fonti in `data/wiki/haum_codifica.jsonl`; testo in `docs/analisi/rq3-esplorativa.md` |
+| gemello LLM | `src/museumbot/rq3_visitors/twin.py` → `data/rq3/twin.jsonl`; confronto `twin_summary.py` → `results/rq3_twin.json`; temi dei commenti in `data/rq3/temi_gemello.json` |
+| test | `rq3_app/tests/`, `rq3_pages/tests/`, `tests/test_rq3_manifest.py`, `tests/test_rq3_collect.py`, `tests/test_rq3_download.py`, `tests/test_rq3_transcribe.py`, `tests/test_rq3_dataset.py`, `tests/test_rq3_summary.py`, `tests/test_rq3_twin.py`, `tests/test_rq3_twin_summary.py`, `tests/test_tts.py` |
 
 ```bash
 node --test rq3_app/tests/*.test.js rq3_pages/tests/*.test.js
-.venv/bin/python -m pytest -q tests/test_rq3_manifest.py tests/test_rq3_collect.py tests/test_rq3_download.py tests/test_rq3_transcribe.py tests/test_rq3_dataset.py tests/test_tts.py
+.venv/bin/python -m pytest -q tests/test_rq3_manifest.py tests/test_rq3_collect.py tests/test_rq3_download.py tests/test_rq3_transcribe.py tests/test_rq3_dataset.py tests/test_rq3_summary.py tests/test_rq3_twin.py tests/test_rq3_twin_summary.py tests/test_tts.py
 PYTHONPATH=src .venv/bin/python -m museumbot.rq3_visitors.dataset        # dataset pulito -> data/rq3/clean/
+PYTHONPATH=src .venv/bin/python -m museumbot.rq3_visitors.summary        # analisi esplorativa -> results/rq3_summary.json
+PYTHONPATH=src .venv/bin/python -m museumbot.rq3_visitors.twin --limit 5 # gemello LLM (senza --limit: tutte le prove) -> data/rq3/twin.jsonl
+PYTHONPATH=src .venv/bin/python -m museumbot.rq3_visitors.twin_summary  # gemello contro visitatori -> results/rq3_twin.json
 PYTHONPATH=src .venv/bin/python -m museumbot.generation.tts --in data/wiki/haum_generations.jsonl --limit 1
 PYTHONPATH=src .venv/bin/python -m museumbot.rq3_visitors.build_manifest --artworks data/rq3/artworks_haum.json --app-root rq3_app --version <v>
 PYTHONPATH=src .venv/bin/python -m museumbot.rq3_visitors.demo_stimuli --app-root rq3_app

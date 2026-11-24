@@ -92,8 +92,19 @@ def build_messages(p: dict, order: str, texts: dict, titles: dict) -> list[dict]
             {"role": "user", "content": user}]
 
 
-def judge_one(session, msgs: list[dict], budget: TokenBudget, model: str = MODEL) -> dict:
-    """Una chiamata con ritentativi: errori HTTP transitori e risposte senza scelta valida."""
+def parse_ab(content: str) -> dict | None:
+    """Scelta A/B e motivazione (giudizi di RQ2), o None."""
+    p = parse_choice(content)
+    return {"choice": p[0], "reason": p[1]} if p else None
+
+
+parse_ab.empty = {"choice": None, "reason": None}  # campi di una risposta non valida
+
+
+def judge_one(session, msgs: list[dict], budget: TokenBudget, model: str = MODEL,
+              parse=parse_ab) -> dict:
+    """Una chiamata con ritentativi: errori HTTP transitori e risposte senza risposta valida.
+    `parse` legge il contenuto e da' un dict di campi, o None se la risposta non e' valida."""
     body = {"model": model, "messages": msgs, "temperature": 0,
             "reasoning_effort": "low", "max_tokens": 1000}
     out = {"valid": False}
@@ -115,11 +126,10 @@ def judge_one(session, msgs: list[dict], budget: TokenBudget, model: str = MODEL
         cost = budget.add(usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0))
         m = d["choices"][0]["message"]
         content = m.get("content") or ""
-        parsed = parse_choice(content)
+        parsed = parse(content)
         out = {
             "valid": parsed is not None,
-            "choice": parsed[0] if parsed else None,
-            "reason": parsed[1] if parsed else None,
+            **(parsed or getattr(parse, "empty", {})),
             "content": content,
             "reasoning_chars": len(m.get("reasoning") or m.get("reasoning_content") or ""),
             "prompt_tokens": usage.get("prompt_tokens"),

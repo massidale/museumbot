@@ -1,0 +1,660 @@
+{
+  "prove_complete": 78,
+  "prove_totali": 78,
+  "visitatori": {
+    "tutto": {
+      "prove": 78,
+      "visitatori": 36,
+      "voto_personal": 5.46,
+      "voto_flat": 5.22,
+      "diff": 0.24,
+      "esiti": {
+        "personal": 36,
+        "pari": 13,
+        "flat": 29
+      },
+      "ic95": [
+        -0.17,
+        0.66
+      ]
+    },
+    "puri_misti": {
+      "misti": {
+        "prove": 47,
+        "visitatori": 18,
+        "voto_personal": 5.77,
+        "voto_flat": 5.21,
+        "diff": 0.55,
+        "esiti": {
+          "personal": 24,
+          "pari": 10,
+          "flat": 13
+        }
+      },
+      "puri": {
+        "prove": 31,
+        "visitatori": 18,
+        "voto_personal": 5.0,
+        "voto_flat": 5.23,
+        "diff": -0.23,
+        "esiti": {
+          "personal": 12,
+          "pari": 3,
+          "flat": 16
+        }
+      }
+    },
+    "per_opera": {
+      "aurora": {
+        "prove": 22,
+        "visitatori": 22,
+        "voto_personal": 5.86,
+        "voto_flat": 4.77,
+        "diff": 1.09,
+        "esiti": {
+          "personal": 15,
+          "pari": 3,
+          "flat": 4
+        }
+      },
+      "judith-with-the-head-of-holofernes": {
+        "prove": 12,
+        "visitatori": 12,
+        "voto_personal": 5.42,
+        "voto_flat": 5.33,
+        "diff": 0.08,
+        "esiti": {
+          "personal": 5,
+          "pari": 2,
+          "flat": 5
+        }
+      },
+      "portrait-of-a-family": {
+        "prove": 10,
+        "visitatori": 10,
+        "voto_personal": 5.4,
+        "voto_flat": 5.0,
+        "diff": 0.4,
+        "esiti": {
+          "personal": 6,
+          "pari": 0,
+          "flat": 4
+        }
+      },
+      "the-dying-cleopatra": {
+        "prove": 15,
+        "visitatori": 15,
+        "voto_personal": 4.73,
+        "voto_flat": 6.0,
+        "diff": -1.27,
+        "esiti": {
+          "personal": 1,
+          "pari": 2,
+          "flat": 12
+        }
+      },
+      "the-girl-with-the-wine-glass": {
+        "prove": 19,
+        "visitatori": 19,
+        "voto_personal": 5.63,
+        "voto_flat": 5.16,
+        "diff": 0.47,
+        "esiti": {
+          "personal": 9,
+          "pari": 6,
+          "flat": 4
+        }
+      }
+    }
+  },
+  "gemello_persona": {
+    "tutto": {
+      "prove": 78,
+      "visitatori": 36,
+      "voto_personal": 6.33,
+      "voto_flat": 5.13,
+      "diff": 1.19,
+      "esiti": {
+        "personal": 70,
+        "pari": 6,
+        "flat": 2
+      },
+      "ic95": [
+        1.0,
+        1.41
+      ]
+    },
+    "puri_misti": {
+      "misti": {
+        "prove": 47,
+        "visitatori": 18,
+        "voto_personal": 6.31,
+        "voto_flat": 5.34,
+        "diff": 0.97,
+        "esiti": {
+          "personal": 41,
+          "pari": 5,
+          "flat": 1
+        }
+      },
+      "puri": {
+        "prove": 31,
+        "visitatori": 18,
+        "voto_personal": 6.35,
+        "voto_flat": 4.82,
+        "diff": 1.53,
+        "esiti": {
+          "personal": 29,
+          "pari": 1,
+          "flat": 1
+        }
+      }
+    },
+    "per_opera": {
+      "aurora": {
+        "prove": 22,
+        "visitatori": 22,
+        "voto_personal": 6.3,
+        "voto_flat": 5.25,
+        "diff": 1.05,
+        "esiti": {
+          "personal": 20,
+          "pari": 2,
+          "flat": 0
+        }
+      },
+      "judith-with-the-head-of-holofernes": {
+        "prove": 12,
+        "visitatori": 12,
+        "voto_personal": 6.04,
+        "voto_flat": 5.46,
+        "diff": 0.58,
+        "esiti": {
+          "personal": 7,
+          "pari": 3,
+          "flat": 2
+        }
+      },
+      "portrait-of-a-family": {
+        "prove": 10,
+        "visitatori": 10,
+        "voto_personal": 6.35,
+        "voto_flat": 4.75,
+        "diff": 1.6,
+        "esiti": {
+          "personal": 9,
+          "pari": 1,
+          "flat": 0
+        }
+      },
+      "the-dying-cleopatra": {
+        "prove": 15,
+        "visitatori": 15,
+        "voto_personal": 6.47,
+        "voto_flat": 4.93,
+        "diff": 1.53,
+        "esiti": {
+          "personal": 15,
+          "pari": 0,
+          "flat": 0
+        }
+      },
+      "the-girl-with-the-wine-glass": {
+        "prove": 19,
+        "visitatori": 19,
+        "voto_personal": 6.42,
+        "voto_flat": 5.16,
+        "diff": 1.26,
+        "esiti": {
+          "personal": 19,
+          "pari": 0,
+          "flat": 0
+        }
+      }
+    }
+  },
+  "gemello_neutral": {
+    "tutto": {
+      "prove": 78,
+      "visitatori": 36,
+      "voto_personal": 5.73,
+      "voto_flat": 5.76,
+      "diff": -0.03,
+      "esiti": {
+        "personal": 33,
+        "pari": 19,
+        "flat": 26
+      },
+      "ic95": [
+        -0.28,
+        0.23
+      ]
+    },
+    "puri_misti": {
+      "misti": {
+        "prove": 47,
+        "visitatori": 18,
+        "voto_personal": 5.84,
+        "voto_flat": 5.76,
+        "diff": 0.09,
+        "esiti": {
+          "personal": 20,
+          "pari": 13,
+          "flat": 14
+        }
+      },
+      "puri": {
+        "prove": 31,
+        "visitatori": 18,
+        "voto_personal": 5.56,
+        "voto_flat": 5.76,
+        "diff": -0.19,
+        "esiti": {
+          "personal": 13,
+          "pari": 6,
+          "flat": 12
+        }
+      }
+    },
+    "per_opera": {
+      "aurora": {
+        "prove": 22,
+        "visitatori": 22,
+        "voto_personal": 5.89,
+        "voto_flat": 5.77,
+        "diff": 0.11,
+        "esiti": {
+          "personal": 11,
+          "pari": 6,
+          "flat": 5
+        }
+      },
+      "judith-with-the-head-of-holofernes": {
+        "prove": 12,
+        "visitatori": 12,
+        "voto_personal": 5.5,
+        "voto_flat": 6.08,
+        "diff": -0.58,
+        "esiti": {
+          "personal": 2,
+          "pari": 1,
+          "flat": 9
+        }
+      },
+      "portrait-of-a-family": {
+        "prove": 10,
+        "visitatori": 10,
+        "voto_personal": 5.8,
+        "voto_flat": 5.75,
+        "diff": 0.05,
+        "esiti": {
+          "personal": 3,
+          "pari": 4,
+          "flat": 3
+        }
+      },
+      "the-dying-cleopatra": {
+        "prove": 15,
+        "visitatori": 15,
+        "voto_personal": 5.57,
+        "voto_flat": 5.53,
+        "diff": 0.03,
+        "esiti": {
+          "personal": 8,
+          "pari": 2,
+          "flat": 5
+        }
+      },
+      "the-girl-with-the-wine-glass": {
+        "prove": 19,
+        "visitatori": 19,
+        "voto_personal": 5.79,
+        "voto_flat": 5.71,
+        "diff": 0.08,
+        "esiti": {
+          "personal": 9,
+          "pari": 6,
+          "flat": 4
+        }
+      }
+    }
+  },
+  "accordo_persona": {
+    "stesso_segno": 32,
+    "prove": 78,
+    "kappa": -0.05,
+    "senza_pari": {
+      "prove": 59,
+      "stesso_segno": 32,
+      "kappa": 0.0
+    },
+    "tabella": {
+      "visitatore_personal": {
+        "gemello_personal": 32,
+        "gemello_pari": 4,
+        "gemello_flat": 0
+      },
+      "visitatore_pari": {
+        "gemello_personal": 11,
+        "gemello_pari": 0,
+        "gemello_flat": 2
+      },
+      "visitatore_flat": {
+        "gemello_personal": 27,
+        "gemello_pari": 2,
+        "gemello_flat": 0
+      }
+    }
+  },
+  "ordine_persona": {
+    "guida1_meno_guida2": -0.22,
+    "ic95": [
+      -0.36,
+      -0.08
+    ],
+    "stesso_segno_nei_due_ordini": 60,
+    "chiamate_pari": 16,
+    "chiamate": 156
+  },
+  "accordo_neutral": {
+    "stesso_segno": 33,
+    "prove": 78,
+    "kappa": 0.1,
+    "senza_pari": {
+      "prove": 50,
+      "stesso_segno": 29,
+      "kappa": 0.15
+    },
+    "tabella": {
+      "visitatore_personal": {
+        "gemello_personal": 17,
+        "gemello_pari": 8,
+        "gemello_flat": 11
+      },
+      "visitatore_pari": {
+        "gemello_personal": 6,
+        "gemello_pari": 4,
+        "gemello_flat": 3
+      },
+      "visitatore_flat": {
+        "gemello_personal": 10,
+        "gemello_pari": 7,
+        "gemello_flat": 12
+      }
+    }
+  },
+  "ordine_neutral": {
+    "guida1_meno_guida2": -0.42,
+    "ic95": [
+      -0.52,
+      -0.34
+    ],
+    "stesso_segno_nei_due_ordini": 31,
+    "chiamate_pari": 37,
+    "chiamate": 156
+  },
+  "persona_meno_neutral": {
+    "diff": 1.22,
+    "ic95": [
+      0.88,
+      1.61
+    ]
+  },
+  "temi": {
+    "visitatori": {
+      "scelta_facile": {
+        "visitatori": 12,
+        "per_guida": {}
+      },
+      "piu_informazioni": {
+        "visitatori": 11,
+        "per_guida": {
+          "flat+": 1,
+          "personal+": 8,
+          "personal-": 2
+        }
+      },
+      "vicino_al_quadro": {
+        "visitatori": 10,
+        "per_guida": {
+          "flat+": 3,
+          "flat-": 1,
+          "personal+": 3,
+          "personal-": 3
+        }
+      },
+      "unire": {
+        "visitatori": 8,
+        "per_guida": {}
+      },
+      "emozioni": {
+        "visitatori": 6,
+        "per_guida": {
+          "personal+": 1,
+          "personal-": 1
+        }
+      },
+      "voce_accento": {
+        "visitatori": 5,
+        "per_guida": {}
+      },
+      "voce_ritmo": {
+        "visitatori": 5,
+        "per_guida": {
+          "flat-": 2
+        }
+      },
+      "goethe": {
+        "visitatori": 5,
+        "per_guida": {
+          "flat+": 1,
+          "flat-": 4
+        }
+      },
+      "racconto": {
+        "visitatori": 4,
+        "per_guida": {
+          "flat+": 4
+        }
+      },
+      "interpretazione_imposta": {
+        "visitatori": 4,
+        "per_guida": {
+          "flat-": 2,
+          "personal+": 1
+        }
+      },
+      "generale_poi_dettaglio": {
+        "visitatori": 3,
+        "per_guida": {
+          "personal+": 1
+        }
+      },
+      "domande": {
+        "visitatori": 3,
+        "per_guida": {
+          "flat-": 1,
+          "personal+": 1,
+          "personal-": 1
+        }
+      },
+      "guide_simili": {
+        "visitatori": 3,
+        "per_guida": {}
+      },
+      "riferimenti_assenti": {
+        "visitatori": 3,
+        "per_guida": {
+          "personal-": 2
+        }
+      },
+      "scelta_difficile": {
+        "visitatori": 2,
+        "per_guida": {}
+      }
+    },
+    "gemello_persona": {
+      "adatta_a_me": {
+        "visitatori": 78,
+        "per_guida": {
+          "flat+": 12,
+          "flat-": 7,
+          "personal+": 73
+        },
+        "commenti": 78
+      },
+      "piu_informazioni": {
+        "visitatori": 67,
+        "per_guida": {
+          "flat+": 22,
+          "flat-": 6,
+          "personal+": 13
+        },
+        "commenti": 67
+      },
+      "domande": {
+        "visitatori": 48,
+        "per_guida": {
+          "flat+": 4,
+          "personal+": 44
+        },
+        "commenti": 48
+      },
+      "racconto": {
+        "visitatori": 24,
+        "per_guida": {
+          "flat+": 6,
+          "personal+": 13
+        },
+        "commenti": 24
+      },
+      "emozioni": {
+        "visitatori": 23,
+        "per_guida": {
+          "flat+": 5,
+          "personal+": 16
+        },
+        "commenti": 23
+      },
+      "goethe": {
+        "visitatori": 21,
+        "per_guida": {
+          "flat+": 14
+        },
+        "commenti": 21
+      },
+      "lezione": {
+        "visitatori": 15,
+        "per_guida": {
+          "flat-": 14,
+          "personal-": 1
+        },
+        "commenti": 15
+      },
+      "vicino_al_quadro": {
+        "visitatori": 14,
+        "per_guida": {
+          "flat+": 1,
+          "flat-": 2,
+          "personal+": 11
+        },
+        "commenti": 14
+      },
+      "interpretazione_imposta": {
+        "visitatori": 12,
+        "per_guida": {
+          "flat+": 4,
+          "flat-": 4,
+          "personal+": 6,
+          "personal-": 1
+        },
+        "commenti": 12
+      },
+      "enfasi": {
+        "visitatori": 6,
+        "per_guida": {
+          "personal+": 6
+        },
+        "commenti": 6
+      }
+    },
+    "gemello_neutral": {
+      "piu_informazioni": {
+        "visitatori": 67,
+        "per_guida": {
+          "flat+": 33,
+          "personal+": 8,
+          "personal-": 1
+        },
+        "commenti": 67
+      },
+      "domande": {
+        "visitatori": 41,
+        "per_guida": {
+          "flat+": 6,
+          "personal+": 35
+        },
+        "commenti": 41
+      },
+      "emozioni": {
+        "visitatori": 29,
+        "per_guida": {
+          "flat+": 9,
+          "personal+": 8,
+          "personal-": 9
+        },
+        "commenti": 29
+      },
+      "goethe": {
+        "visitatori": 22,
+        "per_guida": {
+          "flat+": 14
+        },
+        "commenti": 22
+      },
+      "vicino_al_quadro": {
+        "visitatori": 22,
+        "per_guida": {
+          "flat+": 6,
+          "flat-": 2,
+          "personal+": 15,
+          "personal-": 1
+        },
+        "commenti": 22
+      },
+      "racconto": {
+        "visitatori": 21,
+        "per_guida": {
+          "flat+": 7,
+          "personal+": 12
+        },
+        "commenti": 21
+      },
+      "interpretazione_imposta": {
+        "visitatori": 16,
+        "per_guida": {
+          "flat+": 8,
+          "flat-": 1,
+          "personal+": 6,
+          "personal-": 6
+        },
+        "commenti": 16
+      },
+      "lezione": {
+        "visitatori": 12,
+        "per_guida": {
+          "flat-": 8,
+          "personal-": 4
+        },
+        "commenti": 12
+      },
+      "enfasi": {
+        "visitatori": 7,
+        "per_guida": {
+          "personal-": 5
+        },
+        "commenti": 7
+      }
+    }
+  }
+}

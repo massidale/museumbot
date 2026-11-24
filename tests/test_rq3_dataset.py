@@ -89,3 +89,27 @@ def test_build_scambio_inutilizzabili_e_nota_su_sessione_senza_opere():
     assert (by["op"]["final_text_it"], by["op"]["final_note"]) == ("nota", "operatore")
     ma_trial = [t for t in trials if t["session_id"] == "ma"][0]
     assert (ma_trial["oral_file"], ma_trial["oral_note"]) == ("", "ma_1.m4a inutilizzabile: cuffie")
+
+
+def test_build_annotazioni_e_voti_dell_operatore():
+    voice = {"sec": 10, "mime": "audio/mp4", "recorded_at": "x"}
+    saltata = {**_trial(0, "a"), "skipped": True, "ratings": [None, None], "heard_sec": [85, 99]}
+    recs = [_rec("s1", [saltata, _trial(1, "b")], voice={"skipped": True}),
+            _rec("s2", [{**_trial(0, "a"), "skipped": True, "ratings": [None, None]}]),
+            _rec("s3", [_trial(0, "a")], voice=voice)]
+    operator = {"ratings": [{"session_id": "s1", "artwork_id": "a", "ratings": [6, 6],
+                             "note": "saltata per sbaglio"}],
+                "notes": [{"session_id": "s1", "artwork_id": "b", "text_it": "la seconda"},
+                          {"session_id": "s1", "text_it": "in generale"},
+                          {"session_id": "s2", "text_it": "solo a voce"}]}
+    transcripts = {"s3_operatore.m4a": {"file": "s3_operatore.m4a", "text": "x", "text_it": "x"}}
+    extra = {"s3_operatore.m4a": {"file": "s3_operatore.m4a", "session_id": "s3", "operator": True}}
+    trials, sessions, excluded = dataset.build(recs, {}, transcripts, extra, operator=operator)
+    a, b = [t for t in trials if t["session_id"] == "s1"]
+    assert (a["rating_personal"], a["rating_comparison"]) == (6, 6)
+    assert a["note"].startswith("voti riportati dall'operatore") and "saltata per sbaglio" in a["note"]
+    assert (b["oral_text_it"], b["oral_note"], b["note"]) == ("la seconda", dataset.OPERATOR, "")
+    by = {s["session_id"]: s for s in sessions}
+    assert (by["s1"]["final_text_it"], by["s1"]["final_note"]) == ("in generale", dataset.OPERATOR)
+    assert by["s2"]["trials_valid"] == 0 and by["s2"]["final_text_it"] == "solo a voce"
+    assert by["s3"]["final_note"] == dataset.OPERATOR

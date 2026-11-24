@@ -3,7 +3,8 @@ e le trascrizioni delle registrazioni, se ci sono.
 
 Legge tutti gli export online (data/rq3/raw/online_*.json, uniti con collect.merge), le
 esclusioni scritte a mano (data/rq3/exclusions.json), le trascrizioni
-(data/rq3/transcripts.jsonl) e i file registrati fuori dall'app (raw/voice/extra.json).
+(data/rq3/transcripts.jsonl), i file registrati fuori dall'app (raw/voice/extra.json) e le
+annotazioni scritte dall'operatore (data/rq3/operator.json).
 Scrive in data/rq3/clean/ trials.csv, sessions.csv ed excluded.csv (cosa e' stato tolto e
 perche').
 
@@ -17,6 +18,11 @@ scambiati) o su un'opera (artwork_id); senza artwork_id va con le risposte final
 fatte fuori dall'app, note dell'operatore). I file in exclusions.json "voice" sono inutilizzabili:
 restano solo come nota. Una sessione senza opere valide ma con un commento finale resta in
 sessions.csv (trials_valid 0).
+
+Operatore: operator.json ha "notes" (pareri riferiti dai visitatori che non volevano essere
+registrati, scritti in italiano: vanno in oral_text_it o final_text_it) e "ratings" (voti di
+un'opera saltata per sbaglio, riportati dall'operatore). Queste note e i file di extra.json con
+"operator": true portano la nota OPERATOR.
 """
 import argparse
 import csv
@@ -34,11 +40,12 @@ TRIAL_COLS = ["session_id", "day", "device", "lang", "categories", "n_categories
               "artwork_id", "personal", "comparison", "personal_guide", "rating_personal",
               "rating_comparison", "diff", "heard_personal", "heard_comparison",
               "plays_personal", "plays_comparison", "comment", "oral_file", "oral_text",
-              "oral_text_it", "oral_note"]
+              "oral_text_it", "oral_note", "note"]
 SESSION_COLS = ["session_id", "day", "started_at", "device", "lang", "categories",
                 "category_fit", "trials_valid", "trials_total", "completed", "voice",
                 "final_file", "final_text", "final_text_it", "final_note"]
 EXCLUDED_COLS = ["session_id", "artwork_id", "reason"]
+OPERATOR = "annotazione dell'operatore, tradotta dall'inglese: da non citare letteralmente"
 
 
 def trial_problem(t: dict) -> str | None:
@@ -77,6 +84,7 @@ def trial_row(rec: dict, t: dict, oral: dict | None = None) -> dict:
         "comment": (t.get("why") or "").strip(),
         "oral_file": oral.get("file", ""), "oral_text": oral.get("text", ""),
         "oral_text_it": oral.get("text_it", ""), "oral_note": oral.get("note", ""),
+        "note": t.get("note", ""),
     }
 
 
@@ -123,27 +131,45 @@ def combine(parts: list[dict]) -> dict:
             "text_it": join("text_it", "\n\n"), "note": join("note", "; ")}
 
 
-def gather(transcripts: dict[str, dict], extra: dict[str, dict],
-           unusable: dict[str, str]) -> dict[tuple, list[dict]]:
-    """Registrazioni per posto. Un file inutilizzabile porta solo la nota."""
+def _notes(*xs: str) -> str:
+    return "; ".join(x for x in xs if x)
+
+
+def gather(transcripts: dict[str, dict], extra: dict[str, dict], unusable: dict[str, str],
+           notes: list[dict] = ()) -> dict[tuple, list[dict]]:
+    """Registrazioni e note scritte dell'operatore per posto. Un file inutilizzabile porta solo
+    la nota."""
     slots: dict[tuple, list[dict]] = {}
     for f in sorted(set(transcripts) | set(unusable)):
         if f in unusable:
             part = {"note": f"{f} inutilizzabile: {unusable[f]}"}
         else:
-            r = transcripts[f]
-            note = "; ".join(x for x in [extra.get(f, {}).get("source", ""), r.get("note", "")] if x)
+            r, e = transcripts[f], extra.get(f, {})
+            note = _notes(OPERATOR if e.get("operator") else "", e.get("source", ""), r.get("note", ""))
             part = {"file": f, "text": r.get("text", ""), "text_it": r.get("text_it", ""), "note": note}
         slots.setdefault(slot_of(f, extra), []).append(part)
+    for n in notes:
+        part = {"text_it": n["text_it"], "note": _notes(OPERATOR, n.get("note", ""))}
+        slots.setdefault((n["session_id"], n.get("artwork_id")), []).append(part)
     return slots
 
 
+def fix_ratings(t: dict, fix: dict | None) -> dict:
+    """Opera con i voti riportati dall'operatore (saltata per sbaglio col tasto)."""
+    if not fix:
+        return t
+    return {**t, "ratings": list(fix["ratings"]), "skipped": False,
+            "note": _notes("voti riportati dall'operatore", fix.get("note", ""))}
+
+
 def build(records: list[dict], exclusions: dict[str, str], transcripts: dict[str, dict],
-          extra: dict[str, dict], unusable: dict[str, str] | None = None
-          ) -> tuple[list[dict], list[dict], list[dict]]:
+          extra: dict[str, dict], unusable: dict[str, str] | None = None,
+          operator: dict | None = None) -> tuple[list[dict], list[dict], list[dict]]:
     """(opere, sessioni, escluse). transcripts, extra e unusable sono indicizzati per nome del
-    file."""
-    slots = gather(transcripts, extra, unusable or {})
+    file; operator e' il contenuto di operator.json."""
+    operator = operator or {}
+    slots = gather(transcripts, extra, unusable or {}, operator.get("notes", []))
+    fixes = {(f["session_id"], f["artwork_id"]): f for f in operator.get("ratings", [])}
     trials, sessions, excluded = [], [], []
     for rec in records:
         sid = rec["session_id"]
@@ -152,6 +178,7 @@ def build(records: list[dict], exclusions: dict[str, str], transcripts: dict[str
             continue
         valid = []
         for t in rec.get("trials") or []:
+            t = fix_ratings(t, fixes.get((sid, t["artwork_id"])))
             why = trial_problem(t)
             if why:
                 excluded.append({"session_id": sid, "artwork_id": t["artwork_id"], "reason": why})
@@ -160,7 +187,7 @@ def build(records: list[dict], exclusions: dict[str, str], transcripts: dict[str
                 valid.append(trial_row(rec, t, combine(said) if said else None))
         final = combine(slots[(sid, None)]) if (sid, None) in slots else None
         if not valid:
-            if final and final["text"]:
+            if final and (final["text"] or final["text_it"]):
                 excluded.append({"session_id": sid, "artwork_id": "",
                                  "reason": "nessuna opera valida (resta il commento finale)"})
                 sessions.append(session_row(rec, 0, final))
@@ -206,13 +233,15 @@ def main():
     ap.add_argument("--exclusions", type=Path, default=RQ3 / "exclusions.json")
     ap.add_argument("--transcripts", type=Path, default=RQ3 / "transcripts.jsonl")
     ap.add_argument("--extra", type=Path, default=RAW / "voice" / "extra.json")
+    ap.add_argument("--operator", type=Path, default=RQ3 / "operator.json")
     ap.add_argument("--out", type=Path, default=OUT)
     args = ap.parse_args()
     files = args.exports or sorted(RAW.glob("online_*.json"))
     excl = load_json(args.exclusions, {})
     extra = {e["file"]: e for e in load_json(args.extra, [])}
     trials, sessions, excluded = build(load_records(files), excl.get("sessions", {}),
-                                       load_jsonl(args.transcripts), extra, excl.get("voice", {}))
+                                       load_jsonl(args.transcripts), extra, excl.get("voice", {}),
+                                       load_json(args.operator, {}))
     args.out.mkdir(parents=True, exist_ok=True)
     write_csv(args.out / "trials.csv", trials, TRIAL_COLS)
     write_csv(args.out / "sessions.csv", sessions, SESSION_COLS)

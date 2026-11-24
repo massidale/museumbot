@@ -1276,3 +1276,101 @@ le correzioni sono tutte in file scritti a mano, così si rifanno.
 **Effetto.** Persi i commenti per opera di 4 sessioni (8 registrazioni) e 4 registrazioni
 finali; di queste, 2 sostituite dal recupero. I voti non sono toccati. Dataset delle due
 giornate: 25 sessioni e 52 opere.
+
+## 2026-11-22 — RQ3: terza giornata, persona tornata, voti recuperati e annotazioni dell'operatore
+
+**Decisione.** `zaba33` e `hf9n4p` sono escluse: sono la stessa persona di `tfhvt3`, tornata
+per le altre opere, e le categorie scelte sono diverse in tutte e tre le sessioni (regola
+dell'operatore: categorie diverse, sessione invalidata). Aurora di `u5oi3e`, saltata per
+sbaglio col tasto dopo averla ascoltata, rientra con i voti 6 / 6 annotati dall'operatore
+(`data/rq3/operator.json`). Le annotazioni scritte dell'operatore (`kp8igf`, `r56v63`) e i suoi
+riassunti a voce del 21 novembre portano la nota "annotazione dell'operatore, tradotta
+dall'inglese: da non citare letteralmente".
+
+**Motivo.** Note dell'operatore sulla giornata. La stessa persona è riconoscibile dalle
+trascrizioni ("di nuovo" e la stessa obiezione alla domanda).
+
+**Effetto.** Dataset pulito: 36 sessioni e 77 opere. Il commento a voce su Aurora di `u5oi3e`
+non si recupera (il tasto "salta" scarta la registrazione non salvata).
+
+## 2026-11-22 — RQ3: voti di Aurora di `zk9nrd` riportati dall'operatore
+
+**Decisione.** Aurora di `zk9nrd` (21 novembre, iPad) rientra nel dataset con i voti 6 / 4
+(personalizzata / flat) riportati dall'operatore in `data/rq3/operator.json`.
+
+**Motivo.** L'opera è stata saltata col tasto alle 16:05:15, un secondo prima della fine di
+`tyetwa`, mentre madre e figlia si scambiavano i dispositivi; era stata ascoltata (99,6 s la
+personalizzata, 39,4 s il flat). L'app tiene i voti solo sullo schermo fino ad "Avanti", e
+"Salta" li cancella: nei dati non restano.
+
+**Effetto.** Dataset pulito: 36 sessioni e 78 opere. `zk9nrd` non è più una sessione senza opere
+valide.
+
+## 2026-11-23 — RQ3: analisi esplorativa e opera del commento di `kp8igf`
+
+**Decisione.** Analisi esplorativa delle giornate del 20–22 novembre, con le giornate e le
+versioni dell'app unite (`rq3_visitors/summary.py`, `docs/analisi/rq3-esplorativa.md`). I
+commenti sono codificati a mano per tema in `data/rq3/temi.json`, già tradotti da "prima /
+seconda guida" a personalizzata / `flat`; un tema è "di massa" se lo citano almeno 4
+visitatori diversi. Le voci Wikipedia e i testi del museo sono classificati frase per frase
+(ciò che si vede, storia, interpretazione, artista e contesto, collocazione e fortuna) in
+`data/wiki/haum_codifica.jsonl`. Il commento scritto dall'operatore per `kp8igf` senza opera
+riguarda la Ragazza col bicchiere di vino (indicato dall'operatore).
+
+**Motivo.** Leggere voti e commenti insieme prima dell'analisi prevista, e capire da dove
+vengono le differenze fra opere.
+
+**Effetto.** Nessun cambiamento ai voti (36 sessioni, 78 opere). La soglia "di massa" e i temi
+sono fissati dopo aver letto i commenti: le ipotesi che ne escono sono esplorative. Il commento
+di `kp8igf` passa dalle risposte finali alla Ragazza.
+
+
+## 2026-11-23 — RQ3: disegno del gemello LLM, fissato prima delle risposte
+
+**Decisione.** Il gemello LLM giudica le stesse coppie dei visitatori (`data/rq3/clean/trials.csv`)
+con il giudice di RQ2 (GLM-5.3 su Ollama Cloud, temperatura 0, ragionamento `low`), in
+`rq3_visitors/twin.py`, uscita `data/rq3/twin.jsonl`.
+
+- **Persona:** sa del visitatore solo quello che ha saputo l'app: la descrizione o le due
+  descrizioni in prima persona che ha scelto (testo di `rq3_app/texts.json`, nell'ordine in cui
+  le ha scelte) e quanto ciascuna lo descrive (1–7). Niente nome della categoria né definizione
+  di Falk.
+- **Coppia:** titolo e artista, la guida personalizzata (testo di Gemma) e il testo del museo
+  accorciato, chiamate "Guide 1" e "Guide 2"; tutto il prompt è nella lingua della sessione
+  (testi `text_de` e `text_short_de` per le sessioni in tedesco), con le frasi dell'app.
+- **Domande:** prima la domanda per opera dell'app ("Did the two guides for this painting feel
+  different to you? How? Which one do you think suits you better?"), poi il voto 1–7 di ciascuna
+  guida, pareggi ammessi; risposta in JSON (`comment`, `guide1`, `guide2`).
+- **Ordini:** l'ordine sentito dal visitatore e quello inverso; si usa la media dei due.
+- **Controllo:** le stesse chiamate con il giudice senza persona ("You are visiting an art
+  museum.").
+- **Una chiamata per opera**, senza memoria delle opere precedenti. Il gemello legge i testi e
+  non vede il quadro.
+- **Confronti (esplorativi):** differenza personalizzata − museo per opera e per puri / misti,
+  segno coppia per coppia contro quello del visitatore, quota di pareggi, e i commenti del
+  gemello codificati con i temi di `data/rq3/temi.json`.
+- **Pilota:** 5 prove (20 chiamate) per controllare JSON e lingua prima del giro intero (78
+  prove, 312 chiamate).
+
+**Motivo.** Il confronto fra giudice e visitatori di RQ2 e RQ3 è su stimoli diversi (testi,
+riferimento, persona); sulle stesse coppie si può dire quanto della distanza viene dal giudice.
+La persona fatta delle descrizioni dell'app toglie le parole del blocco di categoria, che in RQ2
+erano anche nei testi.
+
+**Effetto.** Nessuno sui dati dei visitatori. Il disegno è fissato prima di vedere le risposte
+del gemello.
+
+## 2026-11-24 — RQ3: codifica tematica dei commenti del gemello LLM
+
+**Decisione.** Si codificano i commenti del gemello nell'ordine sentito dal visitatore, con e
+senza persona (156 commenti), in `data/rq3/temi_gemello.json`: stessi campi di `temi.json`
+(guida tradotta in personal/flat con `personal_guide`, segno +1/−1/null). Si usano i temi dei
+visitatori che valgono per un lettore di testi (non voce, scelta delle categorie) e tre temi
+nuovi trovati leggendo i commenti: `adatta_a_me`, `lezione`, `enfasi`. Codifica fatta da
+Claude in una lettura, da rileggere. `twin_summary.py` conta i temi per commento, quelli dei
+visitatori per visitatore.
+
+**Motivo.** L'ordine inverso ripete gli stessi contenuti; i temi nuovi servono perché il
+gemello motiva le scelte con la persona, cosa che i visitatori non fanno.
+
+**Effetto.** Nuova sezione `temi` in `results/rq3_twin.json`; nessun effetto sui voti.

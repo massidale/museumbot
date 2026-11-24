@@ -5,7 +5,7 @@ Per ogni opera di --pages: un testo puro per categoria di Falk (5), con --flat a
 e un testo misto a alpha = 0.5 per ogni coppia di categorie (10). Puri come `vllm_gen`, misti come
 `vllm_mix` (miscela classica, nessun ingresso ne' debito della minoranza); pulizia, filtro e
 rigenerazione come gli altri corpus. Tutte le righe hanno variant "wiki"; i misti hanno
-`pair` e `alpha`. Report: docs/report-pagina-intera.md.
+`pair` e `alpha`.
 
 Uso (su Kaggle):
     python -m museumbot.generation.vllm_wiki --out /kaggle/working/wiki.jsonl

@@ -397,7 +397,7 @@ def main() -> None:
         print(f"    tetto (cos fra steering vector di run dello stesso prompt, {n_pairs} coppie):")
         print("      " + "  ".join(f"{LABELS[c]} {ceil[i]:.3f}" for i, c in enumerate(FALK_CATEGORIES)))
 
-    # --- figure: solo quelle citate nei report e nella tesi (Qwen3) ---
+    # --- figure: solo Qwen3 ---
     if args.model == "qwen":
         fig_pca(Xc, FIGS / f"pca_{tag}.png")
         fig_cosine(M, FIGS / f"cosine_{tag}.png")

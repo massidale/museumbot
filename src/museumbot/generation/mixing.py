@@ -17,13 +17,12 @@ Ingresso della minoranza (facoltativo, due esperti): a ogni passo, con probabili
 token lo sceglie da solo l'esperto a peso minore, altrimenti la miscela. q = `minority_q`
 fa vincere alla minoranza la sua quota m alla distanza d* fra i due esperti. Con il veto
 la minoranza sceglie solo fra i suoi token che sono anche fra le prime K della maggioranza
-(rinormalizzati); se non ce n'e' nessuno il passo lo fa la miscela. Spec:
-docs/plans/2026-11-04-ingresso-minoranza-design.md.
+(rinormalizzati); se non ce n'e' nessuno il passo lo fa la miscela.
 
 Debito della minoranza (facoltativo, due esperti, in alternativa all'ingresso): un passo e'
 conteso se il token scelto ha |log p_min - log p_mag| >= CONTEST; a ogni contesa il debito
 cresce di m e cala di 1 se vince la minoranza; il peso della minoranza nel passo dopo e'
-min(m + k max(debito, 0), 0.5). Spec: docs/plans/2026-11-05-debito-minoranza-design.md.
+min(m + k max(debito, 0), 0.5).
 """
 
 import math

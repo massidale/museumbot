@@ -1,4 +1,4 @@
-"""Analisi dei giudizi di RQ2 (criteri e misure fissati in docs/plans/2026-10-01-rq2-giudice-design.md).
+"""Analisi dei giudizi di RQ2 (criteri e misure fissati prima dei giudizi).
 
 Punteggio di una coppia: media dei due ordini di `chose_target` (1, 0.5 o 0), che
 neutralizza il bias di posizione. Le coppie con un ordine non valido sono escluse.

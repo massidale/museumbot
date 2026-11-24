@@ -249,7 +249,7 @@ def pct_messages(
     return msgs
 
 
-# Prova "pagina intera" (docs/report-pagina-intera.md): la fonte e' tutta la voce Wikipedia e
+# Prova "pagina intera": la fonte e' tutta la voce Wikipedia e
 # il prompt dice su quali aspetti concentrarsi per categoria. Il system prompt e' uguale per
 # tutte le categorie; blocco di categoria e indicazione stanno in coda al messaggio utente,
 # dopo la voce, cosi' i due esperti di un testo misto condividono il prefisso (voce compresa)

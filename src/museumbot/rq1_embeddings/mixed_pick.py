@@ -4,7 +4,7 @@ Per coppia e alpha (0.25, 0.75) ogni testo misto si centra sul flat della sua op
 d = e - e[flat]; distanza coseno di d dalla media dei d della coppia. Si fa la media dei
 ranghi sui due alpha e sui due modelli di embedding; per coppia le N opere col rango medio
 piu' basso. La prova a un'opera usa l'opera col rango medio piu' basso sulle tre coppie.
-Scrive data/local/mixq_pilot.json. Spec: docs/plans/2026-11-04-ingresso-minoranza-design.md.
+Scrive data/local/mixq_pilot.json.
 """
 
 import argparse

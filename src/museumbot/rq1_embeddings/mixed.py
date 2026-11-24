@@ -9,7 +9,7 @@ corpus `local` (tutte le opere):
 
 Verifica del metodo (alpha = 0 e 1, un solo esperto): lo steering vector dei testi passo per
 passo contro quello dei testi puri sulle stesse opere, diviso per il tetto full/full_rep
-sulle stesse opere. Criteri nella spec docs/plans/2026-10-06-profilo-continuo-design.md.
+sulle stesse opere.
 Curva per coppia: alpha interni dai testi misti, vertici (alpha = 0 e 1) dai testi puri del
 corpus `local` su tutte le opere; i vertici passo per passo del pilota servono solo alla
 verifica. Due metodi (--method): `mix` (miscela dei logit, data/local/mixed.jsonl) e `pct`
@@ -146,7 +146,7 @@ def run(alias: str, method: str = "mix") -> dict:
                                         "spearman_alpha_position": round(float(rho), 3),
                                         "method_check_ratio": checks}
         if method == "mix" and alias == "qwen":  # figure citate: solo Qwen3
-            # etichetta dell'asse y solo sul primo pannello della figura in tesi
+            # etichetta dell'asse y solo sul primo pannello
             plot(alias, pair, al_all, pos, ylabel=pair[0] == "recharger")
     return out
 

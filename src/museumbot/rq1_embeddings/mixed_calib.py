@@ -7,8 +7,7 @@ puro di Y (replica `full_rep` del corpus `local`, tagli a fine frase) in proporz
 collocano sul segmento fra v_X e v_Y come in mixed.py (steering vector da `full`, centratura
 sul flat dell'opera). La curva per alpha e' il riferimento con cui leggere quella dei testi
 misti: per ogni alpha dei misti, la quota equivalente e' la quota di Y dei testi incollati
-che cade nella stessa posizione mediana. Spec:
-docs/plans/2026-11-03-taratura-segmento-design.md. Scrive results/mixed_calib_<modello>.json.
+che cade nella stessa posizione mediana. Scrive results/mixed_calib_<modello>.json.
 """
 
 import argparse

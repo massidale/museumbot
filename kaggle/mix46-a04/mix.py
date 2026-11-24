@@ -1,6 +1,6 @@
 """Kaggle (2x T4): giro completo della miscela classica a alpha 0.4, tre coppie, 100 opere
 (seed come i misti). Parte da data/local/mixed_46.jsonl del repo (pilota a 10 opere per
-coppia) e salta i testi gia' presenti. Spec: docs/plans/2026-11-09-miscela-alpha-tarata-corpus.md.
+coppia) e salta i testi gia' presenti.
 Output: /kaggle/working/mixed_46.jsonl."""
 
 import os

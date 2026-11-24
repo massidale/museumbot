@@ -3,8 +3,7 @@
 I testi di data/local/mixed_46.jsonl (alpha 0.4 e 0.6, 100 opere per coppia) si confrontano con
 i misti a 0.25 e 0.75 di data/local/mixed.jsonl sulle stesse opere. Ogni testo si colloca sul
 segmento come in mixed.py e si legge sulla curva `alt` della taratura (mixed_calib.py, vertici
-compresi): obiettivo 0.25 per alpha 0.25 e 0.4, 0.75 per alpha 0.75 e 0.6. Misure (spec
-docs/plans/2026-11-09-miscela-alpha-tarata-corpus.md):
+compresi): obiettivo 0.25 per alpha 0.25 e 0.4, 0.75 per alpha 0.75 e 0.6. Misure:
 
 - quota equivalente della posizione mediana, per coppia e alpha; vince l'alpha piu' vicina
   all'obiettivo, una quota fuori dalla curva perde;

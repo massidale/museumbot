@@ -1,7 +1,7 @@
 """Kaggle (2x T4): pilota della miscela classica a alpha 0.4 e 0.6, tre coppie, seed come i
 misti. SMOKE = True: una sola opera (`smoke` di
 data/local/mixq_pilot.json) per le tre coppie, 6 testi; False: le 10 opere per coppia.
-Spec: docs/plans/2026-11-06-miscela-alpha-inversa-design.md. Output: /kaggle/working/mixed_46.jsonl."""
+Output: /kaggle/working/mixed_46.jsonl."""
 
 import json
 import os

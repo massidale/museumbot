@@ -1,7 +1,7 @@
 """Kaggle (2x T4): pilota della miscela con debito della minoranza (--debt 0.25), tre
 coppie, alpha 0.25 e 0.75, stessi seed dei misti. SMOKE = True: una sola opera (`smoke` di
 data/local/mixq_pilot.json) per le tre coppie, 6 testi; False: le 10 opere per coppia.
-Spec: docs/plans/2026-11-05-debito-minoranza-design.md. Output: /kaggle/working/mixed_d.jsonl."""
+Output: /kaggle/working/mixed_d.jsonl."""
 
 import json
 import os

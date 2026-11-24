@@ -1,6 +1,6 @@
 """Generazione con un modello aperto in locale (MLX), con miscela di categorie.
 
-Parte 2 del progetto (docs/plans/2026-10-06-profilo-continuo-design.md). Il ciclo di
+Parte 2 del progetto. Il ciclo di
 decoding e' scritto a mano perche' serve l'accesso alle distribuzioni sul prossimo token:
 
     per ogni esperto k (un system prompt di categoria) con peso w_k > 0:

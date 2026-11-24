@@ -8,9 +8,8 @@ rigenerazione come i testi puri (`vllm_gen.generate_rows`). Ogni riga salva la d
 per token (log-probabilita' per esperto, copertura, divergenza).
 
 Con --dstar la miscela ha l'ingresso della minoranza (`mixing.minority_q`, variante `mixq`;
-con --veto anche il veto della maggioranza, variante `mixqv`; spec
-docs/plans/2026-11-04-ingresso-minoranza-design.md); con --debt il debito della minoranza
-(`mixing.debt_weight`, variante `mixd`, spec docs/plans/2026-11-05-debito-minoranza-design.md);
+con --veto anche il veto della maggioranza, variante `mixqv`); con --debt il debito della
+minoranza (`mixing.debt_weight`, variante `mixd`);
 --ids limita le opere per coppia.
 
 Uso (su Kaggle, dopo il clone del repo):

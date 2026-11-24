@@ -8,7 +8,6 @@ chiamati Guida 1 e Guida 2. Risponde con la domanda a voce dell'app e un voto 1-
 Due ordini per prova: `visitor` (quello che ha avuto il visitatore) e `reversed`. Due modi:
 `persona` e `neutral` (senza descrizioni, controllo). Una chiamata per opera, senza memoria.
 Scrive data/rq3/twin.jsonl in append-only con chiave (session_id, artwork_id, mode, order).
-Disegno in docs/decisioni.md (2026-11-23).
 """
 import argparse
 import csv

@@ -3,7 +3,7 @@
 Legge data/rq3/clean/trials.csv, la codifica tematica dei commenti (data/rq3/temi.json), la
 codifica frase per frase delle voci Wikipedia e dei testi del museo
 (data/wiki/haum_codifica.jsonl) e i testi generati (domande per condizione).
-Scrive results/rq3_summary.json; il testo e' in docs/analisi/rq3-esplorativa.md.
+Scrive results/rq3_summary.json.
 
 diff = voto della personalizzata - voto del flat. Intervalli al 95% con bootstrap sui
 visitatori (le opere di uno stesso visitatore restano insieme).

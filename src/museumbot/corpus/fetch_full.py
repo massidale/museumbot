@@ -1,6 +1,6 @@
 """Voce Wikipedia intera (testo semplice) per alcune opere del corpus.
 
-Prova "pagina intera" (docs/report-pagina-intera.md): al posto dell'intro troncata di
+Prova "pagina intera": al posto dell'intro troncata di
 `fetch_artworks.py` il prompt riceve tutta la voce inglese, senza le sezioni finali di
 servizio (note, bibliografia, collegamenti) e senza le sezioni rimaste vuote.
 
